@@ -842,6 +842,7 @@ function subscribeToGamesStatus() {
 }
 
 // Presence
+// Presence
 async function setupPresence() {
     let sessionId = sessionStorage.getItem('userPresenceId');
     
@@ -852,27 +853,43 @@ async function setupPresence() {
     
     userPresenceId = sessionId;
     
+    // ✅ Vyčistit starou presence
     const cleanupTime = new Date();
-    cleanupTime.setSeconds(cleanupTime.getSeconds() - 10);
+    cleanupTime.setSeconds(cleanupTime.getSeconds() - 30);
     
     await supabase
         .from('presence')
         .delete()
         .lt('timestamp', cleanupTime.toISOString());
     
-    await db.setPresence(userPresenceId);
+    // ✅ Nastavit presence
+    await supabase
+        .from('presence')
+        .upsert({
+            id: userPresenceId,
+            timestamp: new Date().toISOString()
+        });
     
+    // ✅ Odstranit při odchodu
     window.addEventListener('beforeunload', async () => {
-        await db.removePresence(userPresenceId);
+        await supabase
+            .from('presence')
+            .delete()
+            .eq('id', userPresenceId);
     });
     
+    // ✅ Heartbeat každých 5 sekund
     setInterval(async () => {
         if (userPresenceId) {
-            await db.setPresence(userPresenceId);
+            await supabase
+                .from('presence')
+                .upsert({
+                    id: userPresenceId,
+                    timestamp: new Date().toISOString()
+                });
         }
     }, 5000);
 }
-
 async function watchOnlineUsers() {
     async function updateCount() {
         const { count } = await db.getOnlineCount();
@@ -1088,4 +1105,5 @@ window.addEventListener('DOMContentLoaded', async function() {
 
 </body>
 </html>
+
 
