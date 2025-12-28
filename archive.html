@@ -767,16 +767,33 @@ function getOrCreatePresenceId() {
 }
 
 async function setupPresence() {
-    userPresenceId = getOrCreatePresenceId();
+    // NEJDŘÍV vyčisti staré záznamy (starší než 1 minuta)
+    const oneMinuteAgo = new Date();
+    oneMinuteAgo.setMinutes(oneMinuteAgo.getMinutes() - 1);
+    
+    await supabase
+        .from('presence')
+        .delete()
+        .lt('timestamp', oneMinuteAgo.toISOString());
+    
+    // Použít JEDNO ID pro celou session
+    let storedId = localStorage.getItem('userPresenceId');
+    
+    if (!storedId) {
+        storedId = 'user_' + Math.random().toString(36).substr(2, 9);
+        localStorage.setItem('userPresenceId', storedId);
+    }
+    
+    userPresenceId = storedId;
+    
+    // Smazat starý záznam (pokud existuje) a vytvořit nový
+    await db.removePresence(userPresenceId);
     await db.setPresence(userPresenceId);
     
+    // Odstranit při zavření okna
     window.addEventListener('beforeunload', async () => {
-        if (userPresenceId) await db.removePresence(userPresenceId);
+        await db.removePresence(userPresenceId);
     });
-    
-    setInterval(async () => {
-        if (userPresenceId) await db.setPresence(userPresenceId);
-    }, 25000);
 }
 
 async function watchOnlineUsers() {
@@ -1189,3 +1206,4 @@ window.addEventListener('DOMContentLoaded', function() {
 
 </body>
 </html>
+
