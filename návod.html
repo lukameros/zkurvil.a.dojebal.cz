@@ -601,15 +601,25 @@ tbody tr:hover {
 </div>
 
 <script>
-function goBack() { window.location.href = "index.html"; }
-function showLogin() { document.getElementById("loginModal").style.display = "flex"; }
-function closeLogin() { document.getElementById("loginModal").style.display = "none"; }
-function showRegister() { document.getElementById("registerModal").style.display = "flex"; }
-function closeRegister() { document.getElementById("registerModal").style.display = "none"; }
-function toggleChat() {
+// Globální funkce pro UI
+window.goBack = function() { window.location.href = "index.html"; }
+window.showLogin = function() { document.getElementById("loginModal").style.display = "flex"; }
+window.closeLogin = function() { document.getElementById("loginModal").style.display = "none"; }
+window.showRegister = function() { document.getElementById("registerModal").style.display = "flex"; }
+window.closeRegister = function() { document.getElementById("registerModal").style.display = "none"; }
+window.toggleChat = function() {
     const chatPanel = document.getElementById('chatPanel');
     chatPanel.style.display = chatPanel.style.display === 'flex' ? 'none' : 'flex';
 }
+
+// Placeholder funkce (budou přepsány v module script)
+window.sendMessage = function() { console.log('Loading...'); }
+window.addItem = function() { console.log('Loading...'); }
+window.deleteNavod = function() { console.log('Loading...'); }
+window.showAddItemForm = function() { console.log('Loading...'); }
+window.register = function() { console.log('Loading...'); }
+window.login = function() { console.log('Loading...'); }
+window.logout = function() { console.log('Loading...'); }
 </script>
 
 <script type="module">
