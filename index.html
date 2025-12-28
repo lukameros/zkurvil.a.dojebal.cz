@@ -528,11 +528,26 @@ body {
 </div>
 
 <script>
-function goGuide() { window.location.href = "návod.html"; }
-function goArchive() { window.location.href = "archive.html"; }
-function goGames() { window.location.href = "hry.html"; }
-function goAirsoftAction() { window.location.href = "https://www.airsoftbattles.cz/"; }
-function goTools() { window.location.href = "nastroje.html"; }
+// Navigační funkce
+function goGuide() {
+    window.location.href = "návod.html";
+}
+
+function goArchive() {
+    window.location.href = "archive.html";
+}
+
+function goGames() {
+    window.location.href = "hry.html";
+}
+
+function goTools() {
+    window.location.href = "nastroje.html"; // Vytvoř tuto stránku
+}
+
+function goAirsoftAction() {
+    window.location.href = "https://www.airsoftbattles.cz/";
+}
 
 function showLogin() {
     document.getElementById("loginModal").style.display = "flex";
@@ -552,11 +567,16 @@ function closeRegister() {
 
 function toggleChat() {
     const chatPanel = document.getElementById('chatPanel');
-    chatPanel.style.display = chatPanel.style.display === 'flex' ? 'none' : 'flex';
+    if (chatPanel.style.display === 'none' || !chatPanel.style.display) {
+        chatPanel.style.display = 'flex';
+    } else {
+        chatPanel.style.display = 'none';
+    }
 }
 
 function openAdminPanel() {
     document.getElementById('adminPanel').style.display = 'block';
+    loadAdminStats();
 }
 
 function closeAdminPanel() {
@@ -568,75 +588,149 @@ function closeAdminPanel() {
 import { supabase, db } from './supabase-config.js';
 
 let currentUser = null;
+let currentUserId = null;
 let isAdmin = false;
 let userPresenceId = null;
 
-// Presence
-function getOrCreatePresenceId() {
+// Online presence
+async function setupPresence() {
+    // Použít persistentní ID z localStorage nebo vytvořit nové
     let storedId = localStorage.getItem('userPresenceId');
+    
     if (!storedId) {
         storedId = 'user_' + Math.random().toString(36).substr(2, 9) + '_' + Date.now();
         localStorage.setItem('userPresenceId', storedId);
     }
-    return storedId;
-}
-
-async function setupPresence() {
-    userPresenceId = getOrCreatePresenceId();
+    
+    userPresenceId = storedId;
     await db.setPresence(userPresenceId);
     
+    // Odstranit při zavření okna (ne při reloadu)
     window.addEventListener('beforeunload', async () => {
-        if (userPresenceId) await db.removePresence(userPresenceId);
+        await db.removePresence(userPresenceId);
+        localStorage.removeItem('userPresenceId'); // Vyčistit při odchodu
     });
-    
-    setInterval(async () => {
-        if (userPresenceId) await db.setPresence(userPresenceId);
-    }, 25000);
-    
-    await cleanOldPresence();
-    setInterval(async () => await cleanOldPresence(), 60000);
 }
 
-async function cleanOldPresence() {
-    try {
-        const cutoffTime = new Date(Date.now() - 60000).toISOString();
-        await supabase.from('presence').delete().lt('timestamp', cutoffTime);
-    } catch (error) {
-        console.error('Chyba při čištění presence:', error);
-    }
-}
-
-window.clearOldPresence = async function() {
-    if (!isAdmin) { alert('Nemáte admin práva!'); return; }
-    await cleanOldPresence();
-    alert('Staré záznamy vyčištěny!');
-}
-
-window.clearAllPresence = async function() {
-    if (!isAdmin) { alert('Nemáte admin práva!'); return; }
-    if (!confirm('Smazat všechny online záznamy?')) return;
-    await supabase.from('presence').delete().neq('id', '00000000-0000-0000-0000-000000000000');
-    alert('Všechny záznamy smazány!');
-    setTimeout(() => setupPresence(), 1000);
-}
-
-// Online users
+// Sledování online uživatelů
 async function watchOnlineUsers() {
-    async function updateCount() {
-        await cleanOldPresence();
+    const { count } = await db.getOnlineCount();
+    document.getElementById('onlineCount').textContent = count || 0;
+    document.getElementById('adminOnlineCount').textContent = count || 0;
+    
+    db.subscribeToPresence(async () => {
         const { count } = await db.getOnlineCount();
         document.getElementById('onlineCount').textContent = count || 0;
         document.getElementById('adminOnlineCount').textContent = count || 0;
-    }
-    await updateCount();
-    db.subscribeToPresence(updateCount);
-    setInterval(updateCount, 30000);
+    });
+    
+    setInterval(() => {
+        if (userPresenceId) {
+            db.setPresence(userPresenceId);
+        }
+    }, 30000);
 }
 
-// Chat
+// REGISTRACE
+window.register = async function() {
+    const username = document.getElementById('registerUser').value.trim();
+    const email = document.getElementById('registerEmail').value.trim();
+    const password = document.getElementById('registerPass').value;
+    const passwordConfirm = document.getElementById('registerPassConfirm').value;
+    
+    if (!username || !password) {
+        alert('Vyplňte uživatelské jméno a heslo!');
+        return;
+    }
+    
+    if (password.length < 6) {
+        alert('Heslo musí mít alespoň 6 znaků!');
+        return;
+    }
+    
+    if (password !== passwordConfirm) {
+        alert('Hesla se neshodují!');
+        return;
+    }
+    
+    const { data, error } = await db.registerUser(username, password, email);
+    
+    if (error) {
+        alert(error.message || 'Chyba při registraci!');
+        return;
+    }
+    
+    alert('Registrace úspěšná! Můžete se nyní přihlásit.');
+    closeRegister();
+    
+    // Vyčistit formulář
+    document.getElementById('registerUser').value = '';
+    document.getElementById('registerEmail').value = '';
+    document.getElementById('registerPass').value = '';
+    document.getElementById('registerPassConfirm').value = '';
+}
+
+// LOGIN
+window.login = async function() {
+    const username = document.getElementById('loginUser').value.trim();
+    const password = document.getElementById('loginPass').value;
+    
+    if (!username || !password) {
+        alert('Vyplňte všechna pole!');
+        return;
+    }
+    
+    const { data: user, error } = await db.loginUser(username, password);
+    
+    if (error || !user) {
+        alert('Špatné přihlašovací údaje!');
+        return;
+    }
+    
+    currentUser = user.username;
+    currentUserId = user.id;
+    isAdmin = user.is_admin;
+    
+    localStorage.setItem('currentUser', user.username);
+    localStorage.setItem('currentUserId', user.id);
+    localStorage.setItem('isAdmin', user.is_admin ? 'true' : 'false');
+    
+    document.getElementById('loginBtn').style.display = 'none';
+    document.getElementById('registerBtn').style.display = 'none';
+    document.getElementById('logoutBtn').style.display = 'inline-block';
+    
+    if (isAdmin) {
+        document.getElementById('adminMenuBtn').style.display = 'block';
+    }
+    
+    closeLogin();
+    alert(`Vítejte, ${user.username}!${isAdmin ? ' (Admin)' : ''}`);
+}
+
+// LOGOUT
+window.logout = function() {
+    currentUser = null;
+    currentUserId = null;
+    isAdmin = false;
+    window.guestName = null;
+    
+    localStorage.removeItem('currentUser');
+    localStorage.removeItem('currentUserId');
+    localStorage.removeItem('isAdmin');
+    
+    document.getElementById('loginBtn').style.display = 'inline-block';
+    document.getElementById('registerBtn').style.display = 'inline-block';
+    document.getElementById('logoutBtn').style.display = 'none';
+    document.getElementById('adminMenuBtn').style.display = 'none';
+    
+    alert('Byl jste odhlášen. Nyní píšete jako host.');
+}
+
+// Poslat zprávu
 window.sendMessage = async function() {
     const input = document.getElementById('messageInput');
     const message = input.value.trim();
+    
     if (!message) return;
     
     let username = currentUser;
@@ -658,10 +752,13 @@ window.sendMessage = async function() {
     input.value = '';
 }
 
+// Systémová zpráva
 window.sendSystemMessage = async function() {
-    if (!isAdmin) { alert('Nemáte admin práva!'); return; }
+    if (!isAdmin) return;
+    
     const input = document.getElementById('systemMessage');
     const message = input.value.trim();
+    
     if (!message) return;
     
     await db.addMessage({
@@ -673,12 +770,13 @@ window.sendSystemMessage = async function() {
     });
     
     input.value = '';
-    alert('Systémová zpráva odeslána!');
 }
 
+// Načíst zprávy
 async function loadMessages() {
     const { data: messages } = await db.getMessages();
     displayMessages(messages);
+    
     db.subscribeToMessages(async () => {
         const { data: messages } = await db.getMessages();
         displayMessages(messages);
@@ -692,21 +790,21 @@ function displayMessages(messages) {
     if (messages && messages.length > 0) {
         messages.forEach(msg => {
             const div = document.createElement('div');
+            
             let msgClass = 'chat-message';
             if (msg.is_admin) msgClass += ' admin';
             else if (msg.is_guest) msgClass += ' guest';
+            
             div.className = msgClass;
             
-            const time = msg.timestamp ? new Date(msg.timestamp).toLocaleTimeString('cs-CZ', {
-                hour: '2-digit',
-                minute: '2-digit'
-            }) : '';
+            const time = msg.timestamp ? new Date(msg.timestamp).toLocaleTimeString('cs-CZ') : '';
             
             div.innerHTML = `
                 <span class="chat-user">${msg.username}:</span>
-                <span>${msg.text}</span>
-                <span style="font-size: 11px; color: rgba(255,255,255,0.5); margin-left: 8px;">${time}</span>
+                <span class="chat-text">${msg.text}</span>
+                <span class="chat-time">${time}</span>
             `;
+            
             messagesDiv.appendChild(div);
         });
         
@@ -717,151 +815,190 @@ function displayMessages(messages) {
     }
 }
 
-// Admin
-window.clearChat = async function() {
-    if (!isAdmin) { alert('Nemáte admin práva!'); return; }
-    if (confirm('Smazat všechny zprávy?')) {
-        await db.clearMessages();
-        alert('Chat vymazán!');
+// ADMIN FUNKCE
+
+// Načíst admin statistiky
+async function loadAdminStats() {
+    const { data: users } = await db.getAllUsers();
+    document.getElementById('totalUsers').textContent = users ? users.length : 0;
+}
+
+// Zobrazit seznam uživatelů
+window.showUsersList = async function() {
+    if (!isAdmin) return;
+    
+    const usersList = document.getElementById('usersList');
+    const { data: users } = await db.getAllUsers();
+    
+    if (usersList.style.display === 'none') {
+        usersList.style.display = 'block';
+        
+        usersList.innerHTML = '<table style="width: 100%; color: #fff; font-size: 13px;"><thead><tr><th>Uživatel</th><th>Admin</th><th>Registrován</th><th>Akce</th></tr></thead><tbody>';
+        
+        users.forEach(user => {
+            const date = new Date(user.created_at).toLocaleDateString('cs-CZ');
+            const isUserAdmin = user.is_admin;
+            const canDelete = user.username !== 'lukamer'; // Nelze smazat hlavního admina
+            
+            usersList.innerHTML += `
+                <tr style="border-bottom: 1px solid rgba(200,100,0,0.3);">
+                    <td style="padding: 8px;">${user.username}</td>
+                    <td style="padding: 8px;">${isUserAdmin ? '✅' : '❌'}</td>
+                    <td style="padding: 8px;">${date}</td>
+                    <td style="padding: 8px;">
+                        ${canDelete ? `<button onclick="deleteUserAdmin('${user.id}')" style="padding: 4px 8px; background: rgba(200,0,0,0.8); border: none; color: #fff; cursor: pointer; font-size: 11px;">Smazat</button>` : '-'}
+                    </td>
+                </tr>
+            `;
+        });
+        
+        usersList.innerHTML += '</tbody></table>';
+    } else {
+        usersList.style.display = 'none';
     }
 }
 
+// Smazat uživatele (admin)
+window.deleteUserAdmin = async function(userId) {
+    if (!isAdmin) return;
+    
+    if (!confirm('Opravdu chcete smazat tohoto uživatele?')) return;
+    
+    const { error } = await db.deleteUser(userId);
+    
+    if (!error) {
+        alert('Uživatel byl smazán!');
+        showUsersList(); // Refresh
+        showUsersList(); // Zobrazit znovu
+    } else {
+        alert('Chyba při mazání uživatele!');
+    }
+}
+
+// Vymazat chat
+window.clearChat = async function() {
+    if (!isAdmin) return;
+    
+    if (confirm('Opravdu chcete smazat všechny zprávy?')) {
+        const { error } = await db.clearMessages();
+        if (!error) {
+            alert('Chat byl vymazán!');
+        } else {
+            alert('Chyba při mazání chatu!');
+        }
+    }
+}
+
+// Smazat staré zprávy
+window.clearOldMessages = async function() {
+    if (!isAdmin) return;
+    
+    if (confirm('Smazat zprávy starší než 7 dní?')) {
+        const sevenDaysAgo = new Date();
+        sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+        
+        const { error } = await supabase
+            .from('messages')
+            .delete()
+            .lt('timestamp', sevenDaysAgo.toISOString());
+        
+        if (!error) {
+            alert('Staré zprávy byly smazány!');
+        } else {
+            alert('Chyba při mazání zpráv!');
+        }
+    }
+}
+
+// Exportovat chat log
 window.exportChatLog = async function() {
-    if (!isAdmin) { alert('Nemáte admin práva!'); return; }
+    if (!isAdmin) return;
+    
     const { data: messages } = await db.getMessages();
     
     if (messages && messages.length > 0) {
         let log = 'CHAT LOG - ' + new Date().toLocaleString('cs-CZ') + '\n\n';
+        
         messages.forEach(msg => {
             const time = msg.timestamp ? new Date(msg.timestamp).toLocaleString('cs-CZ') : '';
             log += `[${time}] ${msg.username}: ${msg.text}\n`;
         });
         
-        const blob = new Blob([log], { type: 'text/plain;charset=utf-8' });
+        const blob = new Blob([log], { type: 'text/plain' });
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
         a.download = 'chat_log_' + Date.now() + '.txt';
-        document.body.appendChild(a);
         a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
     }
 }
 
-// 🆕 REGISTRACE
-window.register = async function() {
-    const username = document.getElementById('registerUser').value.trim();
-    const password = document.getElementById('registerPass').value;
-    const passwordConfirm = document.getElementById('registerPassConfirm').value;
+// Exportovat všechna data
+window.exportAllData = async function() {
+    if (!isAdmin) return;
     
-    if (!username || !password || !passwordConfirm) {
-        alert('Vyplňte všechna pole!');
-        return;
-    }
+    const { data: messages } = await db.getMessages();
+    const { data: users } = await db.getAllUsers();
+    const { data: navody } = await db.getNavody();
     
-    if (password !== passwordConfirm) {
-        alert('Hesla se neshodují!');
-        return;
-    }
+    const allData = {
+        exportDate: new Date().toISOString(),
+        messages: messages || [],
+        users: users || [],
+        navody: navody || []
+    };
     
-    if (password.length < 4) {
-        alert('Heslo musí mít alespoň 4 znaky!');
-        return;
-    }
-    
-    const { data, error } = await db.registerUser(username, password);
-    
-    if (error) {
-        alert(error.message || 'Chyba při registraci!');
-    } else {
-        alert('Registrace úspěšná! Nyní se můžete přihlásit.');
-        closeRegister();
-        showLogin();
-    }
+    const blob = new Blob([JSON.stringify(allData, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'database_export_' + Date.now() + '.json';
+    a.click();
 }
 
-// 🆕 LOGIN S DATABÁZÍ
-window.login = async function() {
-    const username = document.getElementById('loginUser').value.trim();
-    const password = document.getElementById('loginPass').value;
+// Zobrazit DB statistiky
+window.showDatabaseStats = async function() {
+    if (!isAdmin) return;
     
-    if (!username || !password) {
-        alert('Vyplňte všechna pole!');
-        return;
-    }
+    const { data: messages } = await db.getMessages();
+    const { data: users } = await db.getAllUsers();
+    const { count: onlineCount } = await db.getOnlineCount();
     
-    const { data, error } = await db.loginUser(username, password);
+    const stats = `
+📊 Databázové statistiky:
+
+👥 Uživatelé: ${users ? users.length : 0}
+💬 Zprávy: ${messages ? messages.length : 0}
+🟢 Online: ${onlineCount || 0}
+📅 Export: ${new Date().toLocaleString('cs-CZ')}
+    `;
     
-    if (error || !data) {
-        alert('Špatné uživatelské jméno nebo heslo!');
-        return;
-    }
-    
-    currentUser = data.username;
-    isAdmin = data.is_admin;
-    
-    localStorage.setItem('currentUser', currentUser);
-    localStorage.setItem('isAdmin', isAdmin);
-    
-    document.getElementById('registerBtn').style.display = 'none';
-    document.getElementById('loginBtn').style.display = 'none';
-    document.getElementById('logoutBtn').style.display = 'inline-block';
-    
-    if (isAdmin) {
-        document.getElementById('adminMenuBtn').style.display = 'block';
-        alert('Přihlášení úspěšné! Máte admin práva.');
-    } else {
-        alert('Přihlášení úspěšné!');
-    }
-    
-    closeLogin();
+    alert(stats);
 }
 
-// Logout
-window.logout = async function() {
-    if (userPresenceId) await db.removePresence(userPresenceId);
-    
-    currentUser = null;
-    isAdmin = false;
-    window.guestName = null;
-    
-    localStorage.removeItem('currentUser');
-    localStorage.removeItem('isAdmin');
-    
-    document.getElementById('registerBtn').style.display = 'inline-block';
-    document.getElementById('loginBtn').style.display = 'inline-block';
-    document.getElementById('logoutBtn').style.display = 'none';
-    document.getElementById('adminMenuBtn').style.display = 'none';
-    
-    alert('Byl jste odhlášen.');
-    setTimeout(() => setupPresence(), 500);
-}
-
-// Init
-window.addEventListener('DOMContentLoaded', function() {
+// Načíst uloženou session
+window.onload = async function() {
     const savedUser = localStorage.getItem('currentUser');
+    const savedUserId = localStorage.getItem('currentUserId');
     const savedAdmin = localStorage.getItem('isAdmin');
     
-    if (savedUser) {
+    if (savedUser && savedUserId) {
         currentUser = savedUser;
+        currentUserId = savedUserId;
         isAdmin = savedAdmin === 'true';
         
-        document.getElementById('registerBtn').style.display = 'none';
         document.getElementById('loginBtn').style.display = 'none';
+        document.getElementById('registerBtn').style.display = 'none';
         document.getElementById('logoutBtn').style.display = 'inline-block';
         
         if (isAdmin) {
             document.getElementById('adminMenuBtn').style.display = 'block';
         }
     }
-    
-    setupPresence();
-    watchOnlineUsers();
-    loadMessages();
-});
+}
 
+// Inicializace
+setupPresence();
+watchOnlineUsers();
+loadMessages();
 </script>
-
-</body>
-</html>
