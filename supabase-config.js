@@ -52,17 +52,15 @@ export const db = {
       .subscribe()
   },
   
-  // ✅ OPRAVENÁ PRESENCE SEKCE
+  // Presence
   async setPresence(userId) {
     console.log('📤 setPresence:', userId)
     
-    // Delete starý záznam
     await supabase
       .from('presence')
       .delete()
       .eq('id', userId)
     
-    // Insert nový záznam
     const { data, error } = await supabase
       .from('presence')
       .insert({ 
@@ -95,7 +93,6 @@ export const db = {
   },
   
   async getOnlineCount() {
-    // Vyčistit staré záznamy (starší než 1 minuta)
     const oneMinuteAgo = new Date()
     oneMinuteAgo.setMinutes(oneMinuteAgo.getMinutes() - 1)
     
