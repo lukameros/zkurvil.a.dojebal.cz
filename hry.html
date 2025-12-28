@@ -457,20 +457,6 @@
             <button class="play-btn" onclick="event.stopPropagation(); goTetris();">Hrát hru</button>
         </div>
     </div>
-<!-- Admin panel -->
-<div id="adminPanel" style="display:none; margin: 20px auto; max-width: 800px; text-align:center;">
-    <h2 style="color:#ff5555;">🛠 Admin panel - Správa her 🛠</h2>
-    <div id="adminButtons" style="display:flex; flex-wrap:wrap; justify-content:center; gap:10px;">
-        <button onclick="toggleGame('kolecko')">Kolečko: ✅</button>
-        <button onclick="toggleGame('tetris')">Tetris: ✅</button>
-        <button onclick="toggleGame('swf')">Project Madness 1: ✅</button>
-        <button onclick="toggleGame('happyWheels')">Happy Wheels: ✅</button>
-        <button onclick="toggleGame('hobo1')">Hobo 1: ✅</button>
-        <button onclick="toggleGame('hobo2')">Hobo 2: ✅</button>
-        <button onclick="toggleGame('hobo3')">Hobo 3: ✅</button>
-    </div>
-</div>
-
     <div class="game-card" onclick="goSWF()">
         <div class="game-image-container">
             <img src="project-madness-1-image.jpg" alt="Project Madness 1" class="game-image"
@@ -912,6 +898,7 @@ window.addEventListener('DOMContentLoaded', async function() {
 
 </body>
 </html>
+
 
 
 
