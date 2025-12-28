@@ -750,82 +750,13 @@ function toggleChat() {
 
 <script type="module">
 import { supabase, db } from './supabase-config.js';
+import { initPresence } from './presence-utils.js'; // ✅ NOVÝ IMPORT
 
 let currentCategory = 'Airsoft';
 let currentUser = null;
 let isAdmin = false;
 let userPresenceId = null;
 
-// Presence
-function getOrCreatePresenceId() {
-    let storedId = localStorage.getItem('userPresenceId');
-    if (!storedId) {
-        storedId = 'user_' + Math.random().toString(36).substr(2, 9) + '_' + Date.now();
-        localStorage.setItem('userPresenceId', storedId);
-    }
-    return storedId;
-}
-
-async function setupPresence() {
-    // Použít JEDNO session ID pro všechny taby
-    let sessionId = sessionStorage.getItem('userPresenceId');
-    
-    if (!sessionId) {
-        sessionId = 'user_' + Math.random().toString(36).substr(2, 9);
-        sessionStorage.setItem('userPresenceId', sessionId);
-    }
-    
-    userPresenceId = sessionId;
-    
-    // VŽDYCKY při načtení stránky:
-    // 1. Vyčistit staré záznamy (starší než 45 sekund)
-    const cleanupTime = new Date();
-    cleanupTime.setSeconds(cleanupTime.getSeconds() - 10);
-    
-    await supabase
-        .from('presence')
-        .delete()
-        .lt('timestamp', cleanupTime.toISOString());
-    
-    // 2. Vytvořit/aktualizovat náš záznam
-    await db.setPresence(userPresenceId);
-    
-    // 3. Odstranit při zavření celého tabu (ne stránky)
-    window.addEventListener('beforeunload', () => {
-        // Použít synchronní požadavek (jediný způsob, jak zajistit vymazání)
-        navigator.sendBeacon(
-            `https://bmmaijlbpwgzhrxzxphf.supabase.co/rest/v1/presence?id=eq.${userPresenceId}`,
-            JSON.stringify({})
-        );
-    });
-    
-    // 4. Obnovovat každých 30 sekund
-    setInterval(async () => {
-        if (userPresenceId) {
-            await db.setPresence(userPresenceId);
-        }
-    }, 5000);
-}
-
-async function watchOnlineUsers() {
-    async function updateCount() {
-        const { count } = await db.getOnlineCount();
-        document.getElementById('onlineCount').textContent = count || 0;
-        if (document.getElementById('adminOnlineCount')) {
-            document.getElementById('adminOnlineCount').textContent = count || 0;
-        }
-    }
-    
-    await updateCount();
-    db.subscribeToPresence(updateCount);
-    
-    // Obnovit presence každých 15 sekund
-    setInterval(async () => {
-        if (userPresenceId) {
-            await db.setPresence(userPresenceId);
-        }
-    }, 5000);
-}
 // Chat
 window.sendMessage = async function() {
     const input = document.getElementById('messageInput');
@@ -989,7 +920,7 @@ function compressAndConvertToBase64(file, maxSizeKB = 500) {
     });
 }
 
-// Upload obrázku do Supabase
+// Upload obrázku
 window.uploadImage = async function() {
     if (!isAdmin) {
         alert('Pouze admin může nahrávat obrázky!');
@@ -1018,9 +949,7 @@ window.uploadImage = async function() {
             name: file.name
         });
         
-        if (error) {
-            throw error;
-        }
+        if (error) throw error;
         
         progressDiv.textContent = '✅ Nahráno!';
         setTimeout(() => {
@@ -1128,8 +1057,8 @@ window.register = async function() {
         return;
     }
     
-    if (password.length < 4) {
-        alert('Heslo musí mít alespoň 4 znaky!');
+    if (password.length < 6) {
+        alert('Heslo musí mít alespoň 6 znaků!');
         return;
     }
     
@@ -1140,7 +1069,6 @@ window.register = async function() {
     } else {
         alert('Registrace úspěšná! Nyní se můžete přihlásit.');
         closeRegister();
-        showLogin();
     }
 }
 
@@ -1171,20 +1099,13 @@ window.login = async function() {
     document.getElementById('loginBtn').style.display = 'none';
     document.getElementById('logoutBtn').style.display = 'inline-block';
     
-    if (isAdmin) {
-        alert('Přihlášení úspěšné! Máte admin práva.');
-    } else {
-        alert('Přihlášení úspěšné!');
-    }
-    
     closeLogin();
+    alert(`Přihlášení úspěšné!${isAdmin ? ' Máte admin práva.' : ''}`);
     checkAdminStatus();
 }
 
 // Logout
-window.logout = async function() {
-    if (userPresenceId) await db.removePresence(userPresenceId);
-    
+window.logout = function() {
     currentUser = null;
     isAdmin = false;
     window.guestName = null;
@@ -1198,11 +1119,12 @@ window.logout = async function() {
     
     alert('Byl jste odhlášen.');
     checkAdminStatus();
-    setTimeout(() => setupPresence(), 500);
 }
 
-// Inicializace
-window.addEventListener('DOMContentLoaded', function() {
+// ✅ HLAVNÍ INICIALIZACE
+window.addEventListener('DOMContentLoaded', async function() {
+    console.log('🚀 Archive.html - Inicializace...');
+    
     const savedUser = localStorage.getItem('currentUser');
     const savedAdmin = localStorage.getItem('isAdmin');
     
@@ -1215,17 +1137,21 @@ window.addEventListener('DOMContentLoaded', function() {
         document.getElementById('logoutBtn').style.display = 'inline-block';
     }
     
-    setupPresence();
-    watchOnlineUsers();
+    // ✅ NOVÁ INICIALIZACE PRESENCE
+    userPresenceId = await initPresence(supabase, db);
+    
+    // Načíst zprávy a obrázky
     loadMessages();
     loadImages('Airsoft');
     checkAdminStatus();
+    
+    console.log('✅ Archive.html inicializován');
 });
-
 </script>
 
 </body>
 </html>
+
 
 
 
