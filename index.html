@@ -650,7 +650,7 @@ async function watchOnlineUsers() {
         if (userPresenceId) {
             await db.setPresence(userPresenceId);
         }
-    }, 15000);
+    }, 5000);
 }
 // REGISTRACE
 window.register = async function() {
@@ -1023,6 +1023,7 @@ setupPresence();
 watchOnlineUsers();
 loadMessages();
 </script>
+
 
 
 
