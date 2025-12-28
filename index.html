@@ -18,6 +18,7 @@ body {
     background: #000;
 }
 
+/* ===== HLAVNÍ MENU ===== */
 #mainMenu {
     position: fixed;
     top: 0; left: 0; right: 0; height: 100vh;
@@ -144,6 +145,12 @@ body {
     filter: drop-shadow(0 0 10px rgba(255,0,0,0.9));
 }
 
+/* Admin tlačítko */
+.admin-btn {
+    background: 
+        linear-gradient(135deg, rgba(200,100,0,0.95) 0%, rgba(100,50,0,0.98) 100%) !important;
+}
+
 .admin-btn::before {
     background: 
         linear-gradient(135deg, rgba(200,100,0,0.95) 0%, rgba(100,50,0,0.98) 100%),
@@ -156,6 +163,7 @@ body {
         repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(0,0,0,0.15) 10px, rgba(0,0,0,0.15) 20px) !important;
 }
 
+/* Auth tlačítka */
 #authButtons {
     position: absolute;
     top: 20px;
@@ -182,28 +190,35 @@ body {
 #authButtons button {
     padding: 12px 28px;
     border: 2px solid rgba(200,0,0,0.7);
-    background: linear-gradient(135deg, rgba(40,40,40,0.9) 0%, rgba(20,20,20,0.95) 100%);
+    background: 
+        linear-gradient(135deg, rgba(40,40,40,0.9) 0%, rgba(20,20,20,0.95) 100%);
     color: #fff;
     font-weight: 900;
     font-size: 14px;
     letter-spacing: 1px;
     text-transform: uppercase;
     cursor: pointer;
-    box-shadow: 0 0 20px rgba(200,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.1);
+    box-shadow: 
+        0 0 20px rgba(200,0,0,0.5),
+        inset 0 1px 0 rgba(255,255,255,0.1);
     transition: all 0.3s ease;
     text-shadow: 0 0 10px rgba(255,0,0,0.7);
     clip-path: polygon(8% 0, 100% 0, 92% 100%, 0 100%);
 }
 
 #authButtons button:hover {
-    background: linear-gradient(135deg, rgba(200,0,0,0.9) 0%, rgba(120,0,0,0.95) 100%);
+    background: 
+        linear-gradient(135deg, rgba(200,0,0,0.9) 0%, rgba(120,0,0,0.95) 100%);
     border-color: rgba(255,30,30,0.9);
-    box-shadow: 0 0 30px rgba(255,0,0,0.8), inset 0 1px 0 rgba(255,255,255,0.2);
+    box-shadow: 
+        0 0 30px rgba(255,0,0,0.8),
+        inset 0 1px 0 rgba(255,255,255,0.2);
     text-shadow: 0 0 15px rgba(255,30,30,1);
     transform: translateY(-2px);
 }
 
-#loginModal, #registerModal {
+/* Login modal */
+#loginModal {
     display: none;
     position: fixed;
     inset: 0;
@@ -220,8 +235,9 @@ body {
     to { opacity: 1; }
 }
 
-#loginContent, #registerContent {
-    background: linear-gradient(135deg, rgba(30,30,30,0.98) 0%, rgba(15,15,15,0.99) 100%);
+#loginContent {
+    background: 
+        linear-gradient(135deg, rgba(30,30,30,0.98) 0%, rgba(15,15,15,0.99) 100%);
     padding: 40px;
     border: 3px solid rgba(200,0,0,0.7);
     display: flex;
@@ -249,7 +265,7 @@ body {
     }
 }
 
-#loginContent::before, #registerContent::before {
+#loginContent::before {
     content: "";
     position: absolute;
     top: 15px;
@@ -261,7 +277,7 @@ body {
     box-shadow: 0 0 15px rgba(255,0,0,0.6);
 }
 
-#loginContent::after, #registerContent::after {
+#loginContent::after {
     content: "";
     position: absolute;
     bottom: 15px;
@@ -273,7 +289,7 @@ body {
     box-shadow: 0 0 15px rgba(255,0,0,0.6);
 }
 
-#loginContent h3, #registerContent h3 {
+#loginContent h3 {
     color: #fff;
     font-size: 28px;
     font-weight: 900;
@@ -285,7 +301,7 @@ body {
     margin-bottom: 10px;
 }
 
-#loginContent input, #registerContent input {
+#loginContent input {
     padding: 15px 20px;
     border: 2px solid rgba(200,0,0,0.5);
     background: rgba(0,0,0,0.6);
@@ -299,11 +315,11 @@ body {
     clip-path: polygon(2% 0, 100% 0, 98% 100%, 0 100%);
 }
 
-#loginContent input::placeholder, #registerContent input::placeholder {
+#loginContent input::placeholder {
     color: rgba(255, 255, 255, 0.4);
 }
 
-#loginContent input:focus, #registerContent input:focus {
+#loginContent input:focus {
     outline: none;
     border-color: rgba(255,30,30,0.9);
     background: rgba(0,0,0,0.8);
@@ -322,37 +338,46 @@ body {
     flex: 1;
     padding: 15px;
     border: 2px solid rgba(200,0,0,0.7);
-    background: linear-gradient(135deg, rgba(200,0,0,0.9) 0%, rgba(100,0,0,0.95) 100%);
+    background: 
+        linear-gradient(135deg, rgba(200,0,0,0.9) 0%, rgba(100,0,0,0.95) 100%);
     color: #fff;
     font-weight: 900;
     font-size: 16px;
     letter-spacing: 2px;
     text-transform: uppercase;
     cursor: pointer;
-    box-shadow: 0 0 20px rgba(200,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.2);
+    box-shadow: 
+        0 0 20px rgba(200,0,0,0.5),
+        inset 0 1px 0 rgba(255,255,255,0.2);
     transition: all 0.3s ease;
     text-shadow: 0 0 12px rgba(255,0,0,0.9);
     clip-path: polygon(5% 0, 100% 0, 95% 100%, 0 100%);
 }
 
 .login-btn:hover {
-    background: linear-gradient(135deg, rgba(255,20,20,1) 0%, rgba(150,0,0,1) 100%);
+    background: 
+        linear-gradient(135deg, rgba(255,20,20,1) 0%, rgba(150,0,0,1) 100%);
     border-color: rgba(255,50,50,1);
     transform: translateY(-3px);
-    box-shadow: 0 0 35px rgba(255,0,0,0.8), inset 0 1px 0 rgba(255,255,255,0.3);
+    box-shadow: 
+        0 0 35px rgba(255,0,0,0.8),
+        inset 0 1px 0 rgba(255,255,255,0.3);
     text-shadow: 0 0 18px rgba(255,30,30,1);
 }
 
 .login-btn.cancel {
-    background: linear-gradient(135deg, rgba(60,60,60,0.9) 0%, rgba(30,30,30,0.95) 100%);
+    background: 
+        linear-gradient(135deg, rgba(60,60,60,0.9) 0%, rgba(30,30,30,0.95) 100%);
     border-color: rgba(100,100,100,0.6);
 }
 
 .login-btn.cancel:hover {
-    background: linear-gradient(135deg, rgba(80,80,80,1) 0%, rgba(50,50,50,1) 100%);
+    background: 
+        linear-gradient(135deg, rgba(80,80,80,1) 0%, rgba(50,50,50,1) 100%);
     border-color: rgba(150,150,150,0.8);
 }
 
+/* Chat panel */
 #chatPanel {
     display: none;
     position: fixed;
@@ -360,9 +385,12 @@ body {
     right: 20px;
     width: 400px;
     height: 500px;
-    background: linear-gradient(135deg, rgba(20,20,20,0.98) 0%, rgba(10,10,10,0.99) 100%);
+    background: 
+        linear-gradient(135deg, rgba(20,20,20,0.98) 0%, rgba(10,10,10,0.99) 100%);
     border: 3px solid rgba(200,0,0,0.7);
-    box-shadow: 0 0 50px rgba(255,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.1);
+    box-shadow: 
+        0 0 50px rgba(255,0,0,0.6),
+        inset 0 1px 0 rgba(255,255,255,0.1);
     clip-path: polygon(2% 0, 100% 0, 98% 100%, 0 100%);
     z-index: 99;
     flex-direction: column;
@@ -494,6 +522,7 @@ body {
     transform: scale(1.05);
 }
 
+/* Admin Panel */
 #adminPanel {
     display: none;
     position: fixed;
@@ -502,9 +531,12 @@ body {
     transform: translate(-50%, -50%);
     width: 600px;
     max-height: 80vh;
-    background: linear-gradient(135deg, rgba(30,30,30,0.98) 0%, rgba(15,15,15,0.99) 100%);
+    background: 
+        linear-gradient(135deg, rgba(30,30,30,0.98) 0%, rgba(15,15,15,0.99) 100%);
     border: 3px solid rgba(200,100,0,0.8);
-    box-shadow: 0 0 60px rgba(255,150,0,0.7), inset 0 1px 0 rgba(255,255,255,0.1);
+    box-shadow: 
+        0 0 60px rgba(255,150,0,0.7),
+        inset 0 1px 0 rgba(255,255,255,0.1);
     clip-path: polygon(2% 0, 100% 0, 98% 100%, 0 100%);
     z-index: 101;
     overflow-y: auto;
@@ -570,13 +602,6 @@ body {
     background: rgba(150,150,150,1);
 }
 
-#usersList {
-    display: none;
-    margin-top: 15px;
-    max-height: 300px;
-    overflow-y: auto;
-}
-
 @media (max-width: 768px) {
     .left-buttons {
         margin-top: 100px;
@@ -622,6 +647,7 @@ body {
 <div id="mainMenu">
     <video id="menuVideo" autoplay muted loop playsinline preload="auto">
         <source src="wf.mp4" type="video/mp4">
+        Váš prohlížeč nepodporuje video tag.
     </video>
 
     <div class="left-buttons">
@@ -646,12 +672,11 @@ body {
         <div id="onlineCounter">👥 Online: <span id="onlineCount">0</span></div>
         <button onclick="toggleChat()">💬 Chat</button>
         <button id="loginBtn" onclick="showLogin()">Login</button>
-        <button id="registerBtn" onclick="showRegister()">Registrace</button>
         <button id="logoutBtn" onclick="logout()" style="display:none;">Logout</button>
     </div>
 </div>
 
-<!-- Login Modal -->
+<!-- Login modal -->
 <div id="loginModal">
     <div id="loginContent">
         <h3>Přihlášení</h3>
@@ -660,21 +685,6 @@ body {
         <div class="login-buttons">
             <button class="login-btn" onclick="login()">Přihlásit</button>
             <button class="login-btn cancel" onclick="closeLogin()">Zrušit</button>
-        </div>
-    </div>
-</div>
-
-<!-- Register Modal -->
-<div id="registerModal">
-    <div id="registerContent">
-        <h3>Registrace</h3>
-        <input id="registerUser" placeholder="Uživatelské jméno">
-        <input id="registerEmail" placeholder="Email (volitelné)" type="email">
-        <input id="registerPass" type="password" placeholder="Heslo (min. 6 znaků)">
-        <input id="registerPassConfirm" type="password" placeholder="Potvrdit heslo">
-        <div class="login-buttons">
-            <button class="login-btn" onclick="register()">Registrovat</button>
-            <button class="login-btn cancel" onclick="closeRegister()">Zrušit</button>
         </div>
     </div>
 </div>
@@ -700,22 +710,12 @@ body {
         <h4>📊 Statistiky</h4>
         <p style="color: #fff; margin: 10px 0;">Online uživatelé: <span id="adminOnlineCount">0</span></p>
         <p style="color: #fff; margin: 10px 0;">Celkem zpráv: <span id="totalMessages">0</span></p>
-        <p style="color: #fff; margin: 10px 0;">Registrovaných uživatelů: <span id="totalUsers">0</span></p>
-    </div>
-    
-    <div class="admin-section">
-        <h4>👥 Správa uživatelů</h4>
-        <div class="admin-actions">
-            <button onclick="showUsersList()">Zobrazit uživatele</button>
-        </div>
-        <div id="usersList"></div>
     </div>
     
     <div class="admin-section">
         <h4>🗑️ Správa chatu</h4>
         <div class="admin-actions">
             <button onclick="clearChat()">Smazat všechny zprávy</button>
-            <button onclick="clearOldMessages()">Smazat staré zprávy (7+ dní)</button>
             <button onclick="exportChatLog()">Exportovat chat log</button>
         </div>
     </div>
@@ -728,64 +728,36 @@ body {
         </div>
     </div>
     
-    <div class="admin-section">
-        <h4>💾 Databáze</h4>
-        <div class="admin-actions">
-            <button onclick="showDatabaseStats()">Zobrazit statistiky</button>
-            <button onclick="exportAllData()">Exportovat všechna data</button>
-        </div>
-    </div>
-    
     <button id="closeAdminBtn" onclick="closeAdminPanel()">Zavřít</button>
 </div>
 
-<script type="module">
-import { supabase, db } from './supabase-config.js';
-
-let currentUser = null;
-let currentUserId = null;
-let isAdmin = false;
-let userPresenceId = null;
-
-// ===== NAVIGACE =====
-window.goGuide = function() {
+<script>
+// Navigační funkce
+function goGuide() {
     window.location.href = "návod.html";
 }
 
-window.goArchive = function() {
+function goArchive() {
     window.location.href = "archive.html";
 }
 
-window.goGames = function() {
+function goGames() {
     window.location.href = "hry.html";
 }
 
-window.goTools = function() {
-    window.location.href = "nastroje.html";
-}
-
-window.goAirsoftAction = function() {
+function goAirsoftAction() {
     window.location.href = "https://www.airsoftbattles.cz/";
 }
 
-// ===== MODÁLY =====
-window.showLogin = function() {
+function showLogin() {
     document.getElementById("loginModal").style.display = "flex";
 }
 
-window.closeLogin = function() {
+function closeLogin() {
     document.getElementById("loginModal").style.display = "none";
 }
 
-window.showRegister = function() {
-    document.getElementById("registerModal").style.display = "flex";
-}
-
-window.closeRegister = function() {
-    document.getElementById("registerModal").style.display = "none";
-}
-
-window.toggleChat = function() {
+function toggleChat() {
     const chatPanel = document.getElementById('chatPanel');
     if (chatPanel.style.display === 'none' || !chatPanel.style.display) {
         chatPanel.style.display = 'flex';
@@ -794,36 +766,48 @@ window.toggleChat = function() {
     }
 }
 
-window.openAdminPanel = async function() {
+function openAdminPanel() {
     document.getElementById('adminPanel').style.display = 'block';
-    await loadAdminStats();
 }
 
-window.closeAdminPanel = function() {
+function closeAdminPanel() {
     document.getElementById('adminPanel').style.display = 'none';
 }
+</script>
 
-// ===== ONLINE PRESENCE =====
+<script type="module">
+import { supabase, db } from './supabase-config.js';
+
+let currentUser = null;
+let isAdmin = false;
+let userPresenceId = null;
+
+// Online presence
 async function setupPresence() {
     userPresenceId = 'user_' + Math.random().toString(36).substr(2, 9);
     await db.setPresence(userPresenceId);
     
+    // Odstranit při zavření stránky
     window.addEventListener('beforeunload', async () => {
         await db.removePresence(userPresenceId);
     });
 }
 
+// Sledování online uživatelů
 async function watchOnlineUsers() {
+    // Iniciální načtení
     const { count } = await db.getOnlineCount();
     document.getElementById('onlineCount').textContent = count || 0;
     document.getElementById('adminOnlineCount').textContent = count || 0;
     
+    // Realtime updates
     db.subscribeToPresence(async () => {
         const { count } = await db.getOnlineCount();
         document.getElementById('onlineCount').textContent = count || 0;
         document.getElementById('adminOnlineCount').textContent = count || 0;
     });
     
+    // Pravidelná aktualizace presence (každých 30s)
     setInterval(() => {
         if (userPresenceId) {
             db.setPresence(userPresenceId);
@@ -831,101 +815,7 @@ async function watchOnlineUsers() {
     }, 30000);
 }
 
-// ===== REGISTRACE =====
-window.register = async function() {
-    const username = document.getElementById('registerUser').value.trim();
-    const email = document.getElementById('registerEmail').value.trim();
-    const password = document.getElementById('registerPass').value;
-    const passwordConfirm = document.getElementById('registerPassConfirm').value;
-    
-    if (!username || !password) {
-        alert('Vyplňte uživatelské jméno a heslo!');
-        return;
-    }
-    
-    if (password.length < 6) {
-        alert('Heslo musí mít alespoň 6 znaků!');
-        return;
-    }
-    
-    if (password !== passwordConfirm) {
-        alert('Hesla se neshodují!');
-        return;
-    }
-    
-    const { data, error } = await db.registerUser(username, password, email);
-    
-    if (error) {
-        alert(error.message || 'Chyba při registraci!');
-        return;
-    }
-    
-    alert('Registrace úspěšná! Můžete se nyní přihlásit.');
-    closeRegister();
-    
-    document.getElementById('registerUser').value = '';
-    document.getElementById('registerEmail').value = '';
-    document.getElementById('registerPass').value = '';
-    document.getElementById('registerPassConfirm').value = '';
-}
-
-// ===== LOGIN =====
-window.login = async function() {
-    const username = document.getElementById('loginUser').value.trim();
-    const password = document.getElementById('loginPass').value;
-    
-    if (!username || !password) {
-        alert('Vyplňte všechna pole!');
-        return;
-    }
-    
-    const { data: user, error } = await db.loginUser(username, password);
-    
-    if (error || !user) {
-        alert('Špatné přihlašovací údaje!');
-        return;
-    }
-    
-    currentUser = user.username;
-    currentUserId = user.id;
-    isAdmin = user.is_admin;
-    
-    localStorage.setItem('currentUser', user.username);
-    localStorage.setItem('currentUserId', user.id);
-    localStorage.setItem('isAdmin', user.is_admin ? 'true' : 'false');
-    
-    document.getElementById('loginBtn').style.display = 'none';
-    document.getElementById('registerBtn').style.display = 'none';
-    document.getElementById('logoutBtn').style.display = 'inline-block';
-    
-    if (isAdmin) {
-        document.getElementById('adminMenuBtn').style.display = 'block';
-    }
-    
-    closeLogin();
-    alert(`Vítejte, ${user.username}!${isAdmin ? ' (Admin)' : ''}`);
-}
-
-// ===== LOGOUT =====
-window.logout = function() {
-    currentUser = null;
-    currentUserId = null;
-    isAdmin = false;
-    window.guestName = null;
-    
-    localStorage.removeItem('currentUser');
-    localStorage.removeItem('currentUserId');
-    localStorage.removeItem('isAdmin');
-    
-    document.getElementById('loginBtn').style.display = 'inline-block';
-    document.getElementById('registerBtn').style.display = 'inline-block';
-    document.getElementById('logoutBtn').style.display = 'none';
-    document.getElementById('adminMenuBtn').style.display = 'none';
-    
-    alert('Byl jste odhlášen. Nyní píšete jako host.');
-}
-
-// ===== CHAT =====
+// Poslat zprávu
 window.sendMessage = async function() {
     const input = document.getElementById('messageInput');
     const message = input.value.trim();
@@ -951,6 +841,7 @@ window.sendMessage = async function() {
     input.value = '';
 }
 
+// Poslat systémovou zprávu (admin)
 window.sendSystemMessage = async function() {
     if (!isAdmin) return;
     
@@ -970,10 +861,15 @@ window.sendSystemMessage = async function() {
     input.value = '';
 }
 
+// Načíst zprávy
 async function loadMessages() {
+    const messagesDiv = document.getElementById('chatMessages');
+    
+    // Iniciální načtení
     const { data: messages } = await db.getMessages();
     displayMessages(messages);
     
+    // Realtime updates
     db.subscribeToMessages(async () => {
         const { data: messages } = await db.getMessages();
         displayMessages(messages);
@@ -1012,62 +908,7 @@ function displayMessages(messages) {
     }
 }
 
-// ===== ADMIN FUNKCE =====
-async function loadAdminStats() {
-    const { data: users } = await db.getAllUsers();
-    document.getElementById('totalUsers').textContent = users ? users.length : 0;
-}
-
-window.showUsersList = async function() {
-    if (!isAdmin) return;
-    
-    const usersList = document.getElementById('usersList');
-    const { data: users } = await db.getAllUsers();
-    
-    if (usersList.style.display === 'none' || !usersList.style.display) {
-        usersList.style.display = 'block';
-        
-        usersList.innerHTML = '<table style="width: 100%; color: #fff; font-size: 13px;"><thead><tr><th>Uživatel</th><th>Admin</th><th>Registrován</th><th>Akce</th></tr></thead><tbody>';
-        
-        users.forEach(user => {
-            const date = new Date(user.created_at).toLocaleDateString('cs-CZ');
-            const isUserAdmin = user.is_admin;
-            const canDelete = user.username !== 'lukamer';
-            
-            usersList.innerHTML += `
-                <tr style="border-bottom: 1px solid rgba(200,100,0,0.3);">
-                    <td style="padding: 8px;">${user.username}</td>
-                    <td style="padding: 8px;">${isUserAdmin ? '✅' : '❌'}</td>
-                    <td style="padding: 8px;">${date}</td>
-                    <td style="padding: 8px;">
-                        ${canDelete ? `<button onclick="deleteUserAdmin('${user.id}')" style="padding: 4px 8px; background: rgba(200,0,0,0.8); border: none; color: #fff; cursor: pointer; font-size: 11px;">Smazat</button>` : '-'}
-                    </td>
-                </tr>
-            `;
-        });
-        
-        usersList.innerHTML += '</tbody></table>';
-    } else {
-        usersList.style.display = 'none';
-    }
-}
-
-window.deleteUserAdmin = async function(userId) {
-    if (!isAdmin) return;
-    
-    if (!confirm('Opravdu chcete smazat tohoto uživatele?')) return;
-    
-    const { error } = await db.deleteUser(userId);
-    
-    if (!error) {
-        alert('Uživatel byl smazán!');
-        showUsersList();
-        showUsersList();
-    } else {
-        alert('Chyba při mazání uživatele!');
-    }
-}
-
+// Vymazat chat (admin)
 window.clearChat = async function() {
     if (!isAdmin) return;
     
@@ -1081,26 +922,7 @@ window.clearChat = async function() {
     }
 }
 
-window.clearOldMessages = async function() {
-    if (!isAdmin) return;
-    
-    if (confirm('Smazat zprávy starší než 7 dní?')) {
-        const sevenDaysAgo = new Date();
-        sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
-        
-        const { error } = await supabase
-            .from('messages')
-            .delete()
-            .lt('timestamp', sevenDaysAgo.toISOString());
-        
-        if (!error) {
-            alert('Staré zprávy byly smazány!');
-        } else {
-            alert('Chyba při mazání zpráv!');
-        }
-    }
-}
-
+// Exportovat chat log (admin)
 window.exportChatLog = async function() {
     if (!isAdmin) return;
     
@@ -1123,58 +945,67 @@ window.exportChatLog = async function() {
     }
 }
 
-window.exportAllData = async function() {
-    if (!isAdmin) return;
+// Login
+window.login = function() {
+    const user = document.getElementById('loginUser').value;
+    const pass = document.getElementById('loginPass').value;
     
-    const { data: messages } = await db.getMessages();
-    const { data: users } = await db.getAllUsers();
-    
-    const allData = {
-        exportDate: new Date().toISOString(),
-        messages: messages || [],
-        users: users || []
-    };
-    
-    const blob = new Blob([JSON.stringify(allData, null, 2)], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'database_export_' + Date.now() + '.json';
-    a.click();
+    if (user === 'lukamer' && pass === 'lukas89') {
+        currentUser = user;
+        isAdmin = true;
+        
+        localStorage.setItem('currentUser', user);
+        localStorage.setItem('isAdmin', 'true');
+        
+        document.getElementById('loginBtn').style.display = 'none';
+        document.getElementById('logoutBtn').style.display = 'inline-block';
+        document.getElementById('adminMenuBtn').style.display = 'block';
+        
+        closeLogin();
+        alert('Přihlášení úspěšné! Máte admin práva.');
+    } else if (user && pass) {
+        currentUser = user;
+        isAdmin = false;
+        
+        localStorage.setItem('currentUser', user);
+        localStorage.setItem('isAdmin', 'false');
+        
+        document.getElementById('loginBtn').style.display = 'none';
+        document.getElementById('logoutBtn').style.display = 'inline-block';
+        
+        closeLogin();
+        alert('Přihlášení úspěšné!');
+    } else {
+        alert('Vyplňte všechna pole!');
+    }
 }
 
-window.showDatabaseStats = async function() {
-    if (!isAdmin) return;
+// Logout
+window.logout = function() {
+    currentUser = null;
+    isAdmin = false;
+    window.guestName = null;
     
-    const { data: messages } = await db.getMessages();
-    const { data: users } = await db.getAllUsers();
-    const { count: onlineCount } = await db.getOnlineCount();
+    localStorage.removeItem('currentUser');
+    localStorage.removeItem('isAdmin');
     
-    const stats = `
-📊 Databázové statistiky:
-
-👥 Uživatelé: ${users ? users.length : 0}
-💬 Zprávy: ${messages ? messages.length : 0}
-🟢 Online: ${onlineCount || 0}
-📅 Export: ${new Date().toLocaleString('cs-CZ')}
-    `;
+    document.getElementById('loginBtn').style.display = 'inline-block';
+    document.getElementById('logoutBtn').style.display = 'none';
+    document.getElementById('adminMenuBtn').style.display = 'none';
     
-    alert(stats);
+    alert('Byl jste odhlášen. Nyní píšete jako host.');
 }
 
-// ===== INICIALIZACE =====
-window.onload = async function() {
+// Načíst uloženou session
+window.onload = function() {
     const savedUser = localStorage.getItem('currentUser');
-    const savedUserId = localStorage.getItem('currentUserId');
     const savedAdmin = localStorage.getItem('isAdmin');
     
-    if (savedUser && savedUserId) {
+    if (savedUser) {
         currentUser = savedUser;
-        currentUserId = savedUserId;
         isAdmin = savedAdmin === 'true';
         
         document.getElementById('loginBtn').style.display = 'none';
-        document.getElementById('registerBtn').style.display = 'none';
         document.getElementById('logoutBtn').style.display = 'inline-block';
         
         if (isAdmin) {
@@ -1183,6 +1014,7 @@ window.onload = async function() {
     }
 }
 
+// Inicializace
 setupPresence();
 watchOnlineUsers();
 loadMessages();
