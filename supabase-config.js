@@ -1,5 +1,72 @@
 // supabase-config.js
-import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm'
+import { createClient   // Uživatelé (registrace/login)
+  async registerUser(username, password, email = null) {
+    // Kontrola zda uživatel existuje
+    const { data: existing } = await supabase
+      .from('users')
+      .select('username')
+      .eq('username', username)
+      .single()
+    
+    if (existing) {
+      return { error: { message: 'Uživatel již existuje!' } }
+    }
+    
+    const { data, error } = await supabase
+      .from('users')
+      .insert([{
+        username,
+        password,
+        email,
+        is_admin: false
+      }])
+      .select()
+    return { data, error }
+  },
+  
+  async loginUser(username, password) {
+    const { data, error } = await supabase
+      .from('users')
+      .select('*')
+      .eq('username', username)
+      .eq('password', password)
+      .single()
+    
+    if (data) {
+      // Aktualizovat last_login
+      await supabase
+        .from('users')
+        .update({ last_login: new Date().toISOString() })
+        .eq('id', data.id)
+    }
+    
+    return { data, error }
+  },
+  
+  async getAllUsers() {
+    const { data, error } = await supabase
+      .from('users')
+      .select('*')
+      .order('created_at', { ascending: false })
+    return { data, error }
+  },
+  
+  async deleteUser(id) {
+    const { error } = await supabase
+      .from('users')
+      .delete()
+      .eq('id', id)
+    return { error }
+  },
+  
+  async toggleAdminStatus(userId, isAdmin) {
+    const { error } = await supabase
+      .from('users')
+      .update({ is_admin: isAdmin })
+      .eq('id', userId)
+    return { error }
+  }
+} from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm'
 
 // 🔥 Supabase konfigurace
 const SUPABASE_URL = 'https://bmmaijlbpwgzhrxzxphf.supabase.co'
@@ -9,7 +76,7 @@ export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
 
 // Pomocné funkce pro snadnější práci
 export const db = {
-  // ==================== ZPRÁVY ====================
+  // Zprávy
   async getMessages() {
     const { data, error } = await supabase
       .from('messages')
@@ -19,6 +86,7 @@ export const db = {
   },
   
   async addMessage(message) {
+    // Přejmenovat 'user' na 'username' pro databázi
     const dbMessage = {
       username: message.user,
       text: message.text,
@@ -39,10 +107,11 @@ export const db = {
     const { error } = await supabase
       .from('messages')
       .delete()
-      .neq('id', '00000000-0000-0000-0000-000000000000')
+      .neq('id', '00000000-0000-0000-0000-000000000000') // Delete all
     return { error }
   },
   
+  // Realtime subscription pro zprávy
   subscribeToMessages(callback) {
     return supabase
       .channel('messages')
@@ -53,7 +122,7 @@ export const db = {
       .subscribe()
   },
   
-  // ==================== PRESENCE ====================
+  // Presence (online uživatelé)
   async setPresence(userId) {
     const { data, error } = await supabase
       .from('presence')
@@ -70,6 +139,16 @@ export const db = {
   },
   
   async getOnlineCount() {
+    // Nejdřív smazat staré záznamy (starší než 2 minuty)
+    const twoMinutesAgo = new Date();
+    twoMinutesAgo.setMinutes(twoMinutesAgo.getMinutes() - 2);
+    
+    await supabase
+      .from('presence')
+      .delete()
+      .lt('timestamp', twoMinutesAgo.toISOString());
+    
+    // Pak spočítat aktuální
     const { count, error } = await supabase
       .from('presence')
       .select('*', { count: 'exact', head: true })
@@ -86,7 +165,7 @@ export const db = {
       .subscribe()
   },
   
-  // ==================== NÁVODY ====================
+  // Návody
   async getNavody() {
     const { data, error } = await supabase
       .from('navody')
@@ -121,7 +200,7 @@ export const db = {
       .subscribe()
   },
   
-  // ==================== ARCHIV ====================
+  // Archiv
   async getArchiveImages(category) {
     const table = category === 'Airsoft' ? 'archive_airsoft' : 'archive_hry'
     const { data, error } = await supabase
@@ -162,64 +241,5 @@ export const db = {
         callback
       )
       .subscribe()
-  },
-  
-  // ==================== UŽIVATELÉ ====================
-  async registerUser(username, password) {
-    try {
-      // Zkontrolovat, zda uživatel už neexistuje
-      const { data: existing, error: checkError } = await supabase
-        .from('users')
-        .select('username')
-        .eq('username', username)
-        .maybeSingle()
-      
-      if (existing) {
-        return { error: { message: 'Uživatelské jméno už existuje!' } }
-      }
-      
-      // Vytvořit nového uživatele (is_admin bude automaticky FALSE)
-      const { data, error } = await supabase
-        .from('users')
-        .insert([{
-          username: username,
-          password: password,
-          is_admin: false
-        }])
-        .select()
-      
-      return { data, error }
-    } catch (error) {
-      return { error }
-    }
-  },
-  
-  async loginUser(username, password) {
-    try {
-      const { data, error } = await supabase
-        .from('users')
-        .select('*')
-        .eq('username', username)
-        .eq('password', password)
-        .maybeSingle()
-      
-      return { data, error }
-    } catch (error) {
-      return { error }
-    }
-  },
-  
-  async checkUserExists(username) {
-    try {
-      const { data, error } = await supabase
-        .from('users')
-        .select('username')
-        .eq('username', username)
-        .maybeSingle()
-      
-      return { exists: !!data, error }
-    } catch (error) {
-      return { exists: false, error }
-    }
   }
 }
