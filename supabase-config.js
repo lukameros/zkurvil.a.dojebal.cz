@@ -126,7 +126,13 @@ export const db = {
   async setPresence(userId) {
     const { data, error } = await supabase
       .from('presence')
-      .upsert([{ id: userId, online: true, timestamp: new Date().toISOString() }])
+      .upsert([{ 
+        id: userId, 
+        online: true, 
+        timestamp: new Date().toISOString() 
+      }], { 
+        onConflict: 'id' // DŮLEŽITÉ: Aktualizovat existující záznam místo vytváření nového
+      })
     return { data, error }
   },
   
