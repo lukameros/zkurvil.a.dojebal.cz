@@ -593,35 +593,44 @@ let isAdmin = false;
 let userPresenceId = null;
 
 async function setupPresence() {
-    // Vyčistit staré záznamy (starší než 1 minuta)
-    const oneMinuteAgo = new Date();
-    oneMinuteAgo.setMinutes(oneMinuteAgo.getMinutes() - 1);
+    // Použít JEDNO session ID pro všechny taby
+    let sessionId = sessionStorage.getItem('userPresenceId');
+    
+    if (!sessionId) {
+        sessionId = 'user_' + Math.random().toString(36).substr(2, 9);
+        sessionStorage.setItem('userPresenceId', sessionId);
+    }
+    
+    userPresenceId = sessionId;
+    
+    // VŽDYCKY při načtení stránky:
+    // 1. Vyčistit staré záznamy (starší než 45 sekund)
+    const cleanupTime = new Date();
+    cleanupTime.setSeconds(cleanupTime.getSeconds() - 45);
     
     await supabase
         .from('presence')
         .delete()
-        .lt('timestamp', oneMinuteAgo.toISOString());
+        .lt('timestamp', cleanupTime.toISOString());
     
-    // Použít JEDNO ID pro celou session
-    let storedId = localStorage.getItem('userPresenceId');
-    
-    if (!storedId) {
-        storedId = 'user_' + Math.random().toString(36).substr(2, 9);
-        localStorage.setItem('userPresenceId', storedId);
-    }
-    
-    userPresenceId = storedId;
-    
-    // NEJDŘÍV smazat starý záznam
-    await db.removePresence(userPresenceId);
-    
-    // PAK vytvořit nový
+    // 2. Vytvořit/aktualizovat náš záznam
     await db.setPresence(userPresenceId);
     
-    // Smazat při odchodu (unload) - funguje i při přechodu na jinou stránku
-    window.addEventListener('unload', async () => {
-        await db.removePresence(userPresenceId);
+    // 3. Odstranit při zavření celého tabu (ne stránky)
+    window.addEventListener('beforeunload', () => {
+        // Použít synchronní požadavek (jediný způsob, jak zajistit vymazání)
+        navigator.sendBeacon(
+            `https://bmmaijlbpwgzhrxzxphf.supabase.co/rest/v1/presence?id=eq.${userPresenceId}`,
+            JSON.stringify({})
+        );
     });
+    
+    // 4. Obnovovat každých 30 sekund
+    setInterval(async () => {
+        if (userPresenceId) {
+            await db.setPresence(userPresenceId);
+        }
+    }, 30000);
 }
 
 async function watchOnlineUsers() {
@@ -1014,5 +1023,6 @@ setupPresence();
 watchOnlineUsers();
 loadMessages();
 </script>
+
 
 
