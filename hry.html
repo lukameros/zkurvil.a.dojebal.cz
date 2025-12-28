@@ -600,6 +600,25 @@ import { supabase, db } from './supabase-config.js';
 let currentUser = null;
 let currentUserId = null;
 let isAdmin = false;
+const gamesStatus = {
+    kolecko: true,
+    tetris: true,
+    swf: true,
+    happyWheels: true,
+    hobo1: true,
+    hobo2: true,
+    hobo3: true
+};
+
+function playGame(gameKey, redirectFunc) {
+    if (!gamesStatus[gameKey]) {
+        alert('Tato hra je momentálně mimo provoz.');
+        return;
+    }
+    redirectFunc();
+}
+
+
 let userPresenceId = null;
 
 // Presence
@@ -844,5 +863,6 @@ window.addEventListener('DOMContentLoaded', async function() {
 
 </body>
 </html>
+
 
 
