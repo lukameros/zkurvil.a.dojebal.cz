@@ -1,0 +1,660 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Návody</title>
+
+<link rel="stylesheet" href="firebase-chat-styles.css">
+
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Arial Black', 'Impact', sans-serif;
+    overflow-x: hidden;
+    background: #000;
+    min-height: 100vh;
+}
+
+#navodPage {
+    position: relative;
+    min-height: 100vh;
+    overflow: hidden;
+}
+
+#navodVideo {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: 0;
+    filter: brightness(0.4) contrast(1.3);
+}
+
+#navodPage::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    background: 
+        linear-gradient(90deg, rgba(0,0,0,0.8) 0%, transparent 50%, rgba(0,0,0,0.6) 100%),
+        linear-gradient(180deg, rgba(0,0,0,0.5) 0%, transparent 30%, rgba(0,0,0,0.7) 100%);
+    z-index: 1;
+}
+
+#backBtn {
+    position: fixed;
+    top: 30px;
+    left: 30px;
+    padding: 14px 28px;
+    border: 2px solid rgba(200,0,0,0.7);
+    background: linear-gradient(135deg, rgba(40,40,40,0.9) 0%, rgba(20,20,20,0.95) 100%);
+    color: #fff;
+    font-weight: 900;
+    font-size: 16px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    cursor: pointer;
+    box-shadow: 0 0 20px rgba(200,0,0,0.5);
+    transition: all 0.3s ease;
+    text-shadow: 0 0 10px rgba(255,0,0,0.7);
+    clip-path: polygon(8% 0, 100% 0, 92% 100%, 0 100%);
+    z-index: 100;
+}
+
+#backBtn:hover {
+    background: linear-gradient(135deg, rgba(200,0,0,0.9) 0%, rgba(120,0,0,0.95) 100%);
+    transform: translateY(-2px);
+}
+
+#authButtons {
+    position: fixed;
+    top: 30px;
+    right: 30px;
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    z-index: 100;
+}
+
+#onlineCounter {
+    padding: 8px 16px;
+    background: rgba(0,0,0,0.8);
+    color: #0f0;
+    font-weight: 900;
+    font-size: 14px;
+    letter-spacing: 1px;
+    border: 2px solid rgba(0,255,0,0.5);
+    box-shadow: 0 0 20px rgba(0,255,0,0.4);
+    text-shadow: 0 0 10px rgba(0,255,0,0.9);
+    clip-path: polygon(8% 0, 100% 0, 92% 100%, 0 100%);
+}
+
+#authButtons button {
+    padding: 12px 24px;
+    border: 2px solid rgba(200,0,0,0.7);
+    background: linear-gradient(135deg, rgba(40,40,40,0.9) 0%, rgba(20,20,20,0.95) 100%);
+    color: #fff;
+    font-weight: 900;
+    font-size: 14px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    cursor: pointer;
+    box-shadow: 0 0 20px rgba(200,0,0,0.5);
+    transition: all 0.3s ease;
+    text-shadow: 0 0 10px rgba(255,0,0,0.7);
+    clip-path: polygon(8% 0, 100% 0, 92% 100%, 0 100%);
+}
+
+#authButtons button:hover {
+    background: linear-gradient(135deg, rgba(200,0,0,0.9) 0%, rgba(120,0,0,0.95) 100%);
+    transform: translateY(-2px);
+}
+
+h1 {
+    position: relative;
+    z-index: 2;
+    text-align: center;
+    color: #fff;
+    font-size: 48px;
+    font-weight: 900;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    margin: 120px 0 40px;
+    text-shadow: 0 0 25px rgba(255,0,0,0.9), 3px 3px 8px rgba(0,0,0,1);
+}
+
+#contentContainer {
+    position: relative;
+    z-index: 2;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 40px 80px;
+}
+
+#addItemSection {
+    text-align: center;
+    margin-bottom: 30px;
+    display: none;
+}
+
+#addItemBtn {
+    padding: 14px 32px;
+    border: 2px solid rgba(200,0,0,0.7);
+    background: linear-gradient(135deg, rgba(40,40,40,0.9) 0%, rgba(20,20,20,0.95) 100%);
+    color: #fff;
+    font-weight: 900;
+    font-size: 16px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    cursor: pointer;
+    box-shadow: 0 0 20px rgba(200,0,0,0.5);
+    transition: all 0.3s ease;
+    text-shadow: 0 0 10px rgba(255,0,0,0.7);
+    clip-path: polygon(8% 0, 100% 0, 92% 100%, 0 100%);
+}
+
+#addItemBtn:hover {
+    background: linear-gradient(135deg, rgba(200,0,0,0.9) 0%, rgba(120,0,0,0.95) 100%);
+    transform: translateY(-2px);
+}
+
+#addItemForm {
+    background: linear-gradient(135deg, rgba(30,30,30,0.95) 0%, rgba(15,15,15,0.98) 100%);
+    border: 2px solid rgba(200,0,0,0.5);
+    padding: 30px;
+    margin-bottom: 40px;
+    text-align: center;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.8);
+    clip-path: polygon(2% 0, 100% 0, 98% 100%, 0 100%);
+    display: none;
+}
+
+#addItemForm h2 {
+    color: #fff;
+    font-size: 24px;
+    font-weight: 900;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    text-shadow: 0 0 15px rgba(255,0,0,0.8);
+    margin-bottom: 20px;
+}
+
+#addItemForm input {
+    width: 80%;
+    max-width: 500px;
+    padding: 15px 20px;
+    border: 2px solid rgba(200,0,0,0.5);
+    background: rgba(0,0,0,0.6);
+    color: #fff;
+    font-size: 16px;
+    font-weight: bold;
+    box-shadow: inset 0 2px 8px rgba(0,0,0,0.8);
+    clip-path: polygon(2% 0, 100% 0, 98% 100%, 0 100%);
+    margin-bottom: 15px;
+}
+
+#addItemForm input:focus {
+    outline: none;
+    border-color: rgba(255,30,30,0.9);
+    background: rgba(0,0,0,0.8);
+}
+
+#addItemForm button {
+    padding: 12px 28px;
+    border: 2px solid rgba(200,0,0,0.7);
+    background: linear-gradient(135deg, rgba(200,0,0,0.9) 0%, rgba(100,0,0,0.95) 100%);
+    color: #fff;
+    font-weight: 900;
+    font-size: 16px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    cursor: pointer;
+    clip-path: polygon(5% 0, 100% 0, 95% 100%, 0 100%);
+}
+
+#addItemForm button:hover {
+    background: linear-gradient(135deg, rgba(255,20,20,1) 0%, rgba(150,0,0,1) 100%);
+}
+
+#tableContainer {
+    background: linear-gradient(135deg, rgba(30,30,30,0.95) 0%, rgba(15,15,15,0.98) 100%);
+    border: 2px solid rgba(200,0,0,0.5);
+    padding: 20px;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.8);
+    clip-path: polygon(1% 0, 100% 0, 99% 100%, 0 100%);
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+thead {
+    background: linear-gradient(135deg, rgba(200,0,0,0.8) 0%, rgba(100,0,0,0.9) 100%);
+}
+
+th {
+    padding: 18px 15px;
+    color: #fff;
+    font-size: 18px;
+    font-weight: 900;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    text-align: left;
+    text-shadow: 0 0 12px rgba(255,0,0,0.9);
+    border-bottom: 2px solid rgba(255,0,0,0.5);
+}
+
+td {
+    padding: 15px;
+    color: #fff;
+    font-size: 16px;
+    font-weight: 600;
+    border-bottom: 1px solid rgba(200,0,0,0.2);
+}
+
+tbody tr {
+    background: rgba(0,0,0,0.3);
+    transition: all 0.3s ease;
+}
+
+tbody tr:nth-child(even) {
+    background: rgba(20,0,0,0.3);
+}
+
+tbody tr:hover {
+    background: rgba(100,0,0,0.4);
+}
+
+.delete-row-btn {
+    padding: 8px 16px;
+    border: 2px solid rgba(200,0,0,0.6);
+    background: linear-gradient(135deg, rgba(100,0,0,0.8) 0%, rgba(50,0,0,0.9) 100%);
+    color: #fff;
+    font-weight: 900;
+    font-size: 13px;
+    cursor: pointer;
+    clip-path: polygon(8% 0, 100% 0, 92% 100%, 0 100%);
+    display: none;
+}
+
+.delete-row-btn:hover {
+    background: linear-gradient(135deg, rgba(150,0,0,1) 0%, rgba(80,0,0,1) 100%);
+}
+
+.admin-mode .delete-row-btn {
+    display: inline-block;
+}
+
+.empty-state {
+    text-align: center;
+    padding: 40px;
+    color: rgba(255,255,255,0.5);
+    font-size: 18px;
+    font-style: italic;
+}
+
+#loginModal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(5px);
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+#loginContent {
+    background: linear-gradient(135deg, rgba(30,30,30,0.98) 0%, rgba(15,15,15,0.99) 100%);
+    padding: 40px;
+    border: 3px solid rgba(200,0,0,0.7);
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    width: 420px;
+    text-align: center;
+    box-shadow: 0 0 50px rgba(255,0,0,0.7);
+    clip-path: polygon(3% 0, 100% 0, 97% 100%, 0 100%);
+}
+
+#loginContent h3 {
+    color: #fff;
+    font-size: 28px;
+    font-weight: 900;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    text-shadow: 0 0 20px rgba(255,0,0,0.9);
+}
+
+#loginContent input {
+    padding: 15px 20px;
+    border: 2px solid rgba(200,0,0,0.5);
+    background: rgba(0,0,0,0.6);
+    color: #fff;
+    font-size: 16px;
+    font-weight: bold;
+    clip-path: polygon(2% 0, 100% 0, 98% 100%, 0 100%);
+}
+
+#loginContent input:focus {
+    outline: none;
+    border-color: rgba(255,30,30,0.9);
+}
+
+.login-buttons {
+    display: flex;
+    gap: 15px;
+}
+
+.login-btn {
+    flex: 1;
+    padding: 15px;
+    border: 2px solid rgba(200,0,0,0.7);
+    background: linear-gradient(135deg, rgba(200,0,0,0.9) 0%, rgba(100,0,0,0.95) 100%);
+    color: #fff;
+    font-weight: 900;
+    font-size: 16px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    cursor: pointer;
+    clip-path: polygon(5% 0, 100% 0, 95% 100%, 0 100%);
+}
+
+.login-btn:hover {
+    background: linear-gradient(135deg, rgba(255,20,20,1) 0%, rgba(150,0,0,1) 100%);
+}
+
+.login-btn.cancel {
+    background: linear-gradient(135deg, rgba(60,60,60,0.9) 0%, rgba(30,30,30,0.95) 100%);
+}
+
+.login-btn.cancel:hover {
+    background: linear-gradient(135deg, rgba(80,80,80,1) 0%, rgba(50,50,50,1) 100%);
+}
+
+@media (max-width: 768px) {
+    h1 {
+        font-size: 36px;
+        margin: 100px 20px 30px;
+    }
+    
+    #contentContainer {
+        padding: 0 20px 60px;
+    }
+    
+    #loginContent {
+        width: calc(100% - 40px);
+        max-width: 420px;
+    }
+}
+</style>
+</head>
+<body>
+
+<div id="navodPage">
+    <video id="navodVideo" autoplay muted loop playsinline preload="auto">
+        <source src="wf.mp4" type="video/mp4">
+    </video>
+
+    <button id="backBtn" onclick="goBack()">⬅ Zpět</button>
+
+    <div id="authButtons">
+        <div id="onlineCounter">👥 Online: <span id="onlineCount">0</span></div>
+        <button onclick="toggleChat()">💬 Chat</button>
+        <button id="loginBtn" onclick="showLogin()">Login</button>
+        <button id="logoutBtn" onclick="logout()" style="display:none;">Logout</button>
+    </div>
+
+    <h1>📖 NÁVODY 📖</h1>
+
+    <div id="contentContainer">
+        <div id="addItemSection">
+            <button id="addItemBtn" onclick="showAddItemForm()">➕ Přidat položku</button>
+        </div>
+
+        <div id="addItemForm">
+            <h2>Přidej nový návod</h2>
+            <input type="text" id="newItem" placeholder="Zadejte název návodu">
+            <button onclick="addItem()">Přidat</button>
+        </div>
+
+        <div id="tableContainer">
+            <table id="itemsTable">
+                <thead>
+                    <tr>
+                        <th style="width: 80px;">#</th>
+                        <th>Název návodu</th>
+                        <th style="width: 120px; text-align: center;">Akce</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody">
+                    <tr class="empty-state">
+                        <td colspan="3">Zatím zde nejsou žádné návody. Admin může přidat první!</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div id="loginModal">
+    <div id="loginContent">
+        <h3>Přihlášení</h3>
+        <input id="loginUser" placeholder="Uživatelské jméno">
+        <input id="loginPass" type="password" placeholder="Heslo">
+        <div class="login-buttons">
+            <button class="login-btn" onclick="login()">Přihlásit</button>
+            <button class="login-btn cancel" onclick="closeLogin()">Zrušit</button>
+        </div>
+    </div>
+</div>
+
+<div id="chatPanel" style="display:none;">
+    <div id="chatHeader">
+        <h4>💬 Chat</h4>
+        <button id="closeChatBtn" onclick="toggleChat()">×</button>
+    </div>
+    <div id="chatMessages"></div>
+    <div id="chatInput">
+        <input id="messageInput" placeholder="Napište zprávu..." onkeypress="if(event.key==='Enter') sendMessage()">
+        <button onclick="sendMessage()">Odeslat</button>
+    </div>
+</div>
+
+<div id="adminPanel">
+    <h3>⚙️ Admin Panel</h3>
+    <div class="admin-section">
+        <h4>📊 Statistiky</h4>
+        <p style="color: #fff; margin: 10px 0;">Online uživatelé: <span id="adminOnlineCount">0</span></p>
+        <p style="color: #fff; margin: 10px 0;">Celkem zpráv: <span id="totalMessages">0</span></p>
+    </div>
+    <div class="admin-section">
+        <h4>🗑️ Správa chatu</h4>
+        <div class="admin-actions">
+            <button onclick="clearChat()">Smazat všechny zprávy</button>
+            <button onclick="exportChatLog()">Exportovat chat log</button>
+        </div>
+    </div>
+    <div class="admin-section">
+        <h4>📢 Systémová zpráva</h4>
+        <input id="systemMessage" placeholder="Zadejte systémovou zprávu..." style="width: 100%; padding: 10px; margin-bottom: 10px; background: rgba(0,0,0,0.5); color: #fff; border: 2px solid rgba(200,100,0,0.5);">
+        <div class="admin-actions">
+            <button onclick="sendSystemMessage()">Odeslat systémovou zprávu</button>
+        </div>
+    </div>
+    <button id="closeAdminBtn" onclick="closeAdminPanel()">Zavřít</button>
+</div>
+
+<script type="module">
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+import { getDatabase, ref, push, onValue, remove } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
+
+const firebaseConfig = {
+    apiKey: "AIzaSyDOap2QsXnBvqC2WWp907fAACI0o5qIBk4",
+    authDomain: "tetrisleaderboard-3b345.firebaseapp.com",
+    databaseURL: "https://tetrisleaderboard-3b345-default-rtdb.europe-west1.firebasedatabase.app",
+    projectId: "tetrisleaderboard-3b345",
+    storageBucket: "tetrisleaderboard-3b345.firebasestorage.app",
+    messagingSenderId: "1066407746580",
+    appId: "1:1066407746580:web:b8de384e86711899f99b01"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+
+// Načíst návody z Firebase
+function loadItems() {
+    const itemsRef = ref(db, 'navody');
+    
+    onValue(itemsRef, (snapshot) => {
+        const tbody = document.getElementById('tableBody');
+        tbody.innerHTML = '';
+        
+        if (snapshot.exists()) {
+            const items = snapshot.val();
+            let index = 1;
+            
+            Object.keys(items).forEach(key => {
+                const item = items[key];
+                const row = tbody.insertRow();
+                row.innerHTML = `
+                    <td>${index}</td>
+                    <td>${item.name}</td>
+                    <td style="text-align: center;">
+                        <button class="delete-row-btn" onclick="deleteItemFromFirebase('${key}')">🗑️</button>
+                    </td>
+                `;
+                index++;
+            });
+        } else {
+            tbody.innerHTML = `
+                <tr class="empty-state">
+                    <td colspan="3">Zatím zde nejsou žádné návody. Admin může přidat první!</td>
+                </tr>
+            `;
+        }
+    });
+}
+
+// Přidat návod
+window.addItem = async function() {
+    const newItemInput = document.getElementById('newItem');
+    const newItem = newItemInput.value.trim();
+    
+    if (newItem === '') {
+        alert('Prosím zadejte název návodu!');
+        return;
+    }
+    
+    try {
+        const itemsRef = ref(db, 'navody');
+        await push(itemsRef, {
+            name: newItem,
+            createdAt: Date.now()
+        });
+        
+        newItemInput.value = '';
+        document.getElementById('addItemForm').style.display = 'none';
+        alert('Návod byl přidán!');
+    } catch (error) {
+        console.error('Error adding item:', error);
+        alert('Chyba při přidávání návodu!');
+    }
+}
+
+// Smazat návod
+window.deleteItemFromFirebase = async function(id) {
+    if (!confirm('Opravdu chcete smazat tento návod?')) return;
+    
+    try {
+        const itemRef = ref(db, `navody/${id}`);
+        await remove(itemRef);
+        alert('Návod byl smazán!');
+    } catch (error) {
+        console.error('Error deleting item:', error);
+        alert('Chyba při mazání návodu!');
+    }
+}
+
+// Kontrola admin práv
+function checkAdminStatus() {
+    const isAdmin = localStorage.getItem('isAdmin') === 'true';
+    const addItemSection = document.getElementById('addItemSection');
+    
+    if (isAdmin) {
+        addItemSection.style.display = 'block';
+        document.getElementById('navodPage').classList.add('admin-mode');
+    } else {
+        addItemSection.style.display = 'none';
+        document.getElementById('navodPage').classList.remove('admin-mode');
+    }
+}
+
+// Login
+window.login = function() {
+    const username = document.getElementById('loginUser').value;
+    const password = document.getElementById('loginPass').value;
+    
+    // Admin údaje
+    if (username === 'admin' && password === 'heslo123') {
+        localStorage.setItem('isAdmin', 'true');
+        alert('Přihlášení úspěšné!');
+        closeLogin();
+        
+        document.getElementById('loginBtn').style.display = 'none';
+        document.getElementById('logoutBtn').style.display = 'block';
+        checkAdminStatus();
+    } else {
+        alert('Špatné přihlašovací údaje!');
+    }
+}
+
+// Logout
+window.logout = function() {
+    localStorage.removeItem('isAdmin');
+    document.getElementById('loginBtn').style.display = 'block';
+    document.getElementById('logoutBtn').style.display = 'none';
+    document.getElementById('addItemForm').style.display = 'none';
+    checkAdminStatus();
+    alert('Odhlášeno!');
+}
+
+// UI funkce
+window.goBack = function() { window.location.href = "index.html"; }
+window.showLogin = function() { document.getElementById("loginModal").style.display = "flex"; }
+window.closeLogin = function() { document.getElementById("loginModal").style.display = "none"; }
+window.toggleChat = function() {
+    const chatPanel = document.getElementById('chatPanel');
+    chatPanel.style.display = (chatPanel.style.display === 'none' || !chatPanel.style.display) ? 'flex' : 'none';
+}
+window.openAdminPanel = function() { document.getElementById('adminPanel').style.display = 'block'; }
+window.closeAdminPanel = function() { document.getElementById('adminPanel').style.display = 'none'; }
+window.showAddItemForm = function() {
+    const form = document.getElementById("addItemForm");
+    form.style.display = form.style.display === "none" ? "block" : "none";
+}
+
+// Inicializace
+window.onload = function() {
+    loadItems();
+    checkAdminStatus();
+    
+    const isAdmin = localStorage.getItem('isAdmin') === 'true';
+    if (isAdmin) {
+        document.getElementById('loginBtn').style.display = 'none';
+        document.getElementById('logoutBtn').style.display = 'block';
+    }
+};
+</script>
+
+<script type="module" src="firebase-chat-system.js"></script>
+
+</body>
+</html>

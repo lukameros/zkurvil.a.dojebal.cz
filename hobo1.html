@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hobo 1</title>
+    <style>
+        /* Základní styly pro celou stránku */
+        body {
+            margin: 0;
+            padding: 0;
+            background: black;
+            color: white;
+            font-family: "Segoe UI", sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;  /* Výška stránky nastavena na 100% */
+            overflow: hidden;  /* Skrýváme jakýkoli přetékající obsah */
+            position: relative;
+        }
+
+        /* Tlačítko zpět v levém horním rohu */
+        #backBtn {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            padding: 10px 18px;
+            border-radius: 6px;
+            border: none;
+            background: linear-gradient(45deg, #b80000, #ff1a1a);
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 0 8px #ff0000;
+            z-index: 10;
+        }
+
+        #backBtn:hover {
+            background: linear-gradient(45deg, #ff1a1a, #ff6666);
+            box-shadow: 0 0 15px #ff4444;
+        }
+
+        /* Kontejner pro Flash hru */
+        #flash-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            height: 100%;
+            position: relative;
+        }
+
+        /* Na přehrávač SWF */
+        #swf-player {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+    </style>
+</head>
+<body>
+
+<!-- Tlačítko zpět -->
+<button id="backBtn" onclick="goBack()">⬅ Zpět</button>
+
+<!-- Místo pro vložení SWF souboru -->
+<div id="flash-container">
+    <div id="swf-player"></div>
+</div>
+
+<!-- Načítání Ruffle.js z CDN -->
+<script src="https://unpkg.com/@ruffle-rs/ruffle"></script>
+<script>
+    window.onload = function() {
+        // Inicializace RufflePlayer
+        const ruffle = window.RufflePlayer.newest();  // Načte RufflePlayer
+        const player = ruffle.createPlayer();  // Vytvoří Flash Player
+        document.getElementById('swf-player').appendChild(player);  // Přidání na stránku
+        player.load("hobo1.swf");  // Načtení SWF souboru (ve stejné složce jako HTML)
+    };
+
+    // Funkce pro návrat na "hry.html"
+    function goBack() {
+        window.location.href = "hry.html";  // Odkaz na stránku her (můžeš změnit podle potřeby)
+    }
+</script>
+
+</body>
+</html>

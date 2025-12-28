@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Project Madness 1</title>
+    <style>
+        /* Základní styly pro celou stránku */
+        body {
+            margin: 0;
+            padding: 0;
+            background: black;
+            color: white;
+            font-family: "Segoe UI", sans-serif;
+            display: flex;
+            flex-direction: column; /* Umožníme vertikální rozložení textu a hry */
+            justify-content: center;
+            align-items: center;
+            height: 100vh;  /* Výška stránky nastavena na 100% */
+            overflow: hidden;  /* Skrýváme jakýkoli přetékající obsah */
+            position: relative;
+        }
+
+        /* Tlačítko zpět v levém horním rohu */
+        #backBtn {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            padding: 10px 18px;
+            border-radius: 6px;
+            border: none;
+            background: linear-gradient(45deg, #b80000, #ff1a1a);
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 0 8px #ff0000;
+            z-index: 10;
+        }
+
+        #backBtn:hover {
+            background: linear-gradient(45deg, #ff1a1a, #ff6666);
+            box-shadow: 0 0 15px #ff4444;
+        }
+
+        /* Kontejner pro Flash hru */
+        #flash-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            height: 100%;
+            position: relative;
+        }
+
+        /* Zajistí, že přehrávač zabere celou stránku */
+        #swf-player {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* Text pro pokyn nad hrou */
+        #instructions {
+            font-size: 18px;
+            margin-bottom: 20px;
+            color: #ff0000;
+            font-weight: bold;
+        }
+
+        /* Text pod hrou pro název hry */
+        #game-title {
+            font-size: 22px;
+            color: red;
+            font-weight: bold;
+            margin-top: 20px;
+        }
+
+    </style>
+</head>
+<body>
+
+<!-- Tlačítko zpět -->
+<button id="backBtn" onclick="goBack()">⬅ Zpět</button>
+
+<!-- Pokyn pro zvětšení -->
+<div id="instructions">
+    Klikni pravým tlačítkem na hru pro zvětšení na celou obrazovku
+</div>
+
+<!-- Místo pro vložení SWF souboru -->
+<div id="flash-container">
+    <div id="swf-player"></div>
+</div>
+
+<!-- Název hry pod hrou -->
+<div id="game-title">
+    Project Madness beta 0.1
+</div>
+
+<!-- Načítání Ruffle.js z CDN -->
+<script src="https://unpkg.com/@ruffle-rs/ruffle"></script>
+<script>
+    window.onload = function() {
+        // Inicializace RufflePlayer
+        const ruffle = window.RufflePlayer.newest();  // Načte RufflePlayer
+        const player = ruffle.createPlayer();  // Vytvoří Flash Player
+        document.getElementById('swf-player').appendChild(player);  // Přidání na stránku
+        player.load("project_madness_1.swf");  // Načtení SWF souboru (ve stejné složce jako HTML)
+    };
+
+    // Funkce pro návrat na "hry.html"
+    function goBack() {
+        window.location.href = "hry.html";
+    }
+</script>
+
+</body>
+</html>

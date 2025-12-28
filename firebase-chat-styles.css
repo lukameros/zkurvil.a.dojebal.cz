@@ -1,0 +1,455 @@
+/* ============================================
+   FIREBASE CHAT & ADMIN SYSTEM - GLOBAL STYLES
+   ============================================ */
+
+/* Online Counter */
+#onlineCounter {
+    padding: 8px 16px;
+    background: rgba(0,0,0,0.8);
+    color: #0f0;
+    font-weight: 900;
+    font-size: 14px;
+    letter-spacing: 1px;
+    border: 2px solid rgba(0,255,0,0.5);
+    box-shadow: 0 0 20px rgba(0,255,0,0.4);
+    text-shadow: 0 0 10px rgba(0,255,0,0.9);
+    clip-path: polygon(8% 0, 100% 0, 92% 100%, 0 100%);
+}
+
+/* Auth Buttons Container */
+#authButtons {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+}
+
+#authButtons button {
+    padding: 12px 28px;
+    border: 2px solid rgba(200,0,0,0.7);
+    background: linear-gradient(135deg, rgba(40,40,40,0.9) 0%, rgba(20,20,20,0.95) 100%);
+    color: #fff;
+    font-weight: 900;
+    font-size: 14px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    cursor: pointer;
+    box-shadow: 0 0 20px rgba(200,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.1);
+    transition: all 0.3s ease;
+    text-shadow: 0 0 10px rgba(255,0,0,0.7);
+    clip-path: polygon(8% 0, 100% 0, 92% 100%, 0 100%);
+}
+
+#authButtons button:hover {
+    background: linear-gradient(135deg, rgba(200,0,0,0.9) 0%, rgba(120,0,0,0.95) 100%);
+    border-color: rgba(255,30,30,0.9);
+    box-shadow: 0 0 30px rgba(255,0,0,0.8), inset 0 1px 0 rgba(255,255,255,0.2);
+    text-shadow: 0 0 15px rgba(255,30,30,1);
+    transform: translateY(-2px);
+}
+
+/* Login Modal */
+#loginModal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(5px);
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+#loginContent {
+    background: linear-gradient(135deg, rgba(30,30,30,0.98) 0%, rgba(15,15,15,0.99) 100%);
+    padding: 40px;
+    border: 3px solid rgba(200,0,0,0.7);
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    width: 420px;
+    text-align: center;
+    box-shadow: 0 0 50px rgba(255,0,0,0.7), inset 0 1px 0 rgba(255,255,255,0.1), 0 10px 50px rgba(0,0,0,0.9);
+    clip-path: polygon(3% 0, 100% 0, 97% 100%, 0 100%);
+    animation: slideUp 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    position: relative;
+}
+
+@keyframes slideUp {
+    from { transform: translateY(50px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+#loginContent::before {
+    content: "";
+    position: absolute;
+    top: 15px;
+    left: 15px;
+    width: 40px;
+    height: 40px;
+    border-left: 3px solid rgba(255,0,0,0.9);
+    border-top: 3px solid rgba(255,0,0,0.9);
+    box-shadow: 0 0 15px rgba(255,0,0,0.6);
+}
+
+#loginContent::after {
+    content: "";
+    position: absolute;
+    bottom: 15px;
+    right: 15px;
+    width: 40px;
+    height: 40px;
+    border-right: 3px solid rgba(255,0,0,0.9);
+    border-bottom: 3px solid rgba(255,0,0,0.9);
+    box-shadow: 0 0 15px rgba(255,0,0,0.6);
+}
+
+#loginContent h3 {
+    color: #fff;
+    font-size: 28px;
+    font-weight: 900;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    text-shadow: 0 0 20px rgba(255,0,0,0.9), 2px 2px 6px rgba(0,0,0,0.9);
+    margin-bottom: 10px;
+}
+
+#loginContent input {
+    padding: 15px 20px;
+    border: 2px solid rgba(200,0,0,0.5);
+    background: rgba(0,0,0,0.6);
+    color: #fff;
+    font-size: 16px;
+    font-weight: bold;
+    box-shadow: inset 0 2px 8px rgba(0,0,0,0.8), 0 0 15px rgba(200,0,0,0.3);
+    transition: all 0.3s ease;
+    clip-path: polygon(2% 0, 100% 0, 98% 100%, 0 100%);
+}
+
+#loginContent input::placeholder {
+    color: rgba(255, 255, 255, 0.4);
+}
+
+#loginContent input:focus {
+    outline: none;
+    border-color: rgba(255,30,30,0.9);
+    background: rgba(0,0,0,0.8);
+    box-shadow: inset 0 2px 8px rgba(0,0,0,0.9), 0 0 25px rgba(255,0,0,0.6);
+}
+
+.login-buttons {
+    display: flex;
+    gap: 15px;
+    margin-top: 10px;
+}
+
+.login-btn {
+    flex: 1;
+    padding: 15px;
+    border: 2px solid rgba(200,0,0,0.7);
+    background: linear-gradient(135deg, rgba(200,0,0,0.9) 0%, rgba(100,0,0,0.95) 100%);
+    color: #fff;
+    font-weight: 900;
+    font-size: 16px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    cursor: pointer;
+    box-shadow: 0 0 20px rgba(200,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.2);
+    transition: all 0.3s ease;
+    text-shadow: 0 0 12px rgba(255,0,0,0.9);
+    clip-path: polygon(5% 0, 100% 0, 95% 100%, 0 100%);
+}
+
+.login-btn:hover {
+    background: linear-gradient(135deg, rgba(255,20,20,1) 0%, rgba(150,0,0,1) 100%);
+    border-color: rgba(255,50,50,1);
+    transform: translateY(-3px);
+    box-shadow: 0 0 35px rgba(255,0,0,0.8), inset 0 1px 0 rgba(255,255,255,0.3);
+    text-shadow: 0 0 18px rgba(255,30,30,1);
+}
+
+.login-btn.cancel {
+    background: linear-gradient(135deg, rgba(60,60,60,0.9) 0%, rgba(30,30,30,0.95) 100%);
+    border-color: rgba(100,100,100,0.6);
+}
+
+.login-btn.cancel:hover {
+    background: linear-gradient(135deg, rgba(80,80,80,1) 0%, rgba(50,50,50,1) 100%);
+    border-color: rgba(150,150,150,0.8);
+}
+
+/* Chat Panel */
+#chatPanel {
+    display: none;
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 400px;
+    height: 500px;
+    background: linear-gradient(135deg, rgba(20,20,20,0.98) 0%, rgba(10,10,10,0.99) 100%);
+    border: 3px solid rgba(200,0,0,0.7);
+    box-shadow: 0 0 50px rgba(255,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.1);
+    clip-path: polygon(2% 0, 100% 0, 98% 100%, 0 100%);
+    z-index: 999;
+    flex-direction: column;
+}
+
+#chatHeader {
+    padding: 15px;
+    background: rgba(200,0,0,0.3);
+    border-bottom: 2px solid rgba(200,0,0,0.7);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+#chatHeader h4 {
+    color: #fff;
+    font-size: 18px;
+    font-weight: 900;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    text-shadow: 0 0 15px rgba(255,0,0,0.9);
+}
+
+#closeChatBtn {
+    background: rgba(200,0,0,0.8);
+    border: none;
+    color: #fff;
+    font-size: 20px;
+    width: 30px;
+    height: 30px;
+    cursor: pointer;
+    font-weight: 900;
+    transition: all 0.3s ease;
+}
+
+#closeChatBtn:hover {
+    background: rgba(255,0,0,1);
+    transform: scale(1.1);
+}
+
+#chatMessages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.chat-message {
+    padding: 10px 15px;
+    background: rgba(40,40,40,0.8);
+    border-left: 3px solid rgba(200,0,0,0.7);
+    color: #fff;
+    font-size: 14px;
+    word-wrap: break-word;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.5);
+}
+
+.chat-message .chat-user {
+    color: #ff3333;
+    font-weight: 900;
+    margin-right: 8px;
+    text-shadow: 0 0 10px rgba(255,0,0,0.7);
+}
+
+.chat-message.admin {
+    border-left-color: rgba(255,150,0,0.9);
+    background: rgba(60,40,20,0.8);
+}
+
+.chat-message.admin .chat-user {
+    color: #ff9900;
+    text-shadow: 0 0 10px rgba(255,150,0,0.9);
+}
+
+.chat-message.guest {
+    border-left-color: rgba(100,100,200,0.7);
+    background: rgba(30,30,50,0.8);
+}
+
+.chat-message.guest .chat-user {
+    color: #6699ff;
+    text-shadow: 0 0 10px rgba(100,150,255,0.7);
+}
+
+.chat-message .chat-time {
+    font-size: 11px;
+    color: rgba(255,255,255,0.5);
+    margin-left: 8px;
+}
+
+#chatInput {
+    display: flex;
+    gap: 10px;
+    padding: 15px;
+    border-top: 2px solid rgba(200,0,0,0.7);
+    background: rgba(0,0,0,0.5);
+}
+
+#chatInput input {
+    flex: 1;
+    padding: 12px;
+    border: 2px solid rgba(200,0,0,0.5);
+    background: rgba(0,0,0,0.6);
+    color: #fff;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+#chatInput input:focus {
+    outline: none;
+    border-color: rgba(255,30,30,0.9);
+    box-shadow: 0 0 15px rgba(255,0,0,0.5);
+}
+
+#chatInput button {
+    padding: 12px 20px;
+    border: 2px solid rgba(200,0,0,0.7);
+    background: rgba(200,0,0,0.9);
+    color: #fff;
+    font-weight: 900;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+#chatInput button:hover {
+    background: rgba(255,0,0,1);
+    transform: scale(1.05);
+}
+
+/* Admin Panel */
+#adminPanel {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 600px;
+    max-height: 80vh;
+    background: linear-gradient(135deg, rgba(30,30,30,0.98) 0%, rgba(15,15,15,0.99) 100%);
+    border: 3px solid rgba(200,100,0,0.8);
+    box-shadow: 0 0 60px rgba(255,150,0,0.7), inset 0 1px 0 rgba(255,255,255,0.1);
+    clip-path: polygon(2% 0, 100% 0, 98% 100%, 0 100%);
+    z-index: 1001;
+    overflow-y: auto;
+    padding: 30px;
+}
+
+#adminPanel h3 {
+    color: #ff9900;
+    font-size: 24px;
+    font-weight: 900;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    text-shadow: 0 0 20px rgba(255,150,0,0.9);
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.admin-section {
+    margin-bottom: 25px;
+    padding: 20px;
+    background: rgba(0,0,0,0.5);
+    border: 2px solid rgba(200,100,0,0.5);
+}
+
+.admin-section h4 {
+    color: #fff;
+    font-size: 18px;
+    margin-bottom: 15px;
+    text-shadow: 0 0 10px rgba(255,150,0,0.7);
+}
+
+.admin-section p {
+    color: #fff;
+    margin: 10px 0;
+}
+
+.admin-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.admin-actions button {
+    padding: 12px 20px;
+    border: 2px solid rgba(200,100,0,0.7);
+    background: rgba(200,100,0,0.8);
+    color: #fff;
+    font-weight: 900;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+}
+
+.admin-actions button:hover {
+    background: rgba(255,150,0,1);
+    transform: translateY(-2px);
+    box-shadow: 0 0 20px rgba(255,150,0,0.8);
+}
+
+#systemMessage {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 10px;
+    background: rgba(0,0,0,0.5);
+    color: #fff;
+    border: 2px solid rgba(200,100,0,0.5);
+}
+
+#closeAdminBtn {
+    width: 100%;
+    margin-top: 20px;
+    background: rgba(100,100,100,0.8);
+    border-color: rgba(150,150,150,0.7);
+}
+
+#closeAdminBtn:hover {
+    background: rgba(150,150,150,1);
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: rgba(0,0,0,0.5);
+}
+
+::-webkit-scrollbar-thumb {
+    background: rgba(200,0,0,0.7);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: rgba(255,0,0,0.9);
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+    #chatPanel {
+        width: calc(100% - 40px);
+        height: 400px;
+        bottom: 10px;
+        right: 10px;
+    }
+    
+    #adminPanel {
+        width: calc(100% - 40px);
+    }
+    
+    #loginContent {
+        width: calc(100% - 40px);
+        max-width: 420px;
+        padding: 30px;
+    }
+}

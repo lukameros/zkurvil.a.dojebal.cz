@@ -1,0 +1,86 @@
+/* ===== ZÁKLAD ===== */
+body {
+    margin: 0;
+    font-family: "Segoe UI", sans-serif;
+    background: black;
+}
+
+/* ===== HLAVNÍ MENU (INDEX) ===== */
+#mainMenu {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 100vh;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding: 10px 20px;
+    overflow: hidden;
+    z-index: 50;
+}
+
+#menuVideo {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: 1;
+    pointer-events: none;
+}
+
+/* levá tlačítka */
+.left-buttons {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+/* ČERVENÝ STYL TLAČÍTEK */
+#mainMenu button {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 6px;
+    background: linear-gradient(45deg, #b80000, #ff1a1a);
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 0 0 8px #ff0000;
+    transition: transform 0.2s, box-shadow 0.2s, background 0.2s;
+}
+
+#mainMenu button:hover {
+    transform: scale(1.1);
+    box-shadow: 0 0 20px #ff4444;
+    background: linear-gradient(45deg, #ff1a1a, #ff6666);
+}
+
+/* Auth tlačítka */
+#authButtons {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    display: flex;
+    gap: 10px;
+    z-index: 2;
+}
+
+#authButtons button {
+    padding: 8px 16px;
+    border-radius: 6px;
+    border: none;
+    font-weight: bold;
+    cursor: pointer;
+    background: #b80000;
+    color: white;
+    box-shadow: 0 0 6px #ff0000;
+    transition: background 0.3s, transform 0.2s;
+}
+
+#authButtons button:hover {
+    background: #ff1a1a;
+    transform: scale(1.05);
+}
