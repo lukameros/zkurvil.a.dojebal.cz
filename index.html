@@ -1002,7 +1002,6 @@ window.showDatabaseStats = async function() {
     alert(stats);
 }
 
-// Načíst uloženou session
 window.onload = async function() {
     const savedUser = localStorage.getItem('currentUser');
     
@@ -1027,12 +1026,13 @@ window.onload = async function() {
             localStorage.clear();
         }
     }
-
-// Inicializace
-setupPresence();
-watchOnlineUsers();
-loadMessages();
-</script>
+    
+    // ✅ DŮLEŽITÉ: Tady musí být inicializace!
+    setupPresence();
+    watchOnlineUsers();
+    loadMessages();
+}  // ✅ Tady musí být uzavírací závorka funkce
+</script>  // ✅ A tady musí být uzavírací tag scriptu
 
 
 
