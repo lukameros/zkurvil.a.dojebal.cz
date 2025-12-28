@@ -477,6 +477,7 @@ button.menuBtn.locked::after {
     <button class="menuBtn" onclick="showThemeMenu()">🎨 Barevné téma</button>
     <button class="menuBtn" onclick="startTetris(selectedDifficulty)">🚀 Start hry</button>
     <button class="menuBtn" onclick="showLeaderboard()">🏆 Online žebříček</button>
+    <button class="menuBtn" onclick="startMultiplayer()">👥 Multiplayer (2 hráči)</button>
 </div>
 
 <div id="difficultyMenu" class="centered" style="display:none;">
@@ -696,7 +697,45 @@ button.menuBtn.locked::after {
         <button class="menuBtn" onclick="backToMainMenu()">🏠 Zpět do menu</button>
     </div>
 </div>
-
+<div id="multiplayerGame" style="display:none;">
+    <h1>👥 MULTIPLAYER 👥</h1>
+    <div style="display: flex; gap: 40px; justify-content: center; align-items: flex-start;">
+        <!-- Hráč 1 -->
+        <div>
+            <h2 style="text-align: center; color: #00ffff; margin-bottom: 20px;">🎮 HRÁČ 1</h2>
+            <div style="display: flex; gap: 20px;">
+                <div class="info-box">
+                    <h3>SKÓRE</h3>
+                    <div id="score1">0</div>
+                </div>
+                <div id="tetris1" style="display: grid; gap: 1px; background: rgba(17, 17, 34, 0.9); border: 3px solid #00ffff; border-radius: 8px; padding: 3px;"></div>
+                <div class="info-box">
+                    <h3>ÚROVEŇ</h3>
+                    <div id="level1">1</div>
+                </div>
+            </div>
+            <p style="text-align: center; margin-top: 15px; color: #0ff;">WASD + Q (rotace)</p>
+        </div>
+        
+        <!-- Hráč 2 -->
+        <div>
+            <h2 style="text-align: center; color: #ff00ff; margin-bottom: 20px;">🎮 HRÁČ 2</h2>
+            <div style="display: flex; gap: 20px;">
+                <div class="info-box">
+                    <h3>SKÓRE</h3>
+                    <div id="score2">0</div>
+                </div>
+                <div id="tetris2" style="display: grid; gap: 1px; background: rgba(17, 17, 34, 0.9); border: 3px solid #ff00ff; border-radius: 8px; padding: 3px;"></div>
+                <div class="info-box">
+                    <h3>ÚROVEŇ</h3>
+                    <div id="level2">1</div>
+                </div>
+            </div>
+            <p style="text-align: center; margin-top: 15px; color: #f0f;">← ↑ → ↓</p>
+        </div>
+    </div>
+    <button class="menuBtn" onclick="backToMainMenu()" style="margin-top: 30px;">⬅ Zpět do menu</button>
+</div>
 <script>
 let selectedDifficulty = 'medium';
 let mapRows = 20;
@@ -1602,11 +1641,282 @@ function getDifficultyEmoji(difficulty) {
     }
 }
 
-// Inicializace
+// Multiplayer proměnné
+let player1 = null;
+let player2 = null;
+let multiplayerActive = false;
+
+window.startMultiplayer = function() {
+    document.getElementById('mainMenu').style.display = 'none';
+    document.getElementById('multiplayerGame').style.display = 'flex';
+    multiplayerActive = true;
+    
+    // Inicializace obou hráčů
+    player1 = createPlayer('tetris1', 'score1', 'level1', 15, 10, '#00ffff');
+    player2 = createPlayer('tetris2', 'score2', 'level2', 15, 10, '#ff00ff');
+    
+    // Start herních smyček
+    multiplayerLoop();
+}
+
+function createPlayer(gridId, scoreId, levelId, rows, cols, borderColor) {
+    const player = {
+        grid: [],
+        current: null,
+        nextPiece: null,
+        score: 0,
+        level: 1,
+        lines: 0,
+        gameOver: false,
+        dropInterval: 600,
+        lastDrop: Date.now(),
+        gridElement: document.getElementById(gridId),
+        scoreElement: document.getElementById(scoreId),
+        levelElement: document.getElementById(levelId),
+        rows: rows,
+        cols: cols,
+        borderColor: borderColor
+    };
+    
+    // Vytvoř grid
+    player.gridElement.innerHTML = '';
+    player.gridElement.style.gridTemplateRows = `repeat(${rows}, 25px)`;
+    player.gridElement.style.gridTemplateColumns = `repeat(${cols}, 25px)`;
+    player.gridElement.style.borderColor = borderColor;
+    
+    for (let r = 0; r < rows; r++) {
+        player.grid[r] = [];
+        for (let c = 0; c < cols; c++) {
+            const cell = document.createElement('div');
+            cell.classList.add('cell');
+            cell.style.width = '23px';
+            cell.style.height = '23px';
+            player.gridElement.appendChild(cell);
+            player.grid[r][c] = 0;
+        }
+    }
+    
+    player.nextPiece = randomTetromino();
+    newTetrominoPlayer(player);
+    
+    return player;
+}
+
+function newTetrominoPlayer(player) {
+    player.current = player.nextPiece;
+    player.current.x = Math.floor(player.cols / 2) - 1;
+    player.current.y = 0;
+    player.nextPiece = randomTetromino();
+    
+    if (collisionPlayer(player)) {
+        player.gameOver = true;
+        endMultiplayer(player === player1 ? 'HRÁČ 2' : 'HRÁČ 1');
+    }
+}
+
+function collisionPlayer(player, offsetX = 0, offsetY = 0) {
+    for (let r = 0; r < player.current.shape.length; r++) {
+        for (let c = 0; c < player.current.shape[r].length; c++) {
+            if (player.current.shape[r][c]) {
+                let newY = player.current.y + r + offsetY;
+                let newX = player.current.x + c + offsetX;
+                if (newY >= player.rows || newX < 0 || newX >= player.cols) return true;
+                if (newY >= 0 && player.grid[newY][newX]) return true;
+            }
+        }
+    }
+    return false;
+}
+
+function moveDownPlayer(player) {
+    if (player.gameOver) return;
+    
+    player.current.y++;
+    if (collisionPlayer(player)) {
+        player.current.y--;
+        freezePlayer(player);
+        newTetrominoPlayer(player);
+    }
+}
+
+function freezePlayer(player) {
+    for (let r = 0; r < player.current.shape.length; r++) {
+        for (let c = 0; c < player.current.shape[r].length; c++) {
+            if (player.current.shape[r][c]) {
+                player.grid[player.current.y + r][player.current.x + c] = player.current.color;
+            }
+        }
+    }
+    
+    clearLinesPlayer(player);
+}
+
+function clearLinesPlayer(player) {
+    let cleared = 0;
+    for (let r = player.rows - 1; r >= 0; r--) {
+        if (player.grid[r].every(cell => cell !== 0)) {
+            player.grid.splice(r, 1);
+            player.grid.unshift(Array(player.cols).fill(0));
+            cleared++;
+            r++;
+        }
+    }
+    
+    if (cleared > 0) {
+        player.lines += cleared;
+        player.score += cleared * 100 * player.level;
+        player.level = Math.floor(player.lines / 10) + 1;
+        player.dropInterval = Math.max(100, 600 - (player.level * 50));
+        updateDisplayPlayer(player);
+    }
+}
+
+function drawPlayer(player) {
+    const cells = player.gridElement.querySelectorAll('.cell');
+    
+    cells.forEach(cell => {
+        cell.style.background = '#1a1a2e';
+        cell.style.boxShadow = 'none';
+    });
+    
+    for (let r = 0; r < player.rows; r++) {
+        for (let c = 0; c < player.cols; c++) {
+            if (player.grid[r][c]) {
+                const cell = cells[r * player.cols + c];
+                cell.style.background = player.grid[r][c];
+                cell.style.boxShadow = `0 0 8px ${player.grid[r][c]}`;
+            }
+        }
+    }
+    
+    for (let r = 0; r < player.current.shape.length; r++) {
+        for (let c = 0; c < player.current.shape[r].length; c++) {
+            if (player.current.shape[r][c]) {
+                const index = (player.current.y + r) * player.cols + (player.current.x + c);
+                if (index >= 0 && index < cells.length) {
+                    cells[index].style.background = player.current.color;
+                    cells[index].style.boxShadow = `0 0 12px ${player.current.color}`;
+                }
+            }
+        }
+    }
+}
+
+function updateDisplayPlayer(player) {
+    player.scoreElement.textContent = player.score;
+    player.levelElement.textContent = player.level;
+}
+
+function rotatePlayer(player) {
+    const shape = player.current.shape;
+    const N = shape.length;
+    const M = shape[0].length;
+    const rotated = [];
+    
+    for (let y = 0; y < M; y++) {
+        rotated[y] = [];
+        for (let x = 0; x < N; x++) {
+            rotated[y][x] = shape[N - 1 - x][y] || 0;
+        }
+    }
+    
+    const oldShape = player.current.shape;
+    player.current.shape = rotated;
+    
+    if (collisionPlayer(player)) {
+        player.current.shape = oldShape;
+    }
+}
+
+function multiplayerLoop() {
+    if (!multiplayerActive) return;
+    
+    const now = Date.now();
+    
+    if (!player1.gameOver && now - player1.lastDrop > player1.dropInterval) {
+        moveDownPlayer(player1);
+        drawPlayer(player1);
+        player1.lastDrop = now;
+    }
+    
+    if (!player2.gameOver && now - player2.lastDrop > player2.dropInterval) {
+        moveDownPlayer(player2);
+        drawPlayer(player2);
+        player2.lastDrop = now;
+    }
+    
+    requestAnimationFrame(multiplayerLoop);
+}
+
+function endMultiplayer(winner) {
+    multiplayerActive = false;
+    
+    setTimeout(() => {
+        alert(`🎉 ${winner} VYHRÁL! 🎉`);
+        backToMainMenu();
+    }, 100);
+}
+
+document.addEventListener('keydown', e => {
+    if (!multiplayerActive) return;
+    
+    // Hráč 1: WASD + Q
+    if (!player1.gameOver) {
+        if (e.key === 'a' || e.key === 'A') {
+            player1.current.x--;
+            if (collisionPlayer(player1)) player1.current.x++;
+            drawPlayer(player1);
+        }
+        if (e.key === 'd' || e.key === 'D') {
+            player1.current.x++;
+            if (collisionPlayer(player1)) player1.current.x--;
+            drawPlayer(player1);
+        }
+        if (e.key === 's' || e.key === 'S') {
+            moveDownPlayer(player1);
+            drawPlayer(player1);
+        }
+        if (e.key === 'q' || e.key === 'Q') {
+            rotatePlayer(player1);
+            drawPlayer(player1);
+        }
+    }
+    
+    // Hráč 2: Šipky
+    if (!player2.gameOver) {
+        if (e.key === 'ArrowLeft') {
+            player2.current.x--;
+            if (collisionPlayer(player2)) player2.current.x++;
+            drawPlayer(player2);
+        }
+        if (e.key === 'ArrowRight') {
+            player2.current.x++;
+            if (collisionPlayer(player2)) player2.current.x--;
+            drawPlayer(player2);
+        }
+        if (e.key === 'ArrowDown') {
+            moveDownPlayer(player2);
+            drawPlayer(player2);
+        }
+        if (e.key === 'ArrowUp') {
+            rotatePlayer(player2);
+            drawPlayer(player2);
+        }
+    }
+});
+
+// Upravená funkce backToMainMenu
+const originalBackToMainMenu = window.backToMainMenu;
+window.backToMainMenu = function() {
+    multiplayerActive = false;
+    document.getElementById('multiplayerGame').style.display = 'none';
+    originalBackToMainMenu();
+}
 await loadCurrentUser()
 </script>
 </body>
 </html>
+
 
 
 
