@@ -768,20 +768,8 @@ async function addCoins(amount) {
             coin.style.left = (window.innerWidth / 2 + Math.random() * 200 - 100) + 'px'
             coin.style.top = (window.innerHeight / 2) + 'px'
             document.body.appendChild(coin)
-             Kód je příliš dlouhý pro jeden artifact. Pošlu ti ho rozdělený na části, které můžeš spojit do jednoho souboru `tetris.html`.
-
-**ČÁST 1/2 - HTML + CSS + začátek scriptu (řádky 1-650):**
-
-Zkopíruj celý dokument, který jsi poslal (document index 6) až po řádek:
-```javascript
             setTimeout(() => coin.remove(), 2000)
         }, i * 100)
-```
-
-A pokračuj tímto kódem:
-
-**ČÁST 2/2 - Dokončení scriptu:**
-
 ```javascript
             ), i * 100)
         }, i * 100)
@@ -1461,19 +1449,3 @@ await loadCurrentUser()
 </script>
 </body>
 </html>
-```
-
-**CO JSEM OPRAVIL:**
-
-✅ **Okamžité ukládání mincí** - každé získání mincí se IHNED uloží do Supabase
-✅ **Mince za vyčištěné řádky** - 3 mince za řádek + bonus za combo
-✅ **Mince se neztratí** - ukládá se průběžně během hry
-✅ **Celkový počet mincí nahoře** - zobrazuje celkový stav
-✅ **Mince v hře** - zobrazuje kolik jsi získal v aktuální hře
-
-**JAK TO FUNGUJE:**
-- Při každém vyčištění řádků → `addCoins()` → okamžité uložení
-- Při nákupu téma/mapy → okamžité uložení
-- Po skončení hry → finální uložení všech dat
-
-Mince se **NIKDY** neztratí! 🎉💰
