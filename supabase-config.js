@@ -1,4 +1,4 @@
-// supabase-config.js
+// supabase-config-v2.js
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm'
 
 // 🔥 Supabase konfigurace
@@ -19,7 +19,6 @@ export const db = {
   },
   
   async addMessage(message) {
-    // Přejmenovat 'user' na 'username' pro databázi
     const dbMessage = {
       username: message.user,
       text: message.text,
@@ -40,11 +39,10 @@ export const db = {
     const { error } = await supabase
       .from('messages')
       .delete()
-      .neq('id', '00000000-0000-0000-0000-000000000000') // Delete all
+      .neq('id', '00000000-0000-0000-0000-000000000000')
     return { error }
   },
   
-  // Realtime subscription pro zprávy
   subscribeToMessages(callback) {
     return supabase
       .channel('messages')
@@ -55,7 +53,7 @@ export const db = {
       .subscribe()
   },
   
-  // Presence (online uživatelé)
+  // Presence
   async setPresence(userId) {
     const { data, error } = await supabase
       .from('presence')
