@@ -776,12 +776,14 @@ function updateGameUI(gameKey, isActive) {
 }
 
 // Přepnutí stavu hry (pouze pro admina)
+// Přepnutí stavu hry (pouze pro admina)
 window.toggleGameStatus = async function(gameKey) {
     if (!isAdmin) {
         alert('Nemáte oprávnění ke správě her!');
         return;
     }
     
+    // Načti aktuální stav
     const { data: currentGame } = await supabase
         .from('games_status')
         .select('*')
@@ -790,13 +792,14 @@ window.toggleGameStatus = async function(gameKey) {
     
     const newStatus = currentGame ? !currentGame.is_active : true;
     
+    // UPDATE místo UPSERT
     const { error } = await supabase
         .from('games_status')
-        .upsert({
-            game_key: gameKey,
+        .update({
             is_active: newStatus,
             updated_at: new Date().toISOString()
-        });
+        })
+        .eq('game_key', gameKey);
     
     if (error) {
         console.error('Chyba při ukládání stavu hry:', error);
@@ -1088,3 +1091,4 @@ window.addEventListener('DOMContentLoaded', async function() {
 
 </body>
 </html>
+
