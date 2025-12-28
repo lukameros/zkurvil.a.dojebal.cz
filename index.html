@@ -592,9 +592,8 @@ let currentUserId = null;
 let isAdmin = false;
 let userPresenceId = null;
 
-// Online presence
 async function setupPresence() {
-    // NEJDŘÍV vyčisti staré záznamy (starší než 1 minuta)
+    // Vyčistit staré záznamy (starší než 1 minuta)
     const oneMinuteAgo = new Date();
     oneMinuteAgo.setMinutes(oneMinuteAgo.getMinutes() - 1);
     
@@ -613,35 +612,37 @@ async function setupPresence() {
     
     userPresenceId = storedId;
     
-    // Smazat starý záznam (pokud existuje) a vytvořit nový
+    // NEJDŘÍV smazat starý záznam
     await db.removePresence(userPresenceId);
+    
+    // PAK vytvořit nový
     await db.setPresence(userPresenceId);
     
-    // Odstranit při zavření okna
-    window.addEventListener('beforeunload', async () => {
+    // Smazat při odchodu (unload) - funguje i při přechodu na jinou stránku
+    window.addEventListener('unload', async () => {
         await db.removePresence(userPresenceId);
     });
 }
 
-// Sledování online uživatelů
 async function watchOnlineUsers() {
-    const { count } = await db.getOnlineCount();
-    document.getElementById('onlineCount').textContent = count || 0;
-    document.getElementById('adminOnlineCount').textContent = count || 0;
-    
-    db.subscribeToPresence(async () => {
+    async function updateCount() {
         const { count } = await db.getOnlineCount();
         document.getElementById('onlineCount').textContent = count || 0;
-        document.getElementById('adminOnlineCount').textContent = count || 0;
-    });
-    
-    setInterval(() => {
-        if (userPresenceId) {
-            db.setPresence(userPresenceId);
+        if (document.getElementById('adminOnlineCount')) {
+            document.getElementById('adminOnlineCount').textContent = count || 0;
         }
-    }, 30000);
+    }
+    
+    await updateCount();
+    db.subscribeToPresence(updateCount);
+    
+    // Obnovit presence každých 15 sekund
+    setInterval(async () => {
+        if (userPresenceId) {
+            await db.setPresence(userPresenceId);
+        }
+    }, 15000);
 }
-
 // REGISTRACE
 window.register = async function() {
     const username = document.getElementById('registerUser').value.trim();
@@ -1013,4 +1014,5 @@ setupPresence();
 watchOnlineUsers();
 loadMessages();
 </script>
+
 
