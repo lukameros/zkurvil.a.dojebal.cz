@@ -1,4 +1,4 @@
-// supabase-config.js
+// supabase-config-v2.js
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm'
 
 // 🔥 Supabase konfigurace
@@ -9,7 +9,7 @@ export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
 
 // Pomocné funkce pro snadnější práci
 export const db = {
-  // ==================== ZPRÁVY ====================
+  // Zprávy
   async getMessages() {
     const { data, error } = await supabase
       .from('messages')
@@ -53,7 +53,7 @@ export const db = {
       .subscribe()
   },
   
-  // ==================== PRESENCE ====================
+  // Presence
   async setPresence(userId) {
     const { data, error } = await supabase
       .from('presence')
@@ -86,7 +86,7 @@ export const db = {
       .subscribe()
   },
   
-  // ==================== NÁVODY ====================
+  // Návody
   async getNavody() {
     const { data, error } = await supabase
       .from('navody')
@@ -121,7 +121,7 @@ export const db = {
       .subscribe()
   },
   
-  // ==================== ARCHIV ====================
+  // Archiv
   async getArchiveImages(category) {
     const table = category === 'Airsoft' ? 'archive_airsoft' : 'archive_hry'
     const { data, error } = await supabase
@@ -164,7 +164,7 @@ export const db = {
       .subscribe()
   },
   
-  // ==================== UŽIVATELÉ ====================
+  // 🆕 UŽIVATELÉ - REGISTRACE A PŘIHLÁŠENÍ
   async registerUser(username, password) {
     try {
       // Zkontrolovat, zda uživatel už neexistuje
