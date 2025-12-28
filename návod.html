@@ -523,7 +523,7 @@ tbody tr:hover {
     <div id="authButtons">
         <div id="onlineCounter">👥 Online: <span id="onlineCount">0</span></div>
         <button onclick="toggleChat()">💬 Chat</button>
-        <button id="registerBtn" onclick="showRegister()">Register</button>
+        <button id="registerBtn" onclick="showRegister()">Registrovat</button>
         <button id="loginBtn" onclick="showLogin()">Login</button>
         <button id="logoutBtn" onclick="logout()" style="display:none;">Logout</button>
     </div>
@@ -552,7 +552,7 @@ tbody tr:hover {
                 </thead>
                 <tbody id="tableBody">
                     <tr class="empty-state">
-                        <td colspan="3">Zatím zde nejsou žádné návody. Admin může přidat první!</td>
+                        <td colspan="3">Načítání...</td>
                     </tr>
                 </tbody>
             </table>
@@ -578,6 +578,7 @@ tbody tr:hover {
     <div class="modal-content">
         <h3>Registrace</h3>
         <input id="registerUser" placeholder="Uživatelské jméno">
+        <input id="registerEmail" placeholder="Email (volitelné)">
         <input id="registerPass" type="password" placeholder="Heslo">
         <input id="registerPassConfirm" type="password" placeholder="Potvrdit heslo">
         <div class="modal-buttons">
@@ -601,7 +602,7 @@ tbody tr:hover {
 </div>
 
 <script>
-// Globální funkce pro UI
+// Globální UI funkce
 window.goBack = function() { window.location.href = "index.html"; }
 window.showLogin = function() { document.getElementById("loginModal").style.display = "flex"; }
 window.closeLogin = function() { document.getElementById("loginModal").style.display = "none"; }
@@ -611,61 +612,51 @@ window.toggleChat = function() {
     const chatPanel = document.getElementById('chatPanel');
     chatPanel.style.display = chatPanel.style.display === 'flex' ? 'none' : 'flex';
 }
-
-// Placeholder funkce (budou přepsány v module script)
-window.sendMessage = function() { console.log('Loading...'); }
-window.addItem = function() { console.log('Loading...'); }
-window.deleteNavod = function() { console.log('Loading...'); }
-window.showAddItemForm = function() { console.log('Loading...'); }
-window.register = function() { console.log('Loading...'); }
-window.login = function() { console.log('Loading...'); }
-window.logout = function() { console.log('Loading...'); }
+window.showAddItemForm = function() {
+    const form = document.getElementById("addItemForm");
+    form.style.display = form.style.display === "none" || !form.style.display ? "block" : "none";
+}
 </script>
 
 <script type="module">
 import { supabase, db } from './supabase-config.js';
 
 let currentUser = null;
+let currentUserId = null;
 let isAdmin = false;
 let userPresenceId = null;
 
-// Presence
-function getOrCreatePresenceId() {
-    let storedId = localStorage.getItem('userPresenceId');
-    if (!storedId) {
-        storedId = 'user_' + Math.random().toString(36).substr(2, 9) + '_' + Date.now();
-        localStorage.setItem('userPresenceId', storedId);
-    }
-    return storedId;
-}
-
+// Online presence
 async function setupPresence() {
-    userPresenceId = getOrCreatePresenceId();
+    userPresenceId = 'user_' + Math.random().toString(36).substr(2, 9);
     await db.setPresence(userPresenceId);
     
     window.addEventListener('beforeunload', async () => {
-        if (userPresenceId) await db.removePresence(userPresenceId);
+        await db.removePresence(userPresenceId);
     });
     
-    setInterval(async () => {
-        if (userPresenceId) await db.setPresence(userPresenceId);
-    }, 25000);
+    setInterval(() => {
+        if (userPresenceId) {
+            db.setPresence(userPresenceId);
+        }
+    }, 30000);
 }
 
 async function watchOnlineUsers() {
-    async function updateCount() {
+    const { count } = await db.getOnlineCount();
+    document.getElementById('onlineCount').textContent = count || 0;
+    
+    db.subscribeToPresence(async () => {
         const { count } = await db.getOnlineCount();
         document.getElementById('onlineCount').textContent = count || 0;
-    }
-    await updateCount();
-    db.subscribeToPresence(updateCount);
-    setInterval(updateCount, 30000);
+    });
 }
 
-// Chat
+// Chat funkce
 window.sendMessage = async function() {
     const input = document.getElementById('messageInput');
     const message = input.value.trim();
+    
     if (!message) return;
     
     let username = currentUser;
@@ -690,6 +681,7 @@ window.sendMessage = async function() {
 async function loadMessages() {
     const { data: messages } = await db.getMessages();
     displayMessages(messages);
+    
     db.subscribeToMessages(async () => {
         const { data: messages } = await db.getMessages();
         displayMessages(messages);
@@ -703,21 +695,21 @@ function displayMessages(messages) {
     if (messages && messages.length > 0) {
         messages.forEach(msg => {
             const div = document.createElement('div');
+            
             let msgClass = 'chat-message';
             if (msg.is_admin) msgClass += ' admin';
             else if (msg.is_guest) msgClass += ' guest';
+            
             div.className = msgClass;
             
-            const time = msg.timestamp ? new Date(msg.timestamp).toLocaleTimeString('cs-CZ', {
-                hour: '2-digit',
-                minute: '2-digit'
-            }) : '';
+            const time = msg.timestamp ? new Date(msg.timestamp).toLocaleTimeString('cs-CZ') : '';
             
             div.innerHTML = `
                 <span class="chat-user">${msg.username}:</span>
                 <span>${msg.text}</span>
                 <span style="font-size: 11px; color: rgba(255,255,255,0.5); margin-left: 8px;">${time}</span>
             `;
+            
             messagesDiv.appendChild(div);
         });
         
@@ -725,10 +717,9 @@ function displayMessages(messages) {
     }
 }
 
-// Načíst návody ze Supabase
+// Načíst návody
 async function loadNavody() {
     const { data, error } = await db.getNavody();
-    
     const tbody = document.getElementById('tableBody');
     tbody.innerHTML = '';
     
@@ -777,16 +768,14 @@ window.addItem = async function() {
         return;
     }
     
-    try {
-        const { data, error } = await db.addNavod(newItem);
-        
-        if (error) throw error;
-        
+    const { error } = await db.addNavod(newItem);
+    
+    if (!error) {
         newItemInput.value = '';
         document.getElementById('addItemForm').style.display = 'none';
         alert('Návod byl přidán!');
         loadNavody();
-    } catch (error) {
+    } else {
         console.error('Error adding navod:', error);
         alert('Chyba při přidávání návodu!');
     }
@@ -801,12 +790,12 @@ window.deleteNavod = async function(id) {
     
     if (!confirm('Opravdu chcete smazat tento návod?')) return;
     
-    try {
-        const { error } = await db.deleteNavod(id);
-        if (error) throw error;
+    const { error } = await db.deleteNavod(id);
+    
+    if (!error) {
         alert('Návod byl smazán!');
         loadNavody();
-    } catch (error) {
+    } else {
         console.error('Error deleting navod:', error);
         alert('Chyba při mazání návodu!');
     }
@@ -825,24 +814,20 @@ function checkAdminStatus() {
     }
 }
 
-// UI funkce
-window.showAddItemForm = function() {
-    if (!isAdmin) {
-        alert('Pouze admin může přidávat návody!');
-        return;
-    }
-    const form = document.getElementById("addItemForm");
-    form.style.display = form.style.display === "none" ? "block" : "none";
-}
-
 // Registrace
 window.register = async function() {
     const username = document.getElementById('registerUser').value.trim();
+    const email = document.getElementById('registerEmail').value.trim();
     const password = document.getElementById('registerPass').value;
     const passwordConfirm = document.getElementById('registerPassConfirm').value;
     
-    if (!username || !password || !passwordConfirm) {
-        alert('Vyplňte všechna pole!');
+    if (!username || !password) {
+        alert('Vyplňte uživatelské jméno a heslo!');
+        return;
+    }
+    
+    if (password.length < 6) {
+        alert('Heslo musí mít alespoň 6 znaků!');
         return;
     }
     
@@ -851,20 +836,21 @@ window.register = async function() {
         return;
     }
     
-    if (password.length < 4) {
-        alert('Heslo musí mít alespoň 4 znaky!');
-        return;
-    }
-    
-    const { data, error } = await db.registerUser(username, password);
+    const { data, error } = await db.registerUser(username, password, email);
     
     if (error) {
         alert(error.message || 'Chyba při registraci!');
-    } else {
-        alert('Registrace úspěšná! Nyní se můžete přihlásit.');
-        closeRegister();
-        showLogin();
+        return;
     }
+    
+    alert('Registrace úspěšná! Můžete se nyní přihlásit.');
+    closeRegister();
+    
+    // Vyčistit formulář
+    document.getElementById('registerUser').value = '';
+    document.getElementById('registerEmail').value = '';
+    document.getElementById('registerPass').value = '';
+    document.getElementById('registerPassConfirm').value = '';
 }
 
 // Login
@@ -877,75 +863,78 @@ window.login = async function() {
         return;
     }
     
-    const { data, error } = await db.loginUser(username, password);
+    const { data: user, error } = await db.loginUser(username, password);
     
-    if (error || !data) {
-        alert('Špatné uživatelské jméno nebo heslo!');
+    if (error || !user) {
+        alert('Špatné přihlašovací údaje!');
         return;
     }
     
-    currentUser = data.username;
-    isAdmin = data.is_admin;
+    currentUser = user.username;
+    currentUserId = user.id;
+    isAdmin = user.is_admin;
     
-    localStorage.setItem('currentUser', currentUser);
-    localStorage.setItem('isAdmin', isAdmin);
+    localStorage.setItem('currentUser', user.username);
+    localStorage.setItem('currentUserId', user.id);
+    localStorage.setItem('isAdmin', user.is_admin ? 'true' : 'false');
     
-    document.getElementById('registerBtn').style.display = 'none';
     document.getElementById('loginBtn').style.display = 'none';
+    document.getElementById('registerBtn').style.display = 'none';
     document.getElementById('logoutBtn').style.display = 'inline-block';
     
-    if (isAdmin) {
-        alert('Přihlášení úspěšné! Máte admin práva.');
-    } else {
-        alert('Přihlášení úspěšné!');
-    }
-    
     closeLogin();
+    alert(`Vítejte, ${user.username}!${isAdmin ? ' (Admin)' : ''}`);
     checkAdminStatus();
 }
 
 // Logout
-window.logout = async function() {
-    if (userPresenceId) await db.removePresence(userPresenceId);
-    
+window.logout = function() {
     currentUser = null;
+    currentUserId = null;
     isAdmin = false;
     window.guestName = null;
     
     localStorage.removeItem('currentUser');
+    localStorage.removeItem('currentUserId');
     localStorage.removeItem('isAdmin');
     
-    document.getElementById('registerBtn').style.display = 'inline-block';
     document.getElementById('loginBtn').style.display = 'inline-block';
+    document.getElementById('registerBtn').style.display = 'inline-block';
     document.getElementById('logoutBtn').style.display = 'none';
     
-    alert('Byl jste odhlášen.');
+    alert('Byl jste odhlášen. Nyní píšete jako host.');
     checkAdminStatus();
-    setTimeout(() => setupPresence(), 500);
 }
 
-// Inicializace
-window.addEventListener('DOMContentLoaded', function() {
+// Načíst uloženou session
+window.onload = async function() {
     const savedUser = localStorage.getItem('currentUser');
+    const savedUserId = localStorage.getItem('currentUserId');
     const savedAdmin = localStorage.getItem('isAdmin');
     
-    if (savedUser) {
+    if (savedUser && savedUserId) {
         currentUser = savedUser;
+        currentUserId = savedUserId;
         isAdmin = savedAdmin === 'true';
         
-        document.getElementById('registerBtn').style.display = 'none';
         document.getElementById('loginBtn').style.display = 'none';
+        document.getElementById('registerBtn').style.display = 'none';
         document.getElementById('logoutBtn').style.display = 'inline-block';
     }
     
+    // Inicializace
     setupPresence();
     watchOnlineUsers();
     loadMessages();
     loadNavody();
     checkAdminStatus();
     
-    // Subscribe k real-time změnám v návodech
+    // Realtime subscription pro návody
     db.subscribeToNavody(() => {
         loadNavody();
     });
-});
+}
+</script>
+
+</body>
+</html>
