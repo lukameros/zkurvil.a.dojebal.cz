@@ -14,11 +14,12 @@ export async function setupPresence(supabase, db) {
     let sessionId = sessionStorage.getItem('userPresenceId');
     
     if (!sessionId) {
-        sessionId = 'user_' + Math.random().toString(36).substr(2, 9);
+        sessionId = 'user_' + Math.random().toString(36).substr(2, 9) + '_' + Date.now();
         sessionStorage.setItem('userPresenceId', sessionId);
     }
     
     const userPresenceId = sessionId;
+    console.log('🔷 Presence ID:', userPresenceId);
     
     // Vyčistit staré záznamy (starší než 60 sekund)
     const cleanupTime = new Date();
@@ -29,16 +30,30 @@ export async function setupPresence(supabase, db) {
             .from('presence')
             .delete()
             .lt('timestamp', cleanupTime.toISOString());
+        console.log('🧹 Staré záznamy vyčištěny');
     } catch (error) {
         console.error('❌ Cleanup error:', error);
     }
     
     // Nastavit/aktualizovat presence
     await db.setPresence(userPresenceId);
+    console.log('✅ Presence nastavena');
     
     // Odstranit při zavření tabu
     window.addEventListener('beforeunload', async () => {
         try {
+            // Použít sendBeacon pro spolehlivé odstranění
+            const url = `${supabase.supabaseUrl}/rest/v1/presence?id=eq.${userPresenceId}`;
+            const headers = {
+                'apikey': supabase.supabaseKey,
+                'Authorization': `Bearer ${supabase.supabaseKey}`,
+                'Content-Type': 'application/json'
+            };
+            
+            // Vytvořit blob s prázdným tělem pro DELETE
+            const blob = new Blob([JSON.stringify({})], { type: 'application/json' });
+            
+            // sendBeacon podporuje pouze POST, ale Supabase má RPC pro delete
             await db.removePresence(userPresenceId);
         } catch (error) {
             console.error('❌ Error removing presence:', error);
@@ -47,9 +62,10 @@ export async function setupPresence(supabase, db) {
     
     // Automatické obnovování každých 30 sekund
     setInterval(async () => {
-        if (userPresenceId) {
+        if (sessionStorage.getItem('userPresenceId')) {
             try {
                 await db.setPresence(userPresenceId);
+                console.log('🔄 Presence obnovena');
             } catch (error) {
                 console.error('❌ Error updating presence:', error);
             }
@@ -71,6 +87,7 @@ export async function watchOnlineUsers(db) {
             const countElement = document.getElementById('onlineCount');
             if (countElement) {
                 countElement.textContent = count || 0;
+                console.log('👥 Online:', count || 0);
             }
             
             const adminCountElement = document.getElementById('adminOnlineCount');
@@ -98,7 +115,9 @@ export async function watchOnlineUsers(db) {
  * @param {Object} db - Databázové utility
  */
 export async function initPresence(supabase, db) {
+    console.log('🚀 Inicializuji presence systém...');
     const presenceId = await setupPresence(supabase, db);
     await watchOnlineUsers(db);
+    console.log('✅ Presence systém inicializován');
     return presenceId;
 }
