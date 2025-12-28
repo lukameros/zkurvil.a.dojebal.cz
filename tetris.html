@@ -736,6 +736,79 @@ button.menuBtn.locked::after {
     </div>
     <button class="menuBtn" onclick="backToMainMenu()" style="margin-top: 30px;">⬅ Zpět do menu</button>
 </div>
+    <!-- Online Multiplayer Menu -->
+<div id="onlineMultiplayerMenu" class="centered" style="display:none;">
+    <h1>🌐 Online Multiplayer</h1>
+    <button class="menuBtn" onclick="createOnlineGame()">🎮 Vytvořit hru</button>
+    <button class="menuBtn" onclick="showJoinGame()">🔗 Připojit se ke hře</button>
+    <button class="menuBtn" onclick="backToMainMenu()">⬅ Zpět</button>
+</div>
+
+<!-- Join Game Menu -->
+<div id="joinGameMenu" class="centered" style="display:none;">
+    <h1>🔗 Připojit se ke hře</h1>
+    <input id="gameCodeInput" placeholder="Zadej kód hry (např. ABC123)" style="padding: 15px; font-size: 18px; margin: 20px 0; width: 300px; text-align: center; text-transform: uppercase; background: rgba(0,0,0,0.5); color: #fff; border: 2px solid #0ff; border-radius: 8px;">
+    <button class="menuBtn" onclick="joinOnlineGame()">✅ Připojit se</button>
+    <button class="menuBtn" onclick="backToOnlineMenu()">⬅ Zpět</button>
+</div>
+
+<!-- Waiting Room -->
+<div id="waitingRoom" class="centered" style="display:none;">
+    <h1>⏳ Čekárna</h1>
+    <div style="background: rgba(0,255,255,0.1); border: 2px solid #0ff; border-radius: 12px; padding: 30px; margin: 20px 0;">
+        <h2 style="color: #0ff; font-size: 48px; margin-bottom: 20px;">KÓD HRY</h2>
+        <div id="displayGameCode" style="font-size: 72px; font-weight: 900; color: #fff; text-shadow: 0 0 30px #0ff; letter-spacing: 10px;">------</div>
+    </div>
+    <p style="font-size: 20px; color: #fff; margin: 20px 0;">Čeká se na druhého hráče...</p>
+    <div class="loading">⏳ Připojování...</div>
+    <button class="menuBtn" onclick="cancelWaiting()">❌ Zrušit</button>
+</div>
+
+<!-- Online Game -->
+<div id="onlineGame" style="display:none;">
+    <div style="text-align: center; margin-bottom: 20px;">
+        <h1>🌐 ONLINE MULTIPLAYER</h1>
+        <p style="font-size: 24px; color: #0ff;">Kód hry: <span id="currentGameCode" style="font-weight: 900;">------</span></p>
+    </div>
+    
+    <div style="display: flex; gap: 40px; justify-content: center; align-items: flex-start;">
+        <!-- Hráč 1 -->
+        <div>
+            <h2 id="player1Name" style="text-align: center; color: #00ffff; margin-bottom: 20px;">🎮 HRÁČ 1</h2>
+            <div style="display: flex; gap: 20px;">
+                <div class="info-box">
+                    <h3>SKÓRE</h3>
+                    <div id="onlineScore1">0</div>
+                </div>
+                <div id="onlineTetris1" style="display: grid; gap: 1px; background: rgba(17, 17, 34, 0.9); border: 3px solid #00ffff; border-radius: 8px; padding: 3px;"></div>
+                <div class="info-box">
+                    <h3>ÚROVEŇ</h3>
+                    <div id="onlineLevel1">1</div>
+                </div>
+            </div>
+            <p id="player1Status" style="text-align: center; margin-top: 15px; color: #0f0; font-weight: 900;">✅ HRAJE</p>
+        </div>
+        
+        <!-- Hráč 2 -->
+        <div>
+            <h2 id="player2Name" style="text-align: center; color: #ff00ff; margin-bottom: 20px;">🎮 HRÁČ 2</h2>
+            <div style="display: flex; gap: 20px;">
+                <div class="info-box">
+                    <h3>SKÓRE</h3>
+                    <div id="onlineScore2">0</div>
+                </div>
+                <div id="onlineTetris2" style="display: grid; gap: 1px; background: rgba(17, 17, 34, 0.9); border: 3px solid #ff00ff; border-radius: 8px; padding: 3px;"></div>
+                <div class="info-box">
+                    <h3>ÚROVEŇ</h3>
+                    <div id="onlineLevel2">1</div>
+                </div>
+            </div>
+            <p id="player2Status" style="text-align: center; margin-top: 15px; color: #0f0; font-weight: 900;">✅ HRAJE</p>
+        </div>
+    </div>
+    
+    <button class="menuBtn" onclick="leaveOnlineGame()" style="margin-top: 30px;">🚪 Opustit hru</button>
+</div>
 <script>
 let selectedDifficulty = 'medium';
 let mapRows = 20;
@@ -1912,10 +1985,503 @@ window.backToMainMenu = function() {
     document.getElementById('multiplayerGame').style.display = 'none';
     originalBackToMainMenu();
 }
+    // Online Multiplayer
+let currentGameId = null;
+let currentGameCode = null;
+let myPlayerNumber = null;
+let onlineGameActive = false;
+let onlinePlayer1 = null;
+let onlinePlayer2 = null;
+let gameStateSubscription = null;
+
+window.showOnlineMultiplayer = function() {
+    if (!currentUser || currentUser.is_guest) {
+        alert('Pro online hru se musíš přihlásit!');
+        return;
+    }
+    
+    document.getElementById('mainMenu').style.display = 'none';
+    document.getElementById('onlineMultiplayerMenu').style.display = 'flex';
+}
+
+function backToOnlineMenu() {
+    document.getElementById('onlineMultiplayerMenu').style.display = 'flex';
+    document.getElementById('joinGameMenu').style.display = 'none';
+    document.getElementById('waitingRoom').style.display = 'none';
+}
+
+function generateGameCode() {
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+    let code = '';
+    for (let i = 0; i < 6; i++) {
+        code += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    return code;
+}
+
+window.createOnlineGame = async function() {
+    const gameCode = generateGameCode();
+    
+    try {
+        const { data, error } = await supabase
+            .from('tetris_multiplayer_games')
+            .insert([{
+                game_code: gameCode,
+                player1_id: currentUser.id,
+                player1_username: currentUser.username,
+                status: 'waiting'
+            }])
+            .select()
+            .single();
+        
+        if (error) throw error;
+        
+        currentGameId = data.id;
+        currentGameCode = gameCode;
+        myPlayerNumber = 1;
+        
+        document.getElementById('onlineMultiplayerMenu').style.display = 'none';
+        document.getElementById('waitingRoom').style.display = 'flex';
+        document.getElementById('displayGameCode').textContent = gameCode;
+        
+        waitForPlayer2();
+        
+    } catch (error) {
+        console.error('Chyba při vytváření hry:', error);
+        alert('Chyba při vytváření hry!');
+    }
+}
+
+window.showJoinGame = function() {
+    document.getElementById('onlineMultiplayerMenu').style.display = 'none';
+    document.getElementById('joinGameMenu').style.display = 'flex';
+}
+
+window.joinOnlineGame = async function() {
+    const code = document.getElementById('gameCodeInput').value.trim().toUpperCase();
+    
+    if (!code) {
+        alert('Zadej kód hry!');
+        return;
+    }
+    
+    try {
+        const { data: game, error } = await supabase
+            .from('tetris_multiplayer_games')
+            .select('*')
+            .eq('game_code', code)
+            .eq('status', 'waiting')
+            .single();
+        
+        if (error || !game) {
+            alert('Hra s tímto kódem neexistuje nebo již byla zahájena!');
+            return;
+        }
+        
+        const { error: updateError } = await supabase
+            .from('tetris_multiplayer_games')
+            .update({
+                player2_id: currentUser.id,
+                player2_username: currentUser.username,
+                status: 'playing'
+            })
+            .eq('id', game.id);
+        
+        if (updateError) throw updateError;
+        
+        currentGameId = game.id;
+        currentGameCode = code;
+        myPlayerNumber = 2;
+        
+        startOnlineGame();
+        
+    } catch (error) {
+        console.error('Chyba při připojování:', error);
+        alert('Chyba při připojování ke hře!');
+    }
+}
+
+async function waitForPlayer2() {
+    const channel = supabase
+        .channel(`game_${currentGameId}`)
+        .on('postgres_changes', {
+            event: 'UPDATE',
+            schema: 'public',
+            table: 'tetris_multiplayer_games',
+            filter: `id=eq.${currentGameId}`
+        }, (payload) => {
+            if (payload.new.status === 'playing') {
+                channel.unsubscribe();
+                startOnlineGame();
+            }
+        })
+        .subscribe();
+}
+
+window.cancelWaiting = async function() {
+    if (currentGameId) {
+        await supabase
+            .from('tetris_multiplayer_games')
+            .delete()
+            .eq('id', currentGameId);
+    }
+    
+    currentGameId = null;
+    currentGameCode = null;
+    myPlayerNumber = null;
+    
+    backToOnlineMenu();
+}
+
+async function startOnlineGame() {
+    document.getElementById('waitingRoom').style.display = 'none';
+    document.getElementById('joinGameMenu').style.display = 'none';
+    document.getElementById('onlineGame').style.display = 'flex';
+    document.getElementById('currentGameCode').textContent = currentGameCode;
+    
+    onlineGameActive = true;
+    
+    // Načti informace o hráčích
+    const { data: game } = await supabase
+        .from('tetris_multiplayer_games')
+        .select('*')
+        .eq('id', currentGameId)
+        .single();
+    
+    document.getElementById('player1Name').textContent = `🎮 ${game.player1_username}`;
+    document.getElementById('player2Name').textContent = `🎮 ${game.player2_username}`;
+    
+    // Inicializace obou hráčů
+    onlinePlayer1 = createOnlinePlayer('onlineTetris1', 'onlineScore1', 'onlineLevel1', 15, 10, '#00ffff', 1);
+    onlinePlayer2 = createOnlinePlayer('onlineTetris2', 'onlineScore2', 'onlineLevel2', 15, 10, '#ff00ff', 2);
+    
+    // Vytvoř počáteční stav pro mého hráče
+    const myPlayer = myPlayerNumber === 1 ? onlinePlayer1 : onlinePlayer2;
+    await saveGameState(myPlayer);
+    
+    // Sleduj změny
+    subscribeToGameState();
+    
+    // Start smyčky
+    onlineGameLoop();
+}
+
+function createOnlinePlayer(gridId, scoreId, levelId, rows, cols, borderColor, playerNum) {
+    const player = {
+        grid: [],
+        current: null,
+        nextPiece: null,
+        score: 0,
+        level: 1,
+        lines: 0,
+        gameOver: false,
+        dropInterval: 600,
+        lastDrop: Date.now(),
+        gridElement: document.getElementById(gridId),
+        scoreElement: document.getElementById(scoreId),
+        levelElement: document.getElementById(levelId),
+        rows: rows,
+        cols: cols,
+        borderColor: borderColor,
+        playerNumber: playerNum
+    };
+    
+    player.gridElement.innerHTML = '';
+    player.gridElement.style.gridTemplateRows = `repeat(${rows}, 25px)`;
+    player.gridElement.style.gridTemplateColumns = `repeat(${cols}, 25px)`;
+    player.gridElement.style.borderColor = borderColor;
+    
+    for (let r = 0; r < rows; r++) {
+        player.grid[r] = [];
+        for (let c = 0; c < cols; c++) {
+            const cell = document.createElement('div');
+            cell.classList.add('cell');
+            cell.style.width = '23px';
+            cell.style.height = '23px';
+            player.gridElement.appendChild(cell);
+            player.grid[r][c] = 0;
+        }
+    }
+    
+    player.nextPiece = randomTetromino();
+    newTetrominoOnline(player);
+    
+    return player;
+}
+
+function newTetrominoOnline(player) {
+    player.current = player.nextPiece;
+    player.current.x = Math.floor(player.cols / 2) - 1;
+    player.current.y = 0;
+    player.nextPiece = randomTetromino();
+    
+    if (collisionOnline(player)) {
+        player.gameOver = true;
+        endOnlineGame(player.playerNumber === 1 ? 2 : 1);
+    }
+}
+
+function collisionOnline(player, offsetX = 0, offsetY = 0) {
+    for (let r = 0; r < player.current.shape.length; r++) {
+        for (let c = 0; c < player.current.shape[r].length; c++) {
+            if (player.current.shape[r][c]) {
+                let newY = player.current.y + r + offsetY;
+                let newX = player.current.x + c + offsetX;
+                if (newY >= player.rows || newX < 0 || newX >= player.cols) return true;
+                if (newY >= 0 && player.grid[newY][newX]) return true;
+            }
+        }
+    }
+    return false;
+}
+
+function moveDownOnline(player) {
+    if (player.gameOver) return;
+    
+    player.current.y++;
+    if (collisionOnline(player)) {
+        player.current.y--;
+        freezeOnline(player);
+        newTetrominoOnline(player);
+    }
+}
+
+function freezeOnline(player) {
+    for (let r = 0; r < player.current.shape.length; r++) {
+        for (let c = 0; c < player.current.shape[r].length; c++) {
+            if (player.current.shape[r][c]) {
+                player.grid[player.current.y + r][player.current.x + c] = player.current.color;
+            }
+        }
+    }
+    
+    clearLinesOnline(player);
+}
+
+function clearLinesOnline(player) {
+    let cleared = 0;
+    for (let r = player.rows - 1; r >= 0; r--) {
+        if (player.grid[r].every(cell => cell !== 0)) {
+            player.grid.splice(r, 1);
+            player.grid.unshift(Array(player.cols).fill(0));
+            cleared++;
+            r++;
+        }
+    }
+    
+    if (cleared > 0) {
+        player.lines += cleared;
+        player.score += cleared * 100 * player.level;
+        player.level = Math.floor(player.lines / 10) + 1;
+        player.dropInterval = Math.max(100, 600 - (player.level * 50));
+        updateDisplayOnline(player);
+    }
+}
+
+function drawOnline(player) {
+    const cells = player.gridElement.querySelectorAll('.cell');
+    
+    cells.forEach(cell => {
+        cell.style.background = '#1a1a2e';
+        cell.style.boxShadow = 'none';
+    });
+    
+    for (let r = 0; r < player.rows; r++) {
+        for (let c = 0; c < player.cols; c++) {
+            if (player.grid[r][c]) {
+                const cell = cells[r * player.cols + c];
+                cell.style.background = player.grid[r][c];
+                cell.style.boxShadow = `0 0 8px ${player.grid[r][c]}`;
+            }
+        }
+    }
+    
+    if (player.current) {
+        for (let r = 0; r < player.current.shape.length; r++) {
+            for (let c = 0; c < player.current.shape[r].length; c++) {
+                if (player.current.shape[r][c]) {
+                    const index = (player.current.y + r) * player.cols + (player.current.x + c);
+                    if (index >= 0 && index < cells.length) {
+                        cells[index].style.background = player.current.color;
+                        cells[index].style.boxShadow = `0 0 12px ${player.current.color}`;
+                    }
+                }
+            }
+        }
+    }
+}
+
+function updateDisplayOnline(player) {
+    player.scoreElement.textContent = player.score;
+    player.levelElement.textContent = player.level;
+}
+
+function rotateOnline(player) {
+    const shape = player.current.shape;
+    const N = shape.length;
+    const M = shape[0].length;
+    const rotated = [];
+    
+    for (let y = 0; y < M; y++) {
+        rotated[y] = [];
+        for (let x = 0; x < N; x++) {
+            rotated[y][x] = shape[N - 1 - x][y] || 0;
+        }
+    }
+    
+    const oldShape = player.current.shape;
+    player.current.shape = rotated;
+    
+    if (collisionOnline(player)) {
+        player.current.shape = oldShape;
+    }
+}
+
+async function saveGameState(player) {
+    try {
+        await supabase
+            .from('tetris_game_state')
+            .upsert({
+                game_id: currentGameId,
+                player_number: player.playerNumber,
+                grid: player.grid,
+                current_piece: player.current,
+                score: player.score,
+                level: player.level,
+                lines: player.lines,
+                game_over: player.gameOver,
+                updated_at: new Date().toISOString()
+            }, {
+                onConflict: 'game_id,player_number'
+            });
+    } catch (error) {
+        console.error('Chyba při ukládání stavu:', error);
+    }
+}
+
+function subscribeToGameState() {
+    gameStateSubscription = supabase
+        .channel(`game_state_${currentGameId}`)
+        .on('postgres_changes', {
+            event: '*',
+            schema: 'public',
+            table: 'tetris_game_state',
+            filter: `game_id=eq.${currentGameId}`
+        }, async (payload) => {
+            if (payload.new.player_number !== myPlayerNumber) {
+                const otherPlayer = payload.new.player_number === 1 ? onlinePlayer1 : onlinePlayer2;
+                
+                otherPlayer.grid = payload.new.grid;
+                otherPlayer.current = payload.new.current_piece;
+                otherPlayer.score = payload.new.score;
+                otherPlayer.level = payload.new.level;
+                otherPlayer.lines = payload.new.lines;
+                otherPlayer.gameOver = payload.new.game_over;
+                
+                updateDisplayOnline(otherPlayer);
+                drawOnline(otherPlayer);
+                
+                if (payload.new.game_over) {
+                    document.getElementById(`player${payload.new.player_number}Status`).textContent = '❌ PROHRÁL';
+                    document.getElementById(`player${payload.new.player_number}Status`).style.color = '#f00';
+                }
+            }
+        })
+        .subscribe();
+}
+
+function onlineGameLoop() {
+    if (!onlineGameActive) return;
+    
+    const now = Date.now();
+    const myPlayer = myPlayerNumber === 1 ? onlinePlayer1 : onlinePlayer2;
+    const otherPlayer = myPlayerNumber === 1 ? onlinePlayer2 : onlinePlayer1;
+    
+    if (!myPlayer.gameOver && now - myPlayer.lastDrop > myPlayer.dropInterval) {
+        moveDownOnline(myPlayer);
+        drawOnline(myPlayer);
+        myPlayer.lastDrop = now;
+        saveGameState(myPlayer);
+    }
+    
+    drawOnline(otherPlayer);
+    
+    requestAnimationFrame(onlineGameLoop);
+}
+
+async function endOnlineGame(winnerNumber) {
+    onlineGameActive = false;
+    
+    const winner = winnerNumber === 1 ? 
+        (await supabase.from('tetris_multiplayer_games').select('player1_username').eq('id', currentGameId).single()).data.player1_username :
+        (await supabase.from('tetris_multiplayer_games').select('player2_username').eq('id', currentGameId).single()).data.player2_username;
+    
+    await supabase
+        .from('tetris_multiplayer_games')
+        .update({
+            status: 'finished',
+            winner: winner
+        })
+        .eq('id', currentGameId);
+    
+    setTimeout(() => {
+        alert(`🎉 ${winner} VYHRÁL! 🎉`);
+        leaveOnlineGame();
+    }, 500);
+}
+
+window.leaveOnlineGame = async function() {
+    onlineGameActive = false;
+    
+    if (gameStateSubscription) {
+        await gameStateSubscription.unsubscribe();
+        gameStateSubscription = null;
+    }
+    
+    currentGameId = null;
+    currentGameCode = null;
+    myPlayerNumber = null;
+    
+    document.getElementById('onlineGame').style.display = 'none';
+    backToMainMenu();
+}
+
+// Upravená keydown event listener
+const originalKeydown = document.onkeydown;
+document.addEventListener('keydown', e => {
+    if (!onlineGameActive) return;
+    
+    const myPlayer = myPlayerNumber === 1 ? onlinePlayer1 : onlinePlayer2;
+    if (!myPlayer || myPlayer.gameOver) return;
+    
+    if (e.key === 'ArrowLeft') {
+        myPlayer.current.x--;
+        if (collisionOnline(myPlayer)) myPlayer.current.x++;
+        drawOnline(myPlayer);
+        saveGameState(myPlayer);
+    }
+    if (e.key === 'ArrowRight') {
+        myPlayer.current.x++;
+        if (collisionOnline(myPlayer)) myPlayer.current.x--;
+        drawOnline(myPlayer);
+        saveGameState(myPlayer);
+    }
+    if (e.key === 'ArrowDown') {
+        moveDownOnline(myPlayer);
+        drawOnline(myPlayer);
+        saveGameState(myPlayer);
+    }
+    if (e.key === 'ArrowUp') {
+        rotateOnline(myPlayer);
+        drawOnline(myPlayer);
+        saveGameState(myPlayer);
+    }
+});
 await loadCurrentUser()
 </script>
 </body>
 </html>
+
 
 
 
