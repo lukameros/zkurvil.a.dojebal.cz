@@ -1,3 +1,26 @@
+// ============================================
+// OPRAVENÁ FUNKCE setPresence v supabase-config.js
+// ============================================
+
+// Najděte tuto funkci v supabase-config.js a NAHRAĎTE ji:
+
+async setPresence(userId) {
+  // ✅ OPRAVENO - používáme pouze sloupce 'id' a 'timestamp'
+  const { data, error } = await supabase
+    .from('presence')
+    .upsert([{ 
+      id: userId,  // ✅ používáme 'id', ne 'user_id'
+      timestamp: new Date().toISOString() 
+    }], {
+      onConflict: 'id'  // ✅ conflict na sloupci 'id'
+    })
+  return { data, error }
+},
+
+// ============================================
+// KOMPLETNÍ OPRAVENÝ supabase-config.js
+// ============================================
+
 // supabase-config.js
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.3'
 
@@ -51,17 +74,21 @@ export const db = {
       .subscribe()
   },
   
-  // Presence (online uživatelé)
+  // ✅ OPRAVENÁ PRESENCE SEKCE
   async setPresence(userId) {
     const { data, error } = await supabase
       .from('presence')
       .upsert([{ 
-        id: userId, 
-        online: true, 
+        id: userId,  // ✅ Používáme 'id' místo 'user_id'
         timestamp: new Date().toISOString() 
       }], {
-        onConflict: 'id'
+        onConflict: 'id'  // ✅ Správný conflict column
       })
+    
+    if (error) {
+      console.error('❌ setPresence error:', error)
+    }
+    
     return { data, error }
   },
   
@@ -69,12 +96,17 @@ export const db = {
     const { error } = await supabase
       .from('presence')
       .delete()
-      .eq('id', userId)
+      .eq('id', userId)  // ✅ Používáme 'id' místo 'user_id'
+    
+    if (error) {
+      console.error('❌ removePresence error:', error)
+    }
+    
     return { error }
   },
   
   async getOnlineCount() {
-    // Nejdřív vyčisti staré záznamy (starší než 1 minuta)
+    // Vyčistit staré záznamy (starší než 1 minuta)
     const oneMinuteAgo = new Date()
     oneMinuteAgo.setMinutes(oneMinuteAgo.getMinutes() - 1)
     
@@ -86,6 +118,11 @@ export const db = {
     const { count, error } = await supabase
       .from('presence')
       .select('*', { count: 'exact', head: true })
+    
+    if (error) {
+      console.error('❌ getOnlineCount error:', error)
+    }
+    
     return { count, error }
   },
   
@@ -177,7 +214,7 @@ export const db = {
       .subscribe()
   },
   
-  // Uživatelé (přidávám chybějící funkce)
+  // Uživatelé
   async registerUser(username, password, email = null) {
     const { data: existing } = await supabase
       .from('users')
@@ -227,13 +264,13 @@ export const db = {
     return { data, error }
   },
   
- async deleteUser(id) {
+  async deleteUser(id) {
     const { error } = await supabase
       .from('users')
       .delete()
       .eq('id', id)
     return { error }
-  },   // ← PŘIDEJ ČÁRKU TADY!
+  },
   
   // Tetris player data
   async getTetrisPlayerData(userId) {
@@ -254,5 +291,3 @@ export const db = {
     return { data, error }
   }
 }
-
-
