@@ -611,66 +611,12 @@ function closeAdminPanel() {
 
 <script type="module">
 import { supabase, db } from './supabase-config.js';
+import { initPresence } from './presence-utils.js';
 
 let currentUser = null;
 let currentUserId = null;
 let isAdmin = false;
 let userPresenceId = null;
-
-async function setupPresence() {
-    let sessionId = sessionStorage.getItem('userPresenceId');
-    
-    if (!sessionId) {
-        sessionId = 'user_' + Math.random().toString(36).substr(2, 9);
-        sessionStorage.setItem('userPresenceId', sessionId);
-    }
-    
-    userPresenceId = sessionId;
-    
-    const cleanupTime = new Date();
-    cleanupTime.setSeconds(cleanupTime.getSeconds() - 45);
-    
-    await supabase
-        .from('presence')
-        .delete()
-        .lt('timestamp', cleanupTime.toISOString());
-    
-    await db.setPresence(userPresenceId);
-    
-    window.addEventListener('beforeunload', () => {
-        const formData = new FormData();
-        formData.append('id', userPresenceId);
-        navigator.sendBeacon(
-            `https://bmmaijlbpwgzhrxzxphf.supabase.co/rest/v1/presence?id=eq.${userPresenceId}`,
-            formData
-        );
-    });
-    
-    setInterval(async () => {
-        if (userPresenceId) {
-            await db.setPresence(userPresenceId);
-        }
-    }, 30000);
-}
-
-async function watchOnlineUsers() {
-    async function updateCount() {
-        const { count } = await db.getOnlineCount();
-        document.getElementById('onlineCount').textContent = count || 0;
-        if (document.getElementById('adminOnlineCount')) {
-            document.getElementById('adminOnlineCount').textContent = count || 0;
-        }
-    }
-    
-    await updateCount();
-    db.subscribeToPresence(updateCount);
-    
-    setInterval(async () => {
-        if (userPresenceId) {
-            await db.setPresence(userPresenceId);
-        }
-    }, 30000);
-}
 
 // REGISTRACE
 window.register = async function() {
@@ -1074,6 +1020,8 @@ window.showDatabaseStats = async function() {
 
 // Inicializace při načtení stránky
 window.onload = async function() {
+    console.log('🚀 Index.html - Inicializace...');
+    
     const savedUser = localStorage.getItem('currentUser');
     
     if (savedUser) {
@@ -1098,11 +1046,15 @@ window.onload = async function() {
         }
     }
     
-    setupPresence();
-    watchOnlineUsers();
+    // ✅ NOVÁ INICIALIZACE PRESENCE
+    userPresenceId = await initPresence(supabase, db);
+    
+    // Načíst zprávy
     loadMessages();
+    
+    console.log('✅ Index.html inicializován');
 }
 </script>
-
 </body>
 </html>
+
