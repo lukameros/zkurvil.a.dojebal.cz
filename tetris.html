@@ -607,10 +607,49 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
 // Načtení přihlášeného uživatele
 async function loadCurrentUser() {
     const savedUser = localStorage.getItem('currentUser')
+    
     if (savedUser) {
-        currentUser = JSON.parse(savedUser)
-        console.log('Přihlášený uživatel:', currentUser.username)
-        await loadUserData()
+        try {
+            // Pokus se parsovat jako JSON
+            const parsed = JSON.parse(savedUser)
+            
+            // Zkontroluj, jestli má potřebné údaje
+            if (parsed && parsed.id && parsed.username) {
+                currentUser = parsed
+                console.log('Přihlášený uživatel (JSON):', currentUser.username, 'ID:', currentUser.id)
+                await loadUserData()
+            } else {
+                throw new Error('Neplatný formát')
+            }
+        } catch (e) {
+            // Pokud parse selže, je to jen string (jméno)
+            console.log('currentUser je jen string:', savedUser)
+            
+            // Zkus najít uživatele v Supabase podle jména
+            try {
+                const { data: user, error } = await supabase
+                    .from('users')
+                    .select('*')
+                    .eq('username', savedUser)
+                    .single()
+                
+                if (user && !error) {
+                    currentUser = user
+                    // Ulož správný formát
+                    localStorage.setItem('currentUser', JSON.stringify(user))
+                    console.log('Uživatel načten z databáze:', user.username, 'ID:', user.id)
+                    await loadUserData()
+                } else {
+                    console.error('Uživatel nenalezen v databázi')
+                    currentUser = { username: savedUser, is_guest: true }
+                    loadLocalData()
+                }
+            } catch (error) {
+                console.error('Chyba při načítání uživatele:', error)
+                currentUser = { username: savedUser, is_guest: true }
+                loadLocalData()
+            }
+        }
     } else {
         // Host režim
         currentUser = { username: 'Host', is_guest: true }
