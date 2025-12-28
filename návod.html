@@ -640,7 +640,7 @@ async function setupPresence() {
     // VŽDYCKY při načtení stránky:
     // 1. Vyčistit staré záznamy (starší než 45 sekund)
     const cleanupTime = new Date();
-    cleanupTime.setSeconds(cleanupTime.getSeconds() - 45);
+    cleanupTime.setSeconds(cleanupTime.getSeconds() - 10);
     
     await supabase
         .from('presence')
@@ -664,7 +664,7 @@ async function setupPresence() {
         if (userPresenceId) {
             await db.setPresence(userPresenceId);
         }
-    }, 30000);
+    }, 5000);
 }
 async function watchOnlineUsers() {
     async function updateCount() {
@@ -683,7 +683,7 @@ async function watchOnlineUsers() {
         if (userPresenceId) {
             await db.setPresence(userPresenceId);
         }
-    }, 15000);
+    }, 5000);
 }
 
 // Chat funkce
@@ -972,6 +972,7 @@ window.onload = async function() {
 
 </body>
 </html>
+
 
 
 
