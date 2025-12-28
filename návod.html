@@ -620,71 +620,12 @@ window.showAddItemForm = function() {
 
 <script type="module">
 import { supabase, db } from './supabase-config.js';
+import { initPresence } from './presence-utils.js'; // ✅ NOVÝ IMPORT
 
 let currentUser = null;
 let currentUserId = null;
 let isAdmin = false;
 let userPresenceId = null;
-
-async function setupPresence() {
-    // Použít JEDNO session ID pro všechny taby
-    let sessionId = sessionStorage.getItem('userPresenceId');
-    
-    if (!sessionId) {
-        sessionId = 'user_' + Math.random().toString(36).substr(2, 9);
-        sessionStorage.setItem('userPresenceId', sessionId);
-    }
-    
-    userPresenceId = sessionId;
-    
-    // VŽDYCKY při načtení stránky:
-    // 1. Vyčistit staré záznamy (starší než 45 sekund)
-    const cleanupTime = new Date();
-    cleanupTime.setSeconds(cleanupTime.getSeconds() - 10);
-    
-    await supabase
-        .from('presence')
-        .delete()
-        .lt('timestamp', cleanupTime.toISOString());
-    
-    // 2. Vytvořit/aktualizovat náš záznam
-    await db.setPresence(userPresenceId);
-    
-    // 3. Odstranit při zavření celého tabu (ne stránky)
-    window.addEventListener('beforeunload', () => {
-        // Použít synchronní požadavek (jediný způsob, jak zajistit vymazání)
-        navigator.sendBeacon(
-            `https://bmmaijlbpwgzhrxzxphf.supabase.co/rest/v1/presence?id=eq.${userPresenceId}`,
-            JSON.stringify({})
-        );
-    });
-    
-    // 4. Obnovovat každých 30 sekund
-    setInterval(async () => {
-        if (userPresenceId) {
-            await db.setPresence(userPresenceId);
-        }
-    }, 5000);
-}
-async function watchOnlineUsers() {
-    async function updateCount() {
-        const { count } = await db.getOnlineCount();
-        document.getElementById('onlineCount').textContent = count || 0;
-        if (document.getElementById('adminOnlineCount')) {
-            document.getElementById('adminOnlineCount').textContent = count || 0;
-        }
-    }
-    
-    await updateCount();
-    db.subscribeToPresence(updateCount);
-    
-    // Obnovit presence každých 15 sekund
-    setInterval(async () => {
-        if (userPresenceId) {
-            await db.setPresence(userPresenceId);
-        }
-    }, 5000);
-}
 
 // Chat funkce
 window.sendMessage = async function() {
@@ -880,7 +821,6 @@ window.register = async function() {
     alert('Registrace úspěšná! Můžete se nyní přihlásit.');
     closeRegister();
     
-    // Vyčistit formulář
     document.getElementById('registerUser').value = '';
     document.getElementById('registerEmail').value = '';
     document.getElementById('registerPass').value = '';
@@ -940,8 +880,10 @@ window.logout = function() {
     checkAdminStatus();
 }
 
-// Načíst uloženou session
+// ✅ HLAVNÍ INICIALIZACE
 window.onload = async function() {
+    console.log('🚀 Návod.html - Inicializace...');
+    
     const savedUser = localStorage.getItem('currentUser');
     const savedUserId = localStorage.getItem('currentUserId');
     const savedAdmin = localStorage.getItem('isAdmin');
@@ -956,9 +898,10 @@ window.onload = async function() {
         document.getElementById('logoutBtn').style.display = 'inline-block';
     }
     
-    // Inicializace
-    setupPresence();
-    watchOnlineUsers();
+    // ✅ NOVÁ INICIALIZACE PRESENCE
+    userPresenceId = await initPresence(supabase, db);
+    
+    // Načíst zprávy a návody
     loadMessages();
     loadNavody();
     checkAdminStatus();
@@ -967,11 +910,13 @@ window.onload = async function() {
     db.subscribeToNavody(() => {
         loadNavody();
     });
+    
+    console.log('✅ Návod.html inicializován');
 }
 </script>
-
 </body>
 </html>
+
 
 
 
