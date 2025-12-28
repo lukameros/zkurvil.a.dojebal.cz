@@ -709,7 +709,14 @@ window.login = async function() {
     currentUserId = user.id;
     isAdmin = true; // lukamer je vždy admin
     
-    localStorage.setItem('currentUser', user.username);
+    // ✅ Ukládej celý objekt jako JSON
+localStorage.setItem('currentUser', JSON.stringify({
+    id: user.id,
+    username: user.username,
+    is_admin: true
+}));
+localStorage.setItem('currentUserId', user.id);
+localStorage.setItem('isAdmin', 'true');
     localStorage.setItem('currentUserId', user.id);
     localStorage.setItem('isAdmin', 'true');
     
@@ -808,20 +815,28 @@ function displayMessages(messages) {
     }
 }
 
-// Načíst uloženou session
 window.addEventListener('DOMContentLoaded', async function() {
     const savedUser = localStorage.getItem('currentUser');
-    const savedUserId = localStorage.getItem('currentUserId');
-    const savedAdmin = localStorage.getItem('isAdmin');
     
-    if (savedUser && savedUserId) {
-        currentUser = savedUser;
-        currentUserId = savedUserId;
-        isAdmin = savedAdmin === 'true';
-        
-        document.getElementById('loginBtn').style.display = 'none';
-        document.getElementById('registerBtn').style.display = 'none';
-        document.getElementById('logoutBtn').style.display = 'inline-block';
+    if (savedUser) {
+        try {
+            // ✅ Pokus se načíst jako JSON objekt
+            const user = JSON.parse(savedUser);
+            
+            if (user && user.id && user.username) {
+                currentUser = user.username;
+                currentUserId = user.id;
+                isAdmin = user.is_admin || false;
+                
+                document.getElementById('loginBtn').style.display = 'none';
+                document.getElementById('registerBtn').style.display = 'none';
+                document.getElementById('logoutBtn').style.display = 'inline-block';
+            }
+        } catch (e) {
+            // Starý formát - vymaž a přihlas znovu
+            console.log('Starý formát - vymaž localStorage');
+            localStorage.clear();
+        }
     }
     
     // Inicializace
@@ -834,3 +849,4 @@ window.addEventListener('DOMContentLoaded', async function() {
 
 </body>
 </html>
+
