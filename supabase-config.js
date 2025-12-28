@@ -13,6 +13,7 @@ export const db = {
       .from('messages')
       .select('*')
       .order('timestamp', { ascending: true })
+      .limit(50)
     return { data, error }
   },
   
@@ -51,16 +52,17 @@ export const db = {
       .subscribe()
   },
   
-  // ✅ OPRAVENÁ PRESENCE SEKCE - BEZ pole, jen objekt!
+  // ✅ OPRAVENÁ PRESENCE SEKCE
   async setPresence(userId) {
-    // ✅ Delete + Insert metoda (nejspolehlivější)
-    // Nejdřív smažeme starý záznam
+    console.log('📤 setPresence:', userId)
+    
+    // Delete starý záznam
     await supabase
       .from('presence')
       .delete()
       .eq('id', userId)
     
-    // Pak vložíme nový
+    // Insert nový záznam
     const { data, error } = await supabase
       .from('presence')
       .insert({ 
@@ -70,12 +72,16 @@ export const db = {
     
     if (error) {
       console.error('❌ setPresence error:', error)
+    } else {
+      console.log('✅ setPresence úspěch')
     }
     
     return { data, error }
   },
   
   async removePresence(userId) {
+    console.log('🗑️ removePresence:', userId)
+    
     const { error } = await supabase
       .from('presence')
       .delete()
@@ -106,12 +112,12 @@ export const db = {
       console.error('❌ getOnlineCount error:', error)
     }
     
-    return { count, error }
+    return { count: count || 0, error }
   },
   
   subscribeToPresence(callback) {
     return supabase
-      .channel('presence')
+      .channel('presence_channel')
       .on('postgres_changes',
         { event: '*', schema: 'public', table: 'presence' },
         callback
