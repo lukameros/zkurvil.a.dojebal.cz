@@ -5,8 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Návody</title>
 
-<link rel="stylesheet" href="firebase-chat-styles.css">
-
 <style>
 * {
     margin: 0;
@@ -300,7 +298,8 @@ tbody tr:hover {
     font-style: italic;
 }
 
-#loginModal {
+/* Modal styly */
+.modal {
     display: none;
     position: fixed;
     inset: 0;
@@ -308,33 +307,33 @@ tbody tr:hover {
     backdrop-filter: blur(5px);
     justify-content: center;
     align-items: center;
-    z-index: 1000;
+    z-index: 100;
 }
 
-#loginContent {
+.modal-content {
     background: linear-gradient(135deg, rgba(30,30,30,0.98) 0%, rgba(15,15,15,0.99) 100%);
     padding: 40px;
     border: 3px solid rgba(200,0,0,0.7);
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
     width: 420px;
     text-align: center;
     box-shadow: 0 0 50px rgba(255,0,0,0.7);
     clip-path: polygon(3% 0, 100% 0, 97% 100%, 0 100%);
 }
 
-#loginContent h3 {
+.modal-content h3 {
     color: #fff;
     font-size: 28px;
     font-weight: 900;
     letter-spacing: 3px;
     text-transform: uppercase;
     text-shadow: 0 0 20px rgba(255,0,0,0.9);
+    margin-bottom: 20px;
 }
 
-#loginContent input {
+.modal-content input {
+    width: 100%;
     padding: 15px 20px;
+    margin: 10px 0;
     border: 2px solid rgba(200,0,0,0.5);
     background: rgba(0,0,0,0.6);
     color: #fff;
@@ -343,17 +342,23 @@ tbody tr:hover {
     clip-path: polygon(2% 0, 100% 0, 98% 100%, 0 100%);
 }
 
-#loginContent input:focus {
+.modal-content input::placeholder {
+    color: rgba(255, 255, 255, 0.4);
+}
+
+.modal-content input:focus {
     outline: none;
     border-color: rgba(255,30,30,0.9);
+    box-shadow: 0 0 25px rgba(255,0,0,0.6);
 }
 
-.login-buttons {
+.modal-buttons {
     display: flex;
     gap: 15px;
+    margin-top: 20px;
 }
 
-.login-btn {
+.modal-btn {
     flex: 1;
     padding: 15px;
     border: 2px solid rgba(200,0,0,0.7);
@@ -364,19 +369,129 @@ tbody tr:hover {
     letter-spacing: 2px;
     text-transform: uppercase;
     cursor: pointer;
+    text-shadow: 0 0 12px rgba(255,0,0,0.9);
     clip-path: polygon(5% 0, 100% 0, 95% 100%, 0 100%);
+    transition: all 0.3s ease;
 }
 
-.login-btn:hover {
+.modal-btn:hover {
     background: linear-gradient(135deg, rgba(255,20,20,1) 0%, rgba(150,0,0,1) 100%);
+    transform: translateY(-3px);
 }
 
-.login-btn.cancel {
+.modal-btn.cancel {
     background: linear-gradient(135deg, rgba(60,60,60,0.9) 0%, rgba(30,30,30,0.95) 100%);
+    border-color: rgba(100,100,100,0.6);
 }
 
-.login-btn.cancel:hover {
+.modal-btn.cancel:hover {
     background: linear-gradient(135deg, rgba(80,80,80,1) 0%, rgba(50,50,50,1) 100%);
+}
+
+/* Chat panel */
+#chatPanel {
+    display: none;
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 400px;
+    height: 500px;
+    background: linear-gradient(135deg, rgba(20,20,20,0.98) 0%, rgba(10,10,10,0.99) 100%);
+    border: 3px solid rgba(200,0,0,0.7);
+    clip-path: polygon(2% 0, 100% 0, 98% 100%, 0 100%);
+    z-index: 99;
+    flex-direction: column;
+}
+
+#chatHeader {
+    padding: 15px;
+    background: rgba(200,0,0,0.3);
+    border-bottom: 2px solid rgba(200,0,0,0.7);
+    display: flex;
+    justify-content: space-between;
+}
+
+#chatHeader h4 {
+    color: #fff;
+    font-size: 18px;
+    font-weight: 900;
+    text-transform: uppercase;
+    text-shadow: 0 0 15px rgba(255,0,0,0.9);
+}
+
+#closeChatBtn {
+    background: rgba(200,0,0,0.8);
+    border: none;
+    color: #fff;
+    font-size: 20px;
+    width: 30px;
+    height: 30px;
+    cursor: pointer;
+    font-weight: 900;
+}
+
+#chatMessages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.chat-message {
+    padding: 10px 15px;
+    background: rgba(40,40,40,0.8);
+    border-left: 3px solid rgba(200,0,0,0.7);
+    color: #fff;
+    font-size: 14px;
+}
+
+.chat-message .chat-user {
+    color: #ff3333;
+    font-weight: 900;
+    margin-right: 8px;
+}
+
+.chat-message.admin {
+    border-left-color: rgba(255,150,0,0.9);
+    background: rgba(60,40,20,0.8);
+}
+
+.chat-message.admin .chat-user {
+    color: #ff9900;
+}
+
+.chat-message.guest {
+    border-left-color: rgba(100,100,200,0.7);
+}
+
+.chat-message.guest .chat-user {
+    color: #6699ff;
+}
+
+#chatInput {
+    display: flex;
+    gap: 10px;
+    padding: 15px;
+    border-top: 2px solid rgba(200,0,0,0.7);
+}
+
+#chatInput input {
+    flex: 1;
+    padding: 12px;
+    border: 2px solid rgba(200,0,0,0.5);
+    background: rgba(0,0,0,0.6);
+    color: #fff;
+}
+
+#chatInput button {
+    padding: 12px 20px;
+    border: 2px solid rgba(200,0,0,0.7);
+    background: rgba(200,0,0,0.9);
+    color: #fff;
+    font-weight: 900;
+    cursor: pointer;
 }
 
 @media (max-width: 768px) {
@@ -389,7 +504,7 @@ tbody tr:hover {
         padding: 0 20px 60px;
     }
     
-    #loginContent {
+    .modal-content {
         width: calc(100% - 40px);
         max-width: 420px;
     }
@@ -408,6 +523,7 @@ tbody tr:hover {
     <div id="authButtons">
         <div id="onlineCounter">👥 Online: <span id="onlineCount">0</span></div>
         <button onclick="toggleChat()">💬 Chat</button>
+        <button id="registerBtn" onclick="showRegister()">Register</button>
         <button id="loginBtn" onclick="showLogin()">Login</button>
         <button id="logoutBtn" onclick="logout()" style="display:none;">Logout</button>
     </div>
@@ -444,19 +560,35 @@ tbody tr:hover {
     </div>
 </div>
 
-<div id="loginModal">
-    <div id="loginContent">
+<!-- Login Modal -->
+<div id="loginModal" class="modal">
+    <div class="modal-content">
         <h3>Přihlášení</h3>
         <input id="loginUser" placeholder="Uživatelské jméno">
         <input id="loginPass" type="password" placeholder="Heslo">
-        <div class="login-buttons">
-            <button class="login-btn" onclick="login()">Přihlásit</button>
-            <button class="login-btn cancel" onclick="closeLogin()">Zrušit</button>
+        <div class="modal-buttons">
+            <button class="modal-btn" onclick="login()">Přihlásit</button>
+            <button class="modal-btn cancel" onclick="closeLogin()">Zrušit</button>
         </div>
     </div>
 </div>
 
-<div id="chatPanel" style="display:none;">
+<!-- Register Modal -->
+<div id="registerModal" class="modal">
+    <div class="modal-content">
+        <h3>Registrace</h3>
+        <input id="registerUser" placeholder="Uživatelské jméno">
+        <input id="registerPass" type="password" placeholder="Heslo">
+        <input id="registerPassConfirm" type="password" placeholder="Potvrdit heslo">
+        <div class="modal-buttons">
+            <button class="modal-btn" onclick="register()">Registrovat</button>
+            <button class="modal-btn cancel" onclick="closeRegister()">Zrušit</button>
+        </div>
+    </div>
+</div>
+
+<!-- Chat Panel -->
+<div id="chatPanel">
     <div id="chatHeader">
         <h4>💬 Chat</h4>
         <button id="closeChatBtn" onclick="toggleChat()">×</button>
@@ -468,83 +600,165 @@ tbody tr:hover {
     </div>
 </div>
 
-<div id="adminPanel">
-    <h3>⚙️ Admin Panel</h3>
-    <div class="admin-section">
-        <h4>📊 Statistiky</h4>
-        <p style="color: #fff; margin: 10px 0;">Online uživatelé: <span id="adminOnlineCount">0</span></p>
-        <p style="color: #fff; margin: 10px 0;">Celkem zpráv: <span id="totalMessages">0</span></p>
-    </div>
-    <div class="admin-section">
-        <h4>🗑️ Správa chatu</h4>
-        <div class="admin-actions">
-            <button onclick="clearChat()">Smazat všechny zprávy</button>
-            <button onclick="exportChatLog()">Exportovat chat log</button>
-        </div>
-    </div>
-    <div class="admin-section">
-        <h4>📢 Systémová zpráva</h4>
-        <input id="systemMessage" placeholder="Zadejte systémovou zprávu..." style="width: 100%; padding: 10px; margin-bottom: 10px; background: rgba(0,0,0,0.5); color: #fff; border: 2px solid rgba(200,100,0,0.5);">
-        <div class="admin-actions">
-            <button onclick="sendSystemMessage()">Odeslat systémovou zprávu</button>
-        </div>
-    </div>
-    <button id="closeAdminBtn" onclick="closeAdminPanel()">Zavřít</button>
-</div>
+<script>
+function goBack() { window.location.href = "index.html"; }
+function showLogin() { document.getElementById("loginModal").style.display = "flex"; }
+function closeLogin() { document.getElementById("loginModal").style.display = "none"; }
+function showRegister() { document.getElementById("registerModal").style.display = "flex"; }
+function closeRegister() { document.getElementById("registerModal").style.display = "none"; }
+function toggleChat() {
+    const chatPanel = document.getElementById('chatPanel');
+    chatPanel.style.display = chatPanel.style.display === 'flex' ? 'none' : 'flex';
+}
+</script>
 
 <script type="module">
-import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
-import { getDatabase, ref, push, onValue, remove } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
+import { supabase, db } from './supabase-config.js';
 
-const firebaseConfig = {
-    apiKey: "AIzaSyDOap2QsXnBvqC2WWp907fAACI0o5qIBk4",
-    authDomain: "tetrisleaderboard-3b345.firebaseapp.com",
-    databaseURL: "https://tetrisleaderboard-3b345-default-rtdb.europe-west1.firebasedatabase.app",
-    projectId: "tetrisleaderboard-3b345",
-    storageBucket: "tetrisleaderboard-3b345.firebasestorage.app",
-    messagingSenderId: "1066407746580",
-    appId: "1:1066407746580:web:b8de384e86711899f99b01"
-};
+let currentUser = null;
+let isAdmin = false;
+let userPresenceId = null;
 
-const app = initializeApp(firebaseConfig);
-const db = getDatabase(app);
+// Presence
+function getOrCreatePresenceId() {
+    let storedId = localStorage.getItem('userPresenceId');
+    if (!storedId) {
+        storedId = 'user_' + Math.random().toString(36).substr(2, 9) + '_' + Date.now();
+        localStorage.setItem('userPresenceId', storedId);
+    }
+    return storedId;
+}
 
-// Načíst návody z Firebase
-function loadItems() {
-    const itemsRef = ref(db, 'navody');
+async function setupPresence() {
+    userPresenceId = getOrCreatePresenceId();
+    await db.setPresence(userPresenceId);
     
-    onValue(itemsRef, (snapshot) => {
-        const tbody = document.getElementById('tableBody');
-        tbody.innerHTML = '';
-        
-        if (snapshot.exists()) {
-            const items = snapshot.val();
-            let index = 1;
-            
-            Object.keys(items).forEach(key => {
-                const item = items[key];
-                const row = tbody.insertRow();
-                row.innerHTML = `
-                    <td>${index}</td>
-                    <td>${item.name}</td>
-                    <td style="text-align: center;">
-                        <button class="delete-row-btn" onclick="deleteItemFromFirebase('${key}')">🗑️</button>
-                    </td>
-                `;
-                index++;
-            });
-        } else {
-            tbody.innerHTML = `
-                <tr class="empty-state">
-                    <td colspan="3">Zatím zde nejsou žádné návody. Admin může přidat první!</td>
-                </tr>
-            `;
-        }
+    window.addEventListener('beforeunload', async () => {
+        if (userPresenceId) await db.removePresence(userPresenceId);
     });
+    
+    setInterval(async () => {
+        if (userPresenceId) await db.setPresence(userPresenceId);
+    }, 25000);
+}
+
+async function watchOnlineUsers() {
+    async function updateCount() {
+        const { count } = await db.getOnlineCount();
+        document.getElementById('onlineCount').textContent = count || 0;
+    }
+    await updateCount();
+    db.subscribeToPresence(updateCount);
+    setInterval(updateCount, 30000);
+}
+
+// Chat
+window.sendMessage = async function() {
+    const input = document.getElementById('messageInput');
+    const message = input.value.trim();
+    if (!message) return;
+    
+    let username = currentUser;
+    if (!username) {
+        if (!window.guestName) {
+            window.guestName = 'Host_' + Math.random().toString(36).substr(2, 6).toUpperCase();
+        }
+        username = window.guestName;
+    }
+    
+    await db.addMessage({
+        user: username,
+        text: message,
+        timestamp: new Date().toISOString(),
+        is_admin: isAdmin,
+        is_guest: !currentUser
+    });
+    
+    input.value = '';
+}
+
+async function loadMessages() {
+    const { data: messages } = await db.getMessages();
+    displayMessages(messages);
+    db.subscribeToMessages(async () => {
+        const { data: messages } = await db.getMessages();
+        displayMessages(messages);
+    });
+}
+
+function displayMessages(messages) {
+    const messagesDiv = document.getElementById('chatMessages');
+    messagesDiv.innerHTML = '';
+    
+    if (messages && messages.length > 0) {
+        messages.forEach(msg => {
+            const div = document.createElement('div');
+            let msgClass = 'chat-message';
+            if (msg.is_admin) msgClass += ' admin';
+            else if (msg.is_guest) msgClass += ' guest';
+            div.className = msgClass;
+            
+            const time = msg.timestamp ? new Date(msg.timestamp).toLocaleTimeString('cs-CZ', {
+                hour: '2-digit',
+                minute: '2-digit'
+            }) : '';
+            
+            div.innerHTML = `
+                <span class="chat-user">${msg.username}:</span>
+                <span>${msg.text}</span>
+                <span style="font-size: 11px; color: rgba(255,255,255,0.5); margin-left: 8px;">${time}</span>
+            `;
+            messagesDiv.appendChild(div);
+        });
+        
+        messagesDiv.scrollTop = messagesDiv.scrollHeight;
+    }
+}
+
+// Načíst návody ze Supabase
+async function loadNavody() {
+    const { data, error } = await db.getNavody();
+    
+    const tbody = document.getElementById('tableBody');
+    tbody.innerHTML = '';
+    
+    if (error) {
+        console.error('Error loading navody:', error);
+        tbody.innerHTML = `
+            <tr class="empty-state">
+                <td colspan="3">Chyba při načítání návodů!</td>
+            </tr>
+        `;
+        return;
+    }
+    
+    if (data && data.length > 0) {
+        data.forEach((item, index) => {
+            const row = tbody.insertRow();
+            row.innerHTML = `
+                <td>${index + 1}</td>
+                <td>${item.name}</td>
+                <td style="text-align: center;">
+                    <button class="delete-row-btn" onclick="deleteNavod('${item.id}')">🗑️</button>
+                </td>
+            `;
+        });
+    } else {
+        tbody.innerHTML = `
+            <tr class="empty-state">
+                <td colspan="3">Zatím zde nejsou žádné návody. Admin může přidat první!</td>
+            </tr>
+        `;
+    }
 }
 
 // Přidat návod
 window.addItem = async function() {
+    if (!isAdmin) {
+        alert('Pouze admin může přidávat návody!');
+        return;
+    }
+    
     const newItemInput = document.getElementById('newItem');
     const newItem = newItemInput.value.trim();
     
@@ -554,38 +768,42 @@ window.addItem = async function() {
     }
     
     try {
-        const itemsRef = ref(db, 'navody');
-        await push(itemsRef, {
-            name: newItem,
-            createdAt: Date.now()
-        });
+        const { data, error } = await db.addNavod(newItem);
+        
+        if (error) throw error;
         
         newItemInput.value = '';
         document.getElementById('addItemForm').style.display = 'none';
         alert('Návod byl přidán!');
+        loadNavody();
     } catch (error) {
-        console.error('Error adding item:', error);
+        console.error('Error adding navod:', error);
         alert('Chyba při přidávání návodu!');
     }
 }
 
 // Smazat návod
-window.deleteItemFromFirebase = async function(id) {
+window.deleteNavod = async function(id) {
+    if (!isAdmin) {
+        alert('Pouze admin může mazat návody!');
+        return;
+    }
+    
     if (!confirm('Opravdu chcete smazat tento návod?')) return;
     
     try {
-        const itemRef = ref(db, `navody/${id}`);
-        await remove(itemRef);
+        const { error } = await db.deleteNavod(id);
+        if (error) throw error;
         alert('Návod byl smazán!');
+        loadNavody();
     } catch (error) {
-        console.error('Error deleting item:', error);
+        console.error('Error deleting navod:', error);
         alert('Chyba při mazání návodu!');
     }
 }
 
 // Kontrola admin práv
 function checkAdminStatus() {
-    const isAdmin = localStorage.getItem('isAdmin') === 'true';
     const addItemSection = document.getElementById('addItemSection');
     
     if (isAdmin) {
@@ -597,64 +815,127 @@ function checkAdminStatus() {
     }
 }
 
-// Login
-window.login = function() {
-    const username = document.getElementById('loginUser').value;
-    const password = document.getElementById('loginPass').value;
-    
-    // Admin údaje
-    if (username === 'admin' && password === 'heslo123') {
-        localStorage.setItem('isAdmin', 'true');
-        alert('Přihlášení úspěšné!');
-        closeLogin();
-        
-        document.getElementById('loginBtn').style.display = 'none';
-        document.getElementById('logoutBtn').style.display = 'block';
-        checkAdminStatus();
-    } else {
-        alert('Špatné přihlašovací údaje!');
-    }
-}
-
-// Logout
-window.logout = function() {
-    localStorage.removeItem('isAdmin');
-    document.getElementById('loginBtn').style.display = 'block';
-    document.getElementById('logoutBtn').style.display = 'none';
-    document.getElementById('addItemForm').style.display = 'none';
-    checkAdminStatus();
-    alert('Odhlášeno!');
-}
-
 // UI funkce
-window.goBack = function() { window.location.href = "index.html"; }
-window.showLogin = function() { document.getElementById("loginModal").style.display = "flex"; }
-window.closeLogin = function() { document.getElementById("loginModal").style.display = "none"; }
-window.toggleChat = function() {
-    const chatPanel = document.getElementById('chatPanel');
-    chatPanel.style.display = (chatPanel.style.display === 'none' || !chatPanel.style.display) ? 'flex' : 'none';
-}
-window.openAdminPanel = function() { document.getElementById('adminPanel').style.display = 'block'; }
-window.closeAdminPanel = function() { document.getElementById('adminPanel').style.display = 'none'; }
 window.showAddItemForm = function() {
+    if (!isAdmin) {
+        alert('Pouze admin může přidávat návody!');
+        return;
+    }
     const form = document.getElementById("addItemForm");
     form.style.display = form.style.display === "none" ? "block" : "none";
 }
 
+// Registrace
+window.register = async function() {
+    const username = document.getElementById('registerUser').value.trim();
+    const password = document.getElementById('registerPass').value;
+    const passwordConfirm = document.getElementById('registerPassConfirm').value;
+    
+    if (!username || !password || !passwordConfirm) {
+        alert('Vyplňte všechna pole!');
+        return;
+    }
+    
+    if (password !== passwordConfirm) {
+        alert('Hesla se neshodují!');
+        return;
+    }
+    
+    if (password.length < 4) {
+        alert('Heslo musí mít alespoň 4 znaky!');
+        return;
+    }
+    
+    const { data, error } = await db.registerUser(username, password);
+    
+    if (error) {
+        alert(error.message || 'Chyba při registraci!');
+    } else {
+        alert('Registrace úspěšná! Nyní se můžete přihlásit.');
+        closeRegister();
+        showLogin();
+    }
+}
+
+// Login
+window.login = async function() {
+    const username = document.getElementById('loginUser').value.trim();
+    const password = document.getElementById('loginPass').value;
+    
+    if (!username || !password) {
+        alert('Vyplňte všechna pole!');
+        return;
+    }
+    
+    const { data, error } = await db.loginUser(username, password);
+    
+    if (error || !data) {
+        alert('Špatné uživatelské jméno nebo heslo!');
+        return;
+    }
+    
+    currentUser = data.username;
+    isAdmin = data.is_admin;
+    
+    localStorage.setItem('currentUser', currentUser);
+    localStorage.setItem('isAdmin', isAdmin);
+    
+    document.getElementById('registerBtn').style.display = 'none';
+    document.getElementById('loginBtn').style.display = 'none';
+    document.getElementById('logoutBtn').style.display = 'inline-block';
+    
+    if (isAdmin) {
+        alert('Přihlášení úspěšné! Máte admin práva.');
+    } else {
+        alert('Přihlášení úspěšné!');
+    }
+    
+    closeLogin();
+    checkAdminStatus();
+}
+
+// Logout
+window.logout = async function() {
+    if (userPresenceId) await db.removePresence(userPresenceId);
+    
+    currentUser = null;
+    isAdmin = false;
+    window.guestName = null;
+    
+    localStorage.removeItem('currentUser');
+    localStorage.removeItem('isAdmin');
+    
+    document.getElementById('registerBtn').style.display = 'inline-block';
+    document.getElementById('loginBtn').style.display = 'inline-block';
+    document.getElementById('logoutBtn').style.display = 'none';
+    
+    alert('Byl jste odhlášen.');
+    checkAdminStatus();
+    setTimeout(() => setupPresence(), 500);
+}
+
 // Inicializace
-window.onload = function() {
-    loadItems();
+window.addEventListener('DOMContentLoaded', function() {
+    const savedUser = localStorage.getItem('currentUser');
+    const savedAdmin = localStorage.getItem('isAdmin');
+    
+    if (savedUser) {
+        currentUser = savedUser;
+        isAdmin = savedAdmin === 'true';
+        
+        document.getElementById('registerBtn').style.display = 'none';
+        document.getElementById('loginBtn').style.display = 'none';
+        document.getElementById('logoutBtn').style.display = 'inline-block';
+    }
+    
+    setupPresence();
+    watchOnlineUsers();
+    loadMessages();
+    loadNavody();
     checkAdminStatus();
     
-    const isAdmin = localStorage.getItem('isAdmin') === 'true';
-    if (isAdmin) {
-        document.getElementById('loginBtn').style.display = 'none';
-        document.getElementById('logoutBtn').style.display = 'block';
-    }
-};
-</script>
-
-<script type="module" src="firebase-chat-system.js"></script>
-
-</body>
-</html>
+    // Subscribe k real-time změnám v návodech
+    db.subscribeToNavody(() => {
+        loadNavody();
+    });
+});
