@@ -1,26 +1,3 @@
-// ============================================
-// OPRAVENÁ FUNKCE setPresence v supabase-config.js
-// ============================================
-
-// Najděte tuto funkci v supabase-config.js a NAHRAĎTE ji:
-
-async setPresence(userId) {
-  // ✅ OPRAVENO - používáme pouze sloupce 'id' a 'timestamp'
-  const { data, error } = await supabase
-    .from('presence')
-    .upsert([{ 
-      id: userId,  // ✅ používáme 'id', ne 'user_id'
-      timestamp: new Date().toISOString() 
-    }], {
-      onConflict: 'id'  // ✅ conflict na sloupci 'id'
-    })
-  return { data, error }
-},
-
-// ============================================
-// KOMPLETNÍ OPRAVENÝ supabase-config.js
-// ============================================
-
 // supabase-config.js
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.3'
 
@@ -74,15 +51,21 @@ export const db = {
       .subscribe()
   },
   
-  // ✅ OPRAVENÁ PRESENCE SEKCE
+  // ✅ OPRAVENÁ PRESENCE SEKCE - BEZ pole, jen objekt!
   async setPresence(userId) {
+    // ✅ Delete + Insert metoda (nejspolehlivější)
+    // Nejdřív smažeme starý záznam
+    await supabase
+      .from('presence')
+      .delete()
+      .eq('id', userId)
+    
+    // Pak vložíme nový
     const { data, error } = await supabase
       .from('presence')
-      .upsert([{ 
-        id: userId,  // ✅ Používáme 'id' místo 'user_id'
+      .insert({ 
+        id: userId,
         timestamp: new Date().toISOString() 
-      }], {
-        onConflict: 'id'  // ✅ Správný conflict column
       })
     
     if (error) {
@@ -96,7 +79,7 @@ export const db = {
     const { error } = await supabase
       .from('presence')
       .delete()
-      .eq('id', userId)  // ✅ Používáme 'id' místo 'user_id'
+      .eq('id', userId)
     
     if (error) {
       console.error('❌ removePresence error:', error)
