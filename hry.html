@@ -692,12 +692,6 @@ window.login = async function() {
         return;
     }
     
-    // POUZE LUKAMER
-    if (username !== 'lukamer') {
-        alert('Přístup odepřen!');
-        return;
-    }
-    
     const { data: user, error } = await db.loginUser(username, password);
     
     if (error || !user) {
@@ -706,26 +700,27 @@ window.login = async function() {
     }
     
     currentUser = user.username;
-    currentUserId = user.id;
-    isAdmin = true; // lukamer je vždy admin
-    
-    // ✅ Ukládej celý objekt jako JSON
+currentUserId = user.id;
+isAdmin = user.is_admin || false;
+
+// ✅ Ukládej celý objekt jako JSON
 localStorage.setItem('currentUser', JSON.stringify({
     id: user.id,
     username: user.username,
-    is_admin: true
+    is_admin: user.is_admin || false,
+    email: user.email || null
 }));
+
+// Pro zpětnou kompatibilitu
 localStorage.setItem('currentUserId', user.id);
-localStorage.setItem('isAdmin', 'true');
-    localStorage.setItem('currentUserId', user.id);
-    localStorage.setItem('isAdmin', 'true');
+localStorage.setItem('isAdmin', user.is_admin ? 'true' : 'false');
     
     document.getElementById('loginBtn').style.display = 'none';
     document.getElementById('registerBtn').style.display = 'none';
     document.getElementById('logoutBtn').style.display = 'inline-block';
     
     closeLogin();
-    alert(`Vítejte, ${user.username}! (Admin)`);
+    alert(`Vítejte, ${user.username}!${user.is_admin ? ' (Admin)' : ''}`);
 }
 
 // LOGOUT
@@ -849,4 +844,5 @@ window.addEventListener('DOMContentLoaded', async function() {
 
 </body>
 </html>
+
 
