@@ -612,12 +612,11 @@ import { supabase, db } from './supabase-config.js';
 
 let currentUser = null;
 let currentUserId = null;
-currentUser = "lukamer"; // aktuální uživatel
-let isAdmin = false;
+let isAdmin = false;  // Výchozí hodnota pro admina, bude se měnit podle uživatele
 
-// Kontrola, jestli je aktuální uživatel 'lukamer'
-if (currentUser === "lukamer") {
-    isAdmin = true;
+// Pokud je uživatel "lukamer", bude admin
+if (window.location.href.includes("lukamer")) { 
+    isAdmin = true;  // Pokud je uživatel "lukamer", admin má přístup
 }
 
 const gamesStatus = {
@@ -632,10 +631,11 @@ const gamesStatus = {
 
 // Funkce pro admina - přepínání hry
 function toggleGame(gameKey) {
-    if (!isAdmin) return;
+    if (!isAdmin) return; // Jen pro admina
 
-    gamesStatus[gameKey] = !gamesStatus[gameKey];
+    gamesStatus[gameKey] = !gamesStatus[gameKey]; // Přepne true/false
 
+    // Aktualizace tlačítka
     const button = Array.from(document.querySelectorAll('#adminButtons button'))
         .find(btn => btn.textContent.includes(gameKey.charAt(0).toUpperCase() + gameKey.slice(1)));
     
@@ -644,10 +644,14 @@ function toggleGame(gameKey) {
     }
 }
 
-// Zobraz admin panel jen pokud je admin
+// Zobraz admin panel, jen pokud je admin
 window.addEventListener('DOMContentLoaded', () => {
     if (isAdmin) {
+        // Zobraz admin panel pouze pro admina
         document.getElementById('adminPanel').style.display = 'block';
+    } else {
+        // Skryj admin panel pro ostatní
+        document.getElementById('adminPanel').style.display = 'none';
     }
 });
 
@@ -659,6 +663,7 @@ function playGame(gameKey, redirectFunc) {
     }
     redirectFunc();
 }
+
 
 
 
@@ -907,6 +912,7 @@ window.addEventListener('DOMContentLoaded', async function() {
 
 </body>
 </html>
+
 
 
 
