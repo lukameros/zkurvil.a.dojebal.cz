@@ -721,6 +721,7 @@ function showLogin() { document.getElementById("loginModal").style.display = "fl
 function closeLogin() { document.getElementById("loginModal").style.display = "none"; }
 function showRegister() { document.getElementById("registerModal").style.display = "flex"; }
 function closeRegister() { document.getElementById("registerModal").style.display = "none"; }
+
 function toggleChat() {
     const chatPanel = document.getElementById('chatPanel');
     if (chatPanel.style.display === 'none' || !chatPanel.style.display) {
@@ -729,6 +730,7 @@ function toggleChat() {
         chatPanel.style.display = 'none';
     }
 }
+</script>  <!-- ✅ TOHLE CHYBĚLO! -->
 
 <script type="module">
 import { supabase, db } from './supabase-config.js';
@@ -1109,6 +1111,7 @@ window.addEventListener('DOMContentLoaded', async function() {
 
 </body>
 </html>
+
 
 
 
