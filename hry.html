@@ -457,6 +457,19 @@
             <button class="play-btn" onclick="event.stopPropagation(); goTetris();">Hrát hru</button>
         </div>
     </div>
+<!-- Admin panel -->
+<div id="adminPanel" style="display:none; margin: 20px auto; max-width: 800px; text-align:center;">
+    <h2 style="color:#ff5555;">🛠 Admin panel - Správa her 🛠</h2>
+    <div id="adminButtons" style="display:flex; flex-wrap:wrap; justify-content:center; gap:10px;">
+        <button onclick="toggleGame('kolecko')">Kolečko: ✅</button>
+        <button onclick="toggleGame('tetris')">Tetris: ✅</button>
+        <button onclick="toggleGame('swf')">Project Madness 1: ✅</button>
+        <button onclick="toggleGame('happyWheels')">Happy Wheels: ✅</button>
+        <button onclick="toggleGame('hobo1')">Hobo 1: ✅</button>
+        <button onclick="toggleGame('hobo2')">Hobo 2: ✅</button>
+        <button onclick="toggleGame('hobo3')">Hobo 3: ✅</button>
+    </div>
+</div>
 
     <div class="game-card" onclick="goSWF()">
         <div class="game-image-container">
@@ -610,6 +623,29 @@ const gamesStatus = {
     hobo3: true
 };
 
+// Funkce pro admina - přepínání hry
+function toggleGame(gameKey) {
+    if (!isAdmin) return; // jen pro admina
+
+    gamesStatus[gameKey] = !gamesStatus[gameKey]; // přepne true/false
+
+    // Aktualizace tlačítka
+    const button = Array.from(document.querySelectorAll('#adminButtons button'))
+        .find(btn => btn.textContent.includes(gameKey.charAt(0).toUpperCase() + gameKey.slice(1)));
+    
+    if (button) {
+        button.textContent = `${gameKey.charAt(0).toUpperCase() + gameKey.slice(1)}: ${gamesStatus[gameKey] ? '✅' : '❌'}`;
+    }
+}
+
+// Zobraz admin panel jen pokud je admin
+window.addEventListener('DOMContentLoaded', () => {
+    if (isAdmin) {
+        document.getElementById('adminPanel').style.display = 'block';
+    }
+});
+    
+    
 function playGame(gameKey, redirectFunc) {
     if (!gamesStatus[gameKey]) {
         alert('Tato hra je momentálně mimo provoz.');
@@ -863,6 +899,7 @@ window.addEventListener('DOMContentLoaded', async function() {
 
 </body>
 </html>
+
 
 
 
