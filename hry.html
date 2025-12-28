@@ -688,8 +688,8 @@
         <input id="registerPassConfirm" type="password" placeholder="Potvrdit heslo">
         <div class="modal-buttons">
             <button class="modal-btn" onclick="register()">Registrovat</button>
-            <button class="modal-btn cancel" onclick="closeRegister()">Zrušit</button>
-        </div>
+            <button class="modal-btn cancel" onclick="closeRegister()">Zrušit</button
+                                                                                 </div>
     </div>
 </div>
 
@@ -728,17 +728,164 @@ function toggleChat() {
 
 <script type="module">
 import { supabase, db } from './supabase-config.js';
-import { initPresence } from './presence-utils.js';
 
 let currentUser = null;
 let currentUserId = null;
 let isAdmin = false;
 let userPresenceId = null;
 
+// Načtení stavů her ze Supabase
+async function loadGamesStatus() {
+    const { data, error } = await supabase
+        .from('games_status')
+        .select('*');
+    
+    if (error) {
+        console.error('Chyba při načítání stavů her:', error);
+        return;
+    }
+    
+    if (data && data.length > 0) {
+        data.forEach(game => {
+            updateGameUI(game.game_key, game.is_active);
+        });
+    }
+}
+
+// Aktualizace UI hry
+function updateGameUI(gameKey, isActive) {
+    const gameCard = document.querySelector(`.game-card[data-game="${gameKey}"]`);
+    if (gameCard) {
+        if (isActive) {
+            gameCard.classList.remove('disabled');
+        } else {
+            gameCard.classList.add('disabled');
+        }
+    }
+    
+    const adminBtn = document.querySelector(`.admin-toggle-btn[data-game="${gameKey}"]`);
+    if (adminBtn) {
+        if (isActive) {
+            adminBtn.classList.add('active');
+            adminBtn.textContent = 'AKTIVNÍ';
+        } else {
+            adminBtn.classList.remove('active');
+            adminBtn.textContent = 'MIMO PROVOZ';
+        }
+    }
+}
+
+// Přepnutí stavu hry (pouze pro admina)
+window.toggleGameStatus = async function(gameKey) {
+    if (!isAdmin) {
+        alert('Nemáte oprávnění ke správě her!');
+        return;
+    }
+    
+    const { data: currentGame } = await supabase
+        .from('games_status')
+        .select('*')
+        .eq('game_key', gameKey)
+        .single();
+    
+    const newStatus = currentGame ? !currentGame.is_active : true;
+    
+    const { error } = await supabase
+        .from('games_status')
+        .upsert({
+            game_key: gameKey,
+            is_active: newStatus,
+            updated_at: new Date().toISOString()
+        });
+    
+    if (error) {
+        console.error('Chyba při ukládání stavu hry:', error);
+        alert('Chyba při ukládání stavu hry!');
+        return;
+    }
+    
+    updateGameUI(gameKey, newStatus);
+}
+
+// Funkce pro hrání hry
+window.playGame = async function(gameKey, redirectFunc) {
+    const { data: game } = await supabase
+        .from('games_status')
+        .select('is_active')
+        .eq('game_key', gameKey)
+        .single();
+    
+    const isActive = game ? game.is_active : true;
+    
+    if (!isActive) {
+        alert('Tato hra je momentálně mimo provoz.');
+        return;
+    }
+    
+    redirectFunc();
+}
+
+// Sledování změn stavů her v reálném čase
+function subscribeToGamesStatus() {
+    supabase
+        .channel('games_status_changes')
+        .on('postgres_changes', {
+            event: '*',
+            schema: 'public',
+            table: 'games_status'
+        }, (payload) => {
+            if (payload.new) {
+                updateGameUI(payload.new.game_key, payload.new.is_active);
+            }
+        })
+        .subscribe();
+}
+
+// Presence
+async function setupPresence() {
+    let sessionId = sessionStorage.getItem('userPresenceId');
+    
+    if (!sessionId) {
+        sessionId = 'user_' + Math.random().toString(36).substr(2, 9);
+        sessionStorage.setItem('userPresenceId', sessionId);
+    }
+    
+    userPresenceId = sessionId;
+    
+    const cleanupTime = new Date();
+    cleanupTime.setSeconds(cleanupTime.getSeconds() - 10);
+    
+    await supabase
+        .from('presence')
+        .delete()
+        .lt('timestamp', cleanupTime.toISOString());
+    
+    await db.setPresence(userPresenceId);
+    
+    window.addEventListener('beforeunload', async () => {
+        await db.removePresence(userPresenceId);
+    });
+    
+    setInterval(async () => {
+        if (userPresenceId) {
+            await db.setPresence(userPresenceId);
+        }
+    }, 5000);
+}
+
+async function watchOnlineUsers() {
+    async function updateCount() {
+        const { count } = await db.getOnlineCount();
+        document.getElementById('onlineCount').textContent = count || 0;
+    }
+    await updateCount();
+    db.subscribeToPresence(updateCount);
+    setInterval(updateCount, 10000);
+}
+
 // REGISTRACE
 window.register = async function() {
     const username = document.getElementById('registerUser').value.trim();
-    const email = document.getElementById('registerEmail').value.trim();
     const password = document.getElementById('registerPass').value;
     const passwordConfirm = document.getElementById('registerPassConfirm').value;
     
@@ -757,7 +904,7 @@ window.register = async function() {
         return;
     }
     
-    const { data, error } = await db.registerUser(username, password, email || null);
+    const { data, error } = await db.registerUser(username, password);
     
     if (error) {
         alert(error.message || 'Chyba při registraci!');
@@ -768,7 +915,6 @@ window.register = async function() {
     closeRegister();
     
     document.getElementById('registerUser').value = '';
-    document.getElementById('registerEmail').value = '';
     document.getElementById('registerPass').value = '';
     document.getElementById('registerPassConfirm').value = '';
 }
@@ -792,25 +938,28 @@ window.login = async function() {
     
     currentUser = user.username;
     currentUserId = user.id;
-    isAdmin = user.is_admin;
+    isAdmin = user.is_admin || false;
     
     localStorage.setItem('currentUser', JSON.stringify({
         id: user.id,
         username: user.username,
-        is_admin: user.is_admin,
+        is_admin: user.is_admin || false,
         email: user.email || null
     }));
+    
+    localStorage.setItem('currentUserId', user.id);
+    localStorage.setItem('isAdmin', user.is_admin ? 'true' : 'false');
     
     document.getElementById('loginBtn').style.display = 'none';
     document.getElementById('registerBtn').style.display = 'none';
     document.getElementById('logoutBtn').style.display = 'inline-block';
     
     if (isAdmin) {
-        document.getElementById('adminMenuBtn').style.display = 'block';
+        document.getElementById('adminPanel').style.display = 'block';
     }
     
     closeLogin();
-    alert(`Vítejte, ${user.username}!${isAdmin ? ' (Admin)' : ''}`);
+    alert(`Vítejte, ${user.username}!${user.is_admin ? ' (Admin)' : ''}`);
 }
 
 // LOGOUT
@@ -821,16 +970,18 @@ window.logout = function() {
     window.guestName = null;
     
     localStorage.removeItem('currentUser');
+    localStorage.removeItem('currentUserId');
+    localStorage.removeItem('isAdmin');
     
     document.getElementById('loginBtn').style.display = 'inline-block';
     document.getElementById('registerBtn').style.display = 'inline-block';
     document.getElementById('logoutBtn').style.display = 'none';
-    document.getElementById('adminMenuBtn').style.display = 'none';
+    document.getElementById('adminPanel').style.display = 'none';
     
-    alert('Byl jste odhlášen. Nyní píšete jako host.');
+    alert('Byl jste odhlášen.');
 }
 
-// Poslat zprávu
+// CHAT - Poslat zprávu
 window.sendMessage = async function() {
     const input = document.getElementById('messageInput');
     const message = input.value.trim();
@@ -854,27 +1005,6 @@ window.sendMessage = async function() {
     });
     
     input.value = '';
-}
-
-// Systémová zpráva
-window.sendSystemMessage = async function() {
-    if (!isAdmin) return;
-    
-    const input = document.getElementById('systemMessage');
-    const message = input.value.trim();
-    
-    if (!message) return;
-    
-    await db.addMessage({
-        user: 'SYSTÉM',
-        text: message,
-        timestamp: new Date().toISOString(),
-        is_admin: true,
-        is_system: true
-    });
-    
-    input.value = '';
-    alert('Systémová zpráva byla odeslána!');
 }
 
 // Načíst zprávy
@@ -902,243 +1032,26 @@ function displayMessages(messages) {
             
             div.className = msgClass;
             
-            const time = msg.timestamp ? new Date(msg.timestamp).toLocaleTimeString('cs-CZ') : '';
+            const time = msg.timestamp ? new Date(msg.timestamp).toLocaleTimeString('cs-CZ', {
+                hour: '2-digit',
+                minute: '2-digit'
+            }) : '';
             
             div.innerHTML = `
                 <span class="chat-user">${msg.username}:</span>
-                <span class="chat-text">${msg.text}</span>
-                <span class="chat-time" style="font-size: 11px; color: rgba(255,255,255,0.5); margin-left: 8px;">${time}</span>
+                <span>${msg.text}</span>
+                <span style="font-size: 11px; color: rgba(255,255,255,0.5); margin-left: 8px;">${time}</span>
             `;
             
             messagesDiv.appendChild(div);
         });
         
         messagesDiv.scrollTop = messagesDiv.scrollHeight;
-        if (document.getElementById('totalMessages')) {
-            document.getElementById('totalMessages').textContent = messages.length;
-        }
-    } else {
-        if (document.getElementById('totalMessages')) {
-            document.getElementById('totalMessages').textContent = 0;
-        }
     }
-}
-
-// ADMIN FUNKCE
-window.loadAdminStats = async function() {
-    const { data: users } = await db.getAllUsers();
-    const { data: messages } = await db.getMessages();
-    const { count: onlineCount } = await db.getOnlineCount();
-    
-    if (document.getElementById('totalUsers')) {
-        document.getElementById('totalUsers').textContent = users ? users.length : 0;
-    }
-    if (document.getElementById('totalMessages')) {
-        document.getElementById('totalMessages').textContent = messages ? messages.length : 0;
-    }
-    if (document.getElementById('adminOnlineCount')) {
-        document.getElementById('adminOnlineCount').textContent = onlineCount || 0;
-    }
-}
-
-// Zobrazit seznam uživatelů
-window.showUsersList = async function() {
-    if (!isAdmin) return;
-    
-    const usersList = document.getElementById('usersList');
-    const { data: users } = await db.getAllUsers();
-    
-    if (usersList.style.display === 'none' || !usersList.style.display) {
-        usersList.style.display = 'block';
-        
-        usersList.innerHTML = '<table style="width: 100%; color: #fff; font-size: 13px; border-collapse: collapse;"><thead><tr style="background: rgba(200,100,0,0.3);"><th style="padding: 10px; text-align: left;">Uživatel</th><th style="padding: 10px;">Admin</th><th style="padding: 10px;">Registrován</th><th style="padding: 10px;">Akce</th></tr></thead><tbody>';
-        
-        users.forEach(user => {
-            const date = new Date(user.created_at).toLocaleDateString('cs-CZ');
-            const isUserAdmin = user.is_admin;
-            const canDelete = user.username !== 'lukamer';
-            
-            usersList.innerHTML += `
-                <tr style="border-bottom: 1px solid rgba(200,100,0,0.3);">
-                    <td style="padding: 8px;">${user.username}</td>
-                    <td style="padding: 8px; text-align: center;">${isUserAdmin ? '✅' : '❌'}</td>
-                    <td style="padding: 8px; text-align: center;">${date}</td>
-                    <td style="padding: 8px; text-align: center;">
-                        ${canDelete ? `<button onclick="deleteUserAdmin('${user.id}')" style="padding: 6px 12px; background: rgba(200,0,0,0.8); border: 1px solid rgba(200,0,0,1); color: #fff; cursor: pointer; font-size: 11px; font-weight: bold;">Smazat</button>` : '<span style="color: #666;">-</span>'}
-                    </td>
-                </tr>
-            `;
-        });
-        
-        usersList.innerHTML += '</tbody></table>';
-    } else {
-        usersList.style.display = 'none';
-    }
-}
-
-// Smazat uživatele (admin)
-window.deleteUserAdmin = async function(userId) {
-    if (!isAdmin) return;
-    
-    if (!confirm('Opravdu chcete smazat tohoto uživatele?')) return;
-    
-    const { error } = await db.deleteUser(userId);
-    
-    if (!error) {
-        alert('Uživatel byl smazán!');
-        showUsersList();
-        showUsersList();
-    } else {
-        alert('Chyba při mazání uživatele!');
-    }
-}
-
-// Vymazat chat
-window.clearChat = async function() {
-    if (!isAdmin) return;
-    
-    if (confirm('Opravdu chcete smazat všechny zprávy?')) {
-        const { error } = await db.clearMessages();
-        if (!error) {
-            alert('Chat byl vymazán!');
-            loadMessages();
-        } else {
-            alert('Chyba při mazání chatu!');
-        }
-    }
-}
-
-// Smazat staré zprávy
-window.clearOldMessages = async function() {
-    if (!isAdmin) return;
-    
-    if (confirm('Smazat zprávy starší než 7 dní?')) {
-        const sevenDaysAgo = new Date();
-        sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
-        
-        const { error } = await supabase
-            .from('messages')
-            .delete()
-            .lt('timestamp', sevenDaysAgo.toISOString());
-        
-        if (!error) {
-            alert('Staré zprávy byly smazány!');
-            loadMessages();
-        } else {
-            alert('Chyba při mazání zpráv!');
-        }
-    }
-}
-
-// Vyčistit starou presence
-window.clearOldPresence = async function() {
-    if (!isAdmin) return;
-    
-    const cleanupTime = new Date();
-    cleanupTime.setSeconds(cleanupTime.getSeconds() - 60);
-    
-    const { error } = await supabase
-        .from('presence')
-        .delete()
-        .lt('timestamp', cleanupTime.toISOString());
-    
-    if (!error) {
-        alert('Staré presence záznamy byly vyčištěny!');
-    } else {
-        alert('Chyba při čištění presence!');
-    }
-}
-
-// Smazat všechny presence
-window.clearAllPresence = async function() {
-    if (!isAdmin) return;
-    
-    if (confirm('Opravdu chcete smazat všechny online záznamy?')) {
-        const { error } = await supabase
-            .from('presence')
-            .delete()
-            .neq('id', '');
-        
-        if (!error) {
-            alert('Všechny presence záznamy byly smazány!');
-        } else {
-            alert('Chyba při mazání presence!');
-        }
-    }
-}
-
-// Exportovat chat log
-window.exportChatLog = async function() {
-    if (!isAdmin) return;
-    
-    const { data: messages } = await db.getMessages();
-    
-    if (messages && messages.length > 0) {
-        let log = 'CHAT LOG - ' + new Date().toLocaleString('cs-CZ') + '\n';
-        log += '='.repeat(60) + '\n\n';
-        
-        messages.forEach(msg => {
-            const time = msg.timestamp ? new Date(msg.timestamp).toLocaleString('cs-CZ') : '';
-            log += `[${time}] ${msg.username}: ${msg.text}\n`;
-        });
-        
-        const blob = new Blob([log], { type: 'text/plain;charset=utf-8' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = 'chat_log_' + Date.now() + '.txt';
-        a.click();
-        URL.revokeObjectURL(url);
-    } else {
-        alert('Žádné zprávy k exportu!');
-    }
-}
-
-// Exportovat všechna data
-window.exportAllData = async function() {
-    if (!isAdmin) return;
-    
-    const { data: messages } = await db.getMessages();
-    const { data: users } = await db.getAllUsers();
-    
-    const allData = {
-        exportDate: new Date().toISOString(),
-        messages: messages || [],
-        users: users || []
-    };
-    
-    const blob = new Blob([JSON.stringify(allData, null, 2)], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'database_export_' + Date.now() + '.json';
-    a.click();
-    URL.revokeObjectURL(url);
-}
-
-// Zobrazit DB statistiky
-window.showDatabaseStats = async function() {
-    if (!isAdmin) return;
-    
-    const { data: messages } = await db.getMessages();
-    const { data: users } = await db.getAllUsers();
-    const { count: onlineCount } = await db.getOnlineCount();
-    
-    const stats = `📊 DATABÁZOVÉ STATISTIKY
-
-👥 Uživatelé: ${users ? users.length : 0}
-💬 Zprávy: ${messages ? messages.length : 0}
-🟢 Online: ${onlineCount || 0}
-📅 Export: ${new Date().toLocaleString('cs-CZ')}
-`;
-    
-    alert(stats);
 }
 
 // Inicializace při načtení stránky
-window.onload = async function() {
-    console.log('🚀 Index.html - Inicializace...');
-    
+window.addEventListener('DOMContentLoaded', async function() {
     const savedUser = localStorage.getItem('currentUser');
     
     if (savedUser) {
@@ -1155,30 +1068,23 @@ window.onload = async function() {
                 document.getElementById('logoutBtn').style.display = 'inline-block';
                 
                 if (isAdmin) {
-                    document.getElementById('adminMenuBtn').style.display = 'block';
+                    document.getElementById('adminPanel').style.display = 'block';
                 }
             }
         } catch (e) {
+            console.log('Chyba při načítání uživatele');
             localStorage.clear();
         }
     }
     
-    // ✅ NOVÁ INICIALIZACE PRESENCE
-    userPresenceId = await initPresence(supabase, db);
-    
-    // Načíst zprávy
+    setupPresence();
+    watchOnlineUsers();
     loadMessages();
-    
-    console.log('✅ Index.html inicializován');
-}
+    loadGamesStatus();
+    subscribeToGamesStatus();
+});
+
 </script>
+
 </body>
 </html>
-
-
-
-
-
-
-
-
