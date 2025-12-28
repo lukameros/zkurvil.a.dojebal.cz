@@ -722,9 +722,12 @@ function showRegister() { document.getElementById("registerModal").style.display
 function closeRegister() { document.getElementById("registerModal").style.display = "none"; }
 function toggleChat() {
     const chatPanel = document.getElementById('chatPanel');
-    chatPanel.style.display = chatPanel.style.display === 'flex' ? 'none' : 'flex';
+    if (chatPanel.style.display === 'none' || !chatPanel.style.display) {
+        chatPanel.style.display = 'flex';
+    } else {
+        chatPanel.style.display = 'none';
+    }
 }
-</script>
 
 <script type="module">
 import { supabase, db } from './supabase-config.js';
@@ -1105,5 +1108,6 @@ window.addEventListener('DOMContentLoaded', async function() {
 
 </body>
 </html>
+
 
 
