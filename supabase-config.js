@@ -1,9 +1,9 @@
 // supabase-config.js
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm'
 
-// 🔥 DŮLEŽITÉ: Nahraď tyto hodnoty svými z Supabase projektu!
-const SUPABASE_URL = 'https://TVUJ-PROJEKT.supabase.co'
-const SUPABASE_ANON_KEY = 'tvuj-anon-key-zde'
+// 🔥 Supabase konfigurace
+const SUPABASE_URL = 'https://bmmaijlbpwgzhrxzxphf.supabase.co'
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJtbWFpamxicHdnemhyeHp4cGhmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjY4NjQ5MDcsImV4cCI6MjA4MjQ0MDkwN30.s0YQVnAjMXFu1pSI1NXZ2naSab179N0vQPglsmy3Pgw'
 
 export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
 
@@ -19,9 +19,19 @@ export const db = {
   },
   
   async addMessage(message) {
+    // Přejmenovat 'user' na 'username' pro databázi
+    const dbMessage = {
+      username: message.user,
+      text: message.text,
+      timestamp: message.timestamp,
+      is_admin: message.is_admin,
+      is_guest: message.is_guest,
+      is_system: message.is_system || false
+    };
+    
     const { data, error } = await supabase
       .from('messages')
-      .insert([message])
+      .insert([dbMessage])
       .select()
     return { data, error }
   },
