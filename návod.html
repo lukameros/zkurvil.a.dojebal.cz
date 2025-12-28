@@ -627,7 +627,7 @@ let isAdmin = false;
 let userPresenceId = null;
 
 async function setupPresence() {
-    // NEJDŘÍV vyčisti staré záznamy (starší než 1 minuta)
+    // Vyčistit staré záznamy (starší než 1 minuta)
     const oneMinuteAgo = new Date();
     oneMinuteAgo.setMinutes(oneMinuteAgo.getMinutes() - 1);
     
@@ -646,23 +646,35 @@ async function setupPresence() {
     
     userPresenceId = storedId;
     
-    // Smazat starý záznam (pokud existuje) a vytvořit nový
+    // NEJDŘÍV smazat starý záznam
     await db.removePresence(userPresenceId);
+    
+    // PAK vytvořit nový
     await db.setPresence(userPresenceId);
     
-    // Odstranit při zavření okna
-    window.addEventListener('beforeunload', async () => {
+    // Smazat při odchodu (unload) - funguje i při přechodu na jinou stránku
+    window.addEventListener('unload', async () => {
         await db.removePresence(userPresenceId);
     });
 }
 async function watchOnlineUsers() {
-    const { count } = await db.getOnlineCount();
-    document.getElementById('onlineCount').textContent = count || 0;
-    
-    db.subscribeToPresence(async () => {
+    async function updateCount() {
         const { count } = await db.getOnlineCount();
         document.getElementById('onlineCount').textContent = count || 0;
-    });
+        if (document.getElementById('adminOnlineCount')) {
+            document.getElementById('adminOnlineCount').textContent = count || 0;
+        }
+    }
+    
+    await updateCount();
+    db.subscribeToPresence(updateCount);
+    
+    // Obnovit presence každých 15 sekund
+    setInterval(async () => {
+        if (userPresenceId) {
+            await db.setPresence(userPresenceId);
+        }
+    }, 15000);
 }
 
 // Chat funkce
@@ -951,4 +963,5 @@ window.onload = async function() {
 
 </body>
 </html>
+
 
