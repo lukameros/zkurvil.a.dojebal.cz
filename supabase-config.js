@@ -227,11 +227,32 @@ export const db = {
     return { data, error }
   },
   
-  async deleteUser(id) {
+ async deleteUser(id) {
     const { error } = await supabase
       .from('users')
       .delete()
       .eq('id', id)
     return { error }
+  },   // ← PŘIDEJ ČÁRKU TADY!
+  
+  // Tetris player data
+  async getTetrisPlayerData(userId) {
+    const { data, error } = await supabase
+      .from('tetris_player_data')
+      .select('*')
+      .eq('user_id', userId)
+      .single()
+    return { data, error }
+  },
+  
+  async updateTetrisPlayerData(userId, updates) {
+    const { data, error } = await supabase
+      .from('tetris_player_data')
+      .update(updates)
+      .eq('user_id', userId)
+      .select()
+    return { data, error }
   }
 }
+}
+
