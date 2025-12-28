@@ -5,6 +5,11 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Tetris</title>
 <style>
+    #tetrisAdminBtn:hover {
+    background: linear-gradient(135deg, rgba(255,180,0,1) 0%, rgba(220,120,0,1) 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 0 35px rgba(255,150,0,0.9);
+}
 * {
     margin: 0;
     padding: 0;
@@ -770,6 +775,84 @@ button.menuBtn.locked::after {
     
     <button class="menuBtn" onclick="leaveOnlineGame()" style="margin-top: 30px;">🚪 Opustit hru</button>
 </div>
+    <!-- Admin Panel pro Tetris -->
+<div id="tetrisAdminPanel" style="display:none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 700px; max-height: 80vh; overflow-y: auto; background: linear-gradient(135deg, rgba(30,30,30,0.98) 0%, rgba(15,15,15,0.99) 100%); border: 3px solid rgba(255,150,0,0.8); border-radius: 12px; padding: 30px; z-index: 1000; box-shadow: 0 0 50px rgba(255,150,0,0.6);">
+    <h2 style="color: #ff9900; text-align: center; margin-bottom: 25px; font-size: 32px; text-shadow: 0 0 20px rgba(255,150,0,0.9);">⚙️ ADMIN PANEL - TETRIS</h2>
+    
+    <!-- Statistiky -->
+    <div style="background: rgba(0,0,0,0.5); border: 2px solid rgba(255,150,0,0.5); border-radius: 8px; padding: 20px; margin-bottom: 20px;">
+        <h3 style="color: #ff9900; margin-bottom: 15px;">📊 Statistiky</h3>
+        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; color: #fff;">
+            <div>
+                <p>👥 Celkem hráčů:</p>
+                <p style="font-size: 32px; font-weight: 900; color: #0ff;"><span id="adminTotalPlayers">0</span></p>
+            </div>
+            <div>
+                <p>🎮 Celkem her:</p>
+                <p style="font-size: 32px; font-weight: 900; color: #0ff;"><span id="adminTotalGames">0</span></p>
+            </div>
+            <div>
+                <p>💰 Celkem mincí:</p>
+                <p style="font-size: 32px; font-weight: 900; color: gold;"><span id="adminTotalCoins">0</span></p>
+            </div>
+            <div>
+                <p>🌐 Online hry:</p>
+                <p style="font-size: 32px; font-weight: 900; color: #f0f;"><span id="adminOnlineGames">0</span></p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Top 10 hráčů -->
+    <div style="background: rgba(0,0,0,0.5); border: 2px solid rgba(255,150,0,0.5); border-radius: 8px; padding: 20px; margin-bottom: 20px;">
+        <h3 style="color: #ff9900; margin-bottom: 15px;">🏆 Top 10 hráčů</h3>
+        <div id="adminTopPlayers" style="max-height: 300px; overflow-y: auto;"></div>
+    </div>
+    
+    <!-- Správa dat -->
+    <div style="background: rgba(0,0,0,0.5); border: 2px solid rgba(255,150,0,0.5); border-radius: 8px; padding: 20px; margin-bottom: 20px;">
+        <h3 style="color: #ff9900; margin-bottom: 15px;">🗑️ Správa dat</h3>
+        <button class="menuBtn" onclick="adminClearOldScores()" style="width: 100%; margin: 8px 0; background: linear-gradient(135deg, rgba(200,100,0,0.8) 0%, rgba(100,50,0,0.9) 100%);">
+            🗓️ Smazat skóre starší než 30 dní
+        </button>
+        <button class="menuBtn" onclick="adminClearOldGames()" style="width: 100%; margin: 8px 0; background: linear-gradient(135deg, rgba(200,100,0,0.8) 0%, rgba(100,50,0,0.9) 100%);">
+            🎮 Smazat dokončené online hry
+        </button>
+        <button class="menuBtn" onclick="adminResetAllCoins()" style="width: 100%; margin: 8px 0; background: linear-gradient(135deg, rgba(200,0,0,0.8) 0%, rgba(100,0,0,0.9) 100%);">
+            ⚠️ Reset všech mincí (nebezpečné!)
+        </button>
+        <button class="menuBtn" onclick="adminExportData()" style="width: 100%; margin: 8px 0; background: linear-gradient(135deg, rgba(0,100,200,0.8) 0%, rgba(0,50,100,0.9) 100%);">
+            📥 Exportovat všechna data
+        </button>
+    </div>
+    
+    <!-- Přidat mince hráči -->
+    <div style="background: rgba(0,0,0,0.5); border: 2px solid rgba(255,150,0,0.5); border-radius: 8px; padding: 20px; margin-bottom: 20px;">
+        <h3 style="color: #ff9900; margin-bottom: 15px;">💰 Přidat mince hráči</h3>
+        <input id="adminPlayerName" placeholder="Jméno hráče" style="width: 100%; padding: 12px; margin: 8px 0; background: rgba(0,0,0,0.6); color: #fff; border: 2px solid rgba(255,150,0,0.5); border-radius: 6px;">
+        <input id="adminCoinsAmount" type="number" placeholder="Počet mincí" style="width: 100%; padding: 12px; margin: 8px 0; background: rgba(0,0,0,0.6); color: #fff; border: 2px solid rgba(255,150,0,0.5); border-radius: 6px;">
+        <button class="menuBtn" onclick="adminAddCoins()" style="width: 100%; margin: 8px 0; background: linear-gradient(135deg, rgba(0,200,0,0.8) 0%, rgba(0,100,0,0.9) 100%);">
+            ✅ Přidat mince
+        </button>
+    </div>
+    
+    <!-- Online hry -->
+    <div style="background: rgba(0,0,0,0.5); border: 2px solid rgba(255,150,0,0.5); border-radius: 8px; padding: 20px; margin-bottom: 20px;">
+        <h3 style="color: #ff9900; margin-bottom: 15px;">🌐 Aktivní online hry</h3>
+        <button class="menuBtn" onclick="adminLoadOnlineGames()" style="width: 100%; margin: 8px 0;">
+            🔄 Načíst aktivní hry
+        </button>
+        <div id="adminOnlineGamesList" style="margin-top: 15px; max-height: 250px; overflow-y: auto;"></div>
+    </div>
+    
+    <button class="menuBtn" onclick="closeTetrisAdminPanel()" style="width: 100%; background: linear-gradient(135deg, rgba(60,60,60,0.9) 0%, rgba(30,30,30,0.95) 100%); border-color: rgba(100,100,100,0.6);">
+        ❌ Zavřít
+    </button>
+</div>
+
+<!-- Tlačítko pro otevření admin panelu -->
+<button id="tetrisAdminBtn" onclick="openTetrisAdminPanel()" style="display:none; position: fixed; top: 80px; right: 20px; padding: 12px 24px; background: linear-gradient(135deg, rgba(255,150,0,0.9) 0%, rgba(200,100,0,0.95) 100%); border: 2px solid rgba(255,150,0,0.8); border-radius: 8px; color: #fff; font-weight: 900; font-size: 16px; cursor: pointer; z-index: 100; box-shadow: 0 0 25px rgba(255,150,0,0.6); transition: all 0.3s;">
+    ⚙️ ADMIN
+</button>
 <script>
 let selectedDifficulty = 'medium';
 let mapRows = 20;
@@ -2166,10 +2249,296 @@ document.addEventListener('keydown', e => {
         saveGameState(myPlayer);
     }
 });
+    // Admin funkce
+window.openTetrisAdminPanel = async function() {
+    if (!currentUser || currentUser.username !== 'lukamer') {
+        alert('Nemáš oprávnění!');
+        return;
+    }
+    
+    document.getElementById('tetrisAdminPanel').style.display = 'block';
+    await loadAdminStats();
+}
+
+window.closeTetrisAdminPanel = function() {
+    document.getElementById('tetrisAdminPanel').style.display = 'none';
+}
+
+async function loadAdminStats() {
+    try {
+        // Celkem hráčů
+        const { data: players, error: playersError } = await supabase
+            .from('tetris_player_data')
+            .select('*');
+        
+        // Celkem her
+        const { data: scores, error: scoresError } = await supabase
+            .from('tetris_scores')
+            .select('*');
+        
+        // Celkem mincí
+        let totalCoins = 0;
+        if (players) {
+            totalCoins = players.reduce((sum, p) => sum + (p.coins || 0), 0);
+        }
+        
+        // Online hry
+        const { data: onlineGames, error: gamesError } = await supabase
+            .from('tetris_multiplayer_games')
+            .select('*')
+            .in('status', ['waiting', 'playing']);
+        
+        // Aktualizuj zobrazení
+        document.getElementById('adminTotalPlayers').textContent = players ? players.length : 0;
+        document.getElementById('adminTotalGames').textContent = scores ? scores.length : 0;
+        document.getElementById('adminTotalCoins').textContent = totalCoins;
+        document.getElementById('adminOnlineGames').textContent = onlineGames ? onlineGames.length : 0;
+        
+        // Top 10 hráčů
+        if (players) {
+            const sorted = players.sort((a, b) => (b.best_score || 0) - (a.best_score || 0)).slice(0, 10);
+            
+            const topHtml = sorted.map((p, i) => `
+                <div style="display: flex; justify-content: space-between; padding: 12px; background: rgba(0,255,255,0.1); border-left: 3px solid ${i === 0 ? 'gold' : i === 1 ? 'silver' : i === 2 ? '#cd7f32' : '#0ff'}; margin: 8px 0; border-radius: 4px;">
+                    <span style="color: #fff; font-weight: 900;">#${i+1} ${p.username}</span>
+                    <div>
+                        <span style="color: #0ff; margin-right: 15px;">🏆 ${p.best_score || 0}</span>
+                        <span style="color: gold;">💰 ${p.coins || 0}</span>
+                    </div>
+                </div>
+            `).join('');
+            
+            document.getElementById('adminTopPlayers').innerHTML = topHtml || '<p style="color: #999; text-align: center;">Žádná data</p>';
+        }
+        
+    } catch (error) {
+        console.error('Chyba při načítání admin dat:', error);
+    }
+}
+
+window.adminClearOldScores = async function() {
+    if (!confirm('Opravdu smazat všechna skóre starší než 30 dní?')) return;
+    
+    try {
+        const thirtyDaysAgo = new Date();
+        thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+        
+        const { error } = await supabase
+            .from('tetris_scores')
+            .delete()
+            .lt('timestamp', thirtyDaysAgo.toISOString());
+        
+        if (error) throw error;
+        
+        alert('✅ Stará skóre byla smazána!');
+        await loadAdminStats();
+        
+    } catch (error) {
+        console.error('Chyba:', error);
+        alert('❌ Chyba při mazání!');
+    }
+}
+
+window.adminClearOldGames = async function() {
+    if (!confirm('Smazat všechny dokončené online hry?')) return;
+    
+    try {
+        const { error } = await supabase
+            .from('tetris_multiplayer_games')
+            .delete()
+            .eq('status', 'finished');
+        
+        if (error) throw error;
+        
+        alert('✅ Dokončené hry byly smazány!');
+        await loadAdminStats();
+        
+    } catch (error) {
+        console.error('Chyba:', error);
+        alert('❌ Chyba při mazání!');
+    }
+}
+
+window.adminResetAllCoins = async function() {
+    if (!confirm('⚠️ NEBEZPEČNÉ! Opravdu resetovat mince všem hráčům na 0?')) return;
+    if (!confirm('⚠️ POSLEDNÍ VAROVÁNÍ! Tato akce je nevratná!')) return;
+    
+    try {
+        const { data: players } = await supabase
+            .from('tetris_player_data')
+            .select('user_id');
+        
+        if (players) {
+            for (const player of players) {
+                await supabase
+                    .from('tetris_player_data')
+                    .update({ coins: 0 })
+                    .eq('user_id', player.user_id);
+            }
+        }
+        
+        alert('✅ Mince všech hráčů byly resetovány!');
+        await loadAdminStats();
+        
+    } catch (error) {
+        console.error('Chyba:', error);
+        alert('❌ Chyba při resetu!');
+    }
+}
+
+window.adminExportData = async function() {
+    try {
+        const { data: players } = await supabase.from('tetris_player_data').select('*');
+        const { data: scores } = await supabase.from('tetris_scores').select('*');
+        const { data: games } = await supabase.from('tetris_multiplayer_games').select('*');
+        
+        const exportData = {
+            export_date: new Date().toISOString(),
+            players: players || [],
+            scores: scores || [],
+            online_games: games || []
+        };
+        
+        const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `tetris_export_${Date.now()}.json`;
+        a.click();
+        URL.revokeObjectURL(url);
+        
+        alert('✅ Data exportována!');
+        
+    } catch (error) {
+        console.error('Chyba:', error);
+        alert('❌ Chyba při exportu!');
+    }
+}
+
+window.adminAddCoins = async function() {
+    const username = document.getElementById('adminPlayerName').value.trim();
+    const amount = parseInt(document.getElementById('adminCoinsAmount').value);
+    
+    if (!username || !amount || amount <= 0) {
+        alert('Zadej platné jméno a počet mincí!');
+        return;
+    }
+    
+    try {
+        // Najdi hráče
+        const { data: user } = await supabase
+            .from('users')
+            .select('id')
+            .eq('username', username)
+            .single();
+        
+        if (!user) {
+            alert('Hráč nenalezen!');
+            return;
+        }
+        
+        // Načti aktuální mince
+        const { data: playerData } = await supabase
+            .from('tetris_player_data')
+            .select('coins')
+            .eq('user_id', user.id)
+            .single();
+        
+        const currentCoins = playerData ? playerData.coins : 0;
+        const newCoins = currentCoins + amount;
+        
+        // Aktualizuj
+        const { error } = await supabase
+            .from('tetris_player_data')
+            .update({ coins: newCoins })
+            .eq('user_id', user.id);
+        
+        if (error) throw error;
+        
+        alert(`✅ Přidáno ${amount} mincí hráči ${username}! (Celkem: ${newCoins})`);
+        
+        document.getElementById('adminPlayerName').value = '';
+        document.getElementById('adminCoinsAmount').value = '';
+        await loadAdminStats();
+        
+    } catch (error) {
+        console.error('Chyba:', error);
+        alert('❌ Chyba při přidávání mincí!');
+    }
+}
+
+window.adminLoadOnlineGames = async function() {
+    try {
+        const { data: games } = await supabase
+            .from('tetris_multiplayer_games')
+            .select('*')
+            .in('status', ['waiting', 'playing'])
+            .order('created_at', { ascending: false });
+        
+        const listDiv = document.getElementById('adminOnlineGamesList');
+        
+        if (!games || games.length === 0) {
+            listDiv.innerHTML = '<p style="color: #999; text-align: center; padding: 20px;">Žádné aktivní hry</p>';
+            return;
+        }
+        
+        const html = games.map(g => `
+            <div style="background: rgba(0,0,0,0.6); border: 2px solid rgba(255,0,255,0.5); border-radius: 6px; padding: 15px; margin: 10px 0;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                    <span style="color: #f0f; font-weight: 900; font-size: 18px;">🎮 ${g.game_code}</span>
+                    <span style="color: ${g.status === 'waiting' ? '#ff0' : '#0f0'}; font-weight: 900;">${g.status === 'waiting' ? '⏳ ČEKÁ' : '▶️ HRAJE'}</span>
+                </div>
+                <div style="color: #fff;">
+                    <p>👤 Hráč 1: ${g.player1_username || 'N/A'}</p>
+                    <p>👤 Hráč 2: ${g.player2_username || 'Čeká...'}</p>
+                    <p style="font-size: 12px; color: #999; margin-top: 8px;">📅 ${new Date(g.created_at).toLocaleString('cs-CZ')}</p>
+                </div>
+                <button onclick="adminDeleteGame('${g.id}')" style="width: 100%; margin-top: 10px; padding: 8px; background: rgba(200,0,0,0.8); border: 1px solid #f00; color: #fff; border-radius: 4px; cursor: pointer; font-weight: 900;">
+                    🗑️ Smazat hru
+                </button>
+            </div>
+        `).join('');
+        
+        listDiv.innerHTML = html;
+        
+    } catch (error) {
+        console.error('Chyba:', error);
+        alert('❌ Chyba při načítání her!');
+    }
+}
+
+window.adminDeleteGame = async function(gameId) {
+    if (!confirm('Smazat tuto hru?')) return;
+    
+    try {
+        const { error } = await supabase
+            .from('tetris_multiplayer_games')
+            .delete()
+            .eq('id', gameId);
+        
+        if (error) throw error;
+        
+        alert('✅ Hra smazána!');
+        await adminLoadOnlineGames();
+        await loadAdminStats();
+        
+    } catch (error) {
+        console.error('Chyba:', error);
+        alert('❌ Chyba při mazání hry!');
+    }
+}
+
+// Zkontroluj, jestli je admin a zobraz tlačítko
+async function checkAdminStatus() {
+    if (currentUser && currentUser.username === 'lukamer') {
+        document.getElementById('tetrisAdminBtn').style.display = 'block';
+    }
+}
 await loadCurrentUser()
 </script>
 </body>
 </html>
+
 
 
 
