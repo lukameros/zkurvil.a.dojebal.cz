@@ -776,52 +776,47 @@ function closeAdminPanel() {
 </script>
 
 <script type="module">
-// Firebase konfigurace
-import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
-import { getDatabase, ref, push, onValue, onDisconnect, set, remove, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
-
-const firebaseConfig = {
-    apiKey: "AIzaSyDOap2QsXnBvqC2WWp907fAACI0o5qIBk4",
-    authDomain: "tetrisleaderboard-3b345.firebaseapp.com",
-    databaseURL: "https://tetrisleaderboard-3b345-default-rtdb.europe-west1.firebasedatabase.app",
-    projectId: "tetrisleaderboard-3b345",
-    storageBucket: "tetrisleaderboard-3b345.firebasestorage.app",
-    messagingSenderId: "1066407746580",
-    appId: "1:1066407746580:web:b8de384e86711899f99b01"
-};
-
-const app = initializeApp(firebaseConfig);
-const db = getDatabase(app);
+import { supabase, db } from './supabase-config.js';
 
 let currentUser = null;
 let isAdmin = false;
-let userPresenceRef = null;
+let userPresenceId = null;
 
 // Online presence
-function setupPresence() {
-    const userId = 'user_' + Math.random().toString(36).substr(2, 9);
-    userPresenceRef = ref(db, `presence/${userId}`);
+async function setupPresence() {
+    userPresenceId = 'user_' + Math.random().toString(36).substr(2, 9);
+    await db.setPresence(userPresenceId);
     
-    set(userPresenceRef, {
-        online: true,
-        timestamp: serverTimestamp()
+    // Odstranit při zavření stránky
+    window.addEventListener('beforeunload', async () => {
+        await db.removePresence(userPresenceId);
     });
-    
-    onDisconnect(userPresenceRef).remove();
 }
 
 // Sledování online uživatelů
-function watchOnlineUsers() {
-    const presenceRef = ref(db, 'presence');
-    onValue(presenceRef, (snapshot) => {
-        const count = snapshot.exists() ? Object.keys(snapshot.val()).length : 0;
-        document.getElementById('onlineCount').textContent = count;
-        document.getElementById('adminOnlineCount').textContent = count;
+async function watchOnlineUsers() {
+    // Iniciální načtení
+    const { count } = await db.getOnlineCount();
+    document.getElementById('onlineCount').textContent = count || 0;
+    document.getElementById('adminOnlineCount').textContent = count || 0;
+    
+    // Realtime updates
+    db.subscribeToPresence(async () => {
+        const { count } = await db.getOnlineCount();
+        document.getElementById('onlineCount').textContent = count || 0;
+        document.getElementById('adminOnlineCount').textContent = count || 0;
     });
+    
+    // Pravidelná aktualizace presence (každých 30s)
+    setInterval(() => {
+        if (userPresenceId) {
+            db.setPresence(userPresenceId);
+        }
+    }, 30000);
 }
 
 // Poslat zprávu
-window.sendMessage = function() {
+window.sendMessage = async function() {
     const input = document.getElementById('messageInput');
     const message = input.value.trim();
     
@@ -835,20 +830,19 @@ window.sendMessage = function() {
         username = window.guestName;
     }
     
-    const messagesRef = ref(db, 'messages');
-    push(messagesRef, {
+    await db.addMessage({
         user: username,
         text: message,
-        timestamp: serverTimestamp(),
-        isAdmin: isAdmin,
-        isGuest: !currentUser
+        timestamp: new Date().toISOString(),
+        is_admin: isAdmin,
+        is_guest: !currentUser
     });
     
     input.value = '';
 }
 
 // Poslat systémovou zprávu (admin)
-window.sendSystemMessage = function() {
+window.sendSystemMessage = async function() {
     if (!isAdmin) return;
     
     const input = document.getElementById('systemMessage');
@@ -856,93 +850,99 @@ window.sendSystemMessage = function() {
     
     if (!message) return;
     
-    const messagesRef = ref(db, 'messages');
-    push(messagesRef, {
+    await db.addMessage({
         user: 'SYSTÉM',
         text: message,
-        timestamp: serverTimestamp(),
-        isAdmin: true,
-        isSystem: true
+        timestamp: new Date().toISOString(),
+        is_admin: true,
+        is_system: true
     });
     
     input.value = '';
 }
 
 // Načíst zprávy
-function loadMessages() {
-    const messagesRef = ref(db, 'messages');
-    onValue(messagesRef, (snapshot) => {
-        const messagesDiv = document.getElementById('chatMessages');
-        messagesDiv.innerHTML = '';
-        
-        let messageCount = 0;
-        
-        if (snapshot.exists()) {
-            const messages = snapshot.val();
-            Object.keys(messages).forEach(key => {
-                const msg = messages[key];
-                const div = document.createElement('div');
-                
-                let msgClass = 'chat-message';
-                if (msg.isAdmin) msgClass += ' admin';
-                else if (msg.isGuest) msgClass += ' guest';
-                
-                div.className = msgClass;
-                
-                const time = msg.timestamp ? new Date(msg.timestamp).toLocaleTimeString('cs-CZ') : '';
-                
-                div.innerHTML = `
-                    <span class="chat-user">${msg.user}:</span>
-                    <span class="chat-text">${msg.text}</span>
-                    <span class="chat-time">${time}</span>
-                `;
-                
-                messagesDiv.appendChild(div);
-                messageCount++;
-            });
-            
-            messagesDiv.scrollTop = messagesDiv.scrollHeight;
-        }
-        
-        document.getElementById('totalMessages').textContent = messageCount;
+async function loadMessages() {
+    const messagesDiv = document.getElementById('chatMessages');
+    
+    // Iniciální načtení
+    const { data: messages } = await db.getMessages();
+    displayMessages(messages);
+    
+    // Realtime updates
+    db.subscribeToMessages(async () => {
+        const { data: messages } = await db.getMessages();
+        displayMessages(messages);
     });
 }
 
+function displayMessages(messages) {
+    const messagesDiv = document.getElementById('chatMessages');
+    messagesDiv.innerHTML = '';
+    
+    if (messages && messages.length > 0) {
+        messages.forEach(msg => {
+            const div = document.createElement('div');
+            
+            let msgClass = 'chat-message';
+            if (msg.is_admin) msgClass += ' admin';
+            else if (msg.is_guest) msgClass += ' guest';
+            
+            div.className = msgClass;
+            
+            const time = msg.timestamp ? new Date(msg.timestamp).toLocaleTimeString('cs-CZ') : '';
+            
+            div.innerHTML = `
+                <span class="chat-user">${msg.username}:</span>
+                <span class="chat-text">${msg.text}</span>
+                <span class="chat-time">${time}</span>
+            `;
+            
+            messagesDiv.appendChild(div);
+        });
+        
+        messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        document.getElementById('totalMessages').textContent = messages.length;
+    } else {
+        document.getElementById('totalMessages').textContent = 0;
+    }
+}
+
 // Vymazat chat (admin)
-window.clearChat = function() {
+window.clearChat = async function() {
     if (!isAdmin) return;
     
     if (confirm('Opravdu chcete smazat všechny zprávy?')) {
-        const messagesRef = ref(db, 'messages');
-        remove(messagesRef);
-        alert('Chat byl vymazán!');
+        const { error } = await db.clearMessages();
+        if (!error) {
+            alert('Chat byl vymazán!');
+        } else {
+            alert('Chyba při mazání chatu!');
+        }
     }
 }
 
 // Exportovat chat log (admin)
-window.exportChatLog = function() {
+window.exportChatLog = async function() {
     if (!isAdmin) return;
     
-    const messagesRef = ref(db, 'messages');
-    onValue(messagesRef, (snapshot) => {
-        if (snapshot.exists()) {
-            const messages = snapshot.val();
-            let log = 'CHAT LOG - ' + new Date().toLocaleString('cs-CZ') + '\n\n';
-            
-            Object.keys(messages).forEach(key => {
-                const msg = messages[key];
-                const time = msg.timestamp ? new Date(msg.timestamp).toLocaleString('cs-CZ') : '';
-                log += `[${time}] ${msg.user}: ${msg.text}\n`;
-            });
-            
-            const blob = new Blob([log], { type: 'text/plain' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = 'chat_log_' + Date.now() + '.txt';
-            a.click();
-        }
-    }, { once: true });
+    const { data: messages } = await db.getMessages();
+    
+    if (messages && messages.length > 0) {
+        let log = 'CHAT LOG - ' + new Date().toLocaleString('cs-CZ') + '\n\n';
+        
+        messages.forEach(msg => {
+            const time = msg.timestamp ? new Date(msg.timestamp).toLocaleString('cs-CZ') : '';
+            log += `[${time}] ${msg.username}: ${msg.text}\n`;
+        });
+        
+        const blob = new Blob([log], { type: 'text/plain' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'chat_log_' + Date.now() + '.txt';
+        a.click();
+    }
 }
 
 // Login
