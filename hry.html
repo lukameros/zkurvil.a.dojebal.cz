@@ -782,27 +782,47 @@ function updateGameUI(gameKey, isActive) {
 }
 
 // Přepnutí stavu hry (pouze pro admina)
+// Přepnutí stavu hry (pouze pro admina)
 window.toggleGameStatus = async function(gameKey) {
     if (!isAdmin) {
         alert('Nemáte oprávnění ke správě her!');
         return;
     }
     
-    const { data: currentGame } = await supabase
+    // Nejdřív zkus najít existující záznam
+    const { data: existingGame, error: fetchError } = await supabase
         .from('games_status')
         .select('*')
         .eq('game_key', gameKey)
-        .single();
+        .maybeSingle(); // ✅ místo .single() použij .maybeSingle()
     
-    const newStatus = currentGame ? !currentGame.is_active : true;
+    const newStatus = existingGame ? !existingGame.is_active : true;
     
-    const { error } = await supabase
-        .from('games_status')
-        .upsert({
-            game_key: gameKey,
-            is_active: newStatus,
-            updated_at: new Date().toISOString()
-        });
+    let error;
+    
+    if (existingGame) {
+        // Pokud existuje, aktualizuj
+        const result = await supabase
+            .from('games_status')
+            .update({
+                is_active: newStatus,
+                updated_at: new Date().toISOString()
+            })
+            .eq('game_key', gameKey);
+        
+        error = result.error;
+    } else {
+        // Pokud neexistuje, vytvoř nový
+        const result = await supabase
+            .from('games_status')
+            .insert([{
+                game_key: gameKey,
+                is_active: newStatus,
+                updated_at: new Date().toISOString()
+            }]);
+        
+        error = result.error;
+    }
     
     if (error) {
         console.error('Chyba při ukládání stavu hry:', error);
@@ -811,6 +831,7 @@ window.toggleGameStatus = async function(gameKey) {
     }
     
     updateGameUI(gameKey, newStatus);
+    alert(`Hra "${gameKey}" byla ${newStatus ? 'aktivována' : 'deaktivována'}!`);
 }
 
 // Funkce pro hrání hry
@@ -1111,6 +1132,7 @@ window.addEventListener('DOMContentLoaded', async function() {
 
 </body>
 </html>
+
 
 
 
