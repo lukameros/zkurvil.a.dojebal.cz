@@ -164,5 +164,64 @@ export const db = {
         callback
       )
       .subscribe()
+  },
+  
+  // 🆕 UŽIVATELÉ - REGISTRACE A PŘIHLÁŠENÍ
+  async registerUser(username, password) {
+    try {
+      // Zkontrolovat, zda uživatel už neexistuje
+      const { data: existing, error: checkError } = await supabase
+        .from('users')
+        .select('username')
+        .eq('username', username)
+        .maybeSingle()
+      
+      if (existing) {
+        return { error: { message: 'Uživatelské jméno už existuje!' } }
+      }
+      
+      // Vytvořit nového uživatele (is_admin bude automaticky FALSE)
+      const { data, error } = await supabase
+        .from('users')
+        .insert([{
+          username: username,
+          password: password,
+          is_admin: false
+        }])
+        .select()
+      
+      return { data, error }
+    } catch (error) {
+      return { error }
+    }
+  },
+  
+  async loginUser(username, password) {
+    try {
+      const { data, error } = await supabase
+        .from('users')
+        .select('*')
+        .eq('username', username)
+        .eq('password', password)
+        .maybeSingle()
+      
+      return { data, error }
+    } catch (error) {
+      return { error }
+    }
+  },
+  
+  async checkUserExists(username) {
+    try {
+      const { data, error } = await supabase
+        .from('users')
+        .select('username')
+        .eq('username', username)
+        .maybeSingle()
+      
+      return { exists: !!data, error }
+    } catch (error) {
+      return { exists: false, error }
+    }
   }
 }
