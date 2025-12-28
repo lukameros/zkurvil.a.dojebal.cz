@@ -117,6 +117,76 @@
             text-shadow: 0 0 25px rgba(255,0,0,0.9), 3px 3px 8px rgba(0,0,0,1);
         }
 
+        /* Admin Panel */
+        #adminPanel {
+            display: none;
+            position: fixed;
+            top: 120px;
+            right: 30px;
+            width: 350px;
+            background: linear-gradient(135deg, rgba(40,20,0,0.98) 0%, rgba(20,10,0,0.99) 100%);
+            border: 3px solid rgba(255,150,0,0.8);
+            clip-path: polygon(3% 0, 100% 0, 97% 100%, 0 100%);
+            padding: 20px;
+            z-index: 999;
+            box-shadow: 0 0 40px rgba(255,150,0,0.6);
+            max-height: calc(100vh - 140px);
+            overflow-y: auto;
+        }
+
+        #adminPanel h3 {
+            color: #ff9900;
+            font-size: 20px;
+            font-weight: 900;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            text-shadow: 0 0 15px rgba(255,150,0,0.9);
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .admin-game-toggle {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px;
+            margin: 8px 0;
+            background: rgba(0,0,0,0.6);
+            border: 2px solid rgba(255,150,0,0.5);
+            clip-path: polygon(2% 0, 100% 0, 98% 100%, 0 100%);
+        }
+
+        .admin-game-toggle span {
+            color: #fff;
+            font-weight: 900;
+            font-size: 14px;
+        }
+
+        .admin-toggle-btn {
+            padding: 8px 16px;
+            border: 2px solid rgba(200,0,0,0.7);
+            background: linear-gradient(135deg, rgba(200,0,0,0.9) 0%, rgba(100,0,0,0.95) 100%);
+            color: #fff;
+            font-weight: 900;
+            font-size: 12px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            clip-path: polygon(5% 0, 100% 0, 95% 100%, 0 100%);
+            min-width: 110px;
+        }
+
+        .admin-toggle-btn:hover {
+            background: linear-gradient(135deg, rgba(255,20,20,1) 0%, rgba(150,0,0,1) 100%);
+            transform: translateY(-2px);
+        }
+
+        .admin-toggle-btn.active {
+            background: linear-gradient(135deg, rgba(0,200,0,0.9) 0%, rgba(0,100,0,0.95) 100%);
+            border-color: rgba(0,200,0,0.7);
+        }
+
         #gamesContainer {
             max-width: 1400px;
             margin: 0 auto;
@@ -143,6 +213,30 @@
             transform: translateY(-10px) scale(1.02);
             border-color: rgba(255,30,30,0.8);
             box-shadow: 0 15px 40px rgba(0,0,0,0.9), 0 0 40px rgba(255,0,0,0.6);
+        }
+
+        .game-card.disabled {
+            opacity: 0.5;
+            pointer-events: none;
+            filter: grayscale(1);
+        }
+
+        .game-card.disabled::after {
+            content: "⚠️ MIMO PROVOZ";
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(200,0,0,0.95);
+            color: #fff;
+            padding: 15px 30px;
+            font-weight: 900;
+            font-size: 18px;
+            letter-spacing: 2px;
+            text-shadow: 0 0 15px rgba(255,0,0,0.9);
+            border: 3px solid rgba(255,0,0,0.8);
+            clip-path: polygon(5% 0, 100% 0, 95% 100%, 0 100%);
+            z-index: 10;
         }
 
         .game-image-container {
@@ -410,6 +504,11 @@
         @media (max-width: 768px) {
             h1 { font-size: 36px; margin: 100px 20px 40px; }
             #gamesContainer { padding: 0 20px 60px; gap: 25px; }
+            #adminPanel { 
+                width: calc(100% - 40px); 
+                right: 20px;
+                top: 100px;
+            }
         }
     </style>
 </head>
@@ -427,8 +526,41 @@
 
 <h1>🎮 Hry 🎮</h1>
 
+<!-- Admin Panel -->
+<div id="adminPanel">
+    <h3>⚙️ Admin Panel</h3>
+    <div class="admin-game-toggle">
+        <span>🎡 Kolečko</span>
+        <button class="admin-toggle-btn active" data-game="kolecko" onclick="toggleGameStatus('kolecko')">AKTIVNÍ</button>
+    </div>
+    <div class="admin-game-toggle">
+        <span>🟦 Tetris</span>
+        <button class="admin-toggle-btn active" data-game="tetris" onclick="toggleGameStatus('tetris')">AKTIVNÍ</button>
+    </div>
+    <div class="admin-game-toggle">
+        <span>🎮 Project Madness 1</span>
+        <button class="admin-toggle-btn active" data-game="swf" onclick="toggleGameStatus('swf')">AKTIVNÍ</button>
+    </div>
+    <div class="admin-game-toggle">
+        <span>🚲 Happy Wheels</span>
+        <button class="admin-toggle-btn active" data-game="happyWheels" onclick="toggleGameStatus('happyWheels')">AKTIVNÍ</button>
+    </div>
+    <div class="admin-game-toggle">
+        <span>🥊 Hobo 1</span>
+        <button class="admin-toggle-btn active" data-game="hobo1" onclick="toggleGameStatus('hobo1')">AKTIVNÍ</button>
+    </div>
+    <div class="admin-game-toggle">
+        <span>🥊 Hobo 2</span>
+        <button class="admin-toggle-btn active" data-game="hobo2" onclick="toggleGameStatus('hobo2')">AKTIVNÍ</button>
+    </div>
+    <div class="admin-game-toggle">
+        <span>🥊 Hobo 3</span>
+        <button class="admin-toggle-btn active" data-game="hobo3" onclick="toggleGameStatus('hobo3')">AKTIVNÍ</button>
+    </div>
+</div>
+
 <div id="gamesContainer">
-    <div class="game-card" onclick="goWheel()">
+    <div class="game-card" data-game="kolecko" onclick="playGame('kolecko', goWheel)">
         <div class="game-image-container">
             <img src="kolecko-image.jpg" alt="Kolečko" class="game-image" 
                  onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'">
@@ -443,7 +575,7 @@
         </div>
     </div>
 
-    <div class="game-card" onclick="goTetris()">
+    <div class="game-card" data-game="tetris" onclick="playGame('tetris', goTetris)">
         <div class="game-image-container">
             <img src="tetris-image.jpg" alt="Tetris" class="game-image"
                  onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'">
@@ -454,10 +586,11 @@
                 <span class="game-icon">🟦</span>
                 <span>Tetris</span>
             </div>
-            <button class="play-btn" onclick="event.stopPropagation(); goTetris();">Hrát hru</button>
+            <button class="play-btn" onclick="event.stopPropagation(); playGame('tetris', goTetris);">Hrát hru</button>
         </div>
     </div>
-    <div class="game-card" onclick="goSWF()">
+
+    <div class="game-card" data-game="swf" onclick="playGame('swf', goSWF)">
         <div class="game-image-container">
             <img src="project-madness-1-image.jpg" alt="Project Madness 1" class="game-image"
                  onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'">
@@ -468,11 +601,11 @@
                 <span class="game-icon">🎮</span>
                 <span>Project Madness 1</span>
             </div>
-            <button class="play-btn" onclick="event.stopPropagation(); goSWF();">Hrát hru</button>
+            <button class="play-btn" onclick="event.stopPropagation(); playGame('swf', goSWF);">Hrát hru</button>
         </div>
     </div>
 
-    <div class="game-card" onclick="goHappyWheels()">
+    <div class="game-card" data-game="happyWheels" onclick="playGame('happyWheels', goHappyWheels)">
         <div class="game-image-container">
             <img src="happy-wheels-image.jpg" alt="Happy Wheels" class="game-image"
                  onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'">
@@ -483,11 +616,11 @@
                 <span class="game-icon">🚲</span>
                 <span>Happy Wheels</span>
             </div>
-            <button class="play-btn" onclick="event.stopPropagation(); goHappyWheels();">Hrát hru</button>
+            <button class="play-btn" onclick="event.stopPropagation(); playGame('happyWheels', goHappyWheels);">Hrát hru</button>
         </div>
     </div>
 
-    <div class="game-card" onclick="goHobo1()">
+    <div class="game-card" data-game="hobo1" onclick="playGame('hobo1', goHobo1)">
         <div class="game-image-container">
             <img src="hobo1-image.jpg" alt="Hobo 1" class="game-image"
                  onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'">
@@ -498,11 +631,11 @@
                 <span class="game-icon">🥊</span>
                 <span>Hobo 1</span>
             </div>
-            <button class="play-btn" onclick="event.stopPropagation(); goHobo1();">Hrát hru</button>
+            <button class="play-btn" onclick="event.stopPropagation(); playGame('hobo1', goHobo1);">Hrát hru</button>
         </div>
     </div>
 
-    <div class="game-card" onclick="goHobo2()">
+    <div class="game-card" data-game="hobo2" onclick="playGame('hobo2', goHobo2)">
         <div class="game-image-container">
             <img src="hobo2-image.jpg" alt="Hobo 2" class="game-image"
                  onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'">
@@ -513,11 +646,11 @@
                 <span class="game-icon">🥊</span>
                 <span>Hobo 2</span>
             </div>
-            <button class="play-btn" onclick="event.stopPropagation(); goHobo2();">Hrát hru</button>
+            <button class="play-btn" onclick="event.stopPropagation(); playGame('hobo2', goHobo2);">Hrát hru</button>
         </div>
     </div>
 
-    <div class="game-card" onclick="goHobo3()">
+    <div class="game-card" data-game="hobo3" onclick="playGame('hobo3', goHobo3)">
         <div class="game-image-container">
             <img src="hobo3-image.jpg" alt="Hobo 3" class="game-image"
                  onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'">
@@ -528,7 +661,7 @@
                 <span class="game-icon">🥊</span>
                 <span>Hobo 3</span>
             </div>
-            <button class="play-btn" onclick="event.stopPropagation(); goHobo3();">Hrát hru</button>
+            <button class="play-btn" onclick="event.stopPropagation(); playGame('hobo3', goHobo3);">Hrát hru</button>
         </div>
     </div>
 </div>
@@ -555,8 +688,8 @@
         <input id="registerPassConfirm" type="password" placeholder="Potvrdit heslo">
         <div class="modal-buttons">
             <button class="modal-btn" onclick="register()">Registrovat</button>
-            <button class="modal-btn cancel" onclick="closeRegister()">Zrušit</button>
-        </div>
+            <button class="modal-btn cancel" onclick="closeRegister()">Zrušit</button
+                                                                                 </div>
     </div>
 </div>
 
@@ -598,62 +731,115 @@ import { supabase, db } from './supabase-config.js';
 
 let currentUser = null;
 let currentUserId = null;
-let isAdmin = false;  // Výchozí hodnota pro admina, bude se měnit podle uživatele
+let isAdmin = false;
+let userPresenceId = null;
 
-// Pokud je uživatel "lukamer", bude admin
-if (window.location.href.includes("lukamer")) { 
-    isAdmin = true;  // Pokud je uživatel "lukamer", admin má přístup
-}
-
-const gamesStatus = {
-    kolecko: true,
-    tetris: true,
-    swf: true,
-    happyWheels: true,
-    hobo1: true,
-    hobo2: true,
-    hobo3: true
-};
-
-// Funkce pro admina - přepínání hry
-function toggleGame(gameKey) {
-    if (!isAdmin) return; // Jen pro admina
-
-    gamesStatus[gameKey] = !gamesStatus[gameKey]; // Přepne true/false
-
-    // Aktualizace tlačítka
-    const button = Array.from(document.querySelectorAll('#adminButtons button'))
-        .find(btn => btn.textContent.includes(gameKey.charAt(0).toUpperCase() + gameKey.slice(1)));
+// Načtení stavů her ze Supabase
+async function loadGamesStatus() {
+    const { data, error } = await supabase
+        .from('games_status')
+        .select('*');
     
-    if (button) {
-        button.textContent = `${gameKey.charAt(0).toUpperCase() + gameKey.slice(1)}: ${gamesStatus[gameKey] ? '✅' : '❌'}`;
+    if (error) {
+        console.error('Chyba při načítání stavů her:', error);
+        return;
+    }
+    
+    if (data && data.length > 0) {
+        data.forEach(game => {
+            updateGameUI(game.game_key, game.is_active);
+        });
     }
 }
 
-// Zobraz admin panel, jen pokud je admin
-window.addEventListener('DOMContentLoaded', () => {
-    if (isAdmin) {
-        // Zobraz admin panel pouze pro admina
-        document.getElementById('adminPanel').style.display = 'block';
-    } else {
-        // Skryj admin panel pro ostatní
-        document.getElementById('adminPanel').style.display = 'none';
+// Aktualizace UI hry
+function updateGameUI(gameKey, isActive) {
+    const gameCard = document.querySelector(`.game-card[data-game="${gameKey}"]`);
+    if (gameCard) {
+        if (isActive) {
+            gameCard.classList.remove('disabled');
+        } else {
+            gameCard.classList.add('disabled');
+        }
     }
-});
+    
+    const adminBtn = document.querySelector(`.admin-toggle-btn[data-game="${gameKey}"]`);
+    if (adminBtn) {
+        if (isActive) {
+            adminBtn.classList.add('active');
+            adminBtn.textContent = 'AKTIVNÍ';
+        } else {
+            adminBtn.classList.remove('active');
+            adminBtn.textContent = 'MIMO PROVOZ';
+        }
+    }
+}
 
-// Funkce pro přehrání hry
-function playGame(gameKey, redirectFunc) {
-    if (!gamesStatus[gameKey]) {
+// Přepnutí stavu hry (pouze pro admina)
+window.toggleGameStatus = async function(gameKey) {
+    if (!isAdmin) {
+        alert('Nemáte oprávnění ke správě her!');
+        return;
+    }
+    
+    const { data: currentGame } = await supabase
+        .from('games_status')
+        .select('*')
+        .eq('game_key', gameKey)
+        .single();
+    
+    const newStatus = currentGame ? !currentGame.is_active : true;
+    
+    const { error } = await supabase
+        .from('games_status')
+        .upsert({
+            game_key: gameKey,
+            is_active: newStatus,
+            updated_at: new Date().toISOString()
+        });
+    
+    if (error) {
+        console.error('Chyba při ukládání stavu hry:', error);
+        alert('Chyba při ukládání stavu hry!');
+        return;
+    }
+    
+    updateGameUI(gameKey, newStatus);
+}
+
+// Funkce pro hrání hry
+window.playGame = async function(gameKey, redirectFunc) {
+    const { data: game } = await supabase
+        .from('games_status')
+        .select('is_active')
+        .eq('game_key', gameKey)
+        .single();
+    
+    const isActive = game ? game.is_active : true;
+    
+    if (!isActive) {
         alert('Tato hra je momentálně mimo provoz.');
         return;
     }
+    
     redirectFunc();
 }
 
-
-
-
-let userPresenceId = null;
+// Sledování změn stavů her v reálném čase
+function subscribeToGamesStatus() {
+    supabase
+        .channel('games_status_changes')
+        .on('postgres_changes', {
+            event: '*',
+            schema: 'public',
+            table: 'games_status'
+        }, (payload) => {
+            if (payload.new) {
+                updateGameUI(payload.new.game_key, payload.new.is_active);
+            }
+        })
+        .subscribe();
+}
 
 // Presence
 async function setupPresence() {
@@ -666,7 +852,6 @@ async function setupPresence() {
     
     userPresenceId = sessionId;
     
-    // Vyčistit staré záznamy (starší než 10 sekund)
     const cleanupTime = new Date();
     cleanupTime.setSeconds(cleanupTime.getSeconds() - 10);
     
@@ -681,12 +866,10 @@ async function setupPresence() {
         await db.removePresence(userPresenceId);
     });
     
-    // Obnovovat každých 5 sekund
     setInterval(async () => {
         if (userPresenceId) {
             await db.setPresence(userPresenceId);
         }
-        
     }, 5000);
 }
 
@@ -736,7 +919,7 @@ window.register = async function() {
     document.getElementById('registerPassConfirm').value = '';
 }
 
-// LOGIN (pouze lukamer)
+// LOGIN
 window.login = async function() {
     const username = document.getElementById('loginUser').value.trim();
     const password = document.getElementById('loginPass').value;
@@ -754,24 +937,26 @@ window.login = async function() {
     }
     
     currentUser = user.username;
-currentUserId = user.id;
-isAdmin = user.is_admin || false;
-
-// ✅ Ukládej celý objekt jako JSON
-localStorage.setItem('currentUser', JSON.stringify({
-    id: user.id,
-    username: user.username,
-    is_admin: user.is_admin || false,
-    email: user.email || null
-}));
-
-// Pro zpětnou kompatibilitu
-localStorage.setItem('currentUserId', user.id);
-localStorage.setItem('isAdmin', user.is_admin ? 'true' : 'false');
+    currentUserId = user.id;
+    isAdmin = user.is_admin || false;
+    
+    localStorage.setItem('currentUser', JSON.stringify({
+        id: user.id,
+        username: user.username,
+        is_admin: user.is_admin || false,
+        email: user.email || null
+    }));
+    
+    localStorage.setItem('currentUserId', user.id);
+    localStorage.setItem('isAdmin', user.is_admin ? 'true' : 'false');
     
     document.getElementById('loginBtn').style.display = 'none';
     document.getElementById('registerBtn').style.display = 'none';
     document.getElementById('logoutBtn').style.display = 'inline-block';
+    
+    if (isAdmin) {
+        document.getElementById('adminPanel').style.display = 'block';
+    }
     
     closeLogin();
     alert(`Vítejte, ${user.username}!${user.is_admin ? ' (Admin)' : ''}`);
@@ -791,6 +976,7 @@ window.logout = function() {
     document.getElementById('loginBtn').style.display = 'inline-block';
     document.getElementById('registerBtn').style.display = 'inline-block';
     document.getElementById('logoutBtn').style.display = 'none';
+    document.getElementById('adminPanel').style.display = 'none';
     
     alert('Byl jste odhlášen.');
 }
@@ -864,12 +1050,12 @@ function displayMessages(messages) {
     }
 }
 
+// Inicializace při načtení stránky
 window.addEventListener('DOMContentLoaded', async function() {
     const savedUser = localStorage.getItem('currentUser');
     
     if (savedUser) {
         try {
-            // ✅ Pokus se načíst jako JSON objekt
             const user = JSON.parse(savedUser);
             
             if (user && user.id && user.username) {
@@ -880,32 +1066,25 @@ window.addEventListener('DOMContentLoaded', async function() {
                 document.getElementById('loginBtn').style.display = 'none';
                 document.getElementById('registerBtn').style.display = 'none';
                 document.getElementById('logoutBtn').style.display = 'inline-block';
+                
+                if (isAdmin) {
+                    document.getElementById('adminPanel').style.display = 'block';
+                }
             }
         } catch (e) {
-            // Starý formát - vymaž a přihlas znovu
-            console.log('Starý formát - vymaž localStorage');
+            console.log('Chyba při načítání uživatele');
             localStorage.clear();
         }
     }
     
-    // Inicializace
     setupPresence();
     watchOnlineUsers();
     loadMessages();
+    loadGamesStatus();
+    subscribeToGamesStatus();
 });
 
 </script>
 
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
