@@ -93,19 +93,7 @@ h1 {
     50% { transform: scale(1.05); }
 }
 
-#userInfo {
-    position: absolute;
-    top: 80px;
-    right: 20px;
-    padding: 12px 24px;
-    background: rgba(30, 30, 60, 0.7);
-    border: 2px solid #00ffff;
-    border-radius: 8px;
-    font-size: 16px;
-    color: #00ffff;
-    text-shadow: 0 0 10px #00ffff;
-    z-index: 10;
-}
+
 
 button.menuBtn {
     padding: 16px 48px;
@@ -434,7 +422,6 @@ button.menuBtn.locked::after {
 
 <button id="backBtn" onclick="window.location.href='hry.html'">⬅ Zpět</button>
 <div id="coinsDisplay">💰 <span id="coinCount">0</span></div>
-<div id="userInfo">👤 <span id="usernameDisplay">Host</span></div>
 
 <div id="mainMenu" class="centered">
     <h1>🎮 TETRIS 🎮</h1>
@@ -573,11 +560,10 @@ button.menuBtn.locked::after {
         <div class="coin-reward">
             💰 +<span id="earnedCoins">0</span> mincí!
         </div>
-        <p style="font-size: 18px; color: #00ffff; margin-bottom: 20px;">
-            Uložit do online žebříčku?
+        <p id="saveMessage" style="font-size: 18px; color: #00ff00; margin: 20px 0;">
+            ✅ Skóre automaticky uloženo!
         </p>
-        <button class="menuBtn" onclick="submitScore()">💾 Ano, uložit</button>
-        <button class="menuBtn" onclick="backToMainMenu()">❌ Ne, zpět do menu</button>
+        <button class="menuBtn" onclick="backToMainMenu()">🏠 Zpět do menu</button>
     </div>
 </div>
 
@@ -623,11 +609,12 @@ async function loadCurrentUser() {
     const savedUser = localStorage.getItem('currentUser')
     if (savedUser) {
         currentUser = JSON.parse(savedUser)
-        document.getElementById('usernameDisplay').textContent = currentUser.username
+        console.log('Přihlášený uživatel:', currentUser.username)
         await loadUserData()
     } else {
         // Host režim
         currentUser = { username: 'Host', is_guest: true }
+        console.log('Host režim')
         loadLocalData()
     }
 }
@@ -635,6 +622,8 @@ async function loadCurrentUser() {
 // Načtení dat uživatele ze Supabase
 async function loadUserData() {
     if (!currentUser || currentUser.is_guest) return
+    
+    console.log('Načítám data pro uživatele:', currentUser.username, 'ID:', currentUser.id)
     
     try {
         const { data, error } = await supabase
@@ -648,8 +637,10 @@ async function loadUserData() {
             unlockedThemes = data.unlocked_themes || ['classic', 'neon']
             unlockedMaps = data.unlocked_maps || ['20x10', '18x12']
             totalGamesPlayed = data.games_played || 0
+            console.log('Data načtena:', { playerCoins, totalGamesPlayed })
         } else {
             // První spuštění - vytvoř záznam
+            console.log('První spuštění - vytvářím nový záznam')
             await supabase
                 .from('tetris_player_data')
                 .insert([{
@@ -726,8 +717,12 @@ async function updateAfterGame(finalScore) {
     earnedCoinsThisGame = totalCoins
     playerCoins += totalCoins
     
+    console.log(`Získané mince: ${totalCoins} (skóre: ${coinsFromScore}, bonus: 10)`)
+    console.log(`Celkem mincí: ${playerCoins}`)
+    
     if (!currentUser || currentUser.is_guest) {
         saveUserData()
+        updateCoinsDisplay()
         return
     }
     
@@ -742,8 +737,8 @@ async function updateAfterGame(finalScore) {
         const newTotalScore = (current?.total_score || 0) + finalScore
         const newBestScore = Math.max(current?.best_score || 0, finalScore)
         
-        // Aktualizuj data
-        await supabase
+        // Aktualizuj data včetně mincí!
+        const { error } = await supabase
             .from('tetris_player_data')
             .update({
                 coins: playerCoins,
@@ -754,16 +749,27 @@ async function updateAfterGame(finalScore) {
             })
             .eq('user_id', currentUser.id)
         
+        if (error) throw error
+        
+        console.log('Data úspěšně uložena do Supabase')
+        
     } catch (error) {
         console.error('Chyba při aktualizaci dat:', error)
     }
     
     await saveUserData()
+    updateCoinsDisplay()
 }
 
 window.updateCoinsDisplay = function() {
+    // Vždy zobrazovat celkový počet mincí nahoře
     document.getElementById('coinCount').textContent = playerCoins
-    document.getElementById('gameCoins').textContent = earnedCoinsThisGame
+    
+    // Během hry zobrazit získané mince v této hře
+    const gameCoinsElement = document.getElementById('gameCoins')
+    if (gameCoinsElement) {
+        gameCoinsElement.textContent = earnedCoinsThisGame
+    }
 }
 
 window.updateUnlockedItems = function() {
@@ -1311,37 +1317,40 @@ async function gameOver() {
     
     await updateAfterGame(score)
     
-    document.getElementById('finalScore').textContent = score
-    document.getElementById('earnedCoins').textContent = earnedCoinsThisGame
-    document.getElementById('nameModal').style.display = 'flex'
-}
-
-window.submitScore = async function() {
-    if (!currentUser || currentUser.is_guest) {
-        alert('Pro uložení do žebříčku se musíš přihlásit!')
-        backToMainMenu()
-        return
+    // Automatické uložení skóre pro přihlášené uživatele
+    if (currentUser && !currentUser.is_guest) {
+        try {
+            await supabase
+                .from('tetris_scores')
+                .insert([{
+                    user_id: currentUser.id,
+                    username: currentUser.username,
+                    score: score,
+                    difficulty: selectedDifficulty,
+                    lines_cleared: linesCleared,
+                    level_reached: level,
+                    timestamp: new Date().toISOString()
+                }])
+            console.log('Skóre uloženo do žebříčku!')
+        } catch (error) {
+            console.error('Chyba při ukládání skóre:', error)
+        }
     }
     
-    try {
-        await supabase
-            .from('tetris_scores')
-            .insert([{
-                user_id: currentUser.id,
-                username: currentUser.username,
-                score: score,
-                difficulty: selectedDifficulty,
-                lines_cleared: linesCleared,
-                level_reached: level,
-                timestamp: new Date().toISOString()
-            }])
-        
-        alert('Skóre úspěšně uloženo! 🎉')
-        backToMainMenu()
-    } catch (error) {
-        console.error('Chyba při ukládání skóre:', error)
-        alert('Nepodařilo se uložit skóre.')
+    document.getElementById('finalScore').textContent = score
+    document.getElementById('earnedCoins').textContent = earnedCoinsThisGame
+    
+    // Zobrazit zprávu podle toho, jestli je host nebo přihlášený
+    const saveMsg = document.getElementById('saveMessage')
+    if (currentUser && !currentUser.is_guest) {
+        saveMsg.textContent = '✅ Skóre automaticky uloženo do žebříčku!'
+        saveMsg.style.color = '#00ff00'
+    } else {
+        saveMsg.textContent = '⚠️ Pro uložení do žebříčku se musíš přihlásit'
+        saveMsg.style.color = '#ffaa00'
     }
+    
+    document.getElementById('nameModal').style.display = 'flex'
 }
 
 async function loadLeaderboard() {
