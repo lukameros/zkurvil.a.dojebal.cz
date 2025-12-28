@@ -712,7 +712,12 @@ window.login = async function() {
     currentUserId = user.id;
     isAdmin = user.is_admin;
     
-    localStorage.setItem('currentUser', user.username);
+   localStorage.setItem('currentUser', JSON.stringify({
+    id: user.id,
+    username: user.username,
+    is_admin: user.is_admin,
+    email: user.email || null
+}));
     localStorage.setItem('currentUserId', user.id);
     localStorage.setItem('isAdmin', user.is_admin ? 'true' : 'false');
     
@@ -1000,29 +1005,35 @@ window.showDatabaseStats = async function() {
 // Načíst uloženou session
 window.onload = async function() {
     const savedUser = localStorage.getItem('currentUser');
-    const savedUserId = localStorage.getItem('currentUserId');
-    const savedAdmin = localStorage.getItem('isAdmin');
     
-    if (savedUser && savedUserId) {
-        currentUser = savedUser;
-        currentUserId = savedUserId;
-        isAdmin = savedAdmin === 'true';
-        
-        document.getElementById('loginBtn').style.display = 'none';
-        document.getElementById('registerBtn').style.display = 'none';
-        document.getElementById('logoutBtn').style.display = 'inline-block';
-        
-        if (isAdmin) {
-            document.getElementById('adminMenuBtn').style.display = 'block';
+    if (savedUser) {
+        try {
+            const user = JSON.parse(savedUser);
+            
+            if (user && user.id && user.username) {
+                currentUser = user.username;
+                currentUserId = user.id;
+                isAdmin = user.is_admin || false;
+                
+                document.getElementById('loginBtn').style.display = 'none';
+                document.getElementById('registerBtn').style.display = 'none';
+                document.getElementById('logoutBtn').style.display = 'inline-block';
+                
+                if (isAdmin) {
+                    document.getElementById('adminMenuBtn').style.display = 'block';
+                }
+            }
+        } catch (e) {
+            localStorage.clear();
         }
     }
-}
 
 // Inicializace
 setupPresence();
 watchOnlineUsers();
 loadMessages();
 </script>
+
 
 
 
