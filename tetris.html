@@ -875,9 +875,12 @@ window.buyMap = async function(mapName, rows, cols, price) {
     }
 }
 
-function addCoins(amount) {
+async function addCoins(amount) {
     earnedCoinsThisGame += amount
+    playerCoins += amount           // ⭐ důležité
     updateCoinsDisplay()
+
+    await saveUserData()             // ⭐ uloží do Supabase
     
     for (let i = 0; i < 5; i++) {
         setTimeout(() => {
@@ -1449,3 +1452,4 @@ await loadCurrentUser()
 </script>
 </body>
 </html>
+
