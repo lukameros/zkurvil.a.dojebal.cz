@@ -688,8 +688,8 @@
         <input id="registerPassConfirm" type="password" placeholder="Potvrdit heslo">
         <div class="modal-buttons">
             <button class="modal-btn" onclick="register()">Registrovat</button>
-            <button class="modal-btn cancel" onclick="closeRegister()">Zrušit</button
-                                                                                 </div>
+            <button class="modal-btn cancel" onclick="closeRegister()">Zrušit</button>
+        </div>
     </div>
 </div>
 
@@ -727,12 +727,129 @@ function toggleChat() {
 </script>
 
 <script type="module">
-import { supabase, db } from './supabase-config.js';
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.3'
+
+const SUPABASE_URL = 'https://bmmaijlbpwgzhrxzxphf.supabase.co'
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJtbWFpamxicHdnemhyeHp4cGhmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjY4NjQ5MDcsImV4cCI6MjA4MjQ0MDkwN30.s0YQVnAjMXFu1pSI1NXZ2naSab179N0vQPglsmy3Pgw'
+
+const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
 
 let currentUser = null;
 let currentUserId = null;
 let isAdmin = false;
 let userPresenceId = null;
+
+console.log('🟢 Supabase inicializován');
+
+// DB Helper
+const db = {
+    async getMessages() {
+        console.log('📥 Načítám zprávy...');
+        const { data, error } = await supabase
+            .from('chat_messages')
+            .select('*')
+            .order('timestamp', { ascending: true })
+            .limit(50);
+        
+        if (error) {
+            console.error('❌ Chyba při načítání zpráv:', error);
+            return { data: [] };
+        }
+        
+        console.log('✅ Načteno zpráv:', data.length);
+        return { data };
+    },
+    
+    async addMessage(message) {
+        console.log('📤 Odesílám zprávu:', message);
+        const { error } = await supabase
+            .from('chat_messages')
+            .insert([message]);
+        
+        if (error) {
+            console.error('❌ Chyba při odesílání zprávy:', error);
+        } else {
+            console.log('✅ Zpráva odeslána');
+        }
+    },
+    
+    subscribeToMessages(callback) {
+        console.log('🔔 Přihlašuji se k real-time aktualizacím chatu');
+        return supabase
+            .channel('chat_messages_channel')
+            .on('postgres_changes', {
+                event: '*',
+                schema: 'public',
+                table: 'chat_messages'
+            }, () => {
+                console.log('🔔 Nová zpráva přijata');
+                callback();
+            })
+            .subscribe();
+    },
+    
+    async registerUser(username, password) {
+        const { data, error } = await supabase
+            .from('users')
+            .insert([{ username, password }])
+            .select()
+            .single();
+        
+        if (error) return { error };
+        return { data };
+    },
+    
+    async loginUser(username, password) {
+        const { data, error } = await supabase
+            .from('users')
+            .select('*')
+            .eq('username', username)
+            .eq('password', password)
+            .single();
+        
+        if (error) return { error };
+        return { data };
+    },
+    
+    async setPresence(sessionId) {
+        await supabase
+            .from('presence')
+            .upsert([{ 
+                user_id: sessionId, 
+                timestamp: new Date().toISOString() 
+            }]);
+    },
+    
+    async removePresence(sessionId) {
+        await supabase
+            .from('presence')
+            .delete()
+            .eq('user_id', sessionId);
+    },
+    
+    async getOnlineCount() {
+        const cutoffTime = new Date();
+        cutoffTime.setSeconds(cutoffTime.getSeconds() - 10);
+        
+        const { count } = await supabase
+            .from('presence')
+            .select('*', { count: 'exact', head: true })
+            .gte('timestamp', cutoffTime.toISOString());
+        
+        return { count };
+    },
+    
+    subscribeToPresence(callback) {
+        return supabase
+            .channel('presence_changes')
+            .on('postgres_changes', {
+                event: '*',
+                schema: 'public',
+                table: 'presence'
+            }, callback)
+            .subscribe();
+    }
+};
 
 // Načtení stavů her ze Supabase
 async function loadGamesStatus() {
@@ -776,14 +893,12 @@ function updateGameUI(gameKey, isActive) {
 }
 
 // Přepnutí stavu hry (pouze pro admina)
-// Přepnutí stavu hry (pouze pro admina)
 window.toggleGameStatus = async function(gameKey) {
     if (!isAdmin) {
         alert('Nemáte oprávnění ke správě her!');
         return;
     }
     
-    // Načti aktuální stav
     const { data: currentGame } = await supabase
         .from('games_status')
         .select('*')
@@ -792,7 +907,6 @@ window.toggleGameStatus = async function(gameKey) {
     
     const newStatus = currentGame ? !currentGame.is_active : true;
     
-    // UPDATE místo UPSERT
     const { error } = await supabase
         .from('games_status')
         .update({
@@ -999,8 +1113,10 @@ window.sendMessage = async function() {
         username = window.guestName;
     }
     
+    console.log('Odesílám zprávu jako:', username);
+    
     await db.addMessage({
-        user: username,
+        username: username,
         text: message,
         timestamp: new Date().toISOString(),
         is_admin: isAdmin,
@@ -1012,6 +1128,7 @@ window.sendMessage = async function() {
 
 // Načíst zprávy
 async function loadMessages() {
+    console.log('🔄 Spouštím loadMessages()');
     const { data: messages } = await db.getMessages();
     displayMessages(messages);
     
@@ -1024,6 +1141,8 @@ async function loadMessages() {
 function displayMessages(messages) {
     const messagesDiv = document.getElementById('chatMessages');
     messagesDiv.innerHTML = '';
+    
+    console.log('📝 Zobrazuji zprávy:', messages ? messages.length : 0);
     
     if (messages && messages.length > 0) {
         messages.forEach(msg => {
@@ -1050,11 +1169,15 @@ function displayMessages(messages) {
         });
         
         messagesDiv.scrollTop = messagesDiv.scrollHeight;
+    } else {
+        messagesDiv.innerHTML = '<div style="padding: 20px; text-align: center; color: rgba(255,255,255,0.5);">Zatím žádné zprávy...</div>';
     }
 }
 
 // Inicializace při načtení stránky
 window.addEventListener('DOMContentLoaded', async function() {
+    console.log('🚀 Stránka načtena - inicializuji...');
+    
     const savedUser = localStorage.getItem('currentUser');
     
     if (savedUser) {
@@ -1080,15 +1203,16 @@ window.addEventListener('DOMContentLoaded', async function() {
         }
     }
     
-    setupPresence();
-    watchOnlineUsers();
-    loadMessages();
-    loadGamesStatus();
+    await setupPresence();
+    await watchOnlineUsers();
+    await loadMessages();
+    await loadGamesStatus();
     subscribeToGamesStatus();
+    
+    console.log('✅ Inicializace dokončena');
 });
 
 </script>
 
 </body>
 </html>
-
