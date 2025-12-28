@@ -1396,46 +1396,61 @@ async function gameOver() {
 }
 
 async function loadLeaderboard() {
-    const table = document.getElementById('leaderboardTable')
-    const loading = document.querySelector('.loading')
+    const table = document.getElementById('leaderboardTable');
+    const loading = document.querySelector('.loading');
     
-    loading.style.display = 'block'
-    table.style.display = 'none'
+    loading.style.display = 'block';
+    table.style.display = 'none';
     
     try {
+        // Získat nejlepší skóre pro každého hráče
         const { data, error } = await supabase
             .from('tetris_scores')
-            .select('*')
+            .select('username, score, difficulty, timestamp', { count: 'exact' })
             .order('score', { ascending: false })
-            .limit(50)
+            .limit(50);
         
-        if (error) throw error
-        
-        table.innerHTML = '<tr><th>Pozice</th><th>Hráč</th><th>Skóre</th><th>Obtížnost</th><th>Datum</th></tr>'
-        
-        data.forEach((s, i) => {
-            const row = table.insertRow()
-            row.insertCell(0).textContent = i + 1
-            row.insertCell(1).textContent = s.username || 'Anonymní'
-            row.insertCell(2).textContent = s.score || 0
-            row.insertCell(3).textContent = getDifficultyEmoji(s.difficulty)
-            
-            const date = s.timestamp ? new Date(s.timestamp).toLocaleDateString('cs-CZ') : 'N/A'
-            row.insertCell(4).textContent = date
-            
-            if (i === 0) row.style.background = 'rgba(255, 215, 0, 0.2)'
-            if (i === 1) row.style.background = 'rgba(192, 192, 192, 0.2)'
-            if (i === 2) row.style.background = 'rgba(205, 127, 50, 0.2)'
-        })
-        
-        loading.style.display = 'none'
-        table.style.display = 'table'
+        if (error) throw error;
+
+        // Filtrovat na nejlepší skóre každého hráče
+        const bestScoresMap = {};
+        data.forEach(s => {
+            if (!bestScoresMap[s.username] || s.score > bestScoresMap[s.username].score) {
+                bestScoresMap[s.username] = s;
+            }
+        });
+
+        const bestScores = Object.values(bestScoresMap)
+            .sort((a, b) => b.score - a.score)
+            .slice(0, 50);
+
+        // Vypsat do tabulky
+        table.innerHTML = '<tr><th>Pozice</th><th>Hráč</th><th>Skóre</th><th>Obtížnost</th><th>Datum</th></tr>';
+
+        bestScores.forEach((s, i) => {
+            const row = table.insertRow();
+            row.insertCell(0).textContent = i + 1;
+            row.insertCell(1).textContent = s.username || 'Anonymní';
+            row.insertCell(2).textContent = s.score || 0;
+            row.insertCell(3).textContent = getDifficultyEmoji(s.difficulty);
+
+            const date = s.timestamp ? new Date(s.timestamp).toLocaleDateString('cs-CZ') : 'N/A';
+            row.insertCell(4).textContent = date;
+
+            if (i === 0) row.style.background = 'rgba(255, 215, 0, 0.2)';
+            if (i === 1) row.style.background = 'rgba(192, 192, 192, 0.2)';
+            if (i === 2) row.style.background = 'rgba(205, 127, 50, 0.2)';
+        });
+
+        loading.style.display = 'none';
+        table.style.display = 'table';
         
     } catch (error) {
-        console.error('Chyba při načítání žebříčku:', error)
-        loading.textContent = 'Chyba při načítání žebříčku.'
+        console.error('Chyba při načítání žebříčku:', error);
+        loading.textContent = 'Chyba při načítání žebříčku.';
     }
 }
+
 
 function getDifficultyEmoji(difficulty) {
     switch(difficulty) {
@@ -1452,4 +1467,5 @@ await loadCurrentUser()
 </script>
 </body>
 </html>
+
 
