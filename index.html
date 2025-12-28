@@ -146,11 +146,6 @@ body {
 }
 
 /* Admin tlačítko */
-.admin-btn {
-    background: 
-        linear-gradient(135deg, rgba(200,100,0,0.95) 0%, rgba(100,50,0,0.98) 100%) !important;
-}
-
 .admin-btn::before {
     background: 
         linear-gradient(135deg, rgba(200,100,0,0.95) 0%, rgba(100,50,0,0.98) 100%),
@@ -377,6 +372,12 @@ body {
     border-color: rgba(150,150,150,0.8);
 }
 
+/* CSS pokračuje v části 2... */
+</style>
+</head>
+<body>
+<!-- Pokračování CSS z části 1 -->
+<style>
 /* Chat panel */
 #chatPanel {
     display: none;
@@ -641,9 +642,8 @@ body {
     background: rgba(255,0,0,0.9);
 }
 </style>
-</head>
-<body>
 
+<!-- HTML začíná tady -->
 <div id="mainMenu">
     <video id="menuVideo" autoplay muted loop playsinline preload="auto">
         <source src="wf.mp4" type="video/mp4">
@@ -662,6 +662,9 @@ body {
         </button>
         <button onclick="goAirsoftAction()">
             <span data-icon="🎯">Airsoft Akce</span>
+        </button>
+        <button onclick="goTools()">
+            <span data-icon="🔧">Nástroje</span>
         </button>
         <button id="adminMenuBtn" class="admin-btn" onclick="openAdminPanel()" style="display:none;">
             <span data-icon="⚙️">Admin Panel</span>
@@ -749,6 +752,10 @@ function goAirsoftAction() {
     window.location.href = "https://www.airsoftbattles.cz/";
 }
 
+function goTools() {
+    window.location.href = "nastroje.html";
+}
+
 function showLogin() {
     document.getElementById("loginModal").style.display = "flex";
 }
@@ -782,37 +789,54 @@ let currentUser = null;
 let isAdmin = false;
 let userPresenceId = null;
 
-// Online presence
+// Online presence s automatickým čištěním
 async function setupPresence() {
-    userPresenceId = 'user_' + Math.random().toString(36).substr(2, 9);
+    userPresenceId = 'user_' + Math.random().toString(36).substr(2, 9) + '_' + Date.now();
     await db.setPresence(userPresenceId);
     
     // Odstranit při zavření stránky
     window.addEventListener('beforeunload', async () => {
         await db.removePresence(userPresenceId);
     });
+    
+    // Pravidelná aktualizace presence (každých 20s)
+    setInterval(async () => {
+        if (userPresenceId) {
+            await db.setPresence(userPresenceId);
+        }
+    }, 20000);
+    
+    // Vyčistit staré záznamy při načtení
+    await cleanOldPresence();
+}
+
+// Vyčistit staré presence (starší než 40s)
+async function cleanOldPresence() {
+    const cutoffTime = new Date(Date.now() - 40000).toISOString();
+    
+    await supabase
+        .from('user_presence')
+        .delete()
+        .lt('last_seen', cutoffTime);
 }
 
 // Sledování online uživatelů
 async function watchOnlineUsers() {
-    // Iniciální načtení
-    const { count } = await db.getOnlineCount();
-    document.getElementById('onlineCount').textContent = count || 0;
-    document.getElementById('adminOnlineCount').textContent = count || 0;
-    
-    // Realtime updates
-    db.subscribeToPresence(async () => {
+    async function updateCount() {
+        await cleanOldPresence();
         const { count } = await db.getOnlineCount();
         document.getElementById('onlineCount').textContent = count || 0;
         document.getElementById('adminOnlineCount').textContent = count || 0;
-    });
+    }
     
-    // Pravidelná aktualizace presence (každých 30s)
-    setInterval(() => {
-        if (userPresenceId) {
-            db.setPresence(userPresenceId);
-        }
-    }, 30000);
+    // Iniciální načtení
+    await updateCount();
+    
+    // Realtime updates
+    db.subscribeToPresence(updateCount);
+    
+    // Pravidelné čištění a update každých 30s
+    setInterval(updateCount, 30000);
 }
 
 // Poslat zprávu
@@ -1019,6 +1043,7 @@ setupPresence();
 watchOnlineUsers();
 loadMessages();
 </script>
+<!-- HTML obsah v části 2 -->
 
 </body>
 </html>
