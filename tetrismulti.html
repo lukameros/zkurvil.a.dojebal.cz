@@ -904,15 +904,17 @@ async function saveGameState(player) {
 
 // Sledování změn
 function subscribeToGame() {
+    console.log('Subscribuji se na změny pro hru:', currentGameId)
+    
     gameStateChannel = supabase
-        .channel(`game_state_${currentGameId}`)
+        .channel(`game_state_${currentGameId}_${Date.now()}`)
         .on('postgres_changes', {
             event: '*',
             schema: 'public',
             table: 'tetris_game_state',
             filter: `game_id=eq.${currentGameId}`
         }, async (payload) => {
-            console.log('Přijata změna:', payload.new.player_number)
+            console.log('✅ Přijata změna od hráče:', payload.new.player_number)
             
             if (payload.new.player_number !== myPlayerNumber) {
                 const otherPlayer = payload.new.player_number === 1 ? player1 : player2
@@ -921,8 +923,7 @@ function subscribeToGame() {
                     otherPlayer.grid = JSON.parse(payload.new.grid)
                     otherPlayer.current = JSON.parse(payload.new.current_piece)
                 } catch (e) {
-                    otherPlayer.grid = payload.new.grid
-                    otherPlayer.current = payload.new.current_piece
+                    console.error('Chyba parsování:', e)
                 }
                 
                 otherPlayer.score = payload.new.score
@@ -939,30 +940,46 @@ function subscribeToGame() {
                 }
             }
         })
-        .subscribe()
+        .subscribe((status) => {
+            console.log('Channel status:', status)
+        })
     
-    // Načti aktuální stav protihráče hned na začátku
-    setTimeout(async () => {
-        const otherPlayerNum = myPlayerNumber === 1 ? 2 : 1
-        const { data } = await supabase
-            .from('tetris_game_state')
-            .select('*')
-            .eq('game_id', currentGameId)
-            .eq('player_number', otherPlayerNum)
-            .single()
+    // Polling jako záloha - dotazuj se každých 500ms
+    setInterval(async () => {
+        if (!gameActive) return
         
-        if (data) {
-            const otherPlayer = otherPlayerNum === 1 ? player1 : player2
-            otherPlayer.grid = JSON.parse(data.grid)
-            otherPlayer.current = JSON.parse(data.current_piece)
-            otherPlayer.score = data.score
-            otherPlayer.level = data.level
-            updateDisplay(otherPlayer)
-            draw(otherPlayer)
+        const otherPlayerNum = myPlayerNumber === 1 ? 2 : 1
+        
+        try {
+            const { data, error } = await supabase
+                .from('tetris_game_state')
+                .select('*')
+                .eq('game_id', currentGameId)
+                .eq('player_number', otherPlayerNum)
+            
+            if (error) {
+                console.log('Čeká se na data protihráče...')
+                return
+            }
+            
+            if (data && data.length > 0) {
+                const otherPlayer = otherPlayerNum === 1 ? player1 : player2
+                try {
+                    otherPlayer.grid = JSON.parse(data[0].grid)
+                    otherPlayer.current = JSON.parse(data[0].current_piece)
+                } catch (e) {
+                    console.error('Chyba parsování:', e)
+                }
+                otherPlayer.score = data[0].score
+                otherPlayer.level = data[0].level
+                updateDisplay(otherPlayer)
+                draw(otherPlayer)
+            }
+        } catch (e) {
+            console.error('Chyba při načítání:', e)
         }
     }, 500)
 }
-
 // Konec hry
 async function endGame(winnerNumber) {
     gameActive = false
@@ -1101,5 +1118,6 @@ loadUser()
 </script>
 </body>
 </html>
+
 
 
