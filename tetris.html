@@ -1040,17 +1040,9 @@ async function loadUserData() {
 }
 
 // Načtení lokálních dat pro host
+// Načtení lokálních dat pro host
 function loadLocalData() {
     const saved = localStorage.getItem('tetrisPlayerData')
-    if (saved) {
-        const data = JSON.parse(saved)
-        playerCoins = data.coins || 0
-        unlockedThemes = data.themes || ['classic', 'neon']
-        unlockedMaps = data.maps || ['20x10', '18x12']
-    }
-    updateCoinsDisplay()
-    updateUnlockedItems()
-}
     if (saved) {
         const data = JSON.parse(saved)
         playerCoins = data.coins || 0
@@ -1909,6 +1901,7 @@ await loadCurrentUser()
 </div>
 </body>
 </html>
+
 
 
 
