@@ -902,9 +902,17 @@ async function saveGameState(player) {
     }
 }
 
+// Globální interval ID
+let pollingInterval = null
+
 // Sledování změn
 function subscribeToGame() {
     console.log('Subscribuji se na změny pro hru:', currentGameId)
+    
+    // Zastav starý polling pokud existuje
+    if (pollingInterval) {
+        clearInterval(pollingInterval)
+    }
     
     gameStateChannel = supabase
         .channel(`game_state_${currentGameId}_${Date.now()}`)
@@ -944,9 +952,13 @@ function subscribeToGame() {
             console.log('Channel status:', status)
         })
     
-    // Polling jako záloha - dotazuj se každých 500ms
-    setInterval(async () => {
-        if (!gameActive) return
+    // Polling jako záloha - dotazuj se každých 300ms
+    pollingInterval = setInterval(async () => {
+        if (!gameActive) {
+            console.log('⏸️ Hra není aktivní, zastavuji polling')
+            clearInterval(pollingInterval)
+            return
+        }
         
         const otherPlayerNum = myPlayerNumber === 1 ? 2 : 1
         
@@ -958,11 +970,12 @@ function subscribeToGame() {
                 .eq('player_number', otherPlayerNum)
             
             if (error) {
-                console.log('Čeká se na data protihráče...')
+                console.log('⏳ Čeká se na data protihráče...')
                 return
             }
             
             if (data && data.length > 0) {
+                console.log('🔄 Aktualizace protihráče', otherPlayerNum)
                 const otherPlayer = otherPlayerNum === 1 ? player1 : player2
                 try {
                     otherPlayer.grid = JSON.parse(data[0].grid)
@@ -976,9 +989,9 @@ function subscribeToGame() {
                 draw(otherPlayer)
             }
         } catch (e) {
-            console.error('Chyba při načítání:', e)
+            console.error('❌ Chyba při načítání:', e)
         }
-    }, 500)
+    }, 300)
 }
 // Konec hry
 async function endGame(winnerNumber) {
@@ -1118,6 +1131,7 @@ loadUser()
 </script>
 </body>
 </html>
+
 
 
 
