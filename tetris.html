@@ -1290,7 +1290,21 @@ function clearLines() {
         
         score += points
         level = Math.floor(linesCleared / 10) + 1
-        dropInterval = Math.max(50, 600 - (level * 40))
+        
+        // Dynamická rychlost podle obtížnosti a skóre
+        const baseSpeed = selectedDifficulty === 'easy' ? 800 : 
+                         selectedDifficulty === 'medium' ? 600 : 
+                         selectedDifficulty === 'hard' ? 400 : 250
+        
+        const minSpeed = selectedDifficulty === 'easy' ? 200 : 
+                        selectedDifficulty === 'medium' ? 150 : 
+                        selectedDifficulty === 'hard' ? 100 : 80
+        
+        // Každých 1000 bodů zrychlí o 8% (pomalejší progrese)
+        const speedMultiplier = Math.max(0.25, 1 - (Math.floor(score / 1000) * 0.08))
+        dropInterval = Math.max(minSpeed, Math.floor(baseSpeed * speedMultiplier))
+        
+        console.log(`⚡ Rychlost: ${dropInterval}ms | Level: ${level} | Skóre: ${score}`)
     } else {
         combo = 0
     }
@@ -1583,3 +1597,4 @@ await loadCurrentUser()
 </script>
 </body>
 </html>
+
