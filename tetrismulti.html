@@ -532,6 +532,8 @@ async function joinGame() {
 
 // Čekání na druhého hráče
 async function waitForPlayer2() {
+    console.log('Čekám na hráče 2, game_id:', currentGameId)
+    
     const channel = supabase
         .channel(`game_wait_${currentGameId}`)
         .on('postgres_changes', {
@@ -540,16 +542,46 @@ async function waitForPlayer2() {
             table: 'tetris_multiplayer_games',
             filter: `id=eq.${currentGameId}`
         }, (payload) => {
+            console.log('Změna v hře:', payload)
             if (payload.new.status === 'playing') {
+                console.log('Hra začíná!')
                 channel.unsubscribe()
                 startGame()
             }
         })
-        .subscribe()
+        .subscribe((status) => {
+            console.log('Subscription status:', status)
+        })
+    
+    // Záložní kontrola každých 2 sekundy
+    const checkInterval = setInterval(async () => {
+        const { data: game } = await supabase
+            .from('tetris_multiplayer_games')
+            .select('*')
+            .eq('id', currentGameId)
+            .single()
+        
+        console.log('Kontrola stavu hry:', game)
+        
+        if (game && game.status === 'playing') {
+            clearInterval(checkInterval)
+            channel.unsubscribe()
+            startGame()
+        }
+    }, 2000)
+    
+    // Ulož interval ID pro případné zrušení
+    window.waitInterval = checkInterval
 }
 
 // Zrušení hry
 async function cancelGame() {
+    // Zastav čekací interval
+    if (window.waitInterval) {
+        clearInterval(window.waitInterval)
+        window.waitInterval = null
+    }
+    
     if (currentGameId) {
         await supabase
             .from('tetris_multiplayer_games')
@@ -584,6 +616,14 @@ function backToMenu() {
 
 // Start hry
 async function startGame() {
+    console.log('Spouštím hru pro hráče:', myPlayerNumber)
+    
+    // Zastav čekací interval pokud běží
+    if (window.waitInterval) {
+        clearInterval(window.waitInterval)
+        window.waitInterval = null
+    }
+    
     document.getElementById('waitingRoom').style.display = 'none'
     document.getElementById('joinMenu').style.display = 'none'
     document.getElementById('gameArena').style.display = 'flex'
@@ -598,6 +638,8 @@ async function startGame() {
         .eq('id', currentGameId)
         .single()
     
+    console.log('Data hry:', game)
+    
     document.getElementById('player1Name').textContent = `🎮 ${game.player1_username}`
     document.getElementById('player2Name').textContent = `🎮 ${game.player2_username}`
     
@@ -606,17 +648,16 @@ async function startGame() {
     player2 = createPlayer('grid2', 'score2', 'level2', 2)
     
     // Vytvoř počáteční stav
-    if (myPlayerNumber === 1) {
-        await saveGameState(player1)
-    } else {
-        await saveGameState(player2)
-    }
+    const myPlayer = myPlayerNumber === 1 ? player1 : player2
+    await saveGameState(myPlayer)
     
     // Sleduj změny
     subscribeToGame()
     
     // Start loop
     gameLoop()
+    
+    console.log('Hra spuštěna!')
 }
 
 // Vytvoření hráče
