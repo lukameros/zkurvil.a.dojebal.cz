@@ -1205,7 +1205,7 @@ async function saveUser() {
             id: currentUser.id,
             nickname: currentUser.nickname,
             coins: currentUser.coins,
-            last_daily_bonus: currentUser.lastDailyBonus
+            lastDailyBonus: currentUser.lastDailyBonus
         }, {
             onConflict: 'id'
         });
@@ -1351,9 +1351,10 @@ window.addEventListener('load', async () => {
                 .maybeSingle();
             
             if (existingUser) {
-                currentUser.coins = existingUser.coins;
-                currentUser.lastDailyBonus = existingUser.last_daily_bonus;
-            } else {
+    currentUser.coins = existingUser.coins;
+    currentUser.lastDailyBonus = existingUser.lastDailyBonus;
+}
+             else {
                 // Nový hráč - startovní mince
                 currentUser.coins = 100;
                 currentUser.lastDailyBonus = null;
@@ -1374,6 +1375,7 @@ window.addEventListener('load', async () => {
 
 </body>
 </html>
+
 
 
 
