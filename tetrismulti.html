@@ -912,6 +912,8 @@ function subscribeToGame() {
             table: 'tetris_game_state',
             filter: `game_id=eq.${currentGameId}`
         }, async (payload) => {
+            console.log('Přijata změna:', payload.new.player_number)
+            
             if (payload.new.player_number !== myPlayerNumber) {
                 const otherPlayer = payload.new.player_number === 1 ? player1 : player2
                 
@@ -938,6 +940,27 @@ function subscribeToGame() {
             }
         })
         .subscribe()
+    
+    // Načti aktuální stav protihráče hned na začátku
+    setTimeout(async () => {
+        const otherPlayerNum = myPlayerNumber === 1 ? 2 : 1
+        const { data } = await supabase
+            .from('tetris_game_state')
+            .select('*')
+            .eq('game_id', currentGameId)
+            .eq('player_number', otherPlayerNum)
+            .single()
+        
+        if (data) {
+            const otherPlayer = otherPlayerNum === 1 ? player1 : player2
+            otherPlayer.grid = JSON.parse(data.grid)
+            otherPlayer.current = JSON.parse(data.current_piece)
+            otherPlayer.score = data.score
+            otherPlayer.level = data.level
+            updateDisplay(otherPlayer)
+            draw(otherPlayer)
+        }
+    }, 500)
 }
 
 // Konec hry
@@ -1078,4 +1101,5 @@ loadUser()
 </script>
 </body>
 </html>
+
 
