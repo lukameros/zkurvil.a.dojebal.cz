@@ -323,10 +323,11 @@ button.menuBtn:hover {
     </div>
     
     <div id="countdownDisplay" style="display:none; font-size: 72px; color: #0ff; text-shadow: 0 0 30px #0ff; margin: 30px 0; font-weight: 900;">
-        5
+        10
     </div>
     
     <button id="readyBtn" class="menuBtn" onclick="setReady()" style="display:none;">✅ READY!</button>
+    <button id="startBtn" class="menuBtn" onclick="startCountdown()" style="display:none;">🚀 SPUSTIT HRU</button>
     <button class="menuBtn" onclick="cancelGame()">❌ Zrušit</button>
 </div>
 
@@ -438,6 +439,9 @@ function getColorFromTheme(themeName, colorName) {
     const theme = themes[themeName] || themes.classic
     return theme[colorName] || theme.cyan
 }
+
+// Tvary tetris kostek
+const shapes = [
     {shape: [[1,1,1,1]], color: 'cyan'},
     {shape: [[1,1],[1,1]], color: 'yellow'},
     {shape: [[0,1,0],[1,1,1]], color: 'purple'},
@@ -446,6 +450,31 @@ function getColorFromTheme(themeName, colorName) {
     {shape: [[1,0,0],[1,1,1]], color: 'blue'},
     {shape: [[0,0,1],[1,1,1]], color: 'orange'}
 ]
+
+// Načtení uživatelských nastavení
+async function loadUserSettings() {
+    try {
+        if (currentUser && currentUser.id) {
+            const { data } = await supabase
+                .from('tetris_player_data')
+                .select('map_rows, map_cols, theme')
+                .eq('user_id', currentUser.id)
+                .single()
+            
+            if (data) {
+                return {
+                    rows: data.map_rows || 20,
+                    cols: data.map_cols || 10,
+                    theme: data.theme || 'classic'
+                }
+            }
+        }
+    } catch (e) {
+        console.log('Nastavení nenalezeno, použiji výchozí')
+    }
+    
+    return { rows: 20, cols: 10, theme: 'classic' }
+}
 
 // Načtení uživatele
 async function loadUser() {
@@ -585,67 +614,10 @@ async function joinGame() {
 async function waitForBothPlayers() {
     console.log('Čekám v místnosti, player:', myPlayerNumber)
     
-    // Pokud jsem hráč 1, zobraz mi ready tlačítko až když přijde hráč 2
-    if (myPlayerNumber === 1) {
-        // Sleduj, kdy přijde hráč 2
-        const checkInterval = setInterval(async () => {
-            const { data: game } = await supabase
-                .from('tetris_multiplayer_games')
-                .select('*')
-                .eq('id', currentGameId)
-                .single()
-            
-            if (game && game.player2_username) {
-                clearInterval(checkInterval)
-                document.getElementById('player2WaitName').textContent = game.player2_username
-                document.getElementById('readyBtn').style.display = 'block'
-            }
-        }, 1000)
-        window.waitInterval = checkInterval
-    }
-    
-    // Sleduj ready stavy obou hráčů
-    waitingChannel = supabase
-        .channel(`waiting_${currentGameId}`)
-        .on('postgres_changes', {
-            event: 'UPDATE',
-            schema: 'public',
-            table: 'tetris_multiplayer_games',
-            filter: `id=eq.${currentGameId}`
-        }, (payload) => {
-            console.log('Změna ready stavu:', payload.new)
-            updateReadyStatus(payload.new)
-        })
-        .subscribe()
-    
-    // Načti aktuální stav
-    const { data: game } = await supabase
-        .from('tetris_multiplayer_games')
-        .select('*')
-        .eq('id', currentGameId)
-        .single()
-    
-    if (game) {
-        updateReadyStatus(game)
-    }
-}
-
-// Aktualizace ready statusů
-function updateReadyStatus(game) {
-    player1IsReady = game.player1_ready || false
-    player2IsReady = game.player2_ready || false
-    
-    // Update UI
-    document.getElementById('player1Ready').textContent = player1IsReady ? '✅' : '⏳'
-    document.getElementById('player2Ready').textContent = player2IsReady ? '✅' : '⏳'
-    
-    if (game.player2_username) {
-        document.getElementById('player2WaitName').textContent = game.player2_username
-    }
-    
-    // Pokud jsou oba ready, začni odpočítávání
-    if (player1IsReady && player2IsReady && game.status !== 'countdown' && game.status !== 'playing') {
-        startCountdown()
+    // Pokud jsou oba ready a host (hráč 1) je přihlášený, zobraz tlačítko START
+    if (player1IsReady && player2IsReady && myPlayerNumber === 1) {
+        document.getElementById('startBtn').style.display = 'block'
+        document.getElementById('readyBtn').style.display = 'none'
     }
 }
 
@@ -671,10 +643,14 @@ async function startCountdown() {
         .update({ status: 'countdown' })
         .eq('id', currentGameId)
     
+    // Schovej tlačítka
+    document.getElementById('startBtn').style.display = 'none'
+    document.getElementById('readyBtn').style.display = 'none'
+    
     const countdownEl = document.getElementById('countdownDisplay')
     countdownEl.style.display = 'block'
     
-    let count = 5
+    let count = 10
     countdownEl.textContent = count
     
     const interval = setInterval(async () => {
@@ -798,10 +774,7 @@ async function startGame() {
 }
 
 // Vytvoření hráče
-function createPlayer(gridId, scoreId, levelId, playerNum) {
-    const rows = 20
-    const cols = 10
-    
+function createPlayer(gridId, scoreId, levelId, playerNum, rows, cols, themeName) {
     const player = {
         grid: [],
         current: null,
@@ -817,7 +790,8 @@ function createPlayer(gridId, scoreId, levelId, playerNum) {
         levelElement: document.getElementById(levelId),
         rows: rows,
         cols: cols,
-        playerNumber: playerNum
+        playerNumber: playerNum,
+        theme: themeName
     }
     
     // Vytvoř grid
@@ -859,8 +833,6 @@ function newPiece(player) {
     
     if (collision(player)) {
         player.gameOver = true
-        // KDO PROHRÁL = ten jehož hra skončila
-        // Takže pokud JÁ jsem prohrál (myPlayerNumber), DRUHÝ vyhrál
         const winnerNumber = player.playerNumber === 1 ? 2 : 1
         endGame(winnerNumber)
     }
@@ -1009,14 +981,12 @@ async function saveGameState(player) {
     if (!currentGameId || !player) return
     
     try {
-        // Nejdřív zkus smazat starý stav
         await supabase
             .from('tetris_game_state')
             .delete()
             .eq('game_id', currentGameId)
             .eq('player_number', player.playerNumber)
         
-        // Potom vlož nový
         const { error } = await supabase
             .from('tetris_game_state')
             .insert({
@@ -1098,7 +1068,6 @@ async function endGame(winnerNumber) {
         })
         .eq('id', currentGameId)
     
-    // Přidej 100 mincí vítězi
     if (winnerId && winnerNumber === myPlayerNumber) {
         try {
             const { data: playerData } = await supabase
@@ -1128,7 +1097,6 @@ async function endGame(winnerNumber) {
 
 // Opuštění hry
 async function leaveGame() {
-    // Pokud je hra aktivní, označ ji jako opuštěnou
     if (currentGameId) {
         try {
             await supabase
@@ -1146,12 +1114,10 @@ async function leaveGame() {
     
     gameActive = false
     
-    // Přesměruj na hry.html
     window.location.href = 'hry.html'
 }
 
 // Herní smyčka
-let lastSaveTime = 0
 function gameLoop() {
     if (!gameActive) return
     
@@ -1164,7 +1130,6 @@ function gameLoop() {
         draw(myPlayer)
         myPlayer.lastDrop = now
         
-        // Ukládej KAŽDÝ frame (vždy)
         saveGameState(myPlayer)
     }
     
@@ -1210,7 +1175,7 @@ document.addEventListener('keydown', e => {
     }
 })
 
-// Export funkcí na window pro onclick atributy (HNED!)
+// Export funkcí na window
 window.createGame = createGame
 window.showJoinMenu = showJoinMenu
 window.joinGame = joinGame
@@ -1218,9 +1183,97 @@ window.cancelGame = cancelGame
 window.backToMenu = backToMenu
 window.leaveGame = leaveGame
 window.setReady = setReady
+window.startCountdown = startCountdown
 
 // Inicializace
 loadUser()
 </script>
 </body>
-</html>
+</html> Pokud jsem hráč 1, zobraz mi ready tlačítko až když přijde hráč 2
+    if (myPlayerNumber === 1) {
+        // Sleduj, kdy přijde hráč 2
+        const checkInterval = setInterval(async () => {
+            const { data: game } = await supabase
+                .from('tetris_multiplayer_games')
+                .select('*')
+                .eq('id', currentGameId)
+                .single()
+            
+            if (game && game.player2_username) {
+                clearInterval(checkInterval)
+                document.getElementById('player2WaitName').textContent = game.player2_username
+                document.getElementById('readyBtn').style.display = 'block'
+            }
+        }, 1000)
+        window.waitInterval = checkInterval
+    }
+    
+    // Sleduj ready stavy obou hráčů a status hry
+    waitingChannel = supabase
+        .channel(`waiting_${currentGameId}`)
+        .on('postgres_changes', {
+            event: 'UPDATE',
+            schema: 'public',
+            table: 'tetris_multiplayer_games',
+            filter: `id=eq.${currentGameId}`
+        }, (payload) => {
+            console.log('Změna stavu hry:', payload.new)
+            
+            // Pokud host spustil odpočítávání
+            if (payload.new.status === 'countdown' && myPlayerNumber === 2) {
+                document.getElementById('readyBtn').style.display = 'none'
+                
+                const countdownEl = document.getElementById('countdownDisplay')
+                countdownEl.style.display = 'block'
+                
+                let count = 10
+                countdownEl.textContent = count
+                
+                const interval = setInterval(() => {
+                    count--
+                    if (count > 0) {
+                        countdownEl.textContent = count
+                    } else {
+                        clearInterval(interval)
+                        countdownEl.textContent = 'START!'
+                    }
+                }, 1000)
+            }
+            
+            // Pokud se začalo hrát
+            if (payload.new.status === 'playing') {
+                setTimeout(() => {
+                    startGame()
+                }, 500)
+            }
+            
+            updateReadyStatus(payload.new)
+        })
+        .subscribe()
+    
+    // Načti aktuální stav
+    const { data: game } = await supabase
+        .from('tetris_multiplayer_games')
+        .select('*')
+        .eq('id', currentGameId)
+        .single()
+    
+    if (game) {
+        updateReadyStatus(game)
+    }
+}
+
+// Aktualizace ready statusů
+function updateReadyStatus(game) {
+    player1IsReady = game.player1_ready || false
+    player2IsReady = game.player2_ready || false
+    
+    // Update UI
+    document.getElementById('player1Ready').textContent = player1IsReady ? '✅' : '⏳'
+    document.getElementById('player2Ready').textContent = player2IsReady ? '✅' : '⏳'
+    
+    if (game.player2_username) {
+        document.getElementById('player2WaitName').textContent = game.player2_username
+    }
+    
+    //
