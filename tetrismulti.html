@@ -334,6 +334,7 @@ button.menuBtn:hover {
 <div id="gameArena" style="display:none;">
     <div style="text-align: center; margin-bottom: 20px;">
         <p style="font-size: 24px; color: #0ff;">
+        Kód hry: <span id="currentGameCode">------</span>
         </p>
     </div>
     
@@ -805,11 +806,11 @@ async function startGame() {
         clearInterval(window.waitInterval)
         window.waitInterval = null
     }
-    
     document.getElementById('waitingRoom').style.display = 'none'
     document.getElementById('joinMenu').style.display = 'none'
     document.getElementById('gameArena').style.display = 'flex'
     document.getElementById('currentGameCode').textContent = currentGameCode
+    document.getElementById('currentGameCode').style.display = 'none';
     
     gameActive = true
     
@@ -1288,6 +1289,7 @@ loadUser()
 </script>
 </body>
 </html>
+
 
 
 
