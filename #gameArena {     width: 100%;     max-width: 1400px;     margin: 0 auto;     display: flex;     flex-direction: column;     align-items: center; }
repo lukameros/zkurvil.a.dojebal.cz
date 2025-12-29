@@ -179,13 +179,14 @@ button.menuBtn:hover {
 
 .game-arena {
     display: flex;
-    gap: 40px;
     justify-content: center;
     align-items: flex-start;
-    margin-top: 30px;
+    gap: 80px;
+    width: 100%;
 }
-
+    
 .player-section {
+     width: 360px;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -1287,5 +1288,6 @@ loadUser()
 </script>
 </body>
 </html>
+
 
 
