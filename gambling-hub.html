@@ -59,9 +59,14 @@ body::before {
     display: flex;
     flex-direction: column;
     z-index: 20;
+    padding-top: 60px;
 }
 
 #topBar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
     height: 60px;
     background: rgba(26,0,51,0.95);
     border-bottom: 3px solid #ff00ff;
@@ -129,6 +134,7 @@ body::before {
     padding: 10px 15px;
     justify-content: center;
     background: rgba(0,0,0,0.3);
+    flex-shrink: 0;
 }
 
 .game-btn {
@@ -701,19 +707,19 @@ canvas {
     <button id="dailyBonus" onclick="claimDailyBonus()">🎁 DENNÍ BONUS</button>
 </div>
 
-<div id="gameSelector">
-    <button id="slotBtn" class="game-btn active" onclick="switchGame('slot')">
-        🎰 AUTOMAT
-    </button>
-    <button id="wheelBtn" class="game-btn" onclick="switchGame('wheel')">
-        🎡 KOLO ŠTĚSTÍ
-    </button>
-    <button id="leaderboardBtn" class="game-btn" onclick="switchGame('leaderboard')">
-        🏆 ŽEBŘÍČEK
-    </button>
-</div>
-
 <div id="wrapper">
+    <div id="gameSelector">
+        <button id="slotBtn" class="game-btn active" onclick="switchGame('slot')">
+            🎰 AUTOMAT
+        </button>
+        <button id="wheelBtn" class="game-btn" onclick="switchGame('wheel')">
+            🎡 KOLO ŠTĚSTÍ
+        </button>
+        <button id="leaderboardBtn" class="game-btn" onclick="switchGame('leaderboard')">
+            🏆 ŽEBŘÍČEK
+        </button>
+    </div>
+
     <!-- SLOT MACHINE GAME -->
     <div id="slotGame" class="game-container active">
         <div id="slotContainer">
@@ -1336,12 +1342,16 @@ document.getElementById('nicknameInput').addEventListener('keypress', function(e
 
 // Inicializace
 window.addEventListener('load', async () => {
+    console.log('🎰 Casino inicializace...');
     initReels();
     
     const savedUser = localStorage.getItem('currentUser');
+    console.log('Saved user:', savedUser);
+    
     if (savedUser) {
         try {
             const user = JSON.parse(savedUser);
+            console.log('Parsed user:', user);
             
             currentUser.nickname = user.username;
             currentUser.id = user.id;
@@ -1352,12 +1362,15 @@ window.addEventListener('load', async () => {
                 .eq('id', user.id)
                 .maybeSingle();
             
+            console.log('Existing user from DB:', existingUser);
+            
             if (existingUser) {
                 currentUser.coins = existingUser.coins;
                 currentUser.lastDailyBonus = existingUser.last_daily_bonus;
             } else {
                 currentUser.coins = 100;
                 currentUser.lastDailyBonus = null;
+                console.log('Vytváření nového casino uživatele...');
             }
             
             await saveUser();
@@ -1365,9 +1378,15 @@ window.addEventListener('load', async () => {
             document.getElementById('loginModal').style.display = 'none';
             updateUI();
             checkDailyBonus();
+            
+            console.log('✅ Uživatel načten:', currentUser);
         } catch (e) {
-            console.error('Chyba při načítání uživatele:', e);
+            console.error('❌ Chyba při načítání uživatele:', e);
+            document.getElementById('loginModal').style.display = 'flex';
         }
+    } else {
+        console.log('⚠️ Žádný uložený uživatel, zobrazuji login');
+        document.getElementById('loginModal').style.display = 'flex';
     }
 });
 </script>
