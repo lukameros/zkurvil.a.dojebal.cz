@@ -51,33 +51,70 @@ body::before {
     0%, 100% { opacity: 0.3; }
     50% { opacity: 1; }
 }
-    #gameWrapper {
+   /* Kontejner pro hru a výplatní tabulku */
+#gameWrapper {
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
-    padding: 20px;
+    padding: 10px;
+    flex-wrap: wrap; /* Umožní obsah zabalit na menší obrazovce */
 }
 
 #slotGame {
-    width: 70%; /* Šířka pro herní sekci */
-    margin-right: 20px; /* Mezera mezi hrou a tabulkou */
+    width: 60%; /* Zmenšíme herní sekci, aby se vešla */
+    margin-right: 20px;
+    max-width: 700px; /* Nastavíme maximální šířku pro herní sekci */
 }
 
 #payoutTable {
-    width: 30%; /* Šířka pro výplatní tabulku */
-    background: rgba(0, 0, 0, 0.5); /* Poloprůhledné pozadí pro tabulku */
-    padding: 20px;
+    width: 35%; /* Výplatní tabulka bude menší */
+    background: rgba(0, 0, 0, 0.5);
+    padding: 15px;
     border-radius: 10px;
     border: 2px solid #FFD700;
     color: #fff;
+    max-width: 350px; /* Nastavíme maximální šířku pro výplatní tabulku */
 }
 
 #payoutTable h3 {
-    font-size: 24px;
-    margin-bottom: 20px;
+    font-size: 18px;
+    margin-bottom: 15px;
     text-align: center;
     color: #FFD700;
 }
+
+/* Pro zajištění, že všechny texty, tlačítka a prvky budou menší na menších obrazovkách */
+@media (max-width: 768px) {
+    #slotGame {
+        width: 100%; /* Na malých obrazovkách bude herní sekce zabírat celou šířku */
+        margin-right: 0;
+    }
+    
+    #payoutTable {
+        width: 100%; /* Výplatní tabulka bude také zabírat celou šířku na malých obrazovkách */
+        margin-top: 20px;
+    }
+    
+    #payoutTable h3 {
+        font-size: 16px; /* Zmenšíme velikost nadpisu */
+    }
+
+    /* Zmenšíme tlačítka a texty */
+    .bet-btn, #spinSlotBtn {
+        font-size: 18px;
+        padding: 8px 18px;
+    }
+
+    #betAmount, #currentBet {
+        font-size: 18px;
+    }
+
+    /* Zmenšíme text pro výherní tabulku */
+    #payoutTable div {
+        font-size: 14px;
+    }
+}
+
 
 
 #wrapper {
@@ -1405,6 +1442,7 @@ window.addEventListener('load', async () => {
 
 </body>
 </html>
+
 
 
 
