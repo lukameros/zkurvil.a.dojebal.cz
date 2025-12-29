@@ -1411,27 +1411,56 @@ window.login = async function() {
     checkDailyBonus();
 };
 
+// Najdi a nahraď funkci saveUser
 async function saveUser() {
     if (!currentUser.id) return;
     
-    const { error } = await supabase
-        .from('casino_users')
-        .upsert({
-            id: currentUser.id,
-            nickname: currentUser.nickname,
-            coins: currentUser.coins,
-            last_daily_bonus: currentUser.lastDailyBonus,
-            owned_themes: currentUser.ownedThemes
-        }, {
-            onConflict: 'id'
-        });
-    
-    if (error) {
-        console.error('Chyba při ukládání:', error);
+    try {
+        // Nejdřív zkusíme update
+        const { data: existingUser } = await supabase
+            .from('casino_users')
+            .select('id')
+            .eq('id', currentUser.id)
+            .maybeSingle();
+        
+        if (existingUser) {
+            // Update existujícího uživatele
+            const { error } = await supabase
+                .from('casino_users')
+                .update({
+                    nickname: currentUser.nickname,
+                    coins: currentUser.coins,
+                    last_daily_bonus: currentUser.lastDailyBonus,
+                    owned_themes: currentUser.ownedThemes
+                })
+                .eq('id', currentUser.id);
+            
+            if (error) {
+                console.error('Chyba při updatu:', error);
+                localStorage.setItem('casinoUser', JSON.stringify(currentUser));
+            }
+        } else {
+            // Insert nového uživatele
+            const { error } = await supabase
+                .from('casino_users')
+                .insert([{
+                    id: currentUser.id,
+                    nickname: currentUser.nickname,
+                    coins: currentUser.coins,
+                    last_daily_bonus: currentUser.lastDailyBonus,
+                    owned_themes: currentUser.ownedThemes
+                }]);
+            
+            if (error) {
+                console.error('Chyba při insertu:', error);
+                localStorage.setItem('casinoUser', JSON.stringify(currentUser));
+            }
+        }
+    } catch (e) {
+        console.error('Chyba při ukládání:', e);
         localStorage.setItem('casinoUser', JSON.stringify(currentUser));
     }
 }
-
 function updateUI() {
     document.getElementById('userName').textContent = currentUser.nickname;
     document.getElementById('coinAmount').textContent = currentUser.coins;
@@ -1600,3 +1629,4 @@ window.addEventListener('load', async () => {
 
 </body>
 </html>
+
