@@ -5,122 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Tetris</title>
 <style>
-/* Level bar styling */
-#levelBar {
-    position: fixed;
-    top: 80px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 400px;
-    background: rgba(30, 30, 60, 0.9);
-    border: 3px solid #00ffff;
-    border-radius: 12px;
-    padding: 15px;
-    box-shadow: 0 0 30px rgba(0, 255, 255, 0.4);
-    z-index: 100;
-}
-
-#levelBar h3 {
-    text-align: center;
-    color: #00ffff;
-    margin-bottom: 10px;
-    font-size: 18px;
-    text-shadow: 0 0 10px #00ffff;
-}
-
-.level-info {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 8px;
-    font-size: 14px;
-}
-
-.level-progress {
-    width: 100%;
-    height: 25px;
-    background: rgba(0, 0, 0, 0.5);
-    border-radius: 12px;
-    overflow: hidden;
-    border: 2px solid #00ffff;
-}
-
-.level-progress-fill {
-    height: 100%;
-    background: linear-gradient(90deg, #00ffff, #ff00ff);
-    transition: width 0.5s ease;
-    box-shadow: 0 0 20px rgba(0, 255, 255, 0.8);
-}
-
-.level-up-notification {
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%) scale(0);
-    background: linear-gradient(135deg, rgba(255, 215, 0, 0.95), rgba(255, 165, 0, 0.95));
-    border: 4px solid #ffff00;
-    border-radius: 20px;
-    padding: 40px 60px;
-    z-index: 250;
-    text-align: center;
-    box-shadow: 0 0 80px rgba(255, 215, 0, 0.9);
-    animation: levelUpPop 0.6s ease-out forwards;
-}
-
-@keyframes levelUpPop {
-    0% { transform: translate(-50%, -50%) scale(0) rotate(-10deg); }
-    50% { transform: translate(-50%, -50%) scale(1.15) rotate(5deg); }
-    100% { transform: translate(-50%, -50%) scale(1) rotate(0deg); }
-}
-
-.level-up-notification.hide {
-    animation: levelUpFadeOut 0.4s ease-out forwards;
-}
-
-@keyframes levelUpFadeOut {
-    to { transform: translate(-50%, -50%) scale(0); opacity: 0; }
-}
-
-.level-up-notification h2 {
-    font-size: 56px;
-    margin-bottom: 15px;
-    color: #ffff00;
-    text-shadow: 0 0 25px #ffff00;
-}
-
-.level-up-notification p {
-    font-size: 28px;
-    color: white;
-    text-shadow: 0 0 15px rgba(0, 0, 0, 0.9);
-}
-
-/* Locked by level */
-button.menuBtn.level-locked {
-    background: linear-gradient(135deg, rgba(80, 80, 80, 0.3), rgba(40, 40, 40, 0.3));
-    border-color: #555;
-    color: #888;
-    cursor: not-allowed;
-}
-
-button.menuBtn.level-locked::after {
-    content: '🔒';
-    position: absolute;
-    right: 15px;
-    font-size: 24px;
-}
-
-.level-requirement {
-    position: absolute;
-    right: 50px;
-    background: linear-gradient(135deg, rgba(0, 150, 255, 0.4), rgba(0, 100, 200, 0.4));
-    border: 2px solid #00aaff;
-    border-radius: 6px;
-    padding: 4px 12px;
-    font-size: 14px;
-    color: #00ddff;
-    font-weight: bold;
-}
-
-.event-notification {
+ .event-notification {
     position: fixed;
     top: 50%;
     left: 50%;
@@ -164,14 +49,14 @@ button.menuBtn.level-locked::after {
 
 .event-timer {
     position: fixed;
-    top: 160px;
+    top: 80px;
     left: 50%;
     transform: translateX(-50%);
     background: rgba(255, 0, 0, 0.8);
     border: 3px solid #ffff00;
     border-radius: 12px;
     padding: 15px 30px;
-    font-size: 20px;
+    font-size: 24px;
     font-weight: bold;
     color: #ffff00;
     text-shadow: 0 0 15px #ffff00;
@@ -184,8 +69,7 @@ button.menuBtn.level-locked::after {
 @keyframes timerPulse {
     0%, 100% { transform: translateX(-50%) scale(1); }
     50% { transform: translateX(-50%) scale(1.05); }
-}
-
+}   
 * {
     margin: 0;
     padding: 0;
@@ -274,6 +158,8 @@ h1 {
     50% { transform: scale(1.05); }
 }
 
+
+
 button.menuBtn {
     padding: 16px 48px;
     margin: 12px 0;
@@ -290,13 +176,13 @@ button.menuBtn {
     position: relative;
 }
 
-button.menuBtn:hover:not(.locked):not(.level-locked) {
+button.menuBtn:hover:not(.locked) {
     transform: scale(1.08) translateY(-3px);
     box-shadow: 0 0 35px rgba(0, 255, 255, 0.8);
     background: linear-gradient(135deg, rgba(0, 150, 255, 0.6), rgba(150, 0, 255, 0.6));
 }
 
-button.menuBtn:active:not(.locked):not(.level-locked) {
+button.menuBtn:active:not(.locked) {
     transform: scale(1.03);
 }
 
@@ -361,7 +247,7 @@ button.menuBtn.locked::after {
     text-shadow: 0 0 10px #00ffff;
 }
 
-#score {
+#score, #level, #lines, #combo, #gameCoins {
     font-size: 32px;
     font-weight: bold;
     text-align: center;
@@ -369,7 +255,12 @@ button.menuBtn.locked::after {
     text-shadow: 0 0 10px #ff00ff;
 }
 
-#nextPiece {
+#gameCoins {
+    color: gold;
+    text-shadow: 0 0 10px gold;
+}
+
+#nextPiece, #holdPiece {
     width: 120px;
     height: 120px;
     display: grid;
@@ -469,6 +360,19 @@ button.menuBtn.locked::after {
     100% { transform: translateY(200px) scale(0); opacity: 0; }
 }
 
+.coin-particle {
+    position: fixed;
+    font-size: 32px;
+    pointer-events: none;
+    animation: coinFloat 2s ease-out forwards;
+    z-index: 1000;
+}
+
+@keyframes coinFloat {
+    0% { transform: translateY(0) scale(1); opacity: 1; }
+    100% { transform: translateY(-200px) scale(1.5); opacity: 0; }
+}
+
 .controls {
     position: fixed;
     bottom: 20px;
@@ -525,6 +429,22 @@ button.menuBtn.locked::after {
     text-shadow: 0 0 20px gold;
 }
 
+.modal-content input {
+    padding: 12px 20px;
+    font-size: 18px;
+    border: 2px solid #00ffff;
+    border-radius: 8px;
+    background: rgba(0, 0, 0, 0.5);
+    color: white;
+    width: 300px;
+    margin-bottom: 20px;
+}
+
+.modal-content input:focus {
+    outline: none;
+    box-shadow: 0 0 20px rgba(0, 255, 255, 0.6);
+}
+
 .pause-overlay {
     display: none;
     position: fixed;
@@ -550,20 +470,31 @@ button.menuBtn.locked::after {
     50% { transform: scale(1.1); }
 }
 
+@media (max-width: 1024px) {
+    .game-container {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .controls {
+        position: static;
+        margin-top: 20px;
+    }
+    /* Scrollovatelné menu s grid layoutem */
 .menu-section {
     max-height: 60vh;
     overflow-y: auto;
     padding: 20px;
     width: 100%;
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(2, 1fr); /* 2 sloupce vedle sebe */
     gap: 15px;
     align-items: start;
 }
 
 .menu-section .menuBtn {
-    margin: 0;
-    width: 100%;
+    margin: 0; /* Odstraň margin protože je nahrazen gap */
+    width: 100%; /* Tlačítka vyplní celou šířku sloupce */
 }
 
 .menu-section::-webkit-scrollbar {
@@ -580,12 +511,18 @@ button.menuBtn.locked::after {
     border-radius: 5px;
 }
 
+.menu-section::-webkit-scrollbar-thumb:hover {
+    background: rgba(0, 255, 255, 0.8);
+}
+
+/* Pro větší obrazovky - 3 sloupce */
 @media (min-width: 1200px) {
     .menu-section {
         grid-template-columns: repeat(3, 1fr);
     }
 }
 
+/* Pro mobily - 1 sloupec */
 @media (max-width: 768px) {
     .menu-section {
         grid-template-columns: 1fr;
@@ -597,20 +534,12 @@ button.menuBtn.locked::after {
 
 <button id="backBtn" onclick="window.location.href='hry.html'">⬅ Zpět</button>
 <div id="coinsDisplay">💰 <span id="coinCount">0</span></div>
-<div id="levelBar">
-    <h3>🎯 LEVEL <span id="currentLevel">1</span></h3>
-    <div class="level-info">
-        <span id="expText">0 / 100 EXP</span>
-        <span id="levelReward">🎁 Další odměna</span>
-    </div>
-    <div class="level-progress">
-        <div class="level-progress-fill" id="levelProgressFill" style="width: 0%"></div>
-    </div>
-</div>
 
 <div id="mainMenu" class="centered">
     <h1>🎮 TETRIS 🎮</h1>
+    <button class="menuBtn" onclick="goToKlasika()">🕹️ Classicplay</button>
     <button class="menuBtn" onclick="startTetris(selectedDifficulty)">🚀 Magicplay</button>
+    <button class="menuBtn" onclick="window.location.href='tetrismulti.html'">🌐 Multiplayer</button>
     <button class="menuBtn" onclick="showDifficultyMenu()">⚙️ Nastavení</button>
     <button class="menuBtn" onclick="showMapMenu()">📐 Mapy</button>
     <button class="menuBtn" onclick="showThemeMenu()">🎨 Vzhled</button>
@@ -631,50 +560,132 @@ button.menuBtn.locked::after {
     <div class="menu-section">
         <button class="menuBtn" id="theme-classic" onclick="setTheme('classic')">🌈 Klasické</button>
         <button class="menuBtn" id="theme-neon" onclick="setTheme('neon')">✨ Neon</button>
-        <button class="menuBtn locked" id="theme-fire" onclick="buyTheme('fire', 500, 2)">🔥 Oheň<span class="price-tag">💰 500</span><span class="level-requirement">LVL 2</span></button>
-        <button class="menuBtn locked" id="theme-candy" onclick="buyTheme('candy', 800, 3)">🍬 Candy<span class="price-tag">💰 800</span><span class="level-requirement">LVL 3</span></button>
-        <button class="menuBtn locked" id="theme-ocean" onclick="buyTheme('ocean', 1200, 3)">🌊 Oceán<span class="price-tag">💰 1200</span><span class="level-requirement">LVL 3</span></button>
-        <button class="menuBtn locked" id="theme-ice" onclick="buyTheme('ice', 1600, 4)">❄️ Led<span class="price-tag">💰 1600</span><span class="level-requirement">LVL 4</span></button>
-        <button class="menuBtn locked" id="theme-matrix" onclick="buyTheme('matrix', 2000, 5)">💻 Matrix<span class="price-tag">💰 2000</span><span class="level-requirement">LVL 5</span></button>
-        <button class="menuBtn locked" id="theme-forest" onclick="buyTheme('forest', 2400, 5)">🌲 Les<span class="price-tag">💰 2400</span><span class="level-requirement">LVL 5</span></button>
-        <button class="menuBtn locked" id="theme-lava" onclick="buyTheme('lava', 2800, 6)">🌋 Láva<span class="price-tag">💰 2800</span><span class="level-requirement">LVL 6</span></button>
-        <button class="menuBtn locked" id="theme-toxic" onclick="buyTheme('toxic', 3200, 6)">☢️ Toxic<span class="price-tag">💰 3200</span><span class="level-requirement">LVL 6</span></button>
-        <button class="menuBtn locked" id="theme-sunset" onclick="buyTheme('sunset', 3600, 7)">🌅 Západ slunce<span class="price-tag">💰 3600</span><span class="level-requirement">LVL 7</span></button>
-        <button class="menuBtn locked" id="theme-galaxy" onclick="buyTheme('galaxy', 4000, 8)">🌌 Galaxie<span class="price-tag">💰 4000</span><span class="level-requirement">LVL 8</span></button>
-        <button class="menuBtn locked" id="theme-midnight" onclick="buyTheme('midnight', 4400, 8)">🌙 Půlnoc<span class="price-tag">💰 4400</span><span class="level-requirement">LVL 8</span></button>
-        <button class="menuBtn locked" id="theme-rainbow" onclick="buyTheme('rainbow', 4700, 9)">🦄 Duha<span class="price-tag">💰 4700</span><span class="level-requirement">LVL 9</span></button>
-        <button class="menuBtn locked" id="theme-crystal" onclick="buyTheme('crystal', 4900, 9)">💎 Krystal<span class="price-tag">💰 4900</span><span class="level-requirement">LVL 9</span></button>
-        <button class="menuBtn locked" id="theme-gold" onclick="buyTheme('gold', 5000, 10)">👑 Zlaté<span class="price-tag">💰 5000</span><span class="level-requirement">LVL 10</span></button>
-    </div>
-    <button class="menuBtn" onclick="backToMainMenu()">⬅ Zpět</button>
+        <button class="menuBtn locked" id="theme-fire" onclick="buyTheme('fire', 1200)">
+    🔥 Oheň
+    <span class="price-tag">💰 1200</span>
+</button>
+<button class="menuBtn locked" id="theme-ice" onclick="buyTheme('ice', 2800)">
+    ❄️ Led
+    <span class="price-tag">💰 2800</span>
+</button>
+<button class="menuBtn locked" id="theme-forest" onclick="buyTheme('forest', 3400)">
+    🌲 Les
+    <span class="price-tag">💰 3400</span>
+</button>
+<button class="menuBtn locked" id="theme-sunset" onclick="buyTheme('sunset', 4100)">
+    🌅 Západ slunce
+    <span class="price-tag">💰 4100</span>
+</button>
+<button class="menuBtn locked" id="theme-ocean" onclick="buyTheme('ocean', 2300)">
+    🌊 Oceán
+    <span class="price-tag">💰 2300</span>
+</button>
+<button class="menuBtn locked" id="theme-candy" onclick="buyTheme('candy', 1700)">
+    🍬 Candy
+    <span class="price-tag">💰 1700</span>
+</button>
+<button class="menuBtn locked" id="theme-galaxy" onclick="buyTheme('galaxy', 4600)">
+    🌌 Galaxie
+    <span class="price-tag">💰 4600</span>
+</button>
+<button class="menuBtn locked" id="theme-toxic" onclick="buyTheme('toxic', 3900)">
+    ☢️ Toxic
+    <span class="price-tag">💰 3900</span>
+</button>
+<button class="menuBtn locked" id="theme-rainbow" onclick="buyTheme('rainbow', 4800)">
+    🦄 Duha
+    <span class="price-tag">💰 4800</span>
+</button>
+<button class="menuBtn locked" id="theme-gold" onclick="buyTheme('gold', 5000)">
+    👑 Zlaté
+    <span class="price-tag">💰 5000</span>
+</button>
+<button class="menuBtn locked" id="theme-matrix" onclick="buyTheme('matrix', 2600)">
+    💻 Matrix
+    <span class="price-tag">💰 2600</span>
+</button>
+<button class="menuBtn locked" id="theme-lava" onclick="buyTheme('lava', 3200)">
+    🌋 Láva
+    <span class="price-tag">💰 3200</span>
+</button>
+<button class="menuBtn locked" id="theme-midnight" onclick="buyTheme('midnight', 4400)">
+    🌙 Půlnoc
+    <span class="price-tag">💰 4400</span>
+</button>
+<button class="menuBtn locked" id="theme-crystal" onclick="buyTheme('crystal', 4900)">
+    💎 Krystal
+    <span class="price-tag">💰 4900</span>
+</button>
+</div>
+<button class="menuBtn" onclick="backToMainMenu()">⬅ Zpět</button>
 </div>
 
 <div id="mapMenu" class="centered" style="display:none;">
-    <h1>Rozměry mapy</h1>
-    <div class="menu-section">
-        <button class="menuBtn" id="map-20x10" onclick="setMap(20,10)">📏 Standardní 20x10</button>
-        <button class="menuBtn" id="map-18x12" onclick="setMap(18,12)">↔️ Široká 18x12</button>
-        <button class="menuBtn locked" id="map-22x8" onclick="buyMap('22x8', 22, 8, 400, 2)">↕️ Úzká 22x8<span class="price-tag">💰 400</span><span class="level-requirement">LVL 2</span></button>
-        <button class="menuBtn locked" id="map-15x15" onclick="buyMap('15x15', 15, 15, 700, 2)">🟦 Kompakt 15x15<span class="price-tag">💰 700</span><span class="level-requirement">LVL 2</span></button>
-        <button class="menuBtn locked" id="map-16x16" onclick="buyMap('16x16', 16, 16, 1000, 3)">⬜ Čtverec 16x16<span class="price-tag">💰 1000</span><span class="level-requirement">LVL 3</span></button>
-        <button class="menuBtn locked" id="map-28x9" onclick="buyMap('28x9', 28, 9, 1400, 4)">🗼 Věž 28x9<span class="price-tag">💰 1400</span><span class="level-requirement">LVL 4</span></button>
-        <button class="menuBtn locked" id="map-24x12" onclick="buyMap('24x12', 24, 12, 1800, 4)">⬆️ Vysoká 24x12<span class="price-tag">💰 1800</span><span class="level-requirement">LVL 4</span></button>
-        <button class="menuBtn locked" id="map-14x18" onclick="buyMap('14x18', 14, 18, 2200, 5)">🔲 Vertikální 14x18<span class="price-tag">💰 2200</span><span class="level-requirement">LVL 5</span></button>
-        <button class="menuBtn locked" id="map-12x20" onclick="buyMap('12x20', 12, 20, 2600, 6)">📱 Dlouhá 12x20<span class="price-tag">💰 2600</span><span class="level-requirement">LVL 6</span></button>
-        <button class="menuBtn locked" id="map-18x18" onclick="buyMap('18x18', 18, 18, 3000, 6)">⬛ Velký čtverec 18x18<span class="price-tag">💰 3000</span><span class="level-requirement">LVL 6</span></button>
-       <!-- POKRAČOVÁNÍ MAP MENU: -->
-        <button class="menuBtn locked" id="map-25x8" onclick="buyMap('25x8', 25, 8, 3400, 7)">📏 Extra úzká 25x8<span class="price-tag">💰 3400</span><span class="level-requirement">LVL 7</span></button>
-        <button class="menuBtn locked" id="map-26x10" onclick="buyMap('26x10', 26, 10, 3800, 8)">🏢 Mrakodrap 26x10<span class="price-tag">💰 3800</span><span class="level-requirement">LVL 8</span></button>
-        <button class="menuBtn locked" id="map-10x25" onclick="buyMap('10x25', 10, 25, 4200, 8)">🎯 Ultra široká 10x25<span class="price-tag">💰 4200</span><span class="level-requirement">LVL 8</span></button>
-        <button class="menuBtn locked" id="map-20x20" onclick="buyMap('20x20', 20, 20, 4500, 9)">🎪 Aréna 20x20<span class="price-tag">💰 4500</span><span class="level-requirement">LVL 9</span></button>
-        <button class="menuBtn locked" id="map-30x10" onclick="buyMap('30x10', 30, 10, 4800, 9)">🏰 Epická 30x10<span class="price-tag">💰 4800</span><span class="level-requirement">LVL 9</span></button>
-        <button class="menuBtn locked" id="map-25x25" onclick="buyMap('25x25', 25, 25, 5000, 10)">👑 Mega aréna 25x25<span class="price-tag">💰 5000</span><span class="level-requirement">LVL 10</span></button>
-    </div>
-    <button class="menuBtn" onclick="backToMainMenu()">⬅ Zpět</button>
+<h1>Rozměry mapy</h1>
+<div class="menu-section">
+    <button class="menuBtn" id="map-20x10" onclick="setMap(20,10)">📏 Standardní 20x10</button>
+    <button class="menuBtn" id="map-18x12" onclick="setMap(18,12)">↔️ Široká 18x12</button>
+    <button class="menuBtn locked" id="map-22x8" onclick="buyMap('22x8', 22, 8, 800)">
+        ↕️ Úzká 22x8
+        <span class="price-tag">💰 800</span>
+    </button>
+    <button class="menuBtn locked" id="map-16x16" onclick="buyMap('16x16', 16, 16, 1900)">
+        ⬜ Čtverec 16x16
+        <span class="price-tag">💰 1900</span>
+    </button>
+    <button class="menuBtn locked" id="map-24x12" onclick="buyMap('24x12', 24, 12, 2400)">
+        ⬆️ Vysoká 24x12
+        <span class="price-tag">💰 2400</span>
+    </button>
+    <button class="menuBtn locked" id="map-12x20" onclick="buyMap('12x20', 12, 20, 3100)">
+        📱 Dlouhá 12x20
+        <span class="price-tag">💰 3100</span>
+    </button>
+    <button class="menuBtn locked" id="map-15x15" onclick="buyMap('15x15', 15, 15, 1500)">
+        🟦 Kompakt 15x15
+        <span class="price-tag">💰 1500</span>
+    </button>
+    <button class="menuBtn locked" id="map-25x8" onclick="buyMap('25x8', 25, 8, 3700)">
+        📏 Extra úzká 25x8
+        <span class="price-tag">💰 3700</span>
+    </button>
+    <button class="menuBtn locked" id="map-14x18" onclick="buyMap('14x18', 14, 18, 2800)">
+        🔲 Vertikální 14x18
+        <span class="price-tag">💰 2800</span>
+    </button>
+    <button class="menuBtn locked" id="map-26x10" onclick="buyMap('26x10', 26, 10, 4200)">
+        🏢 Mrakodrap 26x10
+        <span class="price-tag">💰 4200</span>
+    </button>
+    <button class="menuBtn locked" id="map-18x18" onclick="buyMap('18x18', 18, 18, 3600)">
+        ⬛ Velký čtverec 18x18
+        <span class="price-tag">💰 3600</span>
+    </button>
+    <button class="menuBtn locked" id="map-10x25" onclick="buyMap('10x25', 10, 25, 4500)">
+        🎯 Ultra široká 10x25
+        <span class="price-tag">💰 4500</span>
+    </button>
+    <button class="menuBtn locked" id="map-28x9" onclick="buyMap('28x9', 28, 9, 2100)">
+        🗼 Věž 28x9
+        <span class="price-tag">💰 2100</span>
+    </button>
+    <button class="menuBtn locked" id="map-20x20" onclick="buyMap('20x20', 20, 20, 4700)">
+        🎪 Aréna 20x20
+        <span class="price-tag">💰 4700</span>
+    </button>
+    <button class="menuBtn locked" id="map-30x10" onclick="buyMap('30x10', 30, 10, 4900)">
+        🏰 Epická 30x10
+        <span class="price-tag">💰 4900</span>
+    </button>
+    <button class="menuBtn locked" id="map-25x25" onclick="buyMap('25x25', 25, 25, 5000)">
+        👑 Mega aréna 25x25
+        <span class="price-tag">💰 5000</span>
+    </button>
 </div>
-
+<button class="menuBtn" onclick="backToMainMenu()">⬅ Zpět</button>
+</div>
 <div id="leaderboard" class="centered">
-    <h1>🏆 Žebříček 🏆</h1>
+    <h1>🏆 žebříček 🏆</h1>
     <div class="loading">Načítání žebříčku...</div>
     <table id="leaderboardTable" style="display:none;">
         <tr><th>Pozice</th><th>Hráč</th><th>Skóre</th><th>Obtížnost</th><th>Datum</th></tr>
@@ -693,6 +704,7 @@ button.menuBtn.locked::after {
         <div>
             <div id="tetris"></div>
         </div>
+        
         <div class="side-panel">
             <div class="info-box">
                 <h3>SKÓRE</h3>
@@ -700,6 +712,7 @@ button.menuBtn.locked::after {
             </div>
         </div>
     </div>
+    
     <div class="controls">
         <h4>OVLÁDÁNÍ:</h4>
         <div>⬅️➡️ - Pohyb</div>
@@ -719,8 +732,12 @@ button.menuBtn.locked::after {
     <div class="modal-content">
         <h2>🎉 Skvělá hra! 🎉</h2>
         <p style="font-size: 24px; margin-bottom: 10px;">Tvoje skóre: <span id="finalScore">0</span></p>
-        <div class="coin-reward">💰 +<span id="earnedCoins">0</span> mincí!</div>
-        <p id="saveMessage" style="font-size: 18px; color: #00ff00; margin: 20px 0;">✅ Skóre automaticky uloženo!</p>
+        <div class="coin-reward">
+            💰 +<span id="earnedCoins">0</span> mincí!
+        </div>
+        <p id="saveMessage" style="font-size: 18px; color: #00ff00; margin: 20px 0;">
+            ✅ Skóre automaticky uloženo!
+        </p>
         <button class="menuBtn" onclick="backToMainMenu()">🏠 Zpět do menu</button>
     </div>
 </div>
@@ -730,6 +747,7 @@ let selectedDifficulty = 'medium';
 let mapRows = 20;
 let mapCols = 10;
 let currentTheme = 'classic';
+
 let score = 0;
 let level = 1;
 let linesCleared = 0;
@@ -740,166 +758,330 @@ let isPaused = false;
 let isGameOver = false;
 let canHold = true;
 let earnedCoinsThisGame = 0;
+
 let grid = [];
 let current = null;
 let nextPiece = null;
 let holdPiece = null;
+
 let playerCoins = 0;
-let playerLevel = 1;
-let playerExp = 0;
 let unlockedThemes = ['classic', 'neon'];
 let unlockedMaps = ['20x10', '18x12'];
 let currentUser = null;
 let totalGamesPlayed = 0;
+// Event systém
 let activeEvent = null;
 let eventTimeout = null;
-let canRotate = true;
-let inGame = false;
+let canRotate = true;    
+</script>
 
-const expPerLevel = [100, 150, 220, 300, 400, 520, 660, 820, 1000, 99999];
+<script type="module">
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.3'
 
-function addExp(amount) {
-    if (playerLevel >= 10) return;
-    playerExp += amount;
-    const expNeeded = expPerLevel[playerLevel - 1];
-    if (playerExp >= expNeeded) {
-        playerExp -= expNeeded;
-        playerLevel++;
-        showLevelUpNotification();
-        saveUserData();
-        updateUnlockedItems();
+const SUPABASE_URL = 'https://bmmaijlbpwgzhrxzxphf.supabase.co'
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJtbWFpamxicHdnemhyeHp4cGhmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjY4NjQ5MDcsImV4cCI6MjA4MjQ0MDkwN30.s0YQVnAjMXFu1pSI1NXZ2naSab179N0vQPglsmy3Pgw'
+
+const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+
+// Načtení přihlášeného uživatele
+async function loadCurrentUser() {
+    const savedUser = localStorage.getItem('currentUser')
+    
+    if (savedUser) {
+        try {
+            // Pokus se parsovat jako JSON
+            const parsed = JSON.parse(savedUser)
+            
+            // Zkontroluj, jestli má potřebné údaje
+            if (parsed && parsed.id && parsed.username) {
+                currentUser = parsed
+                console.log('Přihlášený uživatel (JSON):', currentUser.username, 'ID:', currentUser.id)
+                await loadUserData()
+            } else {
+                throw new Error('Neplatný formát')
+            }
+        } catch (e) {
+            // Pokud parse selže, je to jen string (jméno)
+            console.log('currentUser je jen string:', savedUser)
+            
+            // Zkus najít uživatele v Supabase podle jména
+            try {
+                const { data: user, error } = await supabase
+                    .from('users')
+                    .select('*')
+                    .eq('username', savedUser)
+                    .single()
+                
+                if (user && !error) {
+                    currentUser = user
+                    // Ulož správný formát
+                    localStorage.setItem('currentUser', JSON.stringify(user))
+                    console.log('Uživatel načten z databáze:', user.username, 'ID:', user.id)
+                    await loadUserData()
+                } else {
+                    console.error('Uživatel nenalezen v databázi')
+                    currentUser = { username: savedUser, is_guest: true }
+                    loadLocalData()
+                }
+            } catch (error) {
+                console.error('Chyba při načítání uživatele:', error)
+                currentUser = { username: savedUser, is_guest: true }
+                loadLocalData()
+            }
+        }
+    } else {
+        // Host režim
+        currentUser = { username: 'Host', is_guest: true }
+        console.log('Host režim')
+        loadLocalData()
     }
-    updateLevelBar();
 }
 
-function showLevelUpNotification() {
-    const notification = document.createElement('div');
-    notification.className = 'level-up-notification';
-    notification.innerHTML = `<h2>🎉 LEVEL UP! 🎉</h2><p>Nyní jsi level ${playerLevel}</p><p style="font-size: 20px; margin-top: 10px;">🔓 Nové věci odemčeny!</p>`;
-    document.body.appendChild(notification);
-    playSound('event');
-    setTimeout(() => {
-        notification.classList.add('hide');
-        setTimeout(() => notification.remove(), 400);
-    }, 3000);
+// Načtení dat uživatele ze Supabase
+async function loadUserData() {
+    if (!currentUser || currentUser.is_guest) return
+    
+    console.log('Načítám data pro uživatele:', currentUser.username, 'ID:', currentUser.id)
+    
+    try {
+        const { data, error } = await supabase
+            .from('tetris_player_data')
+            .select('*')
+            .eq('user_id', currentUser.id)
+            .single()
+        
+        if (data) {
+            playerCoins = data.coins || 0
+            unlockedThemes = data.unlocked_themes || ['classic', 'neon']
+            unlockedMaps = data.unlocked_maps || ['20x10', '18x12']
+            totalGamesPlayed = data.games_played || 0
+            console.log('Data načtena:', { playerCoins, totalGamesPlayed })
+        } else {
+            // První spuštění - vytvoř záznam
+            console.log('První spuštění - vytvářím nový záznam')
+            await supabase
+                .from('tetris_player_data')
+                .insert([{
+                    user_id: currentUser.id,
+                    username: currentUser.username,
+                    coins: 0,
+                    unlocked_themes: ['classic', 'neon'],
+                    unlocked_maps: ['20x10', '18x12'],
+                    games_played: 0,
+                    total_score: 0,
+                    best_score: 0
+                }])
+        }
+    } catch (error) {
+        console.error('Chyba při načítání dat:', error)
+    }
+    
+    updateCoinsDisplay()
+    updateUnlockedItems()
 }
 
-function updateLevelBar() {
-    document.getElementById('currentLevel').textContent = playerLevel;
-    if (playerLevel >= 10) {
-        document.getElementById('expText').textContent = 'MAX LEVEL!';
-        document.getElementById('levelProgressFill').style.width = '100%';
-        document.getElementById('levelReward').textContent = '🏆 Maximum!';
-        return;
+// Načtení lokálních dat pro host
+function loadLocalData() {
+    const saved = localStorage.getItem('tetrisPlayerData')
+    if (saved) {
+        const data = JSON.parse(saved)
+        playerCoins = data.coins || 0
+        unlockedThemes = data.themes || ['classic', 'neon']
+        unlockedMaps = data.maps || ['20x10', '18x12']
     }
-    const expNeeded = expPerLevel[playerLevel - 1];
-    const percentage = (playerExp / expNeeded) * 100;
-    document.getElementById('expText').textContent = `${playerExp} / ${expNeeded} EXP`;
-    document.getElementById('levelProgressFill').style.width = `${percentage}%`;
-    document.getElementById('levelReward').textContent = `🎁 Level ${playerLevel + 1}`;
+    updateCoinsDisplay()
+    updateUnlockedItems()
+}
+
+// Uložení dat do Supabase
+async function saveUserData() {
+    if (!currentUser || currentUser.is_guest) {
+        // Host - ulož lokálně
+        const data = {
+            coins: playerCoins,
+            themes: unlockedThemes,
+            maps: unlockedMaps
+        }
+        localStorage.setItem('tetrisPlayerData', JSON.stringify(data))
+        return
+    }
+    
+    try {
+        const { error } = await supabase
+            .from('tetris_player_data')
+            .update({
+                coins: playerCoins,
+                unlocked_themes: unlockedThemes,
+                unlocked_maps: unlockedMaps,
+                games_played: totalGamesPlayed
+            })
+            .eq('user_id', currentUser.id)
+        
+        if (error) throw error
+    } catch (error) {
+        console.error('Chyba při ukládání dat:', error)
+    }
+}
+
+// Aktualizace dat po hře
+async function updateAfterGame(finalScore) {
+    totalGamesPlayed++
+    
+    // Mince za skóre: každých 100 bodů = 5 mincí
+    const coinsFromScore = Math.floor(finalScore / 100) * 5
+    // Bonus za dokončenou hru: 10 mincí
+    const totalCoins = coinsFromScore + 10
+    
+    earnedCoinsThisGame = totalCoins
+    playerCoins += totalCoins
+    
+    console.log(`Získané mince: ${totalCoins} (skóre: ${coinsFromScore}, bonus: 10)`)
+    console.log(`Celkem mincí: ${playerCoins}`)
+    
+    if (!currentUser || currentUser.is_guest) {
+        saveUserData()
+        updateCoinsDisplay()
+        return
+    }
+    
+    try {
+        // Načti aktuální data
+        const { data: current } = await supabase
+            .from('tetris_player_data')
+            .select('*')
+            .eq('user_id', currentUser.id)
+            .single()
+        
+        const newTotalScore = (current?.total_score || 0) + finalScore
+        const newBestScore = Math.max(current?.best_score || 0, finalScore)
+        
+        // Aktualizuj data včetně mincí!
+        const { error } = await supabase
+            .from('tetris_player_data')
+            .update({
+                coins: playerCoins,
+                games_played: totalGamesPlayed,
+                total_score: newTotalScore,
+                best_score: newBestScore,
+                last_played: new Date().toISOString()
+            })
+            .eq('user_id', currentUser.id)
+        
+        if (error) throw error
+        
+        console.log('Data úspěšně uložena do Supabase')
+        
+    } catch (error) {
+        console.error('Chyba při aktualizaci dat:', error)
+    }
+    
+    await saveUserData()
+    updateCoinsDisplay()
+}
+
+window.updateCoinsDisplay = function() {
+    // Vždy zobrazovat celkový počet mincí nahoře
+    document.getElementById('coinCount').textContent = playerCoins
+    
+    // Během hry zobrazit získané mince v této hře
+    const gameCoinsElement = document.getElementById('gameCoins')
+    if (gameCoinsElement) {
+        gameCoinsElement.textContent = earnedCoinsThisGame
+    }
 }
 
 window.updateUnlockedItems = function() {
-    const themeData = {
-        'classic': 1, 'neon': 1, 'fire': 2, 'candy': 3, 'ocean': 3, 'ice': 4,
-        'matrix': 5, 'forest': 5, 'lava': 6, 'toxic': 6, 'sunset': 7,
-        'galaxy': 8, 'midnight': 8, 'rainbow': 9, 'crystal': 9, 'gold': 10
-    };
-    Object.keys(themeData).forEach(theme => {
-        const btn = document.getElementById(`theme-${theme}`);
-        if (btn) {
-            const isUnlocked = unlockedThemes.includes(theme);
-            const hasLevel = playerLevel >= themeData[theme];
-            if (isUnlocked) {
-                btn.classList.remove('locked', 'level-locked');
-                const priceTag = btn.querySelector('.price-tag');
-                const levelReq = btn.querySelector('.level-requirement');
-                if (priceTag) priceTag.remove();
-                if (levelReq) levelReq.remove();
-            } else if (!hasLevel) {
-                btn.classList.add('level-locked');
-                btn.classList.remove('locked');
-            } else {
-                btn.classList.add('locked');
-                btn.classList.remove('level-locked');
-            }
+    const themes = ['classic', 'neon', 'fire', 'ice', 'forest', 'sunset', 'ocean', 'candy', 'galaxy', 'toxic', 'rainbow', 'gold', 'matrix', 'lava', 'midnight', 'crystal']
+    themes.forEach(theme => {
+        const btn = document.getElementById(`theme-${theme}`)
+        if (btn && unlockedThemes.includes(theme)) {
+            btn.classList.remove('locked')
+            const priceTag = btn.querySelector('.price-tag')
+            if (priceTag) priceTag.remove()
         }
-    });
-    const mapData = {
-        '20x10': 1, '18x12': 1, '22x8': 2, '15x15': 2, '16x16': 3, '28x9': 4,
-        '24x12': 4, '14x18': 5, '12x20': 6, '18x18': 6, '25x8': 7,
-        '26x10': 8, '10x25': 8, '20x20': 9, '30x10': 9, '25x25': 10
-    };
-    Object.keys(mapData).forEach(map => {
-        const btn = document.getElementById(`map-${map}`);
-        if (btn) {
-            const isUnlocked = unlockedMaps.includes(map);
-            const hasLevel = playerLevel >= mapData[map];
-            if (isUnlocked) {
-                btn.classList.remove('locked', 'level-locked');
-                const priceTag = btn.querySelector('.price-tag');
-                const levelReq = btn.querySelector('.level-requirement');
-                if (priceTag) priceTag.remove();
-                if (levelReq) levelReq.remove();
-            } else if (!hasLevel) {
-                btn.classList.add('level-locked');
-                btn.classList.remove('locked');
-            } else {
-                btn.classList.add('locked');
-                btn.classList.remove('level-locked');
-            }
+    })
+    
+    const maps = ['20x10', '18x12', '22x8', '16x16', '24x12', '12x20', '15x15', '25x8', '14x18', '26x10', '18x18', '10x25', '28x9', '20x20', '30x10', '25x25']
+    maps.forEach(map => {
+        const btn = document.getElementById(`map-${map}`)
+        if (btn && unlockedMaps.includes(map)) {
+            btn.classList.remove('locked')
+            const priceTag = btn.querySelector('.price-tag')
+            if (priceTag) priceTag.remove()
         }
-    });
+    })
 }
 
-window.buyTheme = async function(theme, price, requiredLevel) {
-    if (unlockedThemes.includes(theme)) { setTheme(theme); return; }
-    if (playerLevel < requiredLevel) {
-        alert(`Potřebuješ level ${requiredLevel}!\nTvůj level: ${playerLevel}`);
-        return;
+window.buyTheme = async function(theme, price) {
+    if (unlockedThemes.includes(theme)) {
+        setTheme(theme)
+        return
     }
+    
     if (playerCoins >= price) {
-        if (confirm(`Koupit "${theme}" za ${price} mincí?`)) {
-            playerCoins -= price;
-            unlockedThemes.push(theme);
-            await saveUserData();
-            updateCoinsDisplay();
-            updateUnlockedItems();
-            setTheme(theme);
-            alert('Téma odemčeno! 🎉');
+        if (confirm(`Koupit téma "${theme}" za ${price} mincí?`)) {
+            playerCoins -= price
+            unlockedThemes.push(theme)
+            await saveUserData()
+            updateCoinsDisplay()
+            updateUnlockedItems()
+            setTheme(theme)
+            alert('Téma odemčeno! 🎉')
         }
     } else {
-        alert(`Nemáš dost mincí! Potřebuješ ${price}, máš ${playerCoins}.`);
+        alert(`Nemáš dost mincí! Potřebuješ ${price}, máš jen ${playerCoins}.`)
     }
 }
 
-window.buyMap = async function(mapName, rows, cols, price, requiredLevel) {
-    if (unlockedMaps.includes(mapName)) { setMap(rows, cols); return; }
-    if (playerLevel < requiredLevel) {
-        alert(`Potřebuješ level ${requiredLevel}!\nTvůj level: ${playerLevel}`);
-        return;
+window.buyMap = async function(mapName, rows, cols, price) {
+    if (unlockedMaps.includes(mapName)) {
+        setMap(rows, cols)
+        return
     }
+    
     if (playerCoins >= price) {
-        if (confirm(`Koupit "${mapName}" za ${price} mincí?`)) {
-            playerCoins -= price;
-            unlockedMaps.push(mapName);
-            await saveUserData();
-            updateCoinsDisplay();
-            updateUnlockedItems();
-            setMap(rows, cols);
-            alert('Mapa odemčena! 🎉');
+        if (confirm(`Koupit mapu "${mapName}" za ${price} mincí?`)) {
+            playerCoins -= price
+            unlockedMaps.push(mapName)
+            await saveUserData()
+            updateCoinsDisplay()
+            updateUnlockedItems()
+            setMap(rows, cols)
+            alert('Mapa odemčena! 🎉')
         }
     } else {
-        alert(`Nemáš dost mincí! Potřebuješ ${price}, máš ${playerCoins}.`);
+        alert(`Nemáš dost mincí! Potřebuješ ${price}, máš jen ${playerCoins}.`)
+    }
 }
- Display();
+
+async function addCoins(amount) {
+    earnedCoinsThisGame += amount
+    playerCoins += amount           // ⭐ důležité
+    updateCoinsDisplay()
+
+    await saveUserData()             // ⭐ uloží do Supabase
+    
+    for (let i = 0; i < 5; i++) {
+        setTimeout(() => {
+            const coin = document.createElement('div')
+            coin.className = 'coin-particle'
+            coin.textContent = '💰'
+            coin.style.left = (window.innerWidth / 2 + Math.random() * 200 - 100) + 'px'
+            coin.style.top = (window.innerHeight / 2) + 'px'
+            document.body.appendChild(coin)
+            setTimeout(() => coin.remove(), 2000)
+        }, i * 100)
+    }
+}
+
+// Barevná témata
 const themes = {
     classic: ['cyan', 'yellow', 'purple', 'green', 'red', 'blue', 'orange'],
     neon: ['#00ffff', '#ff00ff', '#ffff00', '#00ff00', '#ff0080', '#0080ff', '#ff8000'],
     fire: ['#ff0000', '#ff4500', '#ff6347', '#ff7f50', '#ffa500', '#ffb84d', '#ff8c00'],
     ice: ['#00bfff', '#4169e1', '#1e90ff', '#87ceeb', '#add8e6', '#b0e0e6', '#87cefa'],
     forest: ['#228b22', '#32cd32', '#3cb371', '#2e8b57', '#00fa9a', '#90ee90', '#98fb98'],
-    sunset: ['#ff6347', '#ff7f50', '#ffa500', '#ff8c00', '#ff4500', '#ff69b4', '#ff1493'],
+    sunset: ['#ff6347', '#ff7f50', '#ffa500', '#ff8c00', '#ff4500', '#ff69b4', '#ff1493'], 
     ocean: ['#006994', '#0080b3', '#0099cc', '#00b3e6', '#33ccff', '#66d9ff', '#99e6ff'],
     candy: ['#ff69b4', '#ffb6c1', '#ff1493', '#ff82ab', '#ffc0cb', '#ffaec9', '#ff4da6'],
     galaxy: ['#4b0082', '#8a2be2', '#9370db', '#9932cc', '#ba55d3', '#da70d6', '#ee82ee'],
@@ -910,34 +1092,105 @@ const themes = {
     lava: ['#8b0000', '#b22222', '#dc143c', '#ff4500', '#ff6347', '#ff7f50', '#ffa07a'],
     midnight: ['#191970', '#000080', '#00008b', '#0000cd', '#4169e1', '#6495ed', '#1e3a8a'],
     crystal: ['#e0ffff', '#afeeee', '#add8e6', '#87ceeb', '#b0e0e6', '#d4f1f4', '#c0f0f5']
-};
-
+}
+// Event typy
 const eventTypes = [
-    {name: '⚡ TURBO SPEED', description: 'Bloky padají 3× rychleji!', duration: 10000, color: 'linear-gradient(135deg, rgba(255, 215, 0, 0.95), rgba(255, 140, 0, 0.95))', onStart: () => { dropInterval = Math.max(50, dropInterval / 3); }, onEnd: () => { const baseSpeed = selectedDifficulty === 'easy' ? 800 : selectedDifficulty === 'medium' ? 600 : selectedDifficulty === 'hard' ? 400 : 250; dropInterval = Math.max(100, Math.floor(baseSpeed * Math.max(0.25, 1 - (Math.floor(score / 1000) * 0.08)))); }},
-    {name: '🚫 NO ROTATION', description: 'Nelze otáčet bloky!', duration: 10000, color: 'linear-gradient(135deg, rgba(255, 0, 0, 0.95), rgba(139, 0, 0, 0.95))', onStart: () => { canRotate = false; }, onEnd: () => { canRotate = true; }},
-    {name: '🐌 SLOW MOTION', description: 'Vše se zpomalilo!', duration: 15000, color: 'linear-gradient(135deg, rgba(0, 100, 255, 0.95), rgba(0, 50, 150, 0.95))', onStart: () => { dropInterval = dropInterval * 2.5; }, onEnd: () => { const baseSpeed = selectedDifficulty === 'easy' ? 800 : selectedDifficulty === 'medium' ? 600 : selectedDifficulty === 'hard' ? 400 : 250; dropInterval = Math.max(100, Math.floor(baseSpeed * Math.max(0.25, 1 - (Math.floor(score / 1000) * 0.08)))); }},
-    {name: '🎁 DOUBLE POINTS', description: 'Získáváš 2× body!', duration: 12000, color: 'linear-gradient(135deg, rgba(0, 255, 0, 0.95), rgba(0, 200, 0, 0.95))', multiplier: 2},
-    {name: '⬅️ REVERSE CONTROLS', description: 'Ovládání je obrácené!', duration: 10000, color: 'linear-gradient(135deg, rgba(255, 0, 255, 0.95), rgba(200, 0, 200, 0.95))', reverseControls: true},
-    {name: '👻 INVISIBLE BLOCKS', description: 'Padající blok je neviditelný!', duration: 8000, color: 'linear-gradient(135deg, rgba(100, 100, 100, 0.95), rgba(50, 50, 50, 0.95))', invisibleCurrent: true}
+    {
+        name: '⚡ TURBO SPEED',
+        description: 'Bloky padají 3× rychleji!',
+        duration: 10000,
+        color: 'linear-gradient(135deg, rgba(255, 215, 0, 0.95), rgba(255, 140, 0, 0.95))',
+        onStart: () => {
+            dropInterval = Math.max(50, dropInterval / 3);
+        },
+        onEnd: () => {
+            const baseSpeed = selectedDifficulty === 'easy' ? 800 : 
+                             selectedDifficulty === 'medium' ? 600 : 
+                             selectedDifficulty === 'hard' ? 400 : 250;
+            const speedMultiplier = Math.max(0.25, 1 - (Math.floor(score / 1000) * 0.08));
+            dropInterval = Math.max(100, Math.floor(baseSpeed * speedMultiplier));
+        }
+    },
+    {
+        name: '🚫 NO ROTATION',
+        description: 'Nelze otáčet bloky!',
+        duration: 10000,
+        color: 'linear-gradient(135deg, rgba(255, 0, 0, 0.95), rgba(139, 0, 0, 0.95))',
+        onStart: () => {
+            canRotate = false;
+        },
+        onEnd: () => {
+            canRotate = true;
+        }
+    },
+    {
+        name: '🐌 SLOW MOTION',
+        description: 'Vše se zpomalilo!',
+        duration: 15000,
+        color: 'linear-gradient(135deg, rgba(0, 100, 255, 0.95), rgba(0, 50, 150, 0.95))',
+        onStart: () => {
+            dropInterval = dropInterval * 2.5;
+        },
+        onEnd: () => {
+            const baseSpeed = selectedDifficulty === 'easy' ? 800 : 
+                             selectedDifficulty === 'medium' ? 600 : 
+                             selectedDifficulty === 'hard' ? 400 : 250;
+            const speedMultiplier = Math.max(0.25, 1 - (Math.floor(score / 1000) * 0.08));
+            dropInterval = Math.max(100, Math.floor(baseSpeed * speedMultiplier));
+        }
+    },
+    {
+        name: '🎁 DOUBLE POINTS',
+        description: 'Získáváš 2× body!',
+        duration: 12000,
+        color: 'linear-gradient(135deg, rgba(0, 255, 0, 0.95), rgba(0, 200, 0, 0.95))',
+        multiplier: 2
+    },
+    {
+        name: '⬅️ REVERSE CONTROLS',
+        description: 'Ovládání je obrácené!',
+        duration: 10000,
+        color: 'linear-gradient(135deg, rgba(255, 0, 255, 0.95), rgba(200, 0, 200, 0.95))',
+        reverseControls: true
+    },
+    {
+        name: '👻 INVISIBLE BLOCKS',
+        description: 'Padající blok je neviditelný!',
+        duration: 8000,
+        color: 'linear-gradient(135deg, rgba(100, 100, 100, 0.95), rgba(50, 50, 50, 0.95))',
+        invisibleCurrent: true
+    }
 ];
 
 function triggerRandomEvent() {
-    if (isPaused || isGameOver || activeEvent || !inGame) return;
+    if (isPaused || isGameOver || activeEvent) return;
+    
     const event = eventTypes[Math.floor(Math.random() * eventTypes.length)];
     activeEvent = event;
+    
     showEventNotification(event);
+    
     if (event.onStart) event.onStart();
+    
     updateEventTimer(event.duration);
-    eventTimeout = setTimeout(() => endEvent(), event.duration);
+    
+    eventTimeout = setTimeout(() => {
+        endEvent();
+    }, event.duration);
 }
 
 function showEventNotification(event) {
     const notification = document.createElement('div');
     notification.className = 'event-notification';
     notification.style.background = event.color;
-    notification.innerHTML = `<h2>${event.name}</h2><p>${event.description}</p>`;
+    notification.innerHTML = `
+        <h2>${event.name}</h2>
+        <p>${event.description}</p>
+    `;
     document.body.appendChild(notification);
+    
     playSound('event');
+    
     setTimeout(() => {
         notification.classList.add('hide');
         setTimeout(() => notification.remove(), 300);
@@ -952,39 +1205,122 @@ function updateEventTimer(duration) {
         timer.className = 'event-timer';
         document.body.appendChild(timer);
     }
+    
     timer.style.display = 'block';
     let remaining = Math.floor(duration / 1000);
+    
     const interval = setInterval(() => {
-        if (!activeEvent || isPaused) { clearInterval(interval); return; }
+        if (!activeEvent || isPaused) {
+            clearInterval(interval);
+            return;
+        }
+        
         remaining--;
         timer.textContent = `⏱️ ${activeEvent.name}: ${remaining}s`;
-        if (remaining <= 0) { clearInterval(interval); timer.style.display = 'none'; }
+        
+        if (remaining <= 0) {
+            clearInterval(interval);
+            timer.style.display = 'none';
+        }
     }, 1000);
 }
 
 function endEvent() {
     if (!activeEvent) return;
+    
     if (activeEvent.onEnd) activeEvent.onEnd();
+    
     const timer = document.getElementById('eventTimer');
     if (timer) timer.style.display = 'none';
+    
     activeEvent = null;
 }
 
+// Spustí náhodný event každých 20-40 sekund během hry
 function startEventSystem() {
     const scheduleNextEvent = () => {
-        const delay = 60000 + Math.random() * 120000;
+        const delay = 60000 + Math.random() * 120000; // 60-180s (1-3 minuty)
         setTimeout(() => {
-            if (!isGameOver && inGame && !isPaused) triggerRandomEvent();
-            if (!isGameOver && inGame) scheduleNextEvent();
+            if (!isGameOver) {
+                triggerRandomEvent();
+                scheduleNextEvent();
+            }
         }, delay);
     };
     scheduleNextEvent();
 }
+ window.goToKlasika = function() {
+    // Předá obtížnost, mapu rozměry a téma do klasika.html
+    const url = `klasika.html?difficulty=${selectedDifficulty}&rows=${mapRows}&cols=${mapCols}&theme=${currentTheme}`;
+    window.location.href = url;
+}
 
-const tetris = document.getElementById('tetris');
-const scoreDisplay = document.getElementById('score');
-const nextPieceDisplay = document.getElementById('nextPiece');
-const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+window.backToMainMenu = function() {
+    document.getElementById('mainMenu').style.display = 'flex'
+    document.getElementById('difficultyMenu').style.display = 'none'
+    document.getElementById('themeMenu').style.display = 'none'
+    document.getElementById('mapMenu').style.display = 'none'
+    document.getElementById('leaderboard').style.display = 'none'
+    document.getElementById('tetrisGame').style.display = 'none'
+    document.getElementById('nameModal').style.display = 'none'
+    document.getElementById('pauseOverlay').style.display = 'none'
+    clearTimeout(dropTimeout)
+    isPaused = false
+    isGameOver = false
+}
+
+window.showDifficultyMenu = function() {
+    document.getElementById('mainMenu').style.display = 'none'
+    document.getElementById('difficultyMenu').style.display = 'flex'
+}
+
+window.showThemeMenu = function() {
+    document.getElementById('mainMenu').style.display = 'none'
+    document.getElementById('themeMenu').style.display = 'flex'
+}
+
+window.showMapMenu = function() {
+    document.getElementById('mainMenu').style.display = 'none'
+    document.getElementById('mapMenu').style.display = 'flex'
+}
+
+window.showLeaderboard = async function() {
+    document.getElementById('mainMenu').style.display = 'none'
+    document.getElementById('leaderboard').style.display = 'flex'
+    await loadLeaderboard()
+}
+
+window.setDifficulty = function(level) {
+    selectedDifficulty = level
+    backToMainMenu()
+}
+
+window.setMap = function(rows, cols) {
+    mapRows = rows
+    mapCols = cols
+    backToMainMenu()
+}
+
+window.setTheme = function(theme) {
+    if (!unlockedThemes.includes(theme)) {
+        alert('Toto téma je zamčené!')
+        return
+    }
+    currentTheme = theme
+    backToMainMenu()
+}
+
+// Tetris engine
+const tetris = document.getElementById('tetris')
+const scoreDisplay = document.getElementById('score')
+// const levelDisplay = document.getElementById('level')
+// const linesDisplay = document.getElementById('lines')
+// const comboDisplay = document.getElementById('combo')
+const nextPieceDisplay = document.getElementById('nextPiece')
+const holdPieceDisplay = document.getElementById('holdPiece')
+
+const audioContext = new (window.AudioContext || window.webkitAudioContext)()
+
 const shapes = [
     {shape: [[1,1,1,1]], name: 'I'},
     {shape: [[1,1],[1,1]], name: 'O'},
@@ -993,205 +1329,553 @@ const shapes = [
     {shape: [[1,1,0],[0,1,1]], name: 'Z'},
     {shape: [[1,0,0],[1,1,1]], name: 'J'},
     {shape: [[0,0,1],[1,1,1]], name: 'L'}
-];
+]
 
 function getColor(shapeIndex) {
-    return themes[currentTheme][shapeIndex % themes[currentTheme].length];
+    const colorPalette = themes[currentTheme]
+    return colorPalette[shapeIndex % colorPalette.length]
 }
 
 function initGrid() {
-    tetris.innerHTML = '';
-    grid.length = 0;
-    tetris.style.gridTemplateRows = `repeat(${mapRows}, 30px)`;
-    tetris.style.gridTemplateColumns = `repeat(${mapCols}, 30px)`;
+    tetris.innerHTML = ''
+    grid.length = 0
+    tetris.style.gridTemplateRows = `repeat(${mapRows}, 30px)`
+    tetris.style.gridTemplateColumns = `repeat(${mapCols}, 30px)`
+    
     for (let r = 0; r < mapRows; r++) {
-        grid[r] = [];
+        grid[r] = []
         for (let c = 0; c < mapCols; c++) {
-            const cell = document.createElement('div');
-            cell.classList.add('cell');
-            tetris.appendChild(cell);
-            grid[r][c] = 0;
+            const cell = document.createElement('div')
+            cell.classList.add('cell')
+            tetris.appendChild(cell)
+            grid[r][c] = 0
         }
     }
 }
 
 window.startTetris = function(difficulty) {
-    document.getElementById('mainMenu').style.display = 'none';
-    document.getElementById('tetrisGame').style.display = 'flex';
-    score = 0;
-    level = 1;
-    linesCleared = 0;
-    combo = 0;
-    canHold = true;
-    isPaused = false;
-    isGameOver = false;
-    holdPiece = null;
-    earnedCoinsThisGame = 0;
-    inGame = true;
-    dropInterval = difficulty === 'easy' ? 800 : difficulty === 'medium' ? 600 : difficulty === 'hard' ? 400 : 200;
-    initGrid();
-    nextPiece = randomTetromino();
-    newTetromino();
-    updateDisplay();
-    gameLoop();
+    document.getElementById('mainMenu').style.display = 'none'
+    document.getElementById('tetrisGame').style.display = 'flex'
+    
+    score = 0
+    level = 1
+    linesCleared = 0
+    combo = 0
+    canHold = true
+    isPaused = false
+    isGameOver = false
+    holdPiece = null
+    earnedCoinsThisGame = 0
+    
+    dropInterval = difficulty === 'easy' ? 800 : 
+                   difficulty === 'medium' ? 600 : 
+                   difficulty === 'hard' ? 400 : 200
+    
+    initGrid()
+    nextPiece = randomTetromino()
+    newTetromino()
+    updateDisplay()
+    gameLoop()
     startEventSystem();
 }
-</script>
 
-<script type="module">
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.3'
+function randomTetromino() {
+    const index = Math.floor(Math.random() * shapes.length)
+    return {
+        shape: shapes[index].shape.map(r => r.slice()),
+        color: getColor(index),
+        name: shapes[index].name
+    }
+}
 
-const SUPABASE_URL = 'https://bmmaijlbpwgzhrxzxphf.supabase.co'
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJtbWFpamxicHdnemhyeHp4cGhmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjY4NjQ5MDcsImV4cCI6MjA4MjQ0MDkwN30.s0YQVnAjMXFu1pSI1NXZ2naSab179N0vQPglsmy3Pgw'
+function newTetromino() {
+    current = nextPiece
+    current.x = Math.floor(mapCols / 2) - Math.floor(current.shape[0].length / 2)
+    current.y = 0
+    
+    nextPiece = randomTetromino()
+    drawPreview(nextPiece, nextPieceDisplay)
+    canHold = true
+    
+    if (collision()) {
+        gameOver()
+    }
+}
 
-window.supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
-
-async function loadCurrentUser() {
-    const savedUser = localStorage.getItem('currentUser')
-    if (savedUser) {
-        try {
-            const parsed = JSON.parse(savedUser)
-            if (parsed && parsed.id && parsed.username) {
-                window.currentUser = parsed
-                await loadUserData()
-            } else throw new Error('Neplatný formát')
-        } catch (e) {
-            try {
-                const savedUsername = typeof savedUser === 'string' ? savedUser : savedUser.username;
-                const { data: user } = await window.supabase.from('users').select('*').eq('username', savedUsername).single()
-                if (user) {
-                    window.currentUser = user
-                    localStorage.setItem('currentUser', JSON.stringify(user))
-                    await loadUserData()
-                } else {
-                    window.currentUser = { username: savedUser, is_guest: true }
-                    loadLocalData()
-                }
-            } catch {
-                window.currentUser = { username: savedUser, is_guest: true }
-                loadLocalData()
+function drawPreview(piece, container) {
+    container.innerHTML = ''
+    for (let i = 0; i < 16; i++) {
+        const cell = document.createElement('div')
+        cell.classList.add('preview-cell')
+        container.appendChild(cell)
+    }
+    
+    const offsetX = Math.floor((4 - piece.shape[0].length) / 2)
+    const offsetY = Math.floor((4 - piece.shape.length) / 2)
+    
+    for (let r = 0; r < piece.shape.length; r++) {
+        for (let c = 0; c < piece.shape[r].length; c++) {
+            if (piece.shape[r][c]) {
+                const index = (offsetY + r) * 4 + (offsetX + c)
+                container.children[index].style.background = piece.color
+                container.children[index].style.boxShadow = `0 0 10px ${piece.color}`
             }
         }
-    } else {
-        window.currentUser = { username: 'Host', is_guest: true }
-        loadLocalData()
     }
 }
 
-async function loadUserData() {
-    if (!window.currentUser || window.currentUser.is_guest) return;
-    try {
-        const { data } = await window.supabase.from('tetris_player_data').select('*').eq('user_id', window.currentUser.id).single();
-        if (data) {
-            window.playerCoins = data.coins || 0;
-            window.playerLevel = data.level || 1;
-            window.playerExp = data.exp || 0;
-            window.unlockedThemes = data.unlocked_themes || ['classic', 'neon'];
-            window.unlockedMaps = data.unlocked_maps || ['20x10', '18x12'];
-            window.totalGamesPlayed = data.games_played || 0;
-        } else {
-            await window.supabase.from('tetris_player_data').insert([{
-                user_id: window.currentUser.id,
-                username: window.currentUser.username,
-                coins: 0,
-                level: 1,
-                exp: 0,
-                unlocked_themes: ['classic', 'neon'],
-                unlocked_maps: ['20x10', '18x12'],
-                games_played: 0,
-                total_score: 0,
-                best_score: 0
-            }]);
+function draw() {
+    document.querySelectorAll('.cell').forEach(cell => {
+        cell.style.background = '#1a1a2e';
+        cell.classList.remove('filled');
+    });
+    
+    for (let r = 0; r < mapRows; r++) {
+        for (let c = 0; c < mapCols; c++) {
+            if (grid[r][c]) {
+                const cell = tetris.children[r * mapCols + c];
+                cell.style.background = grid[r][c];
+                cell.style.boxShadow = `0 0 10px ${grid[r][c]}`;
+                cell.classList.add('filled');
+            }
         }
-    } catch (error) {
-        console.error('Chyba při načítání dat:', error);
     }
-    window.updateCoinsDisplay();
-    window.updateLevelBar();
-    window.updateUnlockedItems();
-}
-
-function loadLocalData() {
-    const saved = localStorage.getItem('tetrisPlayerData');
-    if (saved) {
-        const data = JSON.parse(saved);
-        window.playerCoins = data.coins || 0;
-        window.playerLevel = data.level || 1;
-        window.playerExp = data.exp || 0;
-        window.unlockedThemes = data.themes || ['classic', 'neon'];
-        window.unlockedMaps = data.maps || ['20x10', '18x12'];
-    }
-    window.updateCoinsDisplay();
-    window.updateLevelBar();
-    window.updateUnlockedItems();
-}
-
-async function saveUserData() {
-    if (!window.currentUser || window.currentUser.is_guest) {
-        localStorage.setItem('tetrisPlayerData', JSON.stringify({
-            coins: window.playerCoins,
-            level: window.playerLevel,
-            exp: window.playerExp,
-            themes: window.unlockedThemes,
-            maps: window.unlockedMaps
-        }));
-        return;
-    }
-    try {
-        await window.supabase.from('tetris_player_data').update({
-            coins: window.playerCoins,
-            level: window.playerLevel,
-            exp: window.playerExp,
-            unlocked_themes: window.unlockedThemes,
-            unlocked_maps: window.unlockedMaps,
-            games_played: window.totalGamesPlayed
-        }).eq('user_id', window.currentUser.id);
-    } catch (error) {
-        console.error('Chyba při ukládání:', error);
-    }
-}
-
-async function updateAfterGame(finalScore) {
-    window.totalGamesPlayed++;
-    const coinsFromScore = Math.floor(finalScore / 100) * 5;
-    const totalCoins = coinsFromScore + 10;
-    const expFromScore = Math.floor(finalScore / 1000) * 10;
-    window.earnedCoinsThisGame = totalCoins;
-    window.playerCoins += totalCoins;
-    window.addExp(expFromScore);
     
-    if (!window.currentUser || window.currentUser.is_guest) {
-        await saveUserData();
-        window.updateCoinsDisplay();
+    // Invisible event - nekreslí aktuální blok
+    if (activeEvent && activeEvent.invisibleCurrent) {
         return;
     }
     
-    try {
-        const { data: current } = await window.supabase.from('tetris_player_data').select('*').eq('user_id', window.currentUser.id).single();
-        await window.supabase.from('tetris_player_data').update({
-            coins: window.playerCoins,
-            level: window.playerLevel,
-            exp: window.playerExp,
-            games_played: window.totalGamesPlayed,
-            total_score: (current?.total_score || 0) + finalScore,
-            best_score: Math.max(current?.best_score || 0, finalScore),
-            last_played: new Date().toISOString()
-        }).eq('user_id', window.currentUser.id);
-    } catch (error) {
-        console.error('Chyba:', error);
+    for (let r = 0; r < current.shape.length; r++) {
+        for (let c = 0; c < current.shape[r].length; c++) {
+            if (current.shape[r][c]) {
+                const index = (current.y + r) * mapCols + (current.x + c);
+                if (index >= 0 && index < mapRows * mapCols) {
+                    tetris.children[index].style.background = current.color;
+                    tetris.children[index].style.boxShadow = `0 0 15px ${current.color}`;
+                    tetris.children[index].classList.add('filled');
+                }
+            }
+        }
     }
-    
-    await saveUserData();
-    window.updateCoinsDisplay();
-    window.updateLevelBar();
 }
 
-window.updateAfterGame = updateAfterGame;
-window.saveUserData = saveUserData;
+function moveDown() {
+    if (isPaused || isGameOver) return
+    
+    current.y++
+    if (collision()) {
+        current.y--
+        freeze()
+        newTetromino()
+    }
+    draw()
+}
 
-// Načti uživatele při startu
-loadCurrentUser();
+function collision() {
+    return collisionAt(current.x, current.y)
+}
+
+function collisionAt(x, y) {
+    for (let r = 0; r < current.shape.length; r++) {
+        for (let c = 0; c < current.shape[r].length; c++) {
+            if (current.shape[r][c]) {
+                let newY = y + r
+                let newX = x + c
+                if (newY >= mapRows || newX < 0 || newX >= mapCols) return true
+                if (newY >= 0 && grid[newY][newX]) return true
+            }
+        }
+    }
+    return false
+}
+
+function freeze() {
+    for (let r = 0; r < current.shape.length; r++) {
+        for (let c = 0; c < current.shape[r].length; c++) {
+            if (current.shape[r][c]) {
+                grid[current.y + r][current.x + c] = current.color
+            }
+        }
+    }
+    
+    const cleared = clearLines()
+    if (cleared > 0) {
+        createParticles(cleared)
+        playSound('clear')
+    }
+}
+
+function clearLines() {
+    let cleared = 0
+    for (let r = mapRows - 1; r >= 0; r--) {
+        if (grid[r].every(cell => cell !== 0)) {
+            grid.splice(r, 1)
+            grid.unshift(Array(mapCols).fill(0))
+            cleared++
+            r++
+        }
+    }
+    
+    if (cleared > 0) {
+        linesCleared += cleared
+        combo++
+        
+        let points = cleared * 100 * level;
+        if (cleared === 4) points *= 2;
+        points += combo * 50;
+        
+        // Double points event
+        if (activeEvent && activeEvent.multiplier) {
+            points *= activeEvent.multiplier;
+        }
+        
+        score += points;
+        level = Math.floor(linesCleared / 10) + 1
+        
+        // Dynamická rychlost podle obtížnosti a skóre
+        const baseSpeed = selectedDifficulty === 'easy' ? 800 : 
+                         selectedDifficulty === 'medium' ? 600 : 
+                         selectedDifficulty === 'hard' ? 400 : 250
+        
+        const minSpeed = selectedDifficulty === 'easy' ? 200 : 
+                        selectedDifficulty === 'medium' ? 150 : 
+                        selectedDifficulty === 'hard' ? 100 : 80
+        
+        // Každých 1000 bodů zrychlí o 8% (pomalejší progrese)
+        const speedMultiplier = Math.max(0.25, 1 - (Math.floor(score / 1000) * 0.08))
+        dropInterval = Math.max(minSpeed, Math.floor(baseSpeed * speedMultiplier))
+        
+        console.log(`⚡ Rychlost: ${dropInterval}ms | Level: ${level} | Skóre: ${score}`)
+    } else {
+        combo = 0
+    }
+    
+    updateDisplay()
+    return cleared
+}
+
+function createParticles(count) {
+    for (let i = 0; i < count * 20; i++) {
+        const particle = document.createElement('div')
+        particle.classList.add('particle')
+        particle.style.left = (window.innerWidth / 2 + Math.random() * 400 - 200) + 'px'
+        particle.style.top = (window.innerHeight / 2 + Math.random() * 200 - 100) + 'px'
+        particle.style.background = themes[currentTheme][Math.floor(Math.random() * themes[currentTheme].length)]
+        document.body.appendChild(particle)
+        
+        setTimeout(() => particle.remove(), 1000)
+    }
+}
+
+function rotate() {
+    if (!canRotate) {
+        playSound('error');
+        return;
+    }
+    
+    const shape = current.shape;
+    const N = shape.length;
+    const M = shape[0].length;
+    const rotated = [];
+    
+    for (let y = 0; y < M; y++) {
+        rotated[y] = [];
+        for (let x = 0; x < N; x++) {
+            rotated[y][x] = shape[N - 1 - x][y] || 0;
+        }
+    }
+    
+    const oldShape = current.shape;
+    current.shape = rotated;
+    
+    if (collision()) {
+        current.x++;
+        if (collision()) {
+            current.x -= 2;
+            if (collision()) {
+                current.x++;
+                current.shape = oldShape;
+            }
+        }
+    }
+    
+    playSound('rotate');
+}
+
+function hardDrop() {
+    while (!collision()) {
+        current.y++
+    }
+    current.y--
+    freeze()
+    newTetromino()
+    score += 10
+    updateDisplay()
+    playSound('drop')
+}
+
+function hold() {
+    if (!canHold) return
+    
+    if (holdPiece === null) {
+        holdPiece = {
+            shape: current.shape.map(r => r.slice()),
+            color: current.color,
+            name: current.name
+        }
+        newTetromino()
+    } else {
+        const temp = {
+            shape: current.shape.map(r => r.slice()),
+            color: current.color,
+            name: current.name
+        }
+        current = holdPiece
+        current.x = Math.floor(mapCols / 2) - Math.floor(current.shape[0].length / 2)
+        current.y = 0
+        holdPiece = temp
+    }
+    
+    drawPreview(holdPiece, holdPieceDisplay)
+    canHold = false
+    playSound('hold')
+}
+
+function updateDisplay() {
+    scoreDisplay.textContent = score
+    updateCoinsDisplay()
+}
+
+function togglePause() {
+    isPaused = !isPaused
+    document.getElementById('pauseOverlay').style.display = isPaused ? 'flex' : 'none'
+    if (!isPaused) {
+        gameLoop()
+    }
+}
+
+function playSound(type) {
+    const oscillator = audioContext.createOscillator();
+    const gainNode = audioContext.createGain();
+    
+    oscillator.connect(gainNode);
+    gainNode.connect(audioContext.destination);
+    
+    let duration = 0.1; // výchozí délka
+    
+    switch(type) {
+        case 'rotate':
+            oscillator.frequency.value = 400;
+            gainNode.gain.value = 0.1;
+            break;
+        case 'drop':
+            oscillator.frequency.value = 200;
+            gainNode.gain.value = 0.2;
+            break;
+        case 'clear':
+            oscillator.frequency.value = 800;
+            gainNode.gain.value = 0.15;
+            break;
+        case 'hold':
+            oscillator.frequency.value = 600;
+            gainNode.gain.value = 0.1;
+            break;
+        case 'event':
+            oscillator.frequency.value = 1000;
+            gainNode.gain.value = 0.3;
+            duration = 0.3;
+            break;
+        case 'error':
+            oscillator.frequency.value = 150;
+            gainNode.gain.value = 0.2;
+            break;
+    }
+    
+    oscillator.start(audioContext.currentTime);
+    oscillator.stop(audioContext.currentTime + duration);
+}
+document.addEventListener('keydown', e => {
+    if (isGameOver) return;
+    
+    if (e.key === 'p' || e.key === 'P') {
+        togglePause();
+        return;
+    }
+    
+    if (e.key === 'Escape') {
+        backToMainMenu();
+        return;
+    }
+    
+    if (isPaused) return;
+    
+    const reversed = activeEvent && activeEvent.reverseControls;
+    
+    if (e.key === 'ArrowLeft') {
+        if (reversed) {
+            current.x++;
+            if (collision()) current.x--;
+        } else {
+            current.x--;
+            if (collision()) current.x++;
+        }
+    }
+    if (e.key === 'ArrowRight') {
+        if (reversed) {
+            current.x--;
+            if (collision()) current.x++;
+        } else {
+            current.x++;
+            if (collision()) current.x--;
+        }
+    }
+    if (e.key === 'ArrowDown') {
+        moveDown();
+    }
+    if (e.key === 'ArrowUp') {
+        rotate();
+    }
+    if (e.key === ' ') {
+        e.preventDefault();
+        hardDrop();
+    }
+    if (e.key === 'c' || e.key === 'C') {
+        hold();
+    }
+    
+    draw();
+});
+
+function gameLoop() {
+    if (isPaused || isGameOver) return
+    moveDown()
+    dropTimeout = setTimeout(gameLoop, dropInterval)
+}
+
+async function gameOver() {
+    isGameOver = true;
+    endEvent(); // PŘIDEJ TOTO
+    clearTimeout(eventTimeout); // PŘIDEJ TOTO
+    
+    await updateAfterGame(score);
+    // ... zbytek kódu
+    
+    // Automatické uložení skóre pro přihlášené uživatele
+    if (currentUser && !currentUser.is_guest) {
+        try {
+            await supabase
+                .from('tetris_scores')
+                .insert([{
+                    user_id: currentUser.id,
+                    username: currentUser.username,
+                    score: score,
+                    difficulty: selectedDifficulty,
+                    lines_cleared: linesCleared,
+                    level_reached: level,
+                    timestamp: new Date().toISOString()
+                }])
+            console.log('Skóre uloženo do žebříčku!')
+        } catch (error) {
+            console.error('Chyba při ukládání skóre:', error)
+        }
+    }
+    
+    document.getElementById('finalScore').textContent = score
+    document.getElementById('earnedCoins').textContent = earnedCoinsThisGame
+    
+    // Zobrazit zprávu podle toho, jestli je host nebo přihlášený
+    const saveMsg = document.getElementById('saveMessage')
+    if (currentUser && !currentUser.is_guest) {
+        saveMsg.textContent = '✅ Skóre automaticky uloženo do žebříčku!'
+        saveMsg.style.color = '#00ff00'
+    } else {
+        saveMsg.textContent = '⚠️ Pro uložení do žebříčku se musíš přihlásit'
+        saveMsg.style.color = '#ffaa00'
+    }
+    
+    document.getElementById('nameModal').style.display = 'flex'
+}
+
+async function loadLeaderboard() {
+    const table = document.getElementById('leaderboardTable');
+    const loading = document.querySelector('.loading');
+    
+    loading.style.display = 'block';
+    table.style.display = 'none';
+    
+    try {
+        // Získat nejlepší skóre pro každého hráče
+        const { data, error } = await supabase
+            .from('tetris_scores')
+            .select('username, score, difficulty, timestamp', { count: 'exact' })
+            .order('score', { ascending: false })
+            .limit(50);
+        
+        if (error) throw error;
+
+        // Filtrovat na nejlepší skóre každého hráče
+        const bestScoresMap = {};
+        data.forEach(s => {
+            if (!bestScoresMap[s.username] || s.score > bestScoresMap[s.username].score) {
+                bestScoresMap[s.username] = s;
+            }
+        });
+
+        const bestScores = Object.values(bestScoresMap)
+            .sort((a, b) => b.score - a.score)
+            .slice(0, 50);
+
+        // Vypsat do tabulky
+        table.innerHTML = '<tr><th>Pozice</th><th>Hráč</th><th>Skóre</th><th>Obtížnost</th><th>Datum</th></tr>';
+
+        bestScores.forEach((s, i) => {
+            const row = table.insertRow();
+            row.insertCell(0).textContent = i + 1;
+            row.insertCell(1).textContent = s.username || 'Anonymní';
+            row.insertCell(2).textContent = s.score || 0;
+            row.insertCell(3).textContent = getDifficultyEmoji(s.difficulty);
+
+            const date = s.timestamp ? new Date(s.timestamp).toLocaleDateString('cs-CZ') : 'N/A';
+            row.insertCell(4).textContent = date;
+
+            if (i === 0) row.style.background = 'rgba(255, 215, 0, 0.2)';
+            if (i === 1) row.style.background = 'rgba(192, 192, 192, 0.2)';
+            if (i === 2) row.style.background = 'rgba(205, 127, 50, 0.2)';
+        });
+
+        loading.style.display = 'none';
+        table.style.display = 'table';
+        
+    } catch (error) {
+        console.error('Chyba při načítání žebříčku:', error);
+        loading.textContent = 'Chyba při načítání žebříčku.';
+    }
+}
+
+
+function getDifficultyEmoji(difficulty) {
+    switch(difficulty) {
+        case 'easy': return '😊 Snadná'
+        case 'medium': return '😐 Střední'
+        case 'hard': return '😈 Těžká'
+        case 'insane': return '💀 Šílená'
+        default: return '❓'
+    }
+}
+
+// Inicializace
+await loadCurrentUser()
 </script>
 </body>
 </html>
+
+
+
+
+
+
+
+
+
 
