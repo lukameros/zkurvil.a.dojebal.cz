@@ -677,6 +677,20 @@ button.menuBtn.locked::after {
 </div>
 
 <script>
+    // Načtení nastavení z URL parametrů
+const urlParams = new URLSearchParams(window.location.search);
+const savedDifficulty = urlParams.get('difficulty') || 'medium';
+const savedRows = parseInt(urlParams.get('rows')) || 20;
+const savedCols = parseInt(urlParams.get('cols')) || 10;
+const savedTheme = urlParams.get('theme') || 'classic';
+
+// Nastav hodnoty
+let selectedDifficulty = savedDifficulty;
+let mapRows = savedRows;
+let mapCols = savedCols;
+let currentTheme = savedTheme;
+
+console.log('Načteno:', { selectedDifficulty, mapRows, mapCols, currentTheme });
 let selectedDifficulty = 'medium';
 let mapRows = 20;
 let mapCols = 10;
@@ -1597,5 +1611,6 @@ await loadCurrentUser()
 </script>
 </body>
 </html>
+
 
 
