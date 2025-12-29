@@ -812,22 +812,34 @@ function hardDrop(player) {
 
 // Uložení stavu
 async function saveGameState(player) {
+    if (!currentGameId || !player) return
+    
     try {
+        // Nejdřív zkus smazat starý stav
         await supabase
             .from('tetris_game_state')
-            .upsert({
+            .delete()
+            .eq('game_id', currentGameId)
+            .eq('player_number', player.playerNumber)
+        
+        // Potom vlož nový
+        const { error } = await supabase
+            .from('tetris_game_state')
+            .insert({
                 game_id: currentGameId,
                 player_number: player.playerNumber,
-                grid: player.grid,
-                current_piece: player.current,
+                grid: JSON.stringify(player.grid),
+                current_piece: JSON.stringify(player.current),
                 score: player.score,
                 level: player.level,
                 lines: player.lines,
                 game_over: player.gameOver,
                 updated_at: new Date().toISOString()
-            }, {
-                onConflict: 'game_id,player_number'
             })
+        
+        if (error) {
+            console.error('Chyba při ukládání stavu:', error)
+        }
     } catch (error) {
         console.error('Chyba při ukládání stavu:', error)
     }
@@ -846,8 +858,14 @@ function subscribeToGame() {
             if (payload.new.player_number !== myPlayerNumber) {
                 const otherPlayer = payload.new.player_number === 1 ? player1 : player2
                 
-                otherPlayer.grid = payload.new.grid
-                otherPlayer.current = payload.new.current_piece
+                try {
+                    otherPlayer.grid = JSON.parse(payload.new.grid)
+                    otherPlayer.current = JSON.parse(payload.new.current_piece)
+                } catch (e) {
+                    otherPlayer.grid = payload.new.grid
+                    otherPlayer.current = payload.new.current_piece
+                }
+                
                 otherPlayer.score = payload.new.score
                 otherPlayer.level = payload.new.level
                 otherPlayer.lines = payload.new.lines
@@ -900,6 +918,7 @@ async function leaveGame() {
 }
 
 // Herní smyčka
+let lastSaveTime = 0
 function gameLoop() {
     if (!gameActive) return
     
@@ -911,7 +930,12 @@ function gameLoop() {
         moveDown(myPlayer)
         draw(myPlayer)
         myPlayer.lastDrop = now
-        saveGameState(myPlayer)
+        
+        // Ukládej stav jen každých 500ms
+        if (now - lastSaveTime > 500) {
+            saveGameState(myPlayer)
+            lastSaveTime = now
+        }
     }
     
     draw(otherPlayer)
@@ -920,52 +944,62 @@ function gameLoop() {
 }
 
 // Ovládání
+let lastControlSave = 0
 document.addEventListener('keydown', e => {
     if (!gameActive) return
     
     const myPlayer = myPlayerNumber === 1 ? player1 : player2
     if (!myPlayer || myPlayer.gameOver) return
     
+    const now = Date.now()
+    let needSave = false
+    
     if (e.key === 'ArrowLeft') {
         myPlayer.current.x--
         if (collision(myPlayer)) myPlayer.current.x++
         draw(myPlayer)
-        saveGameState(myPlayer)
+        needSave = true
     }
     if (e.key === 'ArrowRight') {
         myPlayer.current.x++
         if (collision(myPlayer)) myPlayer.current.x--
         draw(myPlayer)
-        saveGameState(myPlayer)
+        needSave = true
     }
     if (e.key === 'ArrowDown') {
         moveDown(myPlayer)
         draw(myPlayer)
-        saveGameState(myPlayer)
+        needSave = true
     }
     if (e.key === 'ArrowUp') {
         rotate(myPlayer)
         draw(myPlayer)
-        saveGameState(myPlayer)
+        needSave = true
     }
     if (e.key === ' ') {
         e.preventDefault()
         hardDrop(myPlayer)
         draw(myPlayer)
+        needSave = true
+    }
+    
+    // Ukládej jen každých 200ms
+    if (needSave && now - lastControlSave > 200) {
         saveGameState(myPlayer)
+        lastControlSave = now
     }
 })
 
-// Inicializace
-await loadUser()
-
-// Export funkcí na window pro onclick atributy
+// Export funkcí na window pro onclick atributy (HNED!)
 window.createGame = createGame
 window.showJoinMenu = showJoinMenu
 window.joinGame = joinGame
 window.cancelGame = cancelGame
 window.backToMenu = backToMenu
 window.leaveGame = leaveGame
+
+// Inicializace
+loadUser()
 </script>
 </body>
 </html>
