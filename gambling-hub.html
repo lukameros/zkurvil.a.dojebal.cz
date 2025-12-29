@@ -51,6 +51,34 @@ body::before {
     0%, 100% { opacity: 0.3; }
     50% { opacity: 1; }
 }
+    #gameWrapper {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding: 20px;
+}
+
+#slotGame {
+    width: 70%; /* Šířka pro herní sekci */
+    margin-right: 20px; /* Mezera mezi hrou a tabulkou */
+}
+
+#payoutTable {
+    width: 30%; /* Šířka pro výplatní tabulku */
+    background: rgba(0, 0, 0, 0.5); /* Poloprůhledné pozadí pro tabulku */
+    padding: 20px;
+    border-radius: 10px;
+    border: 2px solid #FFD700;
+    color: #fff;
+}
+
+#payoutTable h3 {
+    font-size: 24px;
+    margin-bottom: 20px;
+    text-align: center;
+    color: #FFD700;
+}
+
 
 #wrapper {
     position: relative;
@@ -711,11 +739,11 @@ canvas {
         </button>
     </div>
     
-    <!-- SLOT MACHINE GAME -->
+    <div id="gameWrapper">
+    <!-- HERNÍ SEKCE -->
     <div id="slotGame" class="game-container active">
         <div id="slotMachine">
             <h2 id="slotTitle">🍒 OVOCNÝ AUTOMAT 🍒</h2>
-            
             <div id="reels">
                 <div class="reel">
                     <div class="reel-inner" id="reel1"></div>
@@ -730,7 +758,7 @@ canvas {
                     <div class="reel-window"></div>
                 </div>
             </div>
-            
+
             <div id="slotControls">
                 <div id="betAmount">Sázka: <span id="currentBet">10</span> 🪙</div>
                 <div>
@@ -743,21 +771,24 @@ canvas {
                 <div id="slotResult"></div>
             </div>
         </div>
-        
-        <div style="margin-top: 30px; background: rgba(0,0,0,0.5); padding: 20px; border-radius: 20px; border: 2px solid #FFD700;">
-            <h3 style="color: #FFD700; text-align: center; font-size: 28px; margin-bottom: 15px;">💰 VÝPLATNÍ TABULKA 💰</h3>
-            <div style="color: #fff; font-size: 20px; line-height: 2;">
-                <div>🍒🍒🍒 = 5x sázka</div>
-                <div>🍋🍋🍋 = 4x sázka</div>
-                <div>🍊🍊🍊 = 6x sázka</div>
-                <div>🍇🍇🍇 = 8x sázka</div>
-                <div>🔔🔔🔔 = 10x sázka</div>
-                <div>⭐⭐⭐ = 15x sázka</div>
-                <div>💎💎💎 = 20x sázka</div>
-                <div style="color: #FFD700; font-weight: bold;">🎰🎰🎰 = 50x sázka (JACKPOT!)</div>
-            </div>
+    </div>
+
+    <!-- VÝPLATNÍ TABULKA -->
+    <div id="payoutTable" class="game-container">
+        <h3>💰 VÝPLATNÍ TABULKA 💰</h3>
+        <div>
+            <div>🍒🍒🍒 = 5x sázka</div>
+            <div>🍋🍋🍋 = 4x sázka</div>
+            <div>🍊🍊🍊 = 6x sázka</div>
+            <div>🍇🍇🍇 = 8x sázka</div>
+            <div>🔔🔔🔔 = 10x sázka</div>
+            <div>⭐⭐⭐ = 15x sázka</div>
+            <div>💎💎💎 = 20x sázka</div>
+            <div style="color: #FFD700; font-weight: bold;">🎰🎰🎰 = 50x sázka (JACKPOT!)</div>
         </div>
     </div>
+</div>
+
     
     <!-- WHEEL OF FORTUNE GAME -->
     <div id="wheelGame" class="game-container">
@@ -1374,6 +1405,7 @@ window.addEventListener('load', async () => {
 
 </body>
 </html>
+
 
 
 
