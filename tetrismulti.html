@@ -330,11 +330,12 @@ button.menuBtn:hover {
     <button class="menuBtn" onclick="cancelGame()">❌ Zrušit</button>
 </div>
 
-<!-- Game Arena -->
-<div id="gameArena" style="display:none;">
-    <div style="text-align: center; margin-bottom: 20px;">
-        <h1>🌐 ONLINE MULTIPLAYER</h1>
-        <p style="font-size: 24px; color: #0ff;">Kód hry: <span id="currentGameCode">------</span></p>
+div id="gameArena" style="display:none;">
+    <div style="text-align: center; margin-bottom: 40px;">
+        <h1 style="margin-bottom: 20px;">🌐 ONLINE MULTIPLAYER</h1>
+        <p style="font-size: 32px; color: #0ff; font-weight: 900; letter-spacing: 5px; text-shadow: 0 0 20px #0ff;">
+            Kód hry: <span id="currentGameCode" style="color: #fff;">------</span>
+        </p>
     </div>
     
     <div class="game-arena">
@@ -1125,7 +1126,6 @@ function subscribeToGame() {
         .subscribe()
 }
 
-// Konec hry
 async function endGame(winnerNumber) {
     gameActive = false
     
@@ -1179,9 +1179,11 @@ async function endGame(winnerNumber) {
     
     const iWon = winnerNumber === myPlayerNumber
     
-    document.getElementById('winnerText').textContent = iWon ? 
-        `🎉 VYHRÁL JSI! +100 💰` : 
-        `😢 ${winner} vyhrál!`
+    // OPRAVENÝ TEXT - zobrazí jméno vítěze
+    document.getElementById('winnerText').innerHTML = iWon ? 
+        `🎉 <strong>${currentUser.username}</strong> vyhrál!<br><span style="font-size: 36px; color: gold;">+100 💰</span>` : 
+        `<strong>${winner}</strong> vyhrál!<br><span style="font-size: 36px; color: gold;">+100 💰</span>`
+    
     document.getElementById('winnerOverlay').style.display = 'flex'
 }
 
@@ -1287,6 +1289,7 @@ loadUser()
 </script>
 </body>
 </html>
+
 
 
 
