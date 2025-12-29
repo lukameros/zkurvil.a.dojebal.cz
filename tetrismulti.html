@@ -708,43 +708,6 @@ function updateReadyStatus(game) {
         }
     }
 }
-
-async function setReady() {
-    const field = myPlayerNumber === 1 ? 'player1_ready' : 'player2_ready';
-    
-    console.log('Nastavuji ready pro:', field);
-    
-    const { data, error } = await supabase
-        .from('tetris_multiplayer_games')
-        .update({ [field]: true })
-        .eq('id', currentGameId)
-        .select()
-        .single();
-    
-    if (error) {
-        console.error('Chyba při nastavení ready:', error);
-        return;
-    } else {
-        console.log('Ready nastaveno úspěšně:', data);
-        // DŮLEŽITÉ: Aktualizuj UI ihned po nastavení ready
-        updateReadyStatus(data);
-    }
-    
-    document.getElementById('readyBtn').style.display = 'none';
-}
-    
-    // Načti aktuální stav a updatuj UI
-    const { data: game } = await supabase
-        .from('tetris_multiplayer_games')
-        .select('*')
-        .eq('id', currentGameId)
-        .single();
-    
-    if (game) {
-        updateReadyStatus(game);
-    }
-}
-
 async function startCountdown() {
     await supabase
         .from('tetris_multiplayer_games')
@@ -1173,6 +1136,7 @@ loadUser();
 </script>
 </body>
 </html>
+
 
 
 
