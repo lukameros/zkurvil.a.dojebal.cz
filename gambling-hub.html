@@ -1330,7 +1330,6 @@ document.getElementById('nicknameInput').addEventListener('keypress', function(e
 });
 
 // Inicializace
-// Inicializace
 window.addEventListener('load', async () => {
     initReels();
     
@@ -1352,17 +1351,16 @@ window.addEventListener('load', async () => {
                 .maybeSingle();
             
             if (existingUser) {
-    currentUser.coins = existingUser.coins;
-    currentUser.lastDailyBonus = existingUser.last_daily_bonus;
-} else {
-    // Nový hráč - startovní mince
-    currentUser.coins = 100;
-    currentUser.lastDailyBonus = null;
-}
-
-// Ulož nebo aktualizuj uživatele
-await saveUser();
+                currentUser.coins = existingUser.coins;
+                currentUser.lastDailyBonus = existingUser.last_daily_bonus;
+            } else {
+                // Nový hráč - startovní mince
+                currentUser.coins = 100;
+                currentUser.lastDailyBonus = null;
             }
+            
+            // Ulož nebo aktualizuj uživatele
+            await saveUser();
             
             document.getElementById('loginModal').style.display = 'none';
             updateUI();
@@ -1376,6 +1374,7 @@ await saveUser();
 
 </body>
 </html>
+
 
 
 
