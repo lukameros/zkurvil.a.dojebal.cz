@@ -574,32 +574,33 @@ async function waitForBothPlayers() {
             console.log('Změna stavu hry:', payload.new);
             
             // Pokud host spustil odpočítávání
-            if (payload.new.status === 'countdown' && myPlayerNumber === 2) {
-                document.getElementById('readyBtn').style.display = 'none';
-                
-                const countdownEl = document.getElementById('countdownDisplay');
-                countdownEl.style.display = 'block';
-                
-                let count = 10;
-                countdownEl.textContent = count;
-                
-                const interval = setInterval(() => {
-                    count--;
-                    if (count > 0) {
-                        countdownEl.textContent = count;
-                    } else {
-                        clearInterval(interval);
-                        countdownEl.textContent = 'START!';
-                    }
-                }, 1000);
-            }
-            
-            // Pokud se začalo hrát
-            if (payload.new.status === 'playing') {
-                setTimeout(() => {
-                    startGame();
-                }, 500);
-            }
+            // Pokud host spustil odpočítávání
+if (payload.new.status === 'countdown' && myPlayerNumber === 2) {
+    document.getElementById('readyBtn').style.display = 'none';
+    
+    const countdownEl = document.getElementById('countdownDisplay');
+    countdownEl.style.display = 'block';
+    
+    let count = 10;
+    countdownEl.textContent = count;
+    
+    const interval = setInterval(() => {
+        count--;
+        if (count > 0) {
+            countdownEl.textContent = count;
+        } else {
+            clearInterval(interval);
+            countdownEl.textContent = 'START!';
+        }
+    }, 1000);
+}
+
+// Pokud se začalo hrát
+if (payload.new.status === 'playing') {
+    setTimeout(() => {
+        startGame();
+    }, 500);
+}
             
             updateReadyStatus(payload.new);
         })
@@ -1108,3 +1109,4 @@ loadUser();
 </script>
 </body>
 </html>
+
