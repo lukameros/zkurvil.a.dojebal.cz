@@ -1158,7 +1158,100 @@ await loadCurrentUser();
 </body>
 </html>
 </script>
+// Globální proměnné
+let selectedDifficulty = 'medium';
+let mapRows = 20;
+let mapCols = 10;
+let currentTheme = 'classic';
+let score = 0;
+let level = 1;
+let linesCleared = 0;
+let combo = 0;
+let dropInterval = 500;
+let dropTimeout;
+let isPaused = false;
+let isGameOver = false;
+let canHold = true;
+let earnedCoinsThisGame = 0;
+let grid = [];
+let current = null;
+let nextPiece = null;
+let holdPiece = null;
+let playerCoins = 0;
+let playerLevel = 1;
+let playerExp = 0;
+let unlockedThemes = ['classic', 'neon'];
+let unlockedMaps = ['20x10', '18x12'];
+let currentUser = null;
+let totalGamesPlayed = 0;
+let activeEvent = null;
+let eventTimeout = null;
+let canRotate = true;
+let inGame = false;
 
+// Globální funkce pro menu
+window.updateCoinsDisplay = function() {
+    document.getElementById('coinCount').textContent = playerCoins;
+}
+
+window.backToMainMenu = function() {
+    inGame = false;
+    if (activeEvent) endEvent();
+    clearTimeout(eventTimeout);
+    document.getElementById('mainMenu').style.display = 'flex';
+    document.getElementById('difficultyMenu').style.display = 'none';
+    document.getElementById('themeMenu').style.display = 'none';
+    document.getElementById('mapMenu').style.display = 'none';
+    document.getElementById('leaderboard').style.display = 'none';
+    document.getElementById('tetrisGame').style.display = 'none';
+    document.getElementById('nameModal').style.display = 'none';
+    document.getElementById('pauseOverlay').style.display = 'none';
+    clearTimeout(dropTimeout);
+    isPaused = false;
+    isGameOver = false;
+}
+
+window.showDifficultyMenu = () => {
+    document.getElementById('mainMenu').style.display = 'none';
+    document.getElementById('difficultyMenu').style.display = 'flex';
+}
+
+window.showThemeMenu = () => {
+    document.getElementById('mainMenu').style.display = 'none';
+    document.getElementById('themeMenu').style.display = 'flex';
+}
+
+window.showMapMenu = () => {
+    document.getElementById('mainMenu').style.display = 'none';
+    document.getElementById('mapMenu').style.display = 'flex';
+}
+
+window.showLeaderboard = async () => {
+    document.getElementById('mainMenu').style.display = 'none';
+    document.getElementById('leaderboard').style.display = 'flex';
+    await loadLeaderboard();
+}
+
+window.setDifficulty = (l) => {
+    selectedDifficulty = l;
+    backToMainMenu();
+}
+
+window.setMap = (r, c) => {
+    mapRows = r;
+    mapCols = c;
+    backToMainMenu();
+}
+
+window.setTheme = (t) => {
+    if (!unlockedThemes.includes(t)) {
+        alert('Zamčené!');
+        return;
+    }
+    currentTheme = t;
+    backToMainMenu();
+}
+</script>
 <script type="module">
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.3'
 
@@ -1178,7 +1271,8 @@ async function loadCurrentUser() {
             } else throw new Error('Neplatný formát')
         } catch (e) {
             try {
-                const { data: user } = await window.supabase.from('users').select('*').eq('username', savedUser).single()
+                const savedUsername = typeof savedUser === 'string' ? savedUser : savedUser.username;
+const { data: user } = await window.supabase.from('users').select('*').eq('username', savedUsername).single()
                 if (user) {
                     window.currentUser = user
                     localStorage.setItem('currentUser', JSON.stringify(user))
@@ -1314,3 +1408,4 @@ loadCurrentUser();
 </script>
 </body>
 </html>
+
