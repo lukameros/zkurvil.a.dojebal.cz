@@ -1090,6 +1090,11 @@ async function saveGameState(player) {
 }
 
 // Sledování změn
+// ============================================
+// ČÁST 1: NAHRAĎ FUNKCI subscribeToGame()
+// ============================================
+// Najdi ve svém kódu funkci "function subscribeToGame()" a nahraď ji touto:
+
 function subscribeToGame() {
     gameStateChannel = supabase
         .channel(`game_state_${currentGameId}`)
@@ -1118,14 +1123,102 @@ function subscribeToGame() {
                 updateDisplay(otherPlayer)
                 draw(otherPlayer)
                 
-                if (payload.new.game_over) {
+                // NOVÉ: Když druhý hráč prohraje, já vyhrávám!
+                if (payload.new.game_over && gameActive) {
+                    console.log('Druhý hráč prohrál, já vyhrávám!')
                     document.getElementById(`status${payload.new.player_number}`).textContent = '❌ PROHRÁL'
                     document.getElementById(`status${payload.new.player_number}`).style.color = '#f00'
                 }
             }
         })
         .subscribe()
+    
+    // NOVÉ: Sleduj také změny v tabulce her (status "finished")
+    supabase
+        .channel(`game_${currentGameId}`)
+        .on('postgres_changes', {
+            event: 'UPDATE',
+            schema: 'public',
+            table: 'tetris_multiplayer_games',
+            filter: `id=eq.${currentGameId}`
+        }, async (payload) => {
+            console.log('Změna ve hře:', payload.new)
+            
+            // Pokud se hra ukončila a já jsem ještě neskončil
+            if (payload.new.status === 'finished' && gameActive) {
+                const { data: game } = await supabase
+                    .from('tetris_multiplayer_games')
+                    .select('*')
+                    .eq('id', currentGameId)
+                    .single()
+                
+                if (game && game.winner) {
+                    // Zjisti, jestli jsem vyhrál nebo prohrál
+                    const iWon = game.winner === currentUser.username
+                    
+                    if (iWon) {
+                        endGameAsWinner()
+                    } else {
+                        endGameAsLoser(game.winner)
+                    }
+                }
+            }
+        })
+        .subscribe()
 }
+async function endGameAsWinner() {
+    if (!gameActive) return // Už jsme skončili
+    
+    gameActive = false
+    
+    const { data: game } = await supabase
+        .from('tetris_multiplayer_games')
+        .select('*')
+        .eq('id', currentGameId)
+        .single()
+    
+    const winner = currentUser.username
+    const loser = myPlayerNumber === 1 ? game.player2_username : game.player1_username
+    
+    // Označ statusy
+    document.getElementById(`status${myPlayerNumber}`).textContent = '🏆 VYHRÁL'
+    document.getElementById(`status${myPlayerNumber}`).style.color = '#FFD700'
+    
+    const loserNumber = myPlayerNumber === 1 ? 2 : 1
+    document.getElementById(`status${loserNumber}`).textContent = '❌ PROHRÁL'
+    document.getElementById(`status${loserNumber}`).style.color = '#f00'
+    
+    // Zobraz výsledek
+    document.getElementById('winnerText').innerHTML = 
+        `🎉 <strong style="color: #FFD700;">${winner}</strong> vyhrál!<br><span style="font-size: 36px; color: gold;">+100 💰</span>`
+    
+    document.getElementById('winnerOverlay').style.display = 'flex'
+}
+async function endGameAsLoser(winnerName) {
+    if (!gameActive) return // Už jsme skončili
+    
+    gameActive = false
+    
+    const loser = currentUser.username
+    
+    // Označ statusy
+    document.getElementById(`status${myPlayerNumber}`).textContent = '❌ PROHRÁL'
+    document.getElementById(`status${myPlayerNumber}`).style.color = '#f00'
+    
+    const winnerNumber = myPlayerNumber === 1 ? 2 : 1
+    document.getElementById(`status${winnerNumber}`).textContent = '🏆 VYHRÁL'
+    document.getElementById(`status${winnerNumber}`).style.color = '#FFD700'
+    
+    // Zobraz výsledek
+    document.getElementById('winnerText').innerHTML = 
+        `<strong style="color: #FFD700;">${winnerName}</strong> vyhrál!<br><strong style="color: #f00;">${loser}</strong> prohrál!<br><span style="font-size: 36px; color: gold;">Vítěz získal +100 💰</span>`
+    
+    document.getElementById('winnerOverlay').style.display = 'flex'
+}
+
+
+
+
 
 // Konec hry
 async function endGame(winnerNumber) {
@@ -1141,7 +1234,7 @@ async function endGame(winnerNumber) {
     const loser = winnerNumber === 1 ? game.player2_username : game.player1_username
     const winnerId = winnerNumber === 1 ? game.player1_id : game.player2_id
     
-    // Označ hru jako dokončenou
+    // Označ hru jako dokončenou v databázi
     await supabase
         .from('tetris_multiplayer_games')
         .update({
@@ -1168,7 +1261,6 @@ async function endGame(winnerNumber) {
                 
                 console.log(`${winner} dostal 100 coinů! Celkem: ${newCoins}`)
             } else {
-                // Vytvoř záznam pokud neexistuje
                 await supabase
                     .from('tetris_player_data')
                     .insert({
@@ -1181,25 +1273,27 @@ async function endGame(winnerNumber) {
         }
     }
     
-    // Označ prohrajícího hráče
+    // Označ statusy
     const loserNumber = winnerNumber === 1 ? 2 : 1
     document.getElementById(`status${loserNumber}`).textContent = '❌ PROHRÁL'
     document.getElementById(`status${loserNumber}`).style.color = '#f00'
     
-    // Označ vítězného hráče
     document.getElementById(`status${winnerNumber}`).textContent = '🏆 VYHRÁL'
     document.getElementById(`status${winnerNumber}`).style.color = '#FFD700'
     
     const iWon = winnerNumber === myPlayerNumber
     
     // Zobraz výsledek
-    document.getElementById('winnerText').innerHTML = iWon ? 
-        `🎉 <strong style="color: #FFD700;">${winner}</strong> vyhrál!<br><span style="font-size: 36px; color: gold;">+100 💰</span>` : 
-        `<strong style="color: #FFD700;">${winner}</strong> vyhrál!<br><strong style="color: #f00;">${loser}</strong> prohrál!<br><span style="font-size: 36px; color: gold;">Vítěz získal +100 💰</span>`
+    if (iWon) {
+        document.getElementById('winnerText').innerHTML = 
+            `🎉 <strong style="color: #FFD700;">${winner}</strong> vyhrál!<br><span style="font-size: 36px; color: gold;">+100 💰</span>`
+    } else {
+        document.getElementById('winnerText').innerHTML = 
+            `<strong style="color: #FFD700;">${winner}</strong> vyhrál!<br><strong style="color: #f00;">${loser}</strong> prohrál!<br><span style="font-size: 36px; color: gold;">Vítěz získal +100 💰</span>`
+    }
     
     document.getElementById('winnerOverlay').style.display = 'flex'
 }
-
 // Opuštění hry
 async function leaveGame() {
     // Pokud je hra aktivní, označ ji jako opuštěnou
@@ -1302,6 +1396,7 @@ loadUser()
 </script>
 </body>
 </html>
+
 
 
 
