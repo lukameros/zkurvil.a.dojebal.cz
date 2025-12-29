@@ -564,6 +564,66 @@ async function waitForBothPlayers() {
     
     // Sleduj ready stavy obou hráčů a status hry
     waitingChannel = supabase
+        .channel(`waiting_${currentGameId}`)
+        .on('postgres_changes', {
+            event: 'UPDATE',
+            schema: 'public',
+            table: 'tetris_multiplayer_games',
+            filter: `id=eq.${currentGameId}`
+        }, (payload) => {
+            console.log('Změna stavu hry:', payload.new);
+            
+            // DŮLEŽITÉ: Vždy aktualizuj ready status při JAKÉKOLI změně
+            updateReadyStatus(payload.new);
+            
+            // Pokud host spustil odpočítávání
+            if (payload.new.status === 'countdown' && myPlayerNumber === 2) {
+                document.getElementById('readyBtn').style.display = 'none';
+                
+                const countdownEl = document.getElementById('countdownDisplay');
+                countdownEl.style.display = 'block';
+                
+                let count = 10;
+                countdownEl.textContent = count;
+                
+                const interval = setInterval(() => {
+                    count--;
+                    if (count > 0) {
+                        countdownEl.textContent = count;
+                    } else {
+                        clearInterval(interval);
+                        countdownEl.textContent = 'START!';
+                    }
+                }, 1000);
+            }
+            
+            // Pokud se začalo hrát
+            if (payload.new.status === 'playing') {
+                setTimeout(() => {
+                    startGame();
+                }, 500);
+            }
+        })
+        .subscribe();
+    
+    // Načti aktuální stav
+    const { data: game } = await supabase
+        .from('tetris_multiplayer_games')
+        .select('*')
+        .eq('id', currentGameId)
+        .single();
+    
+    if (game) {
+        updateReadyStatus(game);
+        // Pokud už je hráč 2 připojený a jsem host, zobraz READY
+        if (myPlayerNumber === 1 && game.player2_username) {
+            document.getElementById('readyBtn').style.display = 'block';
+        }
+    }
+}
+    
+    // Sleduj ready stavy obou hráčů a status hry
+    waitingChannel = supabase
     .channel(`waiting_${currentGameId}`)
     .on('postgres_changes', {
         event: 'UPDATE',
@@ -1113,6 +1173,7 @@ loadUser();
 </script>
 </body>
 </html>
+
 
 
 
