@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Tetris</title>
+<title>Tetris - Classic</title>
 <style>
 * {
     margin: 0;
@@ -93,8 +93,6 @@ h1 {
     50% { transform: scale(1.05); }
 }
 
-
-
 button.menuBtn {
     padding: 16px 48px;
     margin: 12px 0;
@@ -111,44 +109,18 @@ button.menuBtn {
     position: relative;
 }
 
-button.menuBtn:hover:not(.locked) {
+button.menuBtn:hover {
     transform: scale(1.08) translateY(-3px);
     box-shadow: 0 0 35px rgba(0, 255, 255, 0.8);
     background: linear-gradient(135deg, rgba(0, 150, 255, 0.6), rgba(150, 0, 255, 0.6));
 }
 
-button.menuBtn:active:not(.locked) {
+button.menuBtn:active {
     transform: scale(1.03);
 }
 
-button.menuBtn.locked {
-    background: linear-gradient(135deg, rgba(100, 100, 100, 0.3), rgba(50, 50, 50, 0.3));
-    border-color: #666;
-    color: #999;
-    cursor: not-allowed;
-}
-
-button.menuBtn.locked::after {
-    content: '🔒';
-    position: absolute;
-    right: 15px;
-    font-size: 24px;
-}
-
-.price-tag {
-    position: absolute;
-    right: 50px;
-    background: linear-gradient(135deg, rgba(255, 215, 0, 0.3), rgba(255, 165, 0, 0.3));
-    border: 2px solid gold;
-    border-radius: 6px;
-    padding: 4px 12px;
-    font-size: 16px;
-    color: gold;
-    font-weight: bold;
-}
-
 #tetrisGame {
-    display: none;
+    display: flex;
     position: relative;
     gap: 30px;
     flex-direction: row;
@@ -182,7 +154,7 @@ button.menuBtn.locked::after {
     text-shadow: 0 0 10px #00ffff;
 }
 
-#score, #level, #lines, #combo, #gameCoins {
+#score {
     font-size: 32px;
     font-weight: bold;
     text-align: center;
@@ -190,12 +162,7 @@ button.menuBtn.locked::after {
     text-shadow: 0 0 10px #ff00ff;
 }
 
-#gameCoins {
-    color: gold;
-    text-shadow: 0 0 10px gold;
-}
-
-#nextPiece, #holdPiece {
+#nextPiece {
     width: 120px;
     height: 120px;
     display: grid;
@@ -234,50 +201,6 @@ button.menuBtn.locked::after {
 
 .cell.filled {
     box-shadow: inset 0 0 10px rgba(255, 255, 255, 0.3);
-}
-
-#leaderboard {
-    display: none;
-    flex-direction: column;
-    align-items: center;
-    max-width: 90%;
-}
-
-#leaderboard table {
-    border-collapse: collapse;
-    width: 600px;
-    background: rgba(30, 30, 60, 0.7);
-    border: 2px solid #00ffff;
-    border-radius: 12px;
-    overflow: hidden;
-    box-shadow: 0 0 30px rgba(0, 255, 255, 0.4);
-    margin: 20px 0;
-}
-
-#leaderboard th {
-    background: linear-gradient(135deg, #0064c8, #6400c8);
-    padding: 15px;
-    text-align: center;
-    color: #00ffff;
-    text-shadow: 0 0 10px #00ffff;
-}
-
-#leaderboard td {
-    border-top: 1px solid rgba(0, 255, 255, 0.2);
-    padding: 12px;
-    text-align: center;
-    color: #fff;
-}
-
-#leaderboard tr:hover {
-    background: rgba(0, 255, 255, 0.1);
-}
-
-.loading {
-    text-align: center;
-    padding: 20px;
-    font-size: 18px;
-    color: #00ffff;
 }
 
 .particle {
@@ -364,22 +287,6 @@ button.menuBtn.locked::after {
     text-shadow: 0 0 20px gold;
 }
 
-.modal-content input {
-    padding: 12px 20px;
-    font-size: 18px;
-    border: 2px solid #00ffff;
-    border-radius: 8px;
-    background: rgba(0, 0, 0, 0.5);
-    color: white;
-    width: 300px;
-    margin-bottom: 20px;
-}
-
-.modal-content input:focus {
-    outline: none;
-    box-shadow: 0 0 20px rgba(0, 255, 255, 0.6);
-}
-
 .pause-overlay {
     display: none;
     position: fixed;
@@ -415,217 +322,13 @@ button.menuBtn.locked::after {
         position: static;
         margin-top: 20px;
     }
-    /* Scrollovatelné menu s grid layoutem */
-.menu-section {
-    max-height: 60vh;
-    overflow-y: auto;
-    padding: 20px;
-    width: 100%;
-    display: grid;
-    grid-template-columns: repeat(2, 1fr); /* 2 sloupce vedle sebe */
-    gap: 15px;
-    align-items: start;
-}
-
-.menu-section .menuBtn {
-    margin: 0; /* Odstraň margin protože je nahrazen gap */
-    width: 100%; /* Tlačítka vyplní celou šířku sloupce */
-}
-
-.menu-section::-webkit-scrollbar {
-    width: 10px;
-}
-
-.menu-section::-webkit-scrollbar-track {
-    background: rgba(0, 255, 255, 0.1);
-    border-radius: 5px;
-}
-
-.menu-section::-webkit-scrollbar-thumb {
-    background: rgba(0, 255, 255, 0.5);
-    border-radius: 5px;
-}
-
-.menu-section::-webkit-scrollbar-thumb:hover {
-    background: rgba(0, 255, 255, 0.8);
-}
-
-/* Pro větší obrazovky - 3 sloupce */
-@media (min-width: 1200px) {
-    .menu-section {
-        grid-template-columns: repeat(3, 1fr);
-    }
-}
-
-/* Pro mobily - 1 sloupec */
-@media (max-width: 768px) {
-    .menu-section {
-        grid-template-columns: 1fr;
-    }
 }
 </style>
 </head>
 <body>
 
-<button id="backBtn" onclick="window.location.href='hry.html'">⬅ Zpět</button>
+<button id="backBtn" onclick="window.location.href='tetris.html'">⬅ Zpět</button>
 <div id="coinsDisplay">💰 <span id="coinCount">0</span></div>
-
-<div id="mainMenu" class="centered">
-    <h1>🎮 TETRIS 🎮</h1>
-    <button class="menuBtn" onclick="startTetris(selectedDifficulty)">🚀 Singleplayer</button>
-    <button class="menuBtn" onclick="window.location.href='tetrismulti.html'">🌐 Multiplayer</button>
-    <button class="menuBtn" onclick="showDifficultyMenu()">⚙️ Nastavení</button>
-    <button class="menuBtn" onclick="showMapMenu()">📐 Mapy</button>
-    <button class="menuBtn" onclick="showThemeMenu()">🎨 Vzhled</button>
-    <button class="menuBtn" onclick="showLeaderboard()">🏆 Žebříček</button>
-</div>
-
-<div id="difficultyMenu" class="centered" style="display:none;">
-    <h1>Obtížnost</h1>
-    <button class="menuBtn" onclick="setDifficulty('easy')">😊 Snadná</button>
-    <button class="menuBtn" onclick="setDifficulty('medium')">😐 Střední</button>
-    <button class="menuBtn" onclick="setDifficulty('hard')">😈 Těžká</button>
-    <button class="menuBtn" onclick="setDifficulty('insane')">💀 Šílená</button>
-    <button class="menuBtn" onclick="backToMainMenu()">⬅ Zpět</button>
-</div>
-
-<div id="themeMenu" class="centered" style="display:none;">
-    <h1>Barevné téma</h1>
-    <div class="menu-section">
-        <button class="menuBtn" id="theme-classic" onclick="setTheme('classic')">🌈 Klasické</button>
-        <button class="menuBtn" id="theme-neon" onclick="setTheme('neon')">✨ Neon</button>
-        <button class="menuBtn locked" id="theme-fire" onclick="buyTheme('fire', 2500)">
-            🔥 Oheň
-            <span class="price-tag">💰 2500</span>
-        </button>
-        <button class="menuBtn locked" id="theme-ice" onclick="buyTheme('ice', 3000)">
-            ❄️ Led
-            <span class="price-tag">💰 3000</span>
-        </button>
-        <button class="menuBtn locked" id="theme-forest" onclick="buyTheme('forest', 5000)">
-            🌲 Les
-            <span class="price-tag">💰 5000</span>
-        </button>
-        <button class="menuBtn locked" id="theme-sunset" onclick="buyTheme('sunset',6000)">
-            🌅 Západ slunce
-            <span class="price-tag">💰 6000</span>
-        </button>
-        <button class="menuBtn locked" id="theme-ocean" onclick="buyTheme('ocean', 10000)">
-            🌊 Oceán
-            <span class="price-tag">💰 10000</span>
-        </button>
-        <button class="menuBtn locked" id="theme-candy" onclick="buyTheme('candy', 13000)">
-            🍬 Candy
-            <span class="price-tag">💰 13000</span>
-        </button>
-        <button class="menuBtn locked" id="theme-galaxy" onclick="buyTheme('galaxy', 15000)">
-            🌌 Galaxie
-            <span class="price-tag">💰 15000</span>
-        </button>
-        <button class="menuBtn locked" id="theme-toxic" onclick="buyTheme('toxic', 18000)">
-            ☢️ Toxic
-            <span class="price-tag">💰 18000</span>
-        </button>
-        <button class="menuBtn locked" id="theme-rainbow" onclick="buyTheme('rainbow', 20000)">
-            🦄 Duha
-            <span class="price-tag">💰 20000</span>
-        </button>
-        <button class="menuBtn locked" id="theme-gold" onclick="buyTheme('gold', 25000)">
-            👑 Zlaté
-            <span class="price-tag">💰 25000</span>
-        </button>
-        <button class="menuBtn locked" id="theme-matrix" onclick="buyTheme('matrix', 30000)">
-            💻 Matrix
-            <span class="price-tag">💰 30000</span>
-        </button>
-        <button class="menuBtn locked" id="theme-lava" onclick="buyTheme('lava', 35000)">
-            🌋 Láva
-            <span class="price-tag">💰 35000</span>
-        </button>
-        <button class="menuBtn locked" id="theme-midnight" onclick="buyTheme('midnight', 45000)">
-            🌙 Půlnoc
-            <span class="price-tag">💰 45000</span>
-        </button>
-        <button class="menuBtn locked" id="theme-crystal" onclick="buyTheme('crystal', 100000)">
-            💎 Krystal
-            <span class="price-tag">💰 100000</span>
-        </button>
-    </div>
-    <button class="menuBtn" onclick="backToMainMenu()">⬅ Zpět</button>
-</div>
-
-<div id="mapMenu" class="centered" style="display:none;">
-    <h1>Rozměry mapy</h1>
-    <div class="menu-section">
-        <button class="menuBtn" id="map-20x10" onclick="setMap(20,10)">📏 Standardní 20x10</button>
-        <button class="menuBtn" id="map-18x12" onclick="setMap(18,12)">↔️ Široká 18x12</button>
-        <button class="menuBtn locked" id="map-22x8" onclick="buyMap('22x8', 22, 8, 2500)">
-            ↕️ Úzká 22x8
-            <span class="price-tag">💰 2500</span>
-        </button>
-        <button class="menuBtn locked" id="map-16x16" onclick="buyMap('16x16', 16, 16, 5000)">
-            ⬜ Čtverec 16x16
-            <span class="price-tag">💰 5000</span>
-        </button>
-        <button class="menuBtn locked" id="map-24x12" onclick="buyMap('24x12', 24, 12, 5000)">
-            ⬆️ Vysoká 24x12
-            <span class="price-tag">💰 5000</span>
-        </button>
-        <button class="menuBtn locked" id="map-12x20" onclick="buyMap('12x20', 12, 20, 7000)">
-            📱 Dlouhá 12x20
-            <span class="price-tag">💰 7000</span>
-        </button>
-        <button class="menuBtn locked" id="map-15x15" onclick="buyMap('15x15', 15, 15, 10000)">
-            🟦 Kompakt 15x15
-            <span class="price-tag">💰 10000</span>
-        </button>
-        <button class="menuBtn locked" id="map-25x8" onclick="buyMap('25x8', 25, 8, 15000)">
-            📏 Extra úzká 25x8
-            <span class="price-tag">💰 15000</span>
-        </button>
-        <button class="menuBtn locked" id="map-14x18" onclick="buyMap('14x18', 14, 18, 18000)">
-            🔲 Vertikální 14x18
-            <span class="price-tag">💰 18000</span>
-        </button>
-        <button class="menuBtn locked" id="map-26x10" onclick="buyMap('26x10', 26, 10, 20000)">
-            🏢 Mrakodrap 26x10
-            <span class="price-tag">💰 20000</span>
-        </button>
-        <button class="menuBtn locked" id="map-18x18" onclick="buyMap('18x18', 18, 18, 25000)">
-            ⬛ Velký čtverec 18x18
-            <span class="price-tag">💰 25000</span>
-        </button>
-        <button class="menuBtn locked" id="map-10x25" onclick="buyMap('10x25', 10, 25, 28000)">
-            🎯 Ultra široká 10x25
-            <span class="price-tag">💰 28000</span>
-        </button>
-        <button class="menuBtn locked" id="map-28x9" onclick="buyMap('28x9', 28, 9, 30000)">
-            🗼 Věž 28x9
-            <span class="price-tag">💰 30000</span>
-        </button>
-        <button class="menuBtn locked" id="map-20x20" onclick="buyMap('20x20', 20, 20, 35000)">
-            🎪 Aréna 20x20
-            <span class="price-tag">💰 35000</span>
-        </button>
-        <button class="menuBtn locked" id="map-30x10" onclick="buyMap('30x10', 30, 10, 45000)">
-            🏰 Epická 30x10
-            <span class="price-tag">💰 45000</span>
-        </button>
-        <button class="menuBtn locked" id="map-25x25" onclick="buyMap('25x25', 25, 25, 100000)">
-            👑 Mega aréna 25x25
-            <span class="price-tag">💰 100000</span>
-        </button>
-    </div>
-    <button class="menuBtn" onclick="backToMainMenu()">⬅ Zpět</button>
-</div>
-<div id="leaderboard" class="centered">
-    <h1>🏆 žebříček 🏆</h1>
-    <div class="loading">Načítání žebříčku...</div>
-    <table id="leaderboardTable" style="display:none;">
-        <tr><th>Pozice</th><th>Hráč</th><th>Skóre</th><th>Obtížnost</th><th>Datum</th></tr>
-    </table>
-    <button class="menuBtn" onclick="backToMainMenu()" style="margin-top: 20px;">⬅ Zpět</button>
-</div>
 
 <div id="tetrisGame" class="centered">
     <div class="game-container">
@@ -672,12 +375,12 @@ button.menuBtn.locked::after {
         <p id="saveMessage" style="font-size: 18px; color: #00ff00; margin: 20px 0;">
             ✅ Skóre automaticky uloženo!
         </p>
-        <button class="menuBtn" onclick="backToMainMenu()">🏠 Zpět do menu</button>
+        <button class="menuBtn" onclick="window.location.href='tetris.html'">🏠 Zpět do menu</button>
     </div>
 </div>
 
 <script>
-    // Načtení nastavení z URL parametrů
+// Načtení nastavení z URL parametrů
 const urlParams = new URLSearchParams(window.location.search);
 const savedDifficulty = urlParams.get('difficulty') || 'medium';
 const savedRows = parseInt(urlParams.get('rows')) || 20;
@@ -691,10 +394,6 @@ let mapCols = savedCols;
 let currentTheme = savedTheme;
 
 console.log('Načteno:', { selectedDifficulty, mapRows, mapCols, currentTheme });
-let selectedDifficulty = 'medium';
-let mapRows = 20;
-let mapCols = 10;
-let currentTheme = 'classic';
 
 let score = 0;
 let level = 1;
@@ -733,22 +432,18 @@ async function loadCurrentUser() {
     
     if (savedUser) {
         try {
-            // Pokus se parsovat jako JSON
             const parsed = JSON.parse(savedUser)
             
-            // Zkontroluj, jestli má potřebné údaje
             if (parsed && parsed.id && parsed.username) {
                 currentUser = parsed
-                console.log('Přihlášený uživatel (JSON):', currentUser.username, 'ID:', currentUser.id)
+                console.log('Přihlášený uživatel:', currentUser.username, 'ID:', currentUser.id)
                 await loadUserData()
             } else {
                 throw new Error('Neplatný formát')
             }
         } catch (e) {
-            // Pokud parse selže, je to jen string (jméno)
-            console.log('currentUser je jen string:', savedUser)
+            console.log('currentUser string:', savedUser)
             
-            // Zkus najít uživatele v Supabase podle jména
             try {
                 const { data: user, error } = await supabase
                     .from('users')
@@ -758,12 +453,11 @@ async function loadCurrentUser() {
                 
                 if (user && !error) {
                     currentUser = user
-                    // Ulož správný formát
                     localStorage.setItem('currentUser', JSON.stringify(user))
                     console.log('Uživatel načten z databáze:', user.username, 'ID:', user.id)
                     await loadUserData()
                 } else {
-                    console.error('Uživatel nenalezen v databázi')
+                    console.error('Uživatel nenalezen')
                     currentUser = { username: savedUser, is_guest: true }
                     loadLocalData()
                 }
@@ -774,7 +468,6 @@ async function loadCurrentUser() {
             }
         }
     } else {
-        // Host režim
         currentUser = { username: 'Host', is_guest: true }
         console.log('Host režim')
         loadLocalData()
@@ -801,7 +494,6 @@ async function loadUserData() {
             totalGamesPlayed = data.games_played || 0
             console.log('Data načtena:', { playerCoins, totalGamesPlayed })
         } else {
-            // První spuštění - vytvoř záznam
             console.log('První spuštění - vytvářím nový záznam')
             await supabase
                 .from('tetris_player_data')
@@ -821,7 +513,6 @@ async function loadUserData() {
     }
     
     updateCoinsDisplay()
-    updateUnlockedItems()
 }
 
 // Načtení lokálních dat pro host
@@ -834,13 +525,11 @@ function loadLocalData() {
         unlockedMaps = data.maps || ['20x10', '18x12']
     }
     updateCoinsDisplay()
-    updateUnlockedItems()
 }
 
 // Uložení dat do Supabase
 async function saveUserData() {
     if (!currentUser || currentUser.is_guest) {
-        // Host - ulož lokálně
         const data = {
             coins: playerCoins,
             themes: unlockedThemes,
@@ -871,9 +560,7 @@ async function saveUserData() {
 async function updateAfterGame(finalScore) {
     totalGamesPlayed++
     
-    // Mince za skóre: každých 100 bodů = 5 mincí
     const coinsFromScore = Math.floor(finalScore / 100) * 5
-    // Bonus za dokončenou hru: 10 mincí
     const totalCoins = coinsFromScore + 10
     
     earnedCoinsThisGame = totalCoins
@@ -889,7 +576,6 @@ async function updateAfterGame(finalScore) {
     }
     
     try {
-        // Načti aktuální data
         const { data: current } = await supabase
             .from('tetris_player_data')
             .select('*')
@@ -899,7 +585,6 @@ async function updateAfterGame(finalScore) {
         const newTotalScore = (current?.total_score || 0) + finalScore
         const newBestScore = Math.max(current?.best_score || 0, finalScore)
         
-        // Aktualizuj data včetně mincí!
         const { error } = await supabase
             .from('tetris_player_data')
             .update({
@@ -924,98 +609,7 @@ async function updateAfterGame(finalScore) {
 }
 
 window.updateCoinsDisplay = function() {
-    // Vždy zobrazovat celkový počet mincí nahoře
     document.getElementById('coinCount').textContent = playerCoins
-    
-    // Během hry zobrazit získané mince v této hře
-    const gameCoinsElement = document.getElementById('gameCoins')
-    if (gameCoinsElement) {
-        gameCoinsElement.textContent = earnedCoinsThisGame
-    }
-}
-
-window.updateUnlockedItems = function() {
-    const themes = ['classic', 'neon', 'fire', 'ice', 'forest', 'sunset', 'ocean', 'candy', 'galaxy', 'toxic', 'rainbow', 'gold', 'matrix', 'lava', 'midnight', 'crystal']
-    themes.forEach(theme => {
-        const btn = document.getElementById(`theme-${theme}`)
-        if (btn && unlockedThemes.includes(theme)) {
-            btn.classList.remove('locked')
-            const priceTag = btn.querySelector('.price-tag')
-            if (priceTag) priceTag.remove()
-        }
-    })
-    
-    const maps = ['20x10', '18x12', '22x8', '16x16', '24x12', '12x20', '15x15', '25x8', '14x18', '26x10', '18x18', '10x25', '28x9', '20x20', '30x10', '25x25']
-    maps.forEach(map => {
-        const btn = document.getElementById(`map-${map}`)
-        if (btn && unlockedMaps.includes(map)) {
-            btn.classList.remove('locked')
-            const priceTag = btn.querySelector('.price-tag')
-            if (priceTag) priceTag.remove()
-        }
-    })
-}
-
-window.buyTheme = async function(theme, price) {
-    if (unlockedThemes.includes(theme)) {
-        setTheme(theme)
-        return
-    }
-    
-    if (playerCoins >= price) {
-        if (confirm(`Koupit téma "${theme}" za ${price} mincí?`)) {
-            playerCoins -= price
-            unlockedThemes.push(theme)
-            await saveUserData()
-            updateCoinsDisplay()
-            updateUnlockedItems()
-            setTheme(theme)
-            alert('Téma odemčeno! 🎉')
-        }
-    } else {
-        alert(`Nemáš dost mincí! Potřebuješ ${price}, máš jen ${playerCoins}.`)
-    }
-}
-
-window.buyMap = async function(mapName, rows, cols, price) {
-    if (unlockedMaps.includes(mapName)) {
-        setMap(rows, cols)
-        return
-    }
-    
-    if (playerCoins >= price) {
-        if (confirm(`Koupit mapu "${mapName}" za ${price} mincí?`)) {
-            playerCoins -= price
-            unlockedMaps.push(mapName)
-            await saveUserData()
-            updateCoinsDisplay()
-            updateUnlockedItems()
-            setMap(rows, cols)
-            alert('Mapa odemčena! 🎉')
-        }
-    } else {
-        alert(`Nemáš dost mincí! Potřebuješ ${price}, máš jen ${playerCoins}.`)
-    }
-}
-
-async function addCoins(amount) {
-    earnedCoinsThisGame += amount
-    playerCoins += amount           // ⭐ důležité
-    updateCoinsDisplay()
-
-    await saveUserData()             // ⭐ uloží do Supabase
-    
-    for (let i = 0; i < 5; i++) {
-        setTimeout(() => {
-            const coin = document.createElement('div')
-            coin.className = 'coin-particle'
-            coin.textContent = '💰'
-            coin.style.left = (window.innerWidth / 2 + Math.random() * 200 - 100) + 'px'
-            coin.style.top = (window.innerHeight / 2) + 'px'
-            document.body.appendChild(coin)
-            setTimeout(() => coin.remove(), 2000)
-        }, i * 100)
-    }
 }
 
 // Barevná témata
@@ -1038,69 +632,10 @@ const themes = {
     crystal: ['#e0ffff', '#afeeee', '#add8e6', '#87ceeb', '#b0e0e6', '#d4f1f4', '#c0f0f5']
 }
 
-window.backToMainMenu = function() {
-    document.getElementById('mainMenu').style.display = 'flex'
-    document.getElementById('difficultyMenu').style.display = 'none'
-    document.getElementById('themeMenu').style.display = 'none'
-    document.getElementById('mapMenu').style.display = 'none'
-    document.getElementById('leaderboard').style.display = 'none'
-    document.getElementById('tetrisGame').style.display = 'none'
-    document.getElementById('nameModal').style.display = 'none'
-    document.getElementById('pauseOverlay').style.display = 'none'
-    clearTimeout(dropTimeout)
-    isPaused = false
-    isGameOver = false
-}
-
-window.showDifficultyMenu = function() {
-    document.getElementById('mainMenu').style.display = 'none'
-    document.getElementById('difficultyMenu').style.display = 'flex'
-}
-
-window.showThemeMenu = function() {
-    document.getElementById('mainMenu').style.display = 'none'
-    document.getElementById('themeMenu').style.display = 'flex'
-}
-
-window.showMapMenu = function() {
-    document.getElementById('mainMenu').style.display = 'none'
-    document.getElementById('mapMenu').style.display = 'flex'
-}
-
-window.showLeaderboard = async function() {
-    document.getElementById('mainMenu').style.display = 'none'
-    document.getElementById('leaderboard').style.display = 'flex'
-    await loadLeaderboard()
-}
-
-window.setDifficulty = function(level) {
-    selectedDifficulty = level
-    backToMainMenu()
-}
-
-window.setMap = function(rows, cols) {
-    mapRows = rows
-    mapCols = cols
-    backToMainMenu()
-}
-
-window.setTheme = function(theme) {
-    if (!unlockedThemes.includes(theme)) {
-        alert('Toto téma je zamčené!')
-        return
-    }
-    currentTheme = theme
-    backToMainMenu()
-}
-
 // Tetris engine
 const tetris = document.getElementById('tetris')
 const scoreDisplay = document.getElementById('score')
-// const levelDisplay = document.getElementById('level')
-// const linesDisplay = document.getElementById('lines')
-// const comboDisplay = document.getElementById('combo')
 const nextPieceDisplay = document.getElementById('nextPiece')
-const holdPieceDisplay = document.getElementById('holdPiece')
 
 const audioContext = new (window.AudioContext || window.webkitAudioContext)()
 
@@ -1137,9 +672,6 @@ function initGrid() {
 }
 
 window.startTetris = function(difficulty) {
-    document.getElementById('mainMenu').style.display = 'none'
-    document.getElementById('tetrisGame').style.display = 'flex'
-    
     score = 0
     level = 1
     linesCleared = 0
@@ -1305,7 +837,6 @@ function clearLines() {
         score += points
         level = Math.floor(linesCleared / 10) + 1
         
-        // Dynamická rychlost podle obtížnosti a skóre
         const baseSpeed = selectedDifficulty === 'easy' ? 800 : 
                          selectedDifficulty === 'medium' ? 600 : 
                          selectedDifficulty === 'hard' ? 400 : 250
@@ -1314,11 +845,8 @@ function clearLines() {
                         selectedDifficulty === 'medium' ? 150 : 
                         selectedDifficulty === 'hard' ? 100 : 80
         
-        // Každých 1000 bodů zrychlí o 8% (pomalejší progrese)
         const speedMultiplier = Math.max(0.25, 1 - (Math.floor(score / 1000) * 0.08))
         dropInterval = Math.max(minSpeed, Math.floor(baseSpeed * speedMultiplier))
-        
-        console.log(`⚡ Rychlost: ${dropInterval}ms | Level: ${level} | Skóre: ${score}`)
     } else {
         combo = 0
     }
@@ -1382,33 +910,6 @@ function hardDrop() {
     playSound('drop')
 }
 
-function hold() {
-    if (!canHold) return
-    
-    if (holdPiece === null) {
-        holdPiece = {
-            shape: current.shape.map(r => r.slice()),
-            color: current.color,
-            name: current.name
-        }
-        newTetromino()
-    } else {
-        const temp = {
-            shape: current.shape.map(r => r.slice()),
-            color: current.color,
-            name: current.name
-        }
-        current = holdPiece
-        current.x = Math.floor(mapCols / 2) - Math.floor(current.shape[0].length / 2)
-        current.y = 0
-        holdPiece = temp
-    }
-    
-    drawPreview(holdPiece, holdPieceDisplay)
-    canHold = false
-    playSound('hold')
-}
-
 function updateDisplay() {
     scoreDisplay.textContent = score
     updateCoinsDisplay()
@@ -1442,10 +943,6 @@ function playSound(type) {
             oscillator.frequency.value = 800
             gainNode.gain.value = 0.15
             break
-        case 'hold':
-            oscillator.frequency.value = 600
-            gainNode.gain.value = 0.1
-            break
     }
     
     oscillator.start(audioContext.currentTime)
@@ -1461,7 +958,7 @@ document.addEventListener('keydown', e => {
     }
     
     if (e.key === 'Escape') {
-        backToMainMenu()
+        window.location.href = 'tetris.html'
         return
     }
     
@@ -1485,9 +982,6 @@ document.addEventListener('keydown', e => {
         e.preventDefault()
         hardDrop()
     }
-    if (e.key === 'c' || e.key === 'C') {
-        hold()
-    }
     
     draw()
 })
@@ -1503,7 +997,6 @@ async function gameOver() {
     
     await updateAfterGame(score)
     
-    // Automatické uložení skóre pro přihlášené uživatele
     if (currentUser && !currentUser.is_guest) {
         try {
             await supabase
@@ -1526,7 +1019,6 @@ async function gameOver() {
     document.getElementById('finalScore').textContent = score
     document.getElementById('earnedCoins').textContent = earnedCoinsThisGame
     
-    // Zobrazit zprávu podle toho, jestli je host nebo přihlášený
     const saveMsg = document.getElementById('saveMessage')
     if (currentUser && !currentUser.is_guest) {
         saveMsg.textContent = '✅ Skóre automaticky uloženo do žebříčku!'
@@ -1539,78 +1031,13 @@ async function gameOver() {
     document.getElementById('nameModal').style.display = 'flex'
 }
 
-async function loadLeaderboard() {
-    const table = document.getElementById('leaderboardTable');
-    const loading = document.querySelector('.loading');
-    
-    loading.style.display = 'block';
-    table.style.display = 'none';
-    
-    try {
-        // Získat nejlepší skóre pro každého hráče
-        const { data, error } = await supabase
-            .from('tetris_scores')
-            .select('username, score, difficulty, timestamp', { count: 'exact' })
-            .order('score', { ascending: false })
-            .limit(50);
-        
-        if (error) throw error;
-
-        // Filtrovat na nejlepší skóre každého hráče
-        const bestScoresMap = {};
-        data.forEach(s => {
-            if (!bestScoresMap[s.username] || s.score > bestScoresMap[s.username].score) {
-                bestScoresMap[s.username] = s;
-            }
-        });
-
-        const bestScores = Object.values(bestScoresMap)
-            .sort((a, b) => b.score - a.score)
-            .slice(0, 50);
-
-        // Vypsat do tabulky
-        table.innerHTML = '<tr><th>Pozice</th><th>Hráč</th><th>Skóre</th><th>Obtížnost</th><th>Datum</th></tr>';
-
-        bestScores.forEach((s, i) => {
-            const row = table.insertRow();
-            row.insertCell(0).textContent = i + 1;
-            row.insertCell(1).textContent = s.username || 'Anonymní';
-            row.insertCell(2).textContent = s.score || 0;
-            row.insertCell(3).textContent = getDifficultyEmoji(s.difficulty);
-
-            const date = s.timestamp ? new Date(s.timestamp).toLocaleDateString('cs-CZ') : 'N/A';
-            row.insertCell(4).textContent = date;
-
-            if (i === 0) row.style.background = 'rgba(255, 215, 0, 0.2)';
-            if (i === 1) row.style.background = 'rgba(192, 192, 192, 0.2)';
-            if (i === 2) row.style.background = 'rgba(205, 127, 50, 0.2)';
-        });
-
-        loading.style.display = 'none';
-        table.style.display = 'table';
-        
-    } catch (error) {
-        console.error('Chyba při načítání žebříčku:', error);
-        loading.textContent = 'Chyba při načítání žebříčku.';
-    }
-}
-
-
-function getDifficultyEmoji(difficulty) {
-    switch(difficulty) {
-        case 'easy': return '😊 Snadná'
-        case 'medium': return '😐 Střední'
-        case 'hard': return '😈 Těžká'
-        case 'insane': return '💀 Šílená'
-        default: return '❓'
-    }
-}
-
 // Inicializace
 await loadCurrentUser()
+
+// Automaticky spusť hru po načtení
+setTimeout(() => {
+    startTetris(selectedDifficulty)
+}, 500)
 </script>
 </body>
 </html>
-
-
-
