@@ -457,241 +457,15 @@ button.menuBtn.locked::after {
     }
 }
 
-/* Mobilní ovládání - dotykové tlačítka */
-.mobile-controls {
-    display: none;
-    position: fixed;
-    bottom: 20px;
-    left: 50%;
-    transform: translateX(-50%);
-    gap: 10px;
-    z-index: 100;
-}
-
-.mobile-btn {
-    width: 60px;
-    height: 60px;
-    border-radius: 50%;
-    border: 2px solid #00ffff;
-    background: rgba(0, 100, 200, 0.7);
-    color: white;
-    font-size: 24px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 0 20px rgba(0, 255, 255, 0.4);
-    touch-action: manipulation;
-    user-select: none;
-}
-
-.mobile-btn:active {
-    background: rgba(0, 150, 255, 0.9);
-    transform: scale(0.95);
-}
-
-.mobile-controls-row {
-    display: flex;
-    gap: 10px;
-}
-
-/* Responzivita pro mobily */
+/* Pro mobily - 1 sloupec */
 @media (max-width: 768px) {
-    body {
-        padding: 10px;
-    }
-
-    h1 {
-        font-size: 36px;
-        margin-bottom: 20px;
-    }
-
-    #backBtn {
-        top: 10px;
-        left: 10px;
-        padding: 8px 16px;
-        font-size: 14px;
-    }
-
-    #coinsDisplay {
-        top: 10px;
-        right: 10px;
-        padding: 10px 20px;
-        font-size: 20px;
-    }
-
-    button.menuBtn {
-        padding: 12px 32px;
-        font-size: 18px;
-        min-width: 240px;
-        margin: 8px 0;
-    }
-
     .menu-section {
-        max-height: 50vh;
         grid-template-columns: 1fr;
-        padding: 10px;
-        gap: 10px;
-    }
-
-    /* Herní plocha pro mobil */
-    .game-container {
-        flex-direction: column;
-        align-items: center;
-        gap: 15px;
-    }
-
-    .side-panel {
-        flex-direction: row;
-        gap: 15px;
-    }
-
-    .info-box {
-        padding: 15px;
-        min-width: 140px;
-    }
-
-    .info-box h3 {
-        font-size: 16px;
-    }
-
-    #score, #level, #lines, #combo, #gameCoins {
-        font-size: 24px;
-    }
-
-    #tetris {
-        width: 100%;
-        max-width: 300px;
-    }
-
-    .cell {
-        width: 28px;
-        height: 28px;
-    }
-
-    #nextPiece, #holdPiece {
-        width: 100px;
-        height: 100px;
-        grid-template-columns: repeat(4, 25px);
-        grid-template-rows: repeat(4, 25px);
-    }
-
-    .preview-cell {
-        width: 23px;
-        height: 23px;
-    }
-
-    /* Skrýt desktopové ovládání */
-    .controls {
-        display: none;
-    }
-
-    /* Zobrazit mobilní ovládání během hry */
-    #tetrisGame .mobile-controls {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-    }
-
-    /* Modal pro mobil */
-    .modal-content {
-        padding: 30px 20px;
-        width: 90%;
-        max-width: 400px;
-    }
-
-    .modal-content h2 {
-        font-size: 24px;
-    }
-
-    .modal-content .coin-reward {
-        font-size: 36px;
-    }
-
-    .modal-content input {
-        width: 100%;
-        font-size: 16px;
-        padding: 10px 15px;
-    }
-
-    /* Žebříček pro mobil */
-    #leaderboard table {
-        width: 100%;
-        font-size: 14px;
-    }
-
-    #leaderboard th, #leaderboard td {
-        padding: 8px 4px;
-    }
-
-    .pause-text {
-        font-size: 48px;
     }
 }
-
-/* Ještě menší mobily */
-@media (max-width: 480px) {
-    h1 {
-        font-size: 28px;
-    }
-
-    button.menuBtn {
-        padding: 10px 24px;
-        font-size: 16px;
-        min-width: 200px;
-    }
-
-    .cell {
-        width: 24px;
-        height: 24px;
-    }
-
-    #tetris {
-        max-width: 240px;
-    }
-
-    .mobile-btn {
-        width: 50px;
-        height: 50px;
-        font-size: 20px;
-    }
-
-    #coinsDisplay {
-        font-size: 18px;
-        padding: 8px 16px;
-    }
-
-    .info-box {
-        padding: 10px;
-        min-width: 120px;
-    }
-
-    #score, #gameCoins {
-        font-size: 20px;
-    }
-}
-
-/* Landscape režim na mobilu */
-@media (max-width: 768px) and (orientation: landscape) {
-    .game-container {
-        flex-direction: row;
-        gap: 10px;
-    }
-
-    .side-panel {
-        flex-direction: column;
-        gap: 10px;
-    }
-
-    .mobile-controls {
-        right: 20px;
-        left: auto;
-        transform: none;
-    }
-
-    #tetris {
-        max-width: 280px;
-    }
-}
+</style>
+</head>
+<body>
 
 <button id="backBtn" onclick="window.location.href='hry.html'">⬅ Zpět</button>
 <div id="coinsDisplay">💰 <span id="coinCount">0</span></div>
@@ -845,7 +619,7 @@ button.menuBtn.locked::after {
     <button class="menuBtn" onclick="backToMainMenu()">⬅ Zpět</button>
 </div>
 <div id="leaderboard" class="centered">
-    <h1>🏆 žebříček 🏆</h1>
+    <h1>🏆 Online žebříček 🏆</h1>
     <div class="loading">Načítání žebříčku...</div>
     <table id="leaderboardTable" style="display:none;">
         <tr><th>Pozice</th><th>Hráč</th><th>Skóre</th><th>Obtížnost</th><th>Datum</th></tr>
@@ -860,7 +634,6 @@ button.menuBtn.locked::after {
                 <h3>DALŠÍ</h3>
                 <div id="nextPiece"></div>
             </div>
-        </div>
         <div>
             <div id="tetris"></div>
         </div>
@@ -879,6 +652,7 @@ button.menuBtn.locked::after {
         <div>⬆️ - Rotace</div>
         <div>⬇️ - Rychlejší pád</div>
         <div>MEZERNÍK - Okamžité umístění</div>
+        <div>C - Držení dílku</div>
         <div>P - Pauza</div>
         <div>ESC - Menu</div>
     </div>
@@ -1496,63 +1270,33 @@ function freeze() {
 }
 
 function clearLines() {
-    let cleared = 0;
+    let cleared = 0
     for (let r = mapRows - 1; r >= 0; r--) {
         if (grid[r].every(cell => cell !== 0)) {
-            grid.splice(r, 1);
-            grid.unshift(Array(mapCols).fill(0));
-            cleared++;
-            r++;
+            grid.splice(r, 1)
+            grid.unshift(Array(mapCols).fill(0))
+            cleared++
+            r++
         }
     }
     
     if (cleared > 0) {
-        linesCleared += cleared;
-        combo++;
+        linesCleared += cleared
+        combo++
         
-        let points = cleared * 100 * level;
-        if (cleared === 4) points *= 2;
-        points += combo * 50;
+        let points = cleared * 100 * level
+        if (cleared === 4) points *= 2
+        points += combo * 50
         
-        score += points;
-        level = Math.floor(linesCleared / 10) + 1;
-        
-        // Dynamická rychlost podle obtížnosti a skóre
-        let baseSpeed, speedMultiplier;
-        
-        switch(selectedDifficulty) {
-            case 'easy':
-                baseSpeed = 800;
-                speedMultiplier = 0.5; // Nejpomalejší zrychlování
-                break;
-            case 'medium':
-                baseSpeed = 600;
-                speedMultiplier = 1; // Střední zrychlování
-                break;
-            case 'hard':
-                baseSpeed = 400;
-                speedMultiplier = 1.5; // Rychlejší zrychlování
-                break;
-            case 'insane':
-                baseSpeed = 200;
-                speedMultiplier = 2; // Nejrychlejší zrychlování
-                break;
-            default:
-                baseSpeed = 600;
-                speedMultiplier = 1;
-        }
-        
-        // Rychlost klesá s rostoucím skóre
-        let speedReduction = Math.floor(score / 500) * 30 * speedMultiplier;
-        dropInterval = Math.max(50, baseSpeed - speedReduction);
-        
-        console.log(`Obtížnost: ${selectedDifficulty}, Skóre: ${score}, Rychlost: ${dropInterval}ms`);
+        score += points
+        level = Math.floor(linesCleared / 10) + 1
+        dropInterval = Math.max(50, 600 - (level * 40))
     } else {
-        combo = 0;
+        combo = 0
     }
     
-    updateDisplay();
-    return cleared;
+    updateDisplay()
+    return cleared
 }
 
 function createParticles(count) {
@@ -1839,13 +1583,3 @@ await loadCurrentUser()
 </script>
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
