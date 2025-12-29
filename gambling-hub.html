@@ -16,9 +16,9 @@
 body {
     font-family: 'Bangers', cursive;
     background: linear-gradient(135deg, #1a0033 0%, #330066 50%, #1a0033 100%);
-    overflow-x: hidden;
+    overflow: hidden;
     position: relative;
-    min-height: 100vh;
+    height: 100vh;
 }
 
 body::before {
@@ -55,27 +55,20 @@ body::before {
 #wrapper {
     position: relative;
     width: 100%;
-    min-height: 100vh;
+    height: 100vh;
     display: flex;
     flex-direction: column;
-    align-items: center;
     z-index: 20;
-    padding: 20px;
-    padding-top: 100px;
 }
 
 #topBar {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 80px;
+    height: 60px;
     background: rgba(26,0,51,0.95);
     border-bottom: 3px solid #ff00ff;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 0 20px;
+    padding: 0 15px;
     z-index: 100;
     box-shadow: 0 5px 20px rgba(255,0,255,0.5);
 }
@@ -83,55 +76,46 @@ body::before {
 #userInfo {
     display: flex;
     align-items: center;
-    gap: 20px;
+    gap: 15px;
 }
 
 #userName {
     color: #ffff00;
-    font-size: 24px;
+    font-size: 20px;
     text-shadow: 0 0 10px #ff00ff;
 }
 
 #coinDisplay {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 8px;
     background: linear-gradient(135deg, #ffaa00 0%, #ff6600 100%);
-    padding: 8px 20px;
+    padding: 6px 15px;
     border-radius: 20px;
-    border: 3px solid #ffff00;
+    border: 2px solid #ffff00;
     box-shadow: 0 0 20px rgba(255,200,0,0.8);
-    animation: coinGlow 2s ease-in-out infinite;
-}
-
-@keyframes coinGlow {
-    0%, 100% { box-shadow: 0 0 20px rgba(255,200,0,0.8); }
-    50% { box-shadow: 0 0 40px rgba(255,200,0,1); }
 }
 
 #coinAmount {
     color: #000;
-    font-size: 28px;
+    font-size: 22px;
     font-weight: bold;
-    text-shadow: 1px 1px 0 rgba(255,255,255,0.5);
 }
 
 #dailyBonus {
-    padding: 10px 25px;
-    border: 3px solid #00ff00;
+    padding: 8px 20px;
+    border: 2px solid #00ff00;
     background: linear-gradient(135deg, #00ff00 0%, #00aa00 100%);
     color: #000;
-    font-size: 18px;
+    font-size: 16px;
     font-weight: bold;
     cursor: pointer;
     border-radius: 10px;
-    box-shadow: 0 0 20px rgba(0,255,0,0.6);
     transition: all 0.3s ease;
 }
 
 #dailyBonus:hover {
     transform: scale(1.05);
-    box-shadow: 0 0 40px rgba(0,255,0,1);
 }
 
 #dailyBonus:disabled {
@@ -141,113 +125,119 @@ body::before {
 
 #gameSelector {
     display: flex;
-    gap: 15px;
-    margin: 30px 0;
-    flex-wrap: wrap;
+    gap: 10px;
+    padding: 10px 15px;
     justify-content: center;
+    background: rgba(0,0,0,0.3);
 }
 
 .game-btn {
-    padding: 20px 40px;
-    border-radius: 20px;
+    padding: 12px 30px;
+    border-radius: 15px;
     font-weight: bold;
-    font-size: 28px;
+    font-size: 20px;
     cursor: pointer;
     font-family: 'Bangers', cursive;
-    border: 4px solid;
+    border: 3px solid;
     transition: all 0.3s ease;
-    text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
 }
 
 .game-btn.active {
-    transform: scale(1.1);
-    animation: activePulse 1.5s ease-in-out infinite;
-}
-
-@keyframes activePulse {
-    0%, 100% { transform: scale(1.1); }
-    50% { transform: scale(1.15); }
+    transform: scale(1.05);
 }
 
 #slotBtn {
     background: linear-gradient(135deg, #ff0080 0%, #ff00ff 100%);
     border-color: #ff00ff;
     color: #fff;
-    box-shadow: 0 0 30px rgba(255,0,255,0.8);
 }
 
 #wheelBtn {
     background: linear-gradient(135deg, #ffff00 0%, #ff8800 100%);
     border-color: #ffff00;
     color: #000;
-    box-shadow: 0 0 30px rgba(255,255,0,0.8);
 }
 
 #leaderboardBtn {
     background: linear-gradient(135deg, #00ffff 0%, #0080ff 100%);
     border-color: #00ffff;
     color: #000;
-    box-shadow: 0 0 30px rgba(0,255,255,0.8);
 }
 
 .game-container {
     display: none;
-    width: 100%;
-    max-width: 1200px;
-    align-items: center;
-    justify-content: center;
-    flex-direction: column;
+    flex: 1;
+    overflow-y: auto;
+    padding: 15px;
 }
 
 .game-container.active {
     display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
-/* SLOT MACHINE STYLES */
+/* COMPACT SLOT MACHINE */
+#slotContainer {
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
+    justify-content: center;
+    flex-wrap: wrap;
+    width: 100%;
+}
+
 #slotMachine {
     background: linear-gradient(135deg, #8B4513 0%, #D2691E 50%, #8B4513 100%);
-    border: 10px solid #FFD700;
-    border-radius: 30px;
-    padding: 40px;
-    box-shadow: 0 0 60px rgba(255,215,0,0.8), inset 0 0 30px rgba(0,0,0,0.5);
-    max-width: 800px;
-    margin: 20px auto;
+    border: 6px solid #FFD700;
+    border-radius: 20px;
+    padding: 20px;
+    box-shadow: 0 0 40px rgba(255,215,0,0.8);
+    flex: 1;
+    min-width: 380px;
+    max-width: 480px;
 }
 
 #slotTitle {
     color: #FFD700;
-    font-size: 48px;
+    font-size: 32px;
     text-align: center;
-    margin-bottom: 30px;
-    text-shadow: 0 0 20px #ff00ff, 3px 3px 6px rgba(0,0,0,0.8);
-    animation: titleGlow 2s ease-in-out infinite;
-}
-
-@keyframes titleGlow {
-    0%, 100% { text-shadow: 0 0 20px #ff00ff, 3px 3px 6px rgba(0,0,0,0.8); }
-    50% { text-shadow: 0 0 40px #ff00ff, 3px 3px 6px rgba(0,0,0,0.8); }
+    margin-bottom: 15px;
+    text-shadow: 0 0 15px #ff00ff;
 }
 
 #reels {
     display: flex;
-    gap: 10px;
+    gap: 8px;
     justify-content: center;
-    margin: 30px 0;
+    margin: 15px 0;
     background: #000;
-    padding: 20px;
-    border-radius: 20px;
-    box-shadow: inset 0 0 30px rgba(0,0,0,0.9);
+    padding: 15px;
+    border-radius: 15px;
 }
 
 .reel {
-    width: 140px;
-    height: 420px;
+    width: 100px;
+    height: 300px;
     background: linear-gradient(135deg, #1a1a1a 0%, #333 100%);
-    border: 5px solid #FFD700;
-    border-radius: 15px;
+    border: 4px solid #FFD700;
+    border-radius: 10px;
     overflow: hidden;
     position: relative;
-    box-shadow: inset 0 0 20px rgba(0,0,0,0.8), 0 0 20px rgba(255,215,0,0.5);
+}
+
+.reel.spinning {
+    filter: blur(3px);
+}
+
+.reel.stopping {
+    animation: reelStop 0.3s ease-out;
+}
+
+@keyframes reelStop {
+    0% { filter: blur(3px); transform: scale(1); }
+    50% { filter: blur(0); transform: scale(1.05); }
+    100% { filter: blur(0); transform: scale(1); }
 }
 
 .reel-inner {
@@ -258,47 +248,45 @@ body::before {
 
 .symbol {
     width: 100%;
-    height: 140px;
+    height: 100px;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 80px;
+    font-size: 60px;
     background: linear-gradient(135deg, #2a2a2a 0%, #1a1a1a 100%);
     border-bottom: 2px solid #444;
 }
 
 .reel-window {
     position: absolute;
-    top: 140px;
+    top: 100px;
     left: 0;
     right: 0;
-    height: 140px;
-    border: 4px solid #ff00ff;
-    border-radius: 10px;
+    height: 100px;
+    border: 3px solid #ff00ff;
+    border-radius: 8px;
     pointer-events: none;
-    box-shadow: 0 0 20px rgba(255,0,255,0.8);
 }
 
 #slotControls {
     text-align: center;
-    margin-top: 30px;
+    margin-top: 15px;
 }
 
 #betAmount {
     color: #FFD700;
-    font-size: 32px;
-    margin-bottom: 15px;
-    text-shadow: 0 0 10px rgba(255,215,0,0.8);
+    font-size: 24px;
+    margin-bottom: 10px;
 }
 
 .bet-btn {
-    padding: 10px 25px;
-    margin: 0 5px;
+    padding: 8px 18px;
+    margin: 0 3px;
     background: linear-gradient(135deg, #00ff00 0%, #00aa00 100%);
-    border: 3px solid #00ff00;
-    border-radius: 15px;
+    border: 2px solid #00ff00;
+    border-radius: 12px;
     color: #000;
-    font-size: 24px;
+    font-size: 18px;
     font-weight: bold;
     cursor: pointer;
     font-family: 'Bangers', cursive;
@@ -306,8 +294,7 @@ body::before {
 }
 
 .bet-btn:hover {
-    transform: scale(1.1);
-    box-shadow: 0 0 20px rgba(0,255,0,0.8);
+    transform: scale(1.05);
 }
 
 .bet-btn.active {
@@ -316,78 +303,114 @@ body::before {
 }
 
 #spinSlotBtn {
-    margin-top: 20px;
-    padding: 20px 80px;
-    border-radius: 25px;
+    margin-top: 15px;
+    padding: 15px 60px;
+    border-radius: 20px;
     font-weight: bold;
-    font-size: 36px;
+    font-size: 28px;
     cursor: pointer;
     font-family: 'Bangers', cursive;
     background: linear-gradient(135deg, #ff0080 0%, #ff00ff 100%);
     color: #fff;
-    border: 5px solid #ff00ff;
-    box-shadow: 0 0 40px rgba(255,0,255,0.8);
+    border: 4px solid #ff00ff;
     transition: all 0.3s ease;
-    animation: spinPulse 1.5s ease-in-out infinite;
-}
-
-@keyframes spinPulse {
-    0%, 100% { transform: scale(1); box-shadow: 0 0 40px rgba(255,0,255,0.8); }
-    50% { transform: scale(1.05); box-shadow: 0 0 60px rgba(255,0,255,1); }
 }
 
 #spinSlotBtn:hover {
-    transform: scale(1.1) rotate(-2deg);
+    transform: scale(1.05);
 }
 
 #spinSlotBtn:disabled {
     opacity: 0.5;
     cursor: not-allowed;
-    animation: none;
 }
 
 #slotResult {
-    margin-top: 20px;
-    font-size: 36px;
+    margin-top: 15px;
+    font-size: 24px;
     color: #FFD700;
     text-align: center;
-    min-height: 50px;
-    text-shadow: 0 0 20px rgba(255,215,0,0.8);
+    min-height: 35px;
     font-weight: bold;
 }
 
-/* WHEEL OF FORTUNE STYLES */
+.paytable {
+    background: rgba(0,0,0,0.7);
+    padding: 20px;
+    border-radius: 20px;
+    border: 3px solid #FFD700;
+    flex: 0 0 220px;
+    display: flex;
+    flex-direction: column;
+}
+
+.paytable h3 {
+    color: #FFD700;
+    text-align: center;
+    font-size: 24px;
+    margin-bottom: 15px;
+}
+
+.paytable-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    color: #fff;
+    font-size: 18px;
+}
+
+.paytable-item {
+    padding: 8px 12px;
+    background: rgba(255,215,0,0.15);
+    border-radius: 10px;
+    text-align: center;
+    border: 1px solid rgba(255,215,0,0.3);
+    transition: all 0.3s ease;
+}
+
+.paytable-item:hover {
+    background: rgba(255,215,0,0.25);
+    transform: translateX(3px);
+}
+
+.paytable-item.jackpot {
+    background: rgba(255,215,0,0.3);
+    border: 2px solid #FFD700;
+    color: #FFD700;
+    font-weight: bold;
+    animation: jackpotGlow 2s ease-in-out infinite;
+}
+
+@keyframes jackpotGlow {
+    0%, 100% { box-shadow: 0 0 10px rgba(255,215,0,0.5); }
+    50% { box-shadow: 0 0 20px rgba(255,215,0,0.8); }
+}
+
+/* COMPACT WHEEL */
 #wheelContainer {
     position: relative;
-    filter: drop-shadow(0 0 50px rgba(255,0,255,0.8));
+    margin: 20px 0;
 }
 
 .pointer {
     position: absolute;
     top: 50%;
     left: 50%;
-    transform: translate(-50%, -280px);
+    transform: translate(-50%, -200px);
     width: 0;
     height: 0;
-    border-left: 25px solid transparent;
-    border-right: 25px solid transparent;
-    border-top: 50px solid #ffff00;
-    filter: drop-shadow(0 0 20px #ffff00);
+    border-left: 20px solid transparent;
+    border-right: 20px solid transparent;
+    border-top: 40px solid #ffff00;
     z-index: 50;
-    animation: pointerBounce 0.8s ease-in-out infinite;
-}
-
-@keyframes pointerBounce {
-    0%, 100% { transform: translate(-50%, -280px); }
-    50% { transform: translate(-50%, -290px); }
 }
 
 canvas {
-    max-width: 500px;
-    max-height: 500px;
+    width: 400px;
+    height: 400px;
     border-radius: 50%;
-    border: 5px solid #ffff00;
-    box-shadow: 0 0 60px #ff00ff, 0 0 100px #00ffff;
+    border: 4px solid #ffff00;
+    box-shadow: 0 0 40px #ff00ff;
 }
 
 .wheelCenter {
@@ -395,124 +418,115 @@ canvas {
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    width: 80px;
-    height: 80px;
+    width: 60px;
+    height: 60px;
     background: linear-gradient(135deg, #ff00ff 0%, #00ffff 100%);
     border-radius: 50%;
-    border: 4px solid #ffff00;
-    box-shadow: 0 0 30px #ffff00;
+    border: 3px solid #ffff00;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 30px;
+    font-size: 24px;
     z-index: 60;
 }
 
 #wheelTitle {
     color: #ffff00;
-    font-size: 36px;
-    margin: 20px 0;
+    font-size: 28px;
+    margin: 15px 0;
     text-align: center;
-    text-shadow: 0 0 10px #ff00ff, 0 0 20px #ff00ff;
+    text-shadow: 0 0 10px #ff00ff;
 }
 
 #spinWheelBtn {
-    margin-top: 30px;
-    padding: 20px 60px;
-    border-radius: 25px;
+    margin-top: 20px;
+    padding: 15px 50px;
+    border-radius: 20px;
     font-weight: bold;
-    font-size: 32px;
+    font-size: 26px;
     cursor: pointer;
     font-family: 'Bangers', cursive;
     background: linear-gradient(135deg, #ffff00 0%, #ff8800 100%);
     color: #000;
-    border: 4px solid #ffff00;
-    box-shadow: 0 0 30px rgba(255,255,0,0.8);
+    border: 3px solid #ffff00;
     transition: all 0.3s ease;
-    animation: wheelSpinPulse 1.5s ease-in-out infinite;
-}
-
-@keyframes wheelSpinPulse {
-    0%, 100% { transform: scale(1); box-shadow: 0 0 30px rgba(255,255,0,0.8); }
-    50% { transform: scale(1.05); box-shadow: 0 0 50px rgba(255,255,0,1); }
 }
 
 #spinWheelBtn:hover {
-    transform: scale(1.1) rotate(-3deg);
+    transform: scale(1.05);
 }
 
 #spinWheelBtn:disabled {
     opacity: 0.5;
     cursor: not-allowed;
-    animation: none;
 }
 
 #wheelCost {
     color: #ffaa00;
-    font-size: 24px;
-    margin-top: 10px;
+    font-size: 20px;
+    margin-top: 8px;
     text-align: center;
 }
 
-/* LEADERBOARD STYLES */
+/* COMPACT LEADERBOARD */
 #leaderboardFull {
     width: 100%;
-    max-width: 800px;
+    max-width: 700px;
     background: linear-gradient(135deg, rgba(26,0,51,0.95) 0%, rgba(51,0,102,0.95) 100%);
-    border: 5px solid #ff00ff;
-    border-radius: 30px;
-    padding: 40px;
-    box-shadow: 0 0 60px rgba(255,0,255,0.8);
+    border: 4px solid #ff00ff;
+    border-radius: 20px;
+    padding: 20px;
+    max-height: calc(100vh - 200px);
+    overflow-y: auto;
 }
 
 #leaderboardFull h2 {
     color: #ffff00;
-    font-size: 48px;
+    font-size: 36px;
     text-align: center;
-    margin-bottom: 30px;
-    text-shadow: 0 0 20px #ff00ff;
+    margin-bottom: 20px;
+    text-shadow: 0 0 15px #ff00ff;
 }
 
 .leaderboard-item {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 15px 20px;
-    margin: 10px 0;
+    padding: 10px 15px;
+    margin: 8px 0;
     background: rgba(255,0,255,0.1);
-    border-radius: 15px;
+    border-radius: 12px;
     border: 2px solid rgba(255,0,255,0.3);
     transition: all 0.3s ease;
 }
 
 .leaderboard-item:hover {
     background: rgba(255,0,255,0.3);
-    transform: translateX(-5px);
+    transform: translateX(-3px);
 }
 
 .leaderboard-item.top3 {
     background: linear-gradient(135deg, rgba(255,215,0,0.3) 0%, rgba(255,140,0,0.3) 100%);
     border-color: #FFD700;
-    box-shadow: 0 0 20px rgba(255,215,0,0.5);
 }
 
 .leaderboard-rank {
     color: #ffff00;
-    font-size: 32px;
+    font-size: 24px;
     font-weight: bold;
-    min-width: 60px;
+    min-width: 50px;
 }
 
 .leaderboard-name {
     color: #fff;
-    font-size: 24px;
+    font-size: 20px;
     flex: 1;
-    margin: 0 20px;
+    margin: 0 15px;
 }
 
 .leaderboard-coins {
     color: #ffaa00;
-    font-size: 28px;
+    font-size: 22px;
     font-weight: bold;
 }
 
@@ -525,18 +539,15 @@ canvas {
     align-items: center;
     justify-content: center;
     z-index: 200;
-    backdrop-filter: blur(10px);
 }
 
 .modal-content {
     background: linear-gradient(135deg, #330066 0%, #1a0033 100%);
-    padding: 40px;
-    border-radius: 30px;
-    border: 5px solid #ffff00;
-    box-shadow: 0 0 100px #ff00ff;
+    padding: 30px;
+    border-radius: 20px;
+    border: 4px solid #ffff00;
+    box-shadow: 0 0 80px #ff00ff;
     max-width: 90%;
-    max-height: 90vh;
-    overflow-y: auto;
     animation: modalAppear 0.3s ease-out;
 }
 
@@ -547,17 +558,17 @@ canvas {
 
 .modal h2 {
     color: #ffff00;
-    font-size: 48px;
+    font-size: 40px;
     text-align: center;
-    margin-bottom: 30px;
-    text-shadow: 0 0 20px #ff00ff;
+    margin-bottom: 20px;
+    text-shadow: 0 0 15px #ff00ff;
 }
 
 .modal-close {
-    margin-top: 20px;
-    padding: 15px 40px;
-    font-size: 24px;
-    border-radius: 20px;
+    margin-top: 15px;
+    padding: 12px 35px;
+    font-size: 20px;
+    border-radius: 15px;
     border: 3px solid #00ffff;
     background: linear-gradient(135deg, #00ffff 0%, #0080ff 100%);
     color: #000;
@@ -571,40 +582,38 @@ canvas {
 }
 
 .modal-close:hover {
-    transform: scale(1.1);
-    box-shadow: 0 0 30px rgba(0,255,255,1);
+    transform: scale(1.05);
 }
 
 #loginModal input {
     width: 100%;
-    padding: 15px;
-    margin: 10px 0;
-    border-radius: 15px;
-    border: 3px solid #ff00ff;
+    padding: 12px;
+    margin: 8px 0;
+    border-radius: 12px;
+    border: 2px solid #ff00ff;
     background: rgba(26,0,51,0.8);
     color: #fff;
-    font-size: 20px;
+    font-size: 18px;
     font-family: 'Bangers', cursive;
 }
 
 #loginModal input:focus {
     outline: none;
     border-color: #00ffff;
-    box-shadow: 0 0 20px rgba(0,255,255,0.5);
 }
 
 #loginModal button {
     width: 100%;
-    padding: 15px;
-    margin: 10px 0;
-    border-radius: 15px;
+    padding: 12px;
+    margin: 8px 0;
+    border-radius: 12px;
     border: 3px solid #00ff00;
     background: linear-gradient(135deg, #00ff00 0%, #00aa00 100%);
     color: #000;
     font-weight: bold;
     cursor: pointer;
     font-family: 'Bangers', cursive;
-    font-size: 24px;
+    font-size: 20px;
     transition: all 0.3s ease;
 }
 
@@ -614,15 +623,9 @@ canvas {
 
 #winAmount {
     color: #ffaa00;
-    font-size: 72px;
-    margin: 20px 0;
-    text-shadow: 0 0 30px #ffaa00;
-    animation: winBounce 0.6s ease-in-out infinite;
-}
-
-@keyframes winBounce {
-    0%, 100% { transform: scale(1); }
-    50% { transform: scale(1.1); }
+    font-size: 60px;
+    margin: 15px 0;
+    text-shadow: 0 0 25px #ffaa00;
 }
 
 .confetti {
@@ -635,40 +638,44 @@ canvas {
 }
 
 @media (max-width: 768px) {
-    #reels {
-        gap: 5px;
-        padding: 10px;
+    #slotContainer {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    #slotMachine {
+        min-width: 320px;
+    }
+    
+    .paytable {
+        flex: 1;
+        width: 100%;
+        max-width: 320px;
     }
     
     .reel {
-        width: 100px;
-        height: 300px;
+        width: 80px;
+        height: 240px;
     }
     
     .symbol {
-        height: 100px;
-        font-size: 60px;
+        height: 80px;
+        font-size: 50px;
     }
     
     .reel-window {
-        top: 100px;
-        height: 100px;
+        top: 80px;
+        height: 80px;
     }
     
     canvas {
-        max-width: 350px;
-        max-height: 350px;
-    }
-    
-    #topBar {
-        flex-wrap: wrap;
-        height: auto;
-        padding: 10px;
+        width: 300px;
+        height: 300px;
     }
 }
 
 ::-webkit-scrollbar {
-    width: 10px;
+    width: 8px;
 }
 
 ::-webkit-scrollbar-track {
@@ -677,7 +684,7 @@ canvas {
 
 ::-webkit-scrollbar-thumb {
     background: #ff00ff;
-    border-radius: 5px;
+    border-radius: 4px;
 }
 </style>
 </head>
@@ -694,67 +701,65 @@ canvas {
     <button id="dailyBonus" onclick="claimDailyBonus()">🎁 DENNÍ BONUS</button>
 </div>
 
+<div id="gameSelector">
+    <button id="slotBtn" class="game-btn active" onclick="switchGame('slot')">
+        🎰 AUTOMAT
+    </button>
+    <button id="wheelBtn" class="game-btn" onclick="switchGame('wheel')">
+        🎡 KOLO ŠTĚSTÍ
+    </button>
+    <button id="leaderboardBtn" class="game-btn" onclick="switchGame('leaderboard')">
+        🏆 ŽEBŘÍČEK
+    </button>
+</div>
+
 <div id="wrapper">
-    <h1 style="color: #ffff00; font-size: 64px; text-align: center; text-shadow: 0 0 30px #ff00ff; margin-bottom: 20px;">
-        🎰 CASINO HUB 🎰
-    </h1>
-    
-    <div id="gameSelector">
-        <button id="slotBtn" class="game-btn active" onclick="switchGame('slot')">
-            🎰 AUTOMAT
-        </button>
-        <button id="wheelBtn" class="game-btn" onclick="switchGame('wheel')">
-            🎡 KOLO ŠTĚSTÍ
-        </button>
-        <button id="leaderboardBtn" class="game-btn" onclick="switchGame('leaderboard')">
-            🏆 ŽEBŘÍČEK
-        </button>
-    </div>
-    
     <!-- SLOT MACHINE GAME -->
     <div id="slotGame" class="game-container active">
-        <div id="slotMachine">
-            <h2 id="slotTitle">🍒 OVOCNÝ AUTOMAT 🍒</h2>
-            
-            <div id="reels">
-                <div class="reel">
-                    <div class="reel-inner" id="reel1"></div>
-                    <div class="reel-window"></div>
+        <div id="slotContainer">
+            <div id="slotMachine">
+                <h2 id="slotTitle">🍒 AUTOMAT 🍒</h2>
+                
+                <div id="reels">
+                    <div class="reel">
+                        <div class="reel-inner" id="reel1"></div>
+                        <div class="reel-window"></div>
+                    </div>
+                    <div class="reel">
+                        <div class="reel-inner" id="reel2"></div>
+                        <div class="reel-window"></div>
+                    </div>
+                    <div class="reel">
+                        <div class="reel-inner" id="reel3"></div>
+                        <div class="reel-window"></div>
+                    </div>
                 </div>
-                <div class="reel">
-                    <div class="reel-inner" id="reel2"></div>
-                    <div class="reel-window"></div>
-                </div>
-                <div class="reel">
-                    <div class="reel-inner" id="reel3"></div>
-                    <div class="reel-window"></div>
+                
+                <div id="slotControls">
+                    <div id="betAmount">Sázka: <span id="currentBet">10</span> 🪙</div>
+                    <div>
+                        <button class="bet-btn active" onclick="setBet(10)">10</button>
+                        <button class="bet-btn" onclick="setBet(25)">25</button>
+                        <button class="bet-btn" onclick="setBet(50)">50</button>
+                        <button class="bet-btn" onclick="setBet(100)">100</button>
+                    </div>
+                    <button id="spinSlotBtn" onclick="spinSlot()">🎰 ZATOČIT!</button>
+                    <div id="slotResult"></div>
                 </div>
             </div>
             
-            <div id="slotControls">
-                <div id="betAmount">Sázka: <span id="currentBet">10</span> 🪙</div>
-                <div>
-                    <button class="bet-btn" onclick="setBet(10)">10 🪙</button>
-                    <button class="bet-btn" onclick="setBet(25)">25 🪙</button>
-                    <button class="bet-btn" onclick="setBet(50)">50 🪙</button>
-                    <button class="bet-btn" onclick="setBet(100)">100 🪙</button>
+            <div class="paytable">
+                <h3>💰 VÝHRY 💰</h3>
+                <div class="paytable-grid">
+                    <div class="paytable-item">🍒🍒🍒 → 5x</div>
+                    <div class="paytable-item">🍋🍋🍋 → 4x</div>
+                    <div class="paytable-item">🍊🍊🍊 → 6x</div>
+                    <div class="paytable-item">🍇🍇🍇 → 8x</div>
+                    <div class="paytable-item">🔔🔔🔔 → 10x</div>
+                    <div class="paytable-item">⭐⭐⭐ → 15x</div>
+                    <div class="paytable-item">💎💎💎 → 20x</div>
+                    <div class="paytable-item jackpot">🎰🎰🎰 → 50x</div>
                 </div>
-                <button id="spinSlotBtn" onclick="spinSlot()">🎰 ZATOČIT!</button>
-                <div id="slotResult"></div>
-            </div>
-        </div>
-        
-        <div style="margin-top: 30px; background: rgba(0,0,0,0.5); padding: 20px; border-radius: 20px; border: 2px solid #FFD700;">
-            <h3 style="color: #FFD700; text-align: center; font-size: 28px; margin-bottom: 15px;">💰 VÝPLATNÍ TABULKA 💰</h3>
-            <div style="color: #fff; font-size: 20px; line-height: 2;">
-                <div>🍒🍒🍒 = 5x sázka</div>
-                <div>🍋🍋🍋 = 4x sázka</div>
-                <div>🍊🍊🍊 = 6x sázka</div>
-                <div>🍇🍇🍇 = 8x sázka</div>
-                <div>🔔🔔🔔 = 10x sázka</div>
-                <div>⭐⭐⭐ = 15x sázka</div>
-                <div>💎💎💎 = 20x sázka</div>
-                <div style="color: #FFD700; font-weight: bold;">🎰🎰🎰 = 50x sázka (JACKPOT!)</div>
             </div>
         </div>
     </div>
@@ -763,7 +768,7 @@ canvas {
     <div id="wheelGame" class="game-container">
         <div id="wheelContainer">
             <div class="pointer"></div>
-            <canvas id="wheel" width="500" height="500"></canvas>
+            <canvas id="wheel" width="400" height="400"></canvas>
             <div class="wheelCenter">🎡</div>
         </div>
         
@@ -786,7 +791,7 @@ canvas {
 <div id="loginModal" class="modal" style="display: none;">
     <div class="modal-content">
         <h2>🎮 VÍTEJTE V CASINU 🎮</h2>
-        <p style="color: #fff; text-align: center; font-size: 20px; margin-bottom: 20px;">
+        <p style="color: #fff; text-align: center; font-size: 18px; margin-bottom: 15px;">
             Zadejte své herní jméno a začněte hrát!
         </p>
         <input type="text" id="nicknameInput" placeholder="Vaše přezdívka..." maxlength="15">
@@ -811,7 +816,7 @@ const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
 const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 // Vytvoření hvězd
-for(let i = 0; i < 50; i++) {
+for(let i = 0; i < 30; i++) {
     const star = document.createElement('div');
     star.className = 'star';
     star.style.left = Math.random() * 100 + '%';
@@ -863,7 +868,6 @@ function initReels() {
         const reel = document.getElementById(`reel${i + 1}`);
         reel.innerHTML = '';
         
-        // Vytvoříme dlouhý pás symbolů
         for (let j = 0; j < 50; j++) {
             const symbol = getWeightedSymbol();
             reels[i].push(symbol);
@@ -898,59 +902,71 @@ window.spinSlot = async function() {
     document.getElementById('spinSlotBtn').disabled = true;
     document.getElementById('slotResult').textContent = '';
     
-    // Odečteme sázku
     currentUser.coins -= currentBet;
     await saveUser();
     updateUI();
     
-    // Určíme výsledky
     const results = [];
-    const isJackpot = Math.random() < 0.005; // 0.5% šance na jackpot
+    const isJackpot = Math.random() < 0.005;
     
     if (isJackpot) {
-        // Zajistíme tři stejné vzácné symboly
         const jackpotSymbol = Math.random() < 0.5 ? '💎' : '🎰';
         results.push(jackpotSymbol, jackpotSymbol, jackpotSymbol);
     } else {
-        // Normální výsledky
         for (let i = 0; i < 3; i++) {
             results.push(getWeightedSymbol());
         }
     }
     
-    // Animace točení
-    const spinDurations = [2000, 2500, 3000];
+    // Přidáme blur efekt při točení
+    document.querySelectorAll('.reel').forEach(reel => {
+        reel.classList.add('spinning');
+    });
+    
+    // Vylepšená animace s realistickým zpomalováním
+    const spinDurations = [2000, 2800, 3600];
+    const symbolHeight = 100;
     
     for (let i = 0; i < 3; i++) {
         const reel = document.getElementById(`reel${i + 1}`);
-        const symbolHeight = 140;
+        const reelElement = reel.parentElement;
         const targetIndex = reels[i].indexOf(results[i]);
-        const targetPosition = -(targetIndex * symbolHeight - symbolHeight); // Vycentrujeme
+        const targetPosition = -(targetIndex * symbolHeight - symbolHeight);
         
-        // Rychlé točení
-        const spins = 5 + i;
+        // Více otáček pro dramatičtější efekt
+        const spins = 7 + i * 2;
         const totalRotation = spins * reels[i].length * symbolHeight + Math.abs(targetPosition);
         
-        reel.style.transition = `transform ${spinDurations[i]}ms cubic-bezier(0.25, 0.46, 0.45, 0.94)`;
+        // Animace s postupným zpomalením
+        reel.style.transition = `transform ${spinDurations[i]}ms cubic-bezier(0.17, 0.67, 0.35, 0.96)`;
         reel.style.transform = `translateY(${totalRotation}px)`;
         
+        // Odebereme blur a přidáme stopping efekt
         setTimeout(() => {
-            reel.style.transition = 'none';
+            reelElement.classList.remove('spinning');
+            reelElement.classList.add('stopping');
+            
+            reel.style.transition = 'transform 200ms cubic-bezier(0.68, -0.55, 0.265, 1.55)';
             reel.style.transform = `translateY(${targetPosition}px)`;
         }, spinDurations[i]);
+        
+        // Reset pozice pro opakování
+        setTimeout(() => {
+            reelElement.classList.remove('stopping');
+            reel.style.transition = 'none';
+            reel.style.transform = `translateY(${targetPosition}px)`;
+        }, spinDurations[i] + 200);
     }
     
-    // Vyhodnocení po dokončení animace
     setTimeout(() => {
         evaluateSlotWin(results);
-    }, 3500);
+    }, 4000);
 };
 
 async function evaluateSlotWin(results) {
     let winAmount = 0;
     let message = '';
     
-    // Kontrola tří stejných
     if (results[0] === results[1] && results[1] === results[2]) {
         const multiplier = winMultipliers[results[0]];
         winAmount = currentBet * multiplier;
@@ -963,7 +979,7 @@ async function evaluateSlotWin(results) {
             message = `🎉 VÝHRA! 🎉 +${winAmount} 🪙`;
         }
     } else {
-        message = '😢 Tentokrát to nevyšlo... zkuste to znovu!';
+        message = '😢 Zkuste to znovu!';
     }
     
     document.getElementById('slotResult').textContent = message;
@@ -973,13 +989,11 @@ async function evaluateSlotWin(results) {
         await saveUser();
         updateUI();
         
-        // Zobrazíme modal s výhrou
         document.getElementById('winAmount').textContent = `+${winAmount} 🪙`;
         document.getElementById('winModal').style.display = 'flex';
         
-        // Konfety pro velké výhry
         if (winAmount >= currentBet * 10) {
-            for (let i = 0; i < 150; i++) {
+            for (let i = 0; i < 100; i++) {
                 setTimeout(() => createConfetti(), i * 10);
             }
         }
@@ -993,7 +1007,6 @@ window.setBet = function(amount) {
     currentBet = amount;
     document.getElementById('currentBet').textContent = amount;
     
-    // Zvýrazníme aktivní tlačítko
     document.querySelectorAll('.bet-btn').forEach(btn => {
         btn.classList.remove('active');
     });
@@ -1003,7 +1016,7 @@ window.setBet = function(amount) {
 // WHEEL OF FORTUNE LOGIC
 const canvas = document.getElementById("wheel");
 const ctx = canvas.getContext("2d");
-const center = canvas.width / 2;
+const center = 200;
 
 const wheelPrizes = [
     { coins: 50, color: '#ff0080', weight: 30 },
@@ -1019,7 +1032,7 @@ let wheelSpinning = false;
 let autoRotating = true;
 
 function drawWheel() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.clearRect(0, 0, 400, 400);
     const slice = 2 * Math.PI / wheelPrizes.length;
     
     wheelPrizes.forEach((prize, i) => {
@@ -1030,7 +1043,7 @@ function drawWheel() {
         ctx.fill();
         
         ctx.strokeStyle = 'rgba(0,0,0,0.3)';
-        ctx.lineWidth = 3;
+        ctx.lineWidth = 2;
         ctx.stroke();
         
         ctx.save();
@@ -1038,12 +1051,12 @@ function drawWheel() {
         ctx.rotate(rotation + i * slice + slice / 2);
         ctx.fillStyle = "white";
         ctx.strokeStyle = "black";
-        ctx.lineWidth = 3;
+        ctx.lineWidth = 2;
         ctx.textAlign = "right";
-        ctx.font = "bold 24px Bangers";
+        ctx.font = "bold 18px Bangers";
         const text = prize.coins === 0 ? '0 🪙' : `${prize.coins} 🪙`;
-        ctx.strokeText(text, center - 30, 8);
-        ctx.fillText(text, center - 30, 8);
+        ctx.strokeText(text, center - 25, 6);
+        ctx.fillText(text, center - 25, 6);
         ctx.restore();
     });
 }
@@ -1068,12 +1081,10 @@ window.spinWheel = async function() {
     autoRotating = false;
     document.getElementById('spinWheelBtn').disabled = true;
     
-    // Odečteme cenu
     currentUser.coins -= wheelCost;
     await saveUser();
     updateUI();
     
-    // Výběr výhry podle pravděpodobnosti
     const random = Math.random() * 100;
     let cumulative = 0;
     let selectedPrize = null;
@@ -1128,7 +1139,7 @@ async function finishWheelSpin(coinWin) {
     document.getElementById('winModal').style.display = 'flex';
     
     if (coinWin > 0) {
-        for (let i = 0; i < 100; i++) {
+        for (let i = 0; i < 80; i++) {
             setTimeout(() => createConfetti(), i * 15);
         }
     }
@@ -1138,17 +1149,14 @@ async function finishWheelSpin(coinWin) {
 window.switchGame = function(game) {
     currentGame = game;
     
-    // Skryjeme všechny hry
     document.querySelectorAll('.game-container').forEach(container => {
         container.classList.remove('active');
     });
     
-    // Odebereme active ze všech tlačítek
     document.querySelectorAll('.game-btn').forEach(btn => {
         btn.classList.remove('active');
     });
     
-    // Zobrazíme vybranou hru
     if (game === 'slot') {
         document.getElementById('slotGame').classList.add('active');
         document.getElementById('slotBtn').classList.add('active');
@@ -1171,10 +1179,9 @@ window.login = async function() {
     }
     
     currentUser.nickname = nickname;
-    currentUser.coins = 100; // Startovní mince
+    currentUser.coins = 100;
     currentUser.lastDailyBonus = new Date().toDateString();
     
-    // Uložíme do Supabase
     const { data, error } = await supabase
         .from('casino_users')
         .insert([currentUser])
@@ -1182,7 +1189,6 @@ window.login = async function() {
     
     if (error) {
         console.error('Chyba při vytváření uživatele:', error);
-        // Fallback na localStorage
         currentUser.id = 'user_' + Date.now();
         localStorage.setItem('casinoUser', JSON.stringify(currentUser));
     } else {
@@ -1214,6 +1220,7 @@ async function saveUser() {
         localStorage.setItem('casinoUser', JSON.stringify(currentUser));
     }
 }
+
 function updateUI() {
     document.getElementById('userName').textContent = currentUser.nickname;
     document.getElementById('coinAmount').textContent = currentUser.coins;
@@ -1253,14 +1260,14 @@ function checkDailyBonus() {
         btn.textContent = '✅ BONUS VYBRÁN';
     } else {
         btn.disabled = false;
-        btn.textContent = '🎁 DENNÍ BONUS (100 🪙)';
+        btn.textContent = '🎁 DENNÍ BONUS';
     }
 }
 
 // LEADERBOARD
 async function loadLeaderboard() {
     const list = document.getElementById('leaderboardList');
-    list.innerHTML = '<div style="text-align: center; color: #fff; font-size: 24px;">Načítám žebříček...</div>';
+    list.innerHTML = '<div style="text-align: center; color: #fff; font-size: 20px;">Načítám žebříček...</div>';
     
     const { data, error } = await supabase
         .from('casino_users')
@@ -1271,7 +1278,7 @@ async function loadLeaderboard() {
     list.innerHTML = '';
     
     if (error || !data || data.length === 0) {
-        list.innerHTML = '<div style="text-align: center; color: #fff; font-size: 24px;">Žádní hráči v žebříčku</div>';
+        list.innerHTML = '<div style="text-align: center; color: #fff; font-size: 20px;">Žádní hráči v žebříčku</div>';
         return;
     }
     
@@ -1323,7 +1330,6 @@ window.closeWinModal = function() {
     document.getElementById('winModal').style.display = 'none';
 };
 
-// Enter pro login
 document.getElementById('nicknameInput').addEventListener('keypress', function(e) {
     if (e.key === 'Enter') login();
 });
@@ -1332,17 +1338,14 @@ document.getElementById('nicknameInput').addEventListener('keypress', function(e
 window.addEventListener('load', async () => {
     initReels();
     
-    // Zkontroluj, jestli je uživatel přihlášený z hry.html
     const savedUser = localStorage.getItem('currentUser');
     if (savedUser) {
         try {
             const user = JSON.parse(savedUser);
             
-            // Nastav uživatele z hry.html účtu
             currentUser.nickname = user.username;
             currentUser.id = user.id;
             
-            // Načti data z databáze nebo vytvoř nový záznam
             const { data: existingUser, error } = await supabase
                 .from('casino_users')
                 .select('*')
@@ -1350,16 +1353,13 @@ window.addEventListener('load', async () => {
                 .maybeSingle();
             
             if (existingUser) {
-    currentUser.coins = existingUser.coins;
-    currentUser.lastDailyBonus = existingUser.last_daily_bonus;
-}
-             else {
-                // Nový hráč - startovní mince
+                currentUser.coins = existingUser.coins;
+                currentUser.lastDailyBonus = existingUser.last_daily_bonus;
+            } else {
                 currentUser.coins = 100;
                 currentUser.lastDailyBonus = null;
             }
             
-            // Ulož nebo aktualizuj uživatele
             await saveUser();
             
             document.getElementById('loginModal').style.display = 'none';
@@ -1374,9 +1374,3 @@ window.addEventListener('load', async () => {
 
 </body>
 </html>
-
-
-
-
-
-
