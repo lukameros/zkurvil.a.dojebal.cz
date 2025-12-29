@@ -564,25 +564,47 @@ async function waitForBothPlayers() {
     
     // Sleduj ready stavy obou hráčů a status hry
     waitingChannel = supabase
-        .channel(`waiting_${currentGameId}`)
-        .on('postgres_changes', {
-            event: 'UPDATE',
-            schema: 'public',
-            table: 'tetris_multiplayer_games',
-            filter: `id=eq.${currentGameId}`
-        }, (payload) => {
-            console.log('Změna stavu hry:', payload.new);
+    .channel(`waiting_${currentGameId}`)
+    .on('postgres_changes', {
+        event: 'UPDATE',
+        schema: 'public',
+        table: 'tetris_multiplayer_games',
+        filter: `id=eq.${currentGameId}`
+    }, (payload) => {
+        console.log('Změna stavu hry:', payload.new);
+        
+        // DŮLEŽITÉ: Vždy aktualizuj ready status při JAKÉKOLI změně
+        updateReadyStatus(payload.new);
+        
+        // Pokud host spustil odpočítávání
+        if (payload.new.status === 'countdown' && myPlayerNumber === 2) {
+            document.getElementById('readyBtn').style.display = 'none';
             
-// Pokud se začalo hrát
-if (payload.new.status === 'playing') {
-    setTimeout(() => {
-        startGame();
-    }, 500);
-}
+            const countdownEl = document.getElementById('countdownDisplay');
+            countdownEl.style.display = 'block';
             
-            updateReadyStatus(payload.new);
-        })
-        .subscribe();
+            let count = 10;
+            countdownEl.textContent = count;
+            
+            const interval = setInterval(() => {
+                count--;
+                if (count > 0) {
+                    countdownEl.textContent = count;
+                } else {
+                    clearInterval(interval);
+                    countdownEl.textContent = 'START!';
+                }
+            }, 1000);
+        }
+        
+        // Pokud se začalo hrát
+        if (payload.new.status === 'playing') {
+            setTimeout(() => {
+                startGame();
+            }, 500);
+        }
+    })
+    .subscribe();
     
     // Načti aktuální stav
     const { data: game } = await supabase
@@ -641,11 +663,15 @@ async function setReady() {
     
     if (error) {
         console.error('Chyba při nastavení ready:', error);
+        return;
     } else {
         console.log('Ready nastaveno úspěšně:', data);
+        // DŮLEŽITÉ: Aktualizuj UI ihned po nastavení ready
+        updateReadyStatus(data);
     }
     
     document.getElementById('readyBtn').style.display = 'none';
+}
     
     // Načti aktuální stav a updatuj UI
     const { data: game } = await supabase
@@ -1087,5 +1113,6 @@ loadUser();
 </script>
 </body>
 </html>
+
 
 
