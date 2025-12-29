@@ -540,6 +540,9 @@ async function joinGame() {
 }
 
 async function waitForBothPlayers() {
+    console.log('Čekám v místnosti, player:', myPlayerNumber);
+    
+    // Pokud jsem hráč 1, sleduj kdy přijde hráč 2 a pak zobraz READY tlačítko
     if (myPlayerNumber === 1) {
         const checkInterval = setInterval(async () => {
             const { data: game } = await supabase
@@ -550,13 +553,16 @@ async function waitForBothPlayers() {
             
             if (game && game.player2_username) {
                 clearInterval(checkInterval);
+                console.log('Hráč 2 se připojil:', game.player2_username);
                 document.getElementById('player2WaitName').textContent = game.player2_username;
+                // OPRAVA: Zobraz READY tlačítko i pro hráče 1!
                 document.getElementById('readyBtn').style.display = 'block';
             }
         }, 1000);
         window.waitInterval = checkInterval;
     }
     
+    // Sleduj ready stavy obou hráčů a status hry
     waitingChannel = supabase
         .channel(`waiting_${currentGameId}`)
         .on('postgres_changes', {
@@ -565,6 +571,9 @@ async function waitForBothPlayers() {
             table: 'tetris_multiplayer_games',
             filter: `id=eq.${currentGameId}`
         }, (payload) => {
+            console.log('Změna stavu hry:', payload.new);
+            
+            // Pokud host spustil odpočítávání
             if (payload.new.status === 'countdown' && myPlayerNumber === 2) {
                 document.getElementById('readyBtn').style.display = 'none';
                 
@@ -585,6 +594,7 @@ async function waitForBothPlayers() {
                 }, 1000);
             }
             
+            // Pokud se začalo hrát
             if (payload.new.status === 'playing') {
                 setTimeout(() => {
                     startGame();
@@ -595,6 +605,7 @@ async function waitForBothPlayers() {
         })
         .subscribe();
     
+    // Načti aktuální stav
     const { data: game } = await supabase
         .from('tetris_multiplayer_games')
         .select('*')
@@ -603,6 +614,10 @@ async function waitForBothPlayers() {
     
     if (game) {
         updateReadyStatus(game);
+        // Pokud už je hráč 2 připojený a jsem host, zobraz READY
+        if (myPlayerNumber === 1 && game.player2_username) {
+            document.getElementById('readyBtn').style.display = 'block';
+        }
     }
 }
 
