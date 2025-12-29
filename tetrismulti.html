@@ -462,15 +462,19 @@ async function loadUser() {
     }
 }
 
-// Načtení nastavení uživatele
+// Načtení nastavení uživatele - OPRAVENÁ VERZE
 async function loadUserSettings() {
     try {
         if (currentUser && currentUser.id) {
-            const { data } = await supabase
+            const { data, error } = await supabase
                 .from('tetris_player_data')
                 .select('map_rows, map_cols, theme')
                 .eq('user_id', currentUser.id)
-                .single()
+                .maybeSingle()  // ZMĚNA: použij maybeSingle() místo single()
+            
+            if (error) {
+                console.log('Chyba při načítání nastavení:', error)
+            }
             
             if (data) {
                 return {
@@ -481,10 +485,80 @@ async function loadUserSettings() {
             }
         }
     } catch (e) {
-        console.log('Nastavení nenalezeno, používám výchozí')
+        console.log('Nastavení nenalezeno, používám výchozí:', e)
     }
     
     return { rows: 20, cols: 10, theme: 'classic' }
+}
+
+// Aktualizace ready statusů - OPRAVENÁ VERZE
+function updateReadyStatus(game) {
+    player1IsReady = game.player1_ready || false
+    player2IsReady = game.player2_ready || false
+    
+    console.log('Ready status - P1:', player1IsReady, 'P2:', player2IsReady)
+    
+    // Update UI
+    document.getElementById('player1Ready').textContent = player1IsReady ? '✅' : '⏳'
+    document.getElementById('player2Ready').textContent = player2IsReady ? '✅' : '⏳'
+    
+    if (game.player2_username) {
+        document.getElementById('player2WaitName').textContent = game.player2_username
+    }
+    
+    // Pokud jsou oba ready A hra ještě není spuštěná
+    if (player1IsReady && player2IsReady && game.status === 'waiting') {
+        console.log('Oba hráči jsou ready, spouštím countdown!')
+        startCountdown()
+    }
+}
+
+// Odpočítávání - OPRAVENÁ VERZE
+async function startCountdown() {
+    console.log('Začínám odpočítávání!')
+    
+    // Označ hru jako countdown - pouze pokud je ve stavu waiting
+    const { data: currentGame } = await supabase
+        .from('tetris_multiplayer_games')
+        .select('status')
+        .eq('id', currentGameId)
+        .single()
+    
+    if (currentGame.status !== 'waiting') {
+        console.log('Hra už není ve stavu waiting, countdown byl už spuštěn')
+        return
+    }
+    
+    await supabase
+        .from('tetris_multiplayer_games')
+        .update({ status: 'countdown' })
+        .eq('id', currentGameId)
+    
+    const countdownEl = document.getElementById('countdownDisplay')
+    countdownEl.style.display = 'block'
+    
+    let count = 5
+    countdownEl.textContent = count
+    
+    const interval = setInterval(async () => {
+        count--
+        if (count > 0) {
+            countdownEl.textContent = count
+        } else {
+            clearInterval(interval)
+            countdownEl.textContent = 'START!'
+            
+            // Nastav status na playing
+            await supabase
+                .from('tetris_multiplayer_games')
+                .update({ status: 'playing' })
+                .eq('id', currentGameId)
+            
+            setTimeout(() => {
+                startGame()
+            }, 500)
+        }
+    }, 1000)
 }
 
 // Generování kódu hry
@@ -1262,3 +1336,4 @@ loadUser()
 </script>
 </body>
 </html>
+
