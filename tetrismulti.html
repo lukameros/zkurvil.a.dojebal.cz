@@ -3,13 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Tetris</title>
+<title>Tetris Multiplayer</title>
 <style>
-    #tetrisAdminBtn:hover {
-    background: linear-gradient(135deg, rgba(255,180,0,1) 0%, rgba(220,120,0,1) 100%);
-    transform: translateY(-2px);
-    box-shadow: 0 0 35px rgba(255,150,0,0.9);
-}
 * {
     margin: 0;
     padding: 0;
@@ -76,30 +71,6 @@ h1 {
     transform: translateY(-2px);
 }
 
-#coinsDisplay {
-    position: absolute;
-    top: 20px;
-    right: 20px;
-    padding: 15px 30px;
-    background: linear-gradient(135deg, rgba(255, 215, 0, 0.3), rgba(255, 165, 0, 0.3));
-    border: 3px solid gold;
-    border-radius: 12px;
-    font-size: 28px;
-    font-weight: bold;
-    color: gold;
-    text-shadow: 0 0 15px rgba(255, 215, 0, 0.9);
-    box-shadow: 0 0 25px rgba(255, 215, 0, 0.5);
-    z-index: 10;
-    animation: coinPulse 2s ease-in-out infinite;
-}
-
-@keyframes coinPulse {
-    0%, 100% { transform: scale(1); }
-    50% { transform: scale(1.05); }
-}
-
-
-
 button.menuBtn {
     padding: 16px 48px;
     margin: 12px 0;
@@ -113,62 +84,12 @@ button.menuBtn {
     box-shadow: 0 0 20px rgba(0, 255, 255, 0.4);
     transition: all 0.3s;
     min-width: 280px;
-    position: relative;
 }
 
-button.menuBtn:hover:not(.locked) {
+button.menuBtn:hover {
     transform: scale(1.08) translateY(-3px);
     box-shadow: 0 0 35px rgba(0, 255, 255, 0.8);
     background: linear-gradient(135deg, rgba(0, 150, 255, 0.6), rgba(150, 0, 255, 0.6));
-}
-
-button.menuBtn:active:not(.locked) {
-    transform: scale(1.03);
-}
-
-button.menuBtn.locked {
-    background: linear-gradient(135deg, rgba(100, 100, 100, 0.3), rgba(50, 50, 50, 0.3));
-    border-color: #666;
-    color: #999;
-    cursor: not-allowed;
-}
-
-button.menuBtn.locked::after {
-    content: '🔒';
-    position: absolute;
-    right: 15px;
-    font-size: 24px;
-}
-
-.price-tag {
-    position: absolute;
-    right: 50px;
-    background: linear-gradient(135deg, rgba(255, 215, 0, 0.3), rgba(255, 165, 0, 0.3));
-    border: 2px solid gold;
-    border-radius: 6px;
-    padding: 4px 12px;
-    font-size: 16px;
-    color: gold;
-    font-weight: bold;
-}
-
-#tetrisGame {
-    display: none;
-    position: relative;
-    gap: 30px;
-    flex-direction: row;
-}
-
-.game-container {
-    display: flex;
-    gap: 30px;
-    align-items: flex-start;
-}
-
-.side-panel {
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
 }
 
 .info-box {
@@ -187,7 +108,7 @@ button.menuBtn.locked::after {
     text-shadow: 0 0 10px #00ffff;
 }
 
-#score, #level, #lines, #combo {
+.score-display {
     font-size: 32px;
     font-weight: bold;
     text-align: center;
@@ -195,37 +116,9 @@ button.menuBtn.locked::after {
     text-shadow: 0 0 10px #ff00ff;
 }
 
-#nextPiece, #holdPiece {
-    width: 120px;
-    height: 120px;
-    display: grid;
-    grid-template-columns: repeat(4, 30px);
-    grid-template-rows: repeat(4, 30px);
-    gap: 1px;
-    background: #111;
-    margin: 0 auto;
-}
-
-.preview-cell {
-    width: 28px;
-    height: 28px;
-    background: #222;
-    border-radius: 3px;
-}
-
-#tetris {
-    display: grid;
-    gap: 1px;
-    background: rgba(17, 17, 34, 0.9);
-    border: 3px solid #00ffff;
-    border-radius: 8px;
-    box-shadow: 0 0 40px rgba(0, 255, 255, 0.5);
-    padding: 3px;
-}
-
 .cell {
-    width: 30px;
-    height: 30px;
+    width: 25px;
+    height: 25px;
     background: #1a1a2e;
     border: 1px solid #111;
     border-radius: 3px;
@@ -236,41 +129,45 @@ button.menuBtn.locked::after {
     box-shadow: inset 0 0 10px rgba(255, 255, 255, 0.3);
 }
 
-#leaderboard {
-    display: none;
-    flex-direction: column;
-    align-items: center;
-    max-width: 90%;
-}
-
-#leaderboard table {
-    border-collapse: collapse;
-    width: 600px;
-    background: rgba(30, 30, 60, 0.7);
-    border: 2px solid #00ffff;
+#gameCodeDisplay {
+    background: rgba(0,255,255,0.1);
+    border: 3px solid #0ff;
     border-radius: 12px;
-    overflow: hidden;
-    box-shadow: 0 0 30px rgba(0, 255, 255, 0.4);
+    padding: 30px;
     margin: 20px 0;
+    text-align: center;
 }
 
-#leaderboard th {
-    background: linear-gradient(135deg, #0064c8, #6400c8);
-    padding: 15px;
-    text-align: center;
-    color: #00ffff;
-    text-shadow: 0 0 10px #00ffff;
+#gameCodeDisplay h2 {
+    color: #0ff;
+    font-size: 48px;
+    margin-bottom: 20px;
 }
 
-#leaderboard td {
-    border-top: 1px solid rgba(0, 255, 255, 0.2);
-    padding: 12px;
-    text-align: center;
+#gameCodeText {
+    font-size: 72px;
+    font-weight: 900;
     color: #fff;
+    text-shadow: 0 0 30px #0ff;
+    letter-spacing: 10px;
 }
 
-#leaderboard tr:hover {
-    background: rgba(0, 255, 255, 0.1);
+#gameInput {
+    padding: 15px;
+    font-size: 18px;
+    margin: 20px 0;
+    width: 300px;
+    text-align: center;
+    text-transform: uppercase;
+    background: rgba(0,0,0,0.5);
+    color: #fff;
+    border: 2px solid #0ff;
+    border-radius: 8px;
+}
+
+#gameInput:focus {
+    outline: none;
+    box-shadow: 0 0 20px rgba(0, 255, 255, 0.6);
 }
 
 .loading {
@@ -280,32 +177,77 @@ button.menuBtn.locked::after {
     color: #00ffff;
 }
 
-.particle {
-    position: fixed;
-    width: 10px;
-    height: 10px;
-    border-radius: 50%;
-    pointer-events: none;
-    animation: particleFall 1s ease-out forwards;
-    z-index: 1000;
+.game-arena {
+    display: flex;
+    gap: 40px;
+    justify-content: center;
+    align-items: flex-start;
+    margin-top: 30px;
 }
 
-@keyframes particleFall {
-    0% { transform: translateY(0) scale(1); opacity: 1; }
-    100% { transform: translateY(200px) scale(0); opacity: 0; }
+.player-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
-.coin-particle {
-    position: fixed;
+.player-name {
     font-size: 32px;
-    pointer-events: none;
-    animation: coinFloat 2s ease-out forwards;
-    z-index: 1000;
+    font-weight: 900;
+    margin-bottom: 20px;
+    text-shadow: 0 0 20px currentColor;
 }
 
-@keyframes coinFloat {
-    0% { transform: translateY(0) scale(1); opacity: 1; }
-    100% { transform: translateY(-200px) scale(1.5); opacity: 0; }
+.player-stats {
+    display: flex;
+    gap: 20px;
+    margin-bottom: 20px;
+}
+
+.tetris-grid {
+    display: grid;
+    gap: 1px;
+    background: rgba(17, 17, 34, 0.9);
+    border: 3px solid;
+    border-radius: 8px;
+    box-shadow: 0 0 40px;
+    padding: 3px;
+}
+
+.status-text {
+    font-size: 20px;
+    font-weight: 900;
+    margin-top: 15px;
+    text-align: center;
+}
+
+.winner-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.9);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 100;
+}
+
+.winner-content {
+    background: linear-gradient(135deg, #1a1a2e, #2a2a4e);
+    padding: 60px;
+    border-radius: 16px;
+    border: 3px solid gold;
+    box-shadow: 0 0 50px gold;
+    text-align: center;
+}
+
+.winner-content h1 {
+    font-size: 64px;
+    color: gold;
+    text-shadow: 0 0 30px gold;
+    margin-bottom: 30px;
 }
 
 .controls {
@@ -329,464 +271,218 @@ button.menuBtn.locked::after {
     margin: 4px 0;
 }
 
-#nameModal {
-    display: none;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.8);
-    justify-content: center;
-    align-items: center;
-    z-index: 100;
-}
-
-.modal-content {
-    background: linear-gradient(135deg, #1a1a2e, #2a2a4e);
-    padding: 40px;
-    border-radius: 16px;
-    border: 2px solid #00ffff;
-    box-shadow: 0 0 50px rgba(0, 255, 255, 0.5);
-    text-align: center;
-}
-
-.modal-content h2 {
-    margin-bottom: 20px;
-    color: #00ffff;
-    text-shadow: 0 0 15px #00ffff;
-}
-
-.modal-content .coin-reward {
-    font-size: 48px;
-    margin: 20px 0;
-    color: gold;
-    text-shadow: 0 0 20px gold;
-}
-
-.modal-content input {
-    padding: 12px 20px;
-    font-size: 18px;
-    border: 2px solid #00ffff;
-    border-radius: 8px;
-    background: rgba(0, 0, 0, 0.5);
-    color: white;
-    width: 300px;
-    margin-bottom: 20px;
-}
-
-.modal-content input:focus {
-    outline: none;
-    box-shadow: 0 0 20px rgba(0, 255, 255, 0.6);
-}
-
-.pause-overlay {
-    display: none;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.7);
-    justify-content: center;
-    align-items: center;
-    z-index: 50;
-}
-
-.pause-text {
-    font-size: 72px;
-    color: #00ffff;
-    text-shadow: 0 0 30px #00ffff;
-    animation: pulse 1.5s ease-in-out infinite;
-}
-
-@keyframes pulse {
-    0%, 100% { transform: scale(1); }
-    50% { transform: scale(1.1); }
-}
-
-@media (max-width: 1024px) {
-    .game-container {
+@media (max-width: 1200px) {
+    .game-arena {
         flex-direction: column;
-        align-items: center;
-    }
-    
-    .controls {
-        position: static;
-        margin-top: 20px;
-    }
-}
-/* Scrollovatelné menu s grid layoutem */
-.menu-section {
-    max-height: 60vh;
-    overflow-y: auto;
-    padding: 20px;
-    width: 100%;
-    display: grid;
-    grid-template-columns: repeat(2, 1fr); /* 2 sloupce vedle sebe */
-    gap: 15px;
-    align-items: start;
-}
-
-.menu-section .menuBtn {
-    margin: 0; /* Odstraň margin protože je nahrazen gap */
-    width: 100%; /* Tlačítka vyplní celou šířku sloupce */
-}
-
-.menu-section::-webkit-scrollbar {
-    width: 10px;
-}
-
-.menu-section::-webkit-scrollbar-track {
-    background: rgba(0, 255, 255, 0.1);
-    border-radius: 5px;
-}
-
-.menu-section::-webkit-scrollbar-thumb {
-    background: rgba(0, 255, 255, 0.5);
-    border-radius: 5px;
-}
-
-.menu-section::-webkit-scrollbar-thumb:hover {
-    background: rgba(0, 255, 255, 0.8);
-}
-
-/* Pro větší obrazovky - 3 sloupce */
-@media (min-width: 1200px) {
-    .menu-section {
-        grid-template-columns: repeat(3, 1fr);
-    }
-}
-
-/* Pro mobily - 1 sloupec */
-@media (max-width: 768px) {
-    .menu-section {
-        grid-template-columns: 1fr;
+        gap: 20px;
     }
 }
 </style>
 </head>
 <body>
 
-<button id="backBtn" onclick="window.location.href='hry.html'">⬅ Zpět</button>
-<div id="coinsDisplay">💰 <span id="coinCount">0</span></div>
+<button id="backBtn" onclick="window.location.href='tetris.html'">⬅ Zpět na menu</button>
 
+<!-- Menu -->
 <div id="mainMenu" class="centered">
-    <h1>🎮 TETRIS 🎮</h1>
-    <button class="menuBtn" onclick="startTetris(selectedDifficulty)">🚀 Singleplayer</button>
-    <button class="menuBtn" onclick="showOnlineMultiplayer()">🌐 Multiplayer</button>
-    <button class="menuBtn" onclick="showLeaderboard()">🏆 Žebříček</button>
-    <button class="menuBtn" onclick="showDifficultyMenu()">⚙️ Nastavení</button>
-    <button class="menuBtn" onclick="showMapMenu()">📐 Mapy</button>
-    <button class="menuBtn" onclick="showThemeMenu()">🎨 Vzhled</button>
+    <h1>🌐 TETRIS MULTIPLAYER 🌐</h1>
+    <button class="menuBtn" onclick="createGame()">🎮 Vytvořit hru</button>
+    <button class="menuBtn" onclick="showJoinMenu()">🔗 Připojit se ke hře</button>
 </div>
 
-<div id="difficultyMenu" class="centered" style="display:none;">
-    <h1>Obtížnost</h1>
-    <button class="menuBtn" onclick="setDifficulty('easy')">😊 Snadná</button>
-    <button class="menuBtn" onclick="setDifficulty('medium')">😐 Střední</button>
-    <button class="menuBtn" onclick="setDifficulty('hard')">😈 Těžká</button>
-    <button class="menuBtn" onclick="setDifficulty('insane')">💀 Šílená</button>
-    <button class="menuBtn" onclick="backToMainMenu()">⬅ Zpět</button>
-</div>
-
-<div id="themeMenu" class="centered" style="display:none;">
-    <h1>Barevné téma</h1>
-    <div class="menu-section">
-        <button class="menuBtn" id="theme-classic" onclick="setTheme('classic')">🌈 Klasické</button>
-        <button class="menuBtn" id="theme-neon" onclick="setTheme('neon')">✨ Neon</button>
-        <button class="menuBtn locked" id="theme-fire" onclick="buyTheme('fire', 150)">
-            🔥 Oheň
-            <span class="price-tag">💰 150</span>
-        </button>
-        <button class="menuBtn locked" id="theme-ice" onclick="buyTheme('ice', 180)">
-            ❄️ Led
-            <span class="price-tag">💰 180</span>
-        </button>
-        <button class="menuBtn locked" id="theme-forest" onclick="buyTheme('forest', 220)">
-            🌲 Les
-            <span class="price-tag">💰 220</span>
-        </button>
-        <button class="menuBtn locked" id="theme-sunset" onclick="buyTheme('sunset', 270)">
-            🌅 Západ slunce
-            <span class="price-tag">💰 270</span>
-        </button>
-        <button class="menuBtn locked" id="theme-ocean" onclick="buyTheme('ocean', 310)">
-            🌊 Oceán
-            <span class="price-tag">💰 310</span>
-        </button>
-        <button class="menuBtn locked" id="theme-candy" onclick="buyTheme('candy', 350)">
-            🍬 Candy
-            <span class="price-tag">💰 350</span>
-        </button>
-        <button class="menuBtn locked" id="theme-galaxy" onclick="buyTheme('galaxy', 400)">
-            🌌 Galaxie
-            <span class="price-tag">💰 400</span>
-        </button>
-        <button class="menuBtn locked" id="theme-toxic" onclick="buyTheme('toxic', 450)">
-            ☢️ Toxic
-            <span class="price-tag">💰 450</span>
-        </button>
-        <button class="menuBtn locked" id="theme-rainbow" onclick="buyTheme('rainbow', 500)">
-            🦄 Duha
-            <span class="price-tag">💰 500</span>
-        </button>
-        <button class="menuBtn locked" id="theme-gold" onclick="buyTheme('gold', 600)">
-            👑 Zlaté
-            <span class="price-tag">💰 600</span>
-        </button>
-        <button class="menuBtn locked" id="theme-matrix" onclick="buyTheme('matrix', 650)">
-            💻 Matrix
-            <span class="price-tag">💰 650</span>
-        </button>
-        <button class="menuBtn locked" id="theme-lava" onclick="buyTheme('lava', 700)">
-            🌋 Láva
-            <span class="price-tag">💰 700</span>
-        </button>
-        <button class="menuBtn locked" id="theme-midnight" onclick="buyTheme('midnight', 750)">
-            🌙 Půlnoc
-            <span class="price-tag">💰 750</span>
-        </button>
-        <button class="menuBtn locked" id="theme-crystal" onclick="buyTheme('crystal', 850)">
-            💎 Krystal
-            <span class="price-tag">💰 850</span>
-        </button>
-    </div>
-    <button class="menuBtn" onclick="backToMainMenu()">⬅ Zpět</button>
-</div>
-
-<div id="mapMenu" class="centered" style="display:none;">
-    <h1>Rozměry mapy</h1>
-    <div class="menu-section">
-        <button class="menuBtn" id="map-20x10" onclick="setMap(20,10)">📏 Standardní 20x10</button>
-        <button class="menuBtn" id="map-18x12" onclick="setMap(18,12)">↔️ Široká 18x12</button>
-        <button class="menuBtn locked" id="map-22x8" onclick="buyMap('22x8', 22, 8, 150)">
-            ↕️ Úzká 22x8
-            <span class="price-tag">💰 150</span>
-        </button>
-        <button class="menuBtn locked" id="map-16x16" onclick="buyMap('16x16', 16, 16, 180)">
-            ⬜ Čtverec 16x16
-            <span class="price-tag">💰 180</span>
-        </button>
-        <button class="menuBtn locked" id="map-24x12" onclick="buyMap('24x12', 24, 12, 220)">
-            ⬆️ Vysoká 24x12
-            <span class="price-tag">💰 220</span>
-        </button>
-        <button class="menuBtn locked" id="map-12x20" onclick="buyMap('12x20', 12, 20, 270)">
-            📱 Dlouhá 12x20
-            <span class="price-tag">💰 270</span>
-        </button>
-        <button class="menuBtn locked" id="map-15x15" onclick="buyMap('15x15', 15, 15, 310)">
-            🟦 Kompakt 15x15
-            <span class="price-tag">💰 310</span>
-        </button>
-        <button class="menuBtn locked" id="map-25x8" onclick="buyMap('25x8', 25, 8, 350)">
-            📏 Extra úzká 25x8
-            <span class="price-tag">💰 350</span>
-        </button>
-        <button class="menuBtn locked" id="map-14x18" onclick="buyMap('14x18', 14, 18, 400)">
-            🔲 Vertikální 14x18
-            <span class="price-tag">💰 400</span>
-        </button>
-        <button class="menuBtn locked" id="map-26x10" onclick="buyMap('26x10', 26, 10, 450)">
-            🏢 Mrakodrap 26x10
-            <span class="price-tag">💰 450</span>
-        </button>
-        <button class="menuBtn locked" id="map-18x18" onclick="buyMap('18x18', 18, 18, 500)">
-            ⬛ Velký čtverec 18x18
-            <span class="price-tag">💰 500</span>
-        </button>
-        <button class="menuBtn locked" id="map-10x25" onclick="buyMap('10x25', 10, 25, 550)">
-            🎯 Ultra široká 10x25
-            <span class="price-tag">💰 550</span>
-        </button>
-        <button class="menuBtn locked" id="map-28x9" onclick="buyMap('28x9', 28, 9, 600)">
-            🗼 Věž 28x9
-            <span class="price-tag">💰 600</span>
-        </button>
-        <button class="menuBtn locked" id="map-20x20" onclick="buyMap('20x20', 20, 20, 700)">
-            🎪 Aréna 20x20
-            <span class="price-tag">💰 700</span>
-        </button>
-        <button class="menuBtn locked" id="map-30x10" onclick="buyMap('30x10', 30, 10, 800)">
-            🏰 Epická 30x10
-            <span class="price-tag">💰 800</span>
-        </button>
-        <button class="menuBtn locked" id="map-25x25" onclick="buyMap('25x25', 25, 25, 1000)">
-            👑 Mega aréna 25x25
-            <span class="price-tag">💰 1000</span>
-        </button>
-    </div>
-    <button class="menuBtn" onclick="backToMainMenu()">⬅ Zpět</button>
-</div>
-<div id="leaderboard" class="centered">
-    <h1>🏆 Online žebříček 🏆</h1>
-    <div class="loading">Načítání žebříčku...</div>
-    <table id="leaderboardTable" style="display:none;">
-        <tr><th>Pozice</th><th>Hráč</th><th>Skóre</th><th>Obtížnost</th><th>Datum</th></tr>
-    </table>
-    <button class="menuBtn" onclick="backToMainMenu()" style="margin-top: 20px;">⬅ Zpět</button>
-</div>
-
-<div id="tetrisGame" class="centered">
-    <div class="game-container">
-        <div class="side-panel">
-            <div class="info-box">
-                <h3>DALŠÍ</h3>
-                <div id="nextPiece"></div>
-            </div>
-            <div class="info-box">
-                <h3>HOLD (C)</h3>
-                <div id="holdPiece"></div>
-            </div>
-        </div>
-        
-        <div>
-            <div id="tetris"></div>
-        </div>
-        
-        <div class="side-panel">
-            <div class="info-box">
-                <h3>SKÓRE</h3>
-                <div id="score">0</div>
-            </div>
-            <div class="info-box">
-                <h3>ÚROVEŇ</h3>
-                <div id="level">1</div>
-            </div>
-            <div class="info-box">
-                <h3>ŘÁDKY</h3>
-                <div id="lines">0</div>
-            </div>
-            <div class="info-box">
-                <h3>COMBO</h3>
-                <div id="combo">0</div>
-            </div>
-        </div>
-    </div>
-    
-    <div class="controls">
-        <h4>OVLÁDÁNÍ:</h4>
-        <div>⬅️➡️ - Pohyb</div>
-        <div>⬆️ - Rotace</div>
-        <div>⬇️ - Rychlejší pád</div>
-        <div>MEZERNÍK - Okamžité umístění</div>
-        <div>C - Hold dílku</div>
-        <div>P - Pauza</div>
-        <div>ESC - Menu</div>
-    </div>
-</div>
-
-<div class="pause-overlay" id="pauseOverlay">
-    <div class="pause-text">PAUZA</div>
-</div>
-
-<div id="nameModal">
-    <div class="modal-content">
-        <h2>🎉 Skvělá hra! 🎉</h2>
-        <p style="font-size: 24px; margin-bottom: 10px;">Tvoje skóre: <span id="finalScore">0</span></p>
-        <div class="coin-reward">
-            💰 +<span id="earnedCoins">0</span> mincí!
-        </div>
-        <p id="saveMessage" style="font-size: 18px; color: #00ff00; margin: 20px 0;">
-            ✅ Skóre automaticky uloženo!
-        </p>
-        <button class="menuBtn" onclick="backToMainMenu()">🏠 Zpět do menu</button>
-    </div>
-</div>
-<!-- Online Multiplayer Menu -->
-<div id="onlineMultiplayerMenu" class="centered" style="display:none;">
-    <h1>🌐 Online Multiplayer</h1>
-    <button class="menuBtn" onclick="createOnlineGame()">🎮 Vytvořit hru</button>
-    <button class="menuBtn" onclick="showJoinGame()">🔗 Připojit se ke hře</button>
-    <button class="menuBtn" onclick="backToMainMenu()">⬅ Zpět</button>
-</div>
-
-<!-- Join Game Menu -->
-<div id="joinGameMenu" class="centered" style="display:none;">
+<!-- Join Menu -->
+<div id="joinMenu" class="centered" style="display:none;">
     <h1>🔗 Připojit se ke hře</h1>
-    <input id="gameCodeInput" placeholder="Zadej kód hry (např. ABC123)" style="padding: 15px; font-size: 18px; margin: 20px 0; width: 300px; text-align: center; text-transform: uppercase; background: rgba(0,0,0,0.5); color: #fff; border: 2px solid #0ff; border-radius: 8px;">
-    <button class="menuBtn" onclick="joinOnlineGame()">✅ Připojit se</button>
-    <button class="menuBtn" onclick="backToOnlineMenu()">⬅ Zpět</button>
+    <input id="gameInput" placeholder="Zadej kód hry (např. ABC123)" maxlength="6">
+    <button class="menuBtn" onclick="joinGame()">✅ Připojit se</button>
+    <button class="menuBtn" onclick="backToMenu()">⬅ Zpět</button>
 </div>
 
 <!-- Waiting Room -->
 <div id="waitingRoom" class="centered" style="display:none;">
     <h1>⏳ Čekárna</h1>
-    <div style="background: rgba(0,255,255,0.1); border: 2px solid #0ff; border-radius: 12px; padding: 30px; margin: 20px 0;">
-        <h2 style="color: #
-            let currentGameId = null;
-let currentGameCode = null;
-let myPlayerNumber = null;
-let onlineGameActive = false;
-let onlinePlayer1 = null;
-let onlinePlayer2 = null;
-let gameStateSubscription = null;
-let onlineGameLoopId = null;
+    <div id="gameCodeDisplay">
+        <h2>KÓD HRY</h2>
+        <div id="gameCodeText">------</div>
+    </div>
+    <p class="loading">⏳ Čeká se na druhého hráče...</p>
+    <button class="menuBtn" onclick="cancelGame()">❌ Zrušit</button>
+</div>
 
-window.showOnlineMultiplayer = function() {
-    if (!currentUser || currentUser.is_guest) {
-        alert('Pro online hru se musíš přihlásit!');
-        return;
-    }
+<!-- Game Arena -->
+<div id="gameArena" style="display:none;">
+    <div style="text-align: center; margin-bottom: 20px;">
+        <h1>🌐 ONLINE MULTIPLAYER</h1>
+        <p style="font-size: 24px; color: #0ff;">Kód hry: <span id="currentGameCode">------</span></p>
+    </div>
     
-    hideAllScreens();
-    document.getElementById('onlineMultiplayerMenu').style.display = 'flex';
+    <div class="game-arena">
+        <!-- Hráč 1 -->
+        <div class="player-section">
+            <div class="player-name" id="player1Name" style="color: #00ffff;">🎮 HRÁČ 1</div>
+            <div class="player-stats">
+                <div class="info-box">
+                    <h3>SKÓRE</h3>
+                    <div class="score-display" id="score1">0</div>
+                </div>
+                <div class="info-box">
+                    <h3>ÚROVEŇ</h3>
+                    <div class="score-display" id="level1">1</div>
+                </div>
+            </div>
+            <div id="grid1" class="tetris-grid" style="border-color: #00ffff; box-shadow: 0 0 40px rgba(0,255,255,0.5);"></div>
+            <p class="status-text" id="status1" style="color: #0f0;">✅ HRAJE</p>
+        </div>
+        
+        <!-- Hráč 2 -->
+        <div class="player-section">
+            <div class="player-name" id="player2Name" style="color: #ff00ff;">🎮 HRÁČ 2</div>
+            <div class="player-stats">
+                <div class="info-box">
+                    <h3>SKÓRE</h3>
+                    <div class="score-display" id="score2">0</div>
+                </div>
+                <div class="info-box">
+                    <h3>ÚROVEŇ</h3>
+                    <div class="score-display" id="level2">1</div>
+                </div>
+            </div>
+            <div id="grid2" class="tetris-grid" style="border-color: #ff00ff; box-shadow: 0 0 40px rgba(255,0,255,0.5);"></div>
+            <p class="status-text" id="status2" style="color: #0f0;">✅ HRAJE</p>
+        </div>
+    </div>
+    
+    <button class="menuBtn" onclick="leaveGame()" style="margin-top: 30px;">🚪 Opustit hru</button>
+</div>
+
+<!-- Winner Overlay -->
+<div id="winnerOverlay" class="winner-overlay">
+    <div class="winner-content">
+        <h1>🏆 VÍTĚZ 🏆</h1>
+        <p id="winnerText" style="font-size: 48px; color: #fff; margin-bottom: 30px;">-</p>
+        <button class="menuBtn" onclick="backToMenu()">🏠 Zpět do menu</button>
+    </div>
+</div>
+
+<div class="controls">
+    <h4>OVLÁDÁNÍ:</h4>
+    <div>⬅️➡️ - Pohyb</div>
+    <div>⬆️ - Rotace</div>
+    <div>⬇️ - Rychlejší pád</div>
+    <div>MEZERNÍK - Okamžité umístění</div>
+</div>
+
+<script type="module">
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.3'
+
+const SUPABASE_URL = 'https://bmmaijlbpwgzhrxzxphf.supabase.co'
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJtbWFpamxicHdnemhyeHp4cGhmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjY4NjQ5MDcsImV4cCI6MjA4MjQ0MDkwN30.s0YQVnAjMXFu1pSI1NXZ2naSab179N0vQPglsmy3Pgw'
+
+const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+
+// Globální proměnné
+let currentUser = null
+let currentGameId = null
+let currentGameCode = null
+let myPlayerNumber = null
+let gameActive = false
+let player1 = null
+let player2 = null
+let gameStateChannel = null
+
+// Tetris shapes
+const shapes = [
+    {shape: [[1,1,1,1]], color: 'cyan'},
+    {shape: [[1,1],[1,1]], color: 'yellow'},
+    {shape: [[0,1,0],[1,1,1]], color: 'purple'},
+    {shape: [[0,1,1],[1,1,0]], color: 'green'},
+    {shape: [[1,1,0],[0,1,1]], color: 'red'},
+    {shape: [[1,0,0],[1,1,1]], color: 'blue'},
+    {shape: [[0,0,1],[1,1,1]], color: 'orange'}
+]
+
+const colors = {
+    cyan: '#00ffff',
+    yellow: '#ffff00',
+    purple: '#ff00ff',
+    green: '#00ff00',
+    red: '#ff0000',
+    blue: '#0000ff',
+    orange: '#ff8800'
 }
 
-function hideAllScreens() {
-    document.getElementById('mainMenu').style.display = 'none';
-    document.getElementById('onlineMultiplayerMenu').style.display = 'none';
-    document.getElementById('joinGameMenu').style.display = 'none';
-    document.getElementById('waitingRoom').style.display = 'none';
-    document.getElementById('onlineGame').style.display = 'none';
-    document.getElementById('tetrisGame').style.display = 'none';
+// Načtení uživatele
+async function loadUser() {
+    const saved = localStorage.getItem('currentUser')
+    if (saved) {
+        try {
+            currentUser = JSON.parse(saved)
+            console.log('Přihlášený uživatel:', currentUser.username)
+        } catch (e) {
+            currentUser = { username: saved, is_guest: true }
+        }
+    } else {
+        currentUser = { username: 'Host_' + Math.floor(Math.random() * 10000), is_guest: true }
+    }
 }
 
-function backToOnlineMenu() {
-    hideAllScreens();
-    document.getElementById('onlineMultiplayerMenu').style.display = 'flex';
+// Generování kódu hry
+function generateGameCode() {
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
+    let code = ''
+    for (let i = 0; i < 6; i++) {
+        code += chars.charAt(Math.floor(Math.random() * chars.length))
+    }
+    return code
 }
 
-window.createOnlineGame = async function() {
-    const gameCode = generateGameCode();
+// Vytvoření hry
+window.createGame = async function() {
+    const gameCode = generateGameCode()
     
     try {
         const { data, error } = await supabase
             .from('tetris_multiplayer_games')
             .insert([{
                 game_code: gameCode,
-                player1_id: currentUser.id,
+                player1_id: currentUser.id || null,
                 player1_username: currentUser.username,
                 status: 'waiting'
             }])
             .select()
-            .single();
+            .single()
         
-        if (error) throw error;
+        if (error) throw error
         
-        currentGameId = data.id;
-        currentGameCode = gameCode;
-        myPlayerNumber = 1;
+        currentGameId = data.id
+        currentGameCode = gameCode
+        myPlayerNumber = 1
         
-        hideAllScreens();
-        document.getElementById('waitingRoom').style.display = 'flex';
-        document.getElementById('displayGameCode').textContent = gameCode;
+        document.getElementById('mainMenu').style.display = 'none'
+        document.getElementById('waitingRoom').style.display = 'flex'
+        document.getElementById('gameCodeText').textContent = gameCode
         
-        waitForPlayer2();
+        waitForPlayer2()
         
     } catch (error) {
-        console.error('Chyba při vytváření hry:', error);
-        alert('Chyba při vytváření hry!');
+        console.error('Chyba při vytváření hry:', error)
+        alert('Chyba při vytváření hry!')
     }
 }
 
-window.joinOnlineGame = async function() {
-    const code = document.getElementById('gameCodeInput').value.trim().toUpperCase();
+// Zobrazit join menu
+window.showJoinMenu = function() {
+    document.getElementById('mainMenu').style.display = 'none'
+    document.getElementById('joinMenu').style.display = 'flex'
+}
+
+// Připojit se ke hře
+window.joinGame = async function() {
+    const code = document.getElementById('gameInput').value.trim().toUpperCase()
     
-    if (!code) {
-        alert('Zadej kód hry!');
-        return;
+    if (!code || code.length !== 6) {
+        alert('Zadej platný 6-místný kód hry!')
+        return
     }
     
     try {
@@ -795,39 +491,40 @@ window.joinOnlineGame = async function() {
             .select('*')
             .eq('game_code', code)
             .eq('status', 'waiting')
-            .single();
+            .single()
         
         if (error || !game) {
-            alert('Hra s tímto kódem neexistuje nebo již byla zahájena!');
-            return;
+            alert('Hra s tímto kódem neexistuje nebo již byla zahájena!')
+            return
         }
         
         const { error: updateError } = await supabase
             .from('tetris_multiplayer_games')
             .update({
-                player2_id: currentUser.id,
+                player2_id: currentUser.id || null,
                 player2_username: currentUser.username,
                 status: 'playing'
             })
-            .eq('id', game.id);
+            .eq('id', game.id)
         
-        if (updateError) throw updateError;
+        if (updateError) throw updateError
         
-        currentGameId = game.id;
-        currentGameCode = code;
-        myPlayerNumber = 2;
+        currentGameId = game.id
+        currentGameCode = code
+        myPlayerNumber = 2
         
-        await startOnlineGame();
+        startGame()
         
     } catch (error) {
-        console.error('Chyba při připojování:', error);
-        alert('Chyba při připojování ke hře!');
+        console.error('Chyba při připojování:', error)
+        alert('Chyba při připojování ke hře!')
     }
 }
 
+// Čekání na druhého hráče
 async function waitForPlayer2() {
     const channel = supabase
-        .channel(`game_${currentGameId}`)
+        .channel(`game_wait_${currentGameId}`)
         .on('postgres_changes', {
             event: 'UPDATE',
             schema: 'public',
@@ -835,61 +532,85 @@ async function waitForPlayer2() {
             filter: `id=eq.${currentGameId}`
         }, (payload) => {
             if (payload.new.status === 'playing') {
-                channel.unsubscribe();
-                startOnlineGame();
+                channel.unsubscribe()
+                startGame()
             }
         })
-        .subscribe();
+        .subscribe()
 }
 
-window.cancelWaiting = async function() {
+// Zrušení hry
+window.cancelGame = async function() {
     if (currentGameId) {
         await supabase
             .from('tetris_multiplayer_games')
             .delete()
-            .eq('id', currentGameId);
+            .eq('id', currentGameId)
     }
-    
-    currentGameId = null;
-    currentGameCode = null;
-    myPlayerNumber = null;
-    
-    backToOnlineMenu();
+    backToMenu()
 }
 
-async function startOnlineGame() {
-    hideAllScreens();
-    document.getElementById('onlineGame').style.display = 'flex';
-    document.getElementById('currentGameCode').textContent = currentGameCode;
+// Zpět do menu
+window.backToMenu = function() {
+    if (gameStateChannel) {
+        gameStateChannel.unsubscribe()
+        gameStateChannel = null
+    }
     
-    onlineGameActive = true;
+    gameActive = false
+    currentGameId = null
+    currentGameCode = null
+    myPlayerNumber = null
     
-    // Načti informace o hráčích
+    document.getElementById('mainMenu').style.display = 'flex'
+    document.getElementById('joinMenu').style.display = 'none'
+    document.getElementById('waitingRoom').style.display = 'none'
+    document.getElementById('gameArena').style.display = 'none'
+    document.getElementById('winnerOverlay').style.display = 'none'
+}
+
+// Start hry
+async function startGame() {
+    document.getElementById('waitingRoom').style.display = 'none'
+    document.getElementById('joinMenu').style.display = 'none'
+    document.getElementById('gameArena').style.display = 'flex'
+    document.getElementById('currentGameCode').textContent = currentGameCode
+    
+    gameActive = true
+    
+    // Načti data hry
     const { data: game } = await supabase
         .from('tetris_multiplayer_games')
         .select('*')
         .eq('id', currentGameId)
-        .single();
+        .single()
     
-    document.getElementById('player1Name').textContent = `🎮 ${game.player1_username}`;
-    document.getElementById('player2Name').textContent = `🎮 ${game.player2_username}`;
+    document.getElementById('player1Name').textContent = `🎮 ${game.player1_username}`
+    document.getElementById('player2Name').textContent = `🎮 ${game.player2_username}`
     
-    // Inicializace obou hráčů
-    onlinePlayer1 = createOnlinePlayer('onlineTetris1', 'onlineScore1', 'onlineLevel1', 15, 10, '#00ffff', 1);
-    onlinePlayer2 = createOnlinePlayer('onlineTetris2', 'onlineScore2', 'onlineLevel2', 15, 10, '#ff00ff', 2);
+    // Vytvoř hráče
+    player1 = createPlayer('grid1', 'score1', 'level1', 1)
+    player2 = createPlayer('grid2', 'score2', 'level2', 2)
     
-    // Vytvoř počáteční stav pro mého hráče
-    const myPlayer = myPlayerNumber === 1 ? onlinePlayer1 : onlinePlayer2;
-    await saveGameState(myPlayer);
+    // Vytvoř počáteční stav
+    if (myPlayerNumber === 1) {
+        await saveGameState(player1)
+    } else {
+        await saveGameState(player2)
+    }
     
     // Sleduj změny
-    subscribeToGameState();
+    subscribeToGame()
     
-    // Start smyčky
-    onlineGameLoop();
+    // Start loop
+    gameLoop()
 }
 
-function createOnlinePlayer(gridId, scoreId, levelId, rows, cols, borderColor, playerNum) {
+// Vytvoření hráče
+function createPlayer(gridId, scoreId, levelId, playerNum) {
+    const rows = 20
+    const cols = 10
+    
     const player = {
         grid: [],
         current: null,
@@ -905,134 +626,144 @@ function createOnlinePlayer(gridId, scoreId, levelId, rows, cols, borderColor, p
         levelElement: document.getElementById(levelId),
         rows: rows,
         cols: cols,
-        borderColor: borderColor,
         playerNumber: playerNum
-    };
+    }
     
-    player.gridElement.innerHTML = '';
-    player.gridElement.style.gridTemplateRows = `repeat(${rows}, 25px)`;
-    player.gridElement.style.gridTemplateColumns = `repeat(${cols}, 25px)`;
-    player.gridElement.style.borderColor = borderColor;
+    // Vytvoř grid
+    player.gridElement.innerHTML = ''
+    player.gridElement.style.gridTemplateRows = `repeat(${rows}, 25px)`
+    player.gridElement.style.gridTemplateColumns = `repeat(${cols}, 25px)`
     
     for (let r = 0; r < rows; r++) {
-        player.grid[r] = [];
+        player.grid[r] = []
         for (let c = 0; c < cols; c++) {
-            const cell = document.createElement('div');
-            cell.classList.add('cell');
-            cell.style.width = '23px';
-            cell.style.height = '23px';
-            player.gridElement.appendChild(cell);
-            player.grid[r][c] = 0;
+            const cell = document.createElement('div')
+            cell.classList.add('cell')
+            player.gridElement.appendChild(cell)
+            player.grid[r][c] = 0
         }
     }
     
-    player.nextPiece = randomTetromino();
-    newTetrominoOnline(player);
+    player.nextPiece = randomShape()
+    newPiece(player)
     
-    return player;
+    return player
 }
 
-function newTetrominoOnline(player) {
-    player.current = player.nextPiece;
-    player.current.x = Math.floor(player.cols / 2) - 1;
-    player.current.y = 0;
-    player.nextPiece = randomTetromino();
-    
-    if (collisionOnline(player)) {
-        player.gameOver = true;
-        endOnlineGame(player.playerNumber === 1 ? 2 : 1);
+// Náhodný tvar
+function randomShape() {
+    const shape = shapes[Math.floor(Math.random() * shapes.length)]
+    return {
+        shape: shape.shape.map(r => r.slice()),
+        color: shape.color
     }
 }
 
-function collisionOnline(player, offsetX = 0, offsetY = 0) {
-    if (!player || !player.current || !player.current.shape) return true;
+// Nový dílek
+function newPiece(player) {
+    player.current = player.nextPiece
+    player.current.x = Math.floor(player.cols / 2) - 1
+    player.current.y = 0
+    player.nextPiece = randomShape()
     
+    if (collision(player)) {
+        player.gameOver = true
+        endGame(player.playerNumber === 1 ? 2 : 1)
+    }
+}
+
+// Kolize
+function collision(player, offsetX = 0, offsetY = 0) {
     for (let r = 0; r < player.current.shape.length; r++) {
         for (let c = 0; c < player.current.shape[r].length; c++) {
             if (player.current.shape[r][c]) {
-                let newY = player.current.y + r + offsetY;
-                let newX = player.current.x + c + offsetX;
-                if (newY >= player.rows || newX < 0 || newX >= player.cols) return true;
-                if (newY >= 0 && player.grid[newY][newX]) return true;
+                let newY = player.current.y + r + offsetY
+                let newX = player.current.x + c + offsetX
+                if (newY >= player.rows || newX < 0 || newX >= player.cols) return true
+                if (newY >= 0 && player.grid[newY][newX]) return true
             }
         }
     }
-    return false;
+    return false
 }
 
-function moveDownOnline(player) {
-    if (player.gameOver) return;
+// Pohyb dolů
+function moveDown(player) {
+    if (player.gameOver) return
     
-    player.current.y++;
-    if (collisionOnline(player)) {
-        player.current.y--;
-        freezeOnline(player);
-        newTetrominoOnline(player);
+    player.current.y++
+    if (collision(player)) {
+        player.current.y--
+        freeze(player)
+        newPiece(player)
     }
 }
 
-function freezeOnline(player) {
+// Zmrazení
+function freeze(player) {
     for (let r = 0; r < player.current.shape.length; r++) {
         for (let c = 0; c < player.current.shape[r].length; c++) {
             if (player.current.shape[r][c]) {
-                player.grid[player.current.y + r][player.current.x + c] = player.current.color;
+                player.grid[player.current.y + r][player.current.x + c] = player.current.color
             }
         }
     }
-    
-    clearLinesOnline(player);
+    clearLines(player)
 }
 
-function clearLinesOnline(player) {
-    let cleared = 0;
+// Mazání řádků
+function clearLines(player) {
+    let cleared = 0
     for (let r = player.rows - 1; r >= 0; r--) {
         if (player.grid[r].every(cell => cell !== 0)) {
-            player.grid.splice(r, 1);
-            player.grid.unshift(Array(player.cols).fill(0));
-            cleared++;
-            r++;
+            player.grid.splice(r, 1)
+            player.grid.unshift(Array(player.cols).fill(0))
+            cleared++
+            r++
         }
     }
     
     if (cleared > 0) {
-        player.lines += cleared;
-        player.score += cleared * 100 * player.level;
-        player.level = Math.floor(player.lines / 10) + 1;
-        player.dropInterval = Math.max(100, 600 - (player.level * 50));
-        updateDisplayOnline(player);
+        player.lines += cleared
+        player.score += cleared * 100 * player.level
+        player.level = Math.floor(player.lines / 10) + 1
+        player.dropInterval = Math.max(100, 600 - (player.level * 50))
+        updateDisplay(player)
     }
 }
 
-function drawOnline(player) {
-    if (!player || !player.gridElement) return;
-    
-    const cells = player.gridElement.querySelectorAll('.cell');
+// Vykreslení
+function draw(player) {
+    const cells = player.gridElement.querySelectorAll('.cell')
     
     cells.forEach(cell => {
-        cell.style.background = '#1a1a2e';
-        cell.style.boxShadow = 'none';
-    });
+        cell.style.background = '#1a1a2e'
+        cell.style.boxShadow = 'none'
+        cell.classList.remove('filled')
+    })
     
     for (let r = 0; r < player.rows; r++) {
         for (let c = 0; c < player.cols; c++) {
             if (player.grid[r][c]) {
-                const cell = cells[r * player.cols + c];
-                if (cell) {
-                    cell.style.background = player.grid[r][c];
-                    cell.style.boxShadow = `0 0 8px ${player.grid[r][c]}`;
-                }
+                const cell = cells[r * player.cols + c]
+                const color = colors[player.grid[r][c]]
+                cell.style.background = color
+                cell.style.boxShadow = `0 0 8px ${color}`
+                cell.classList.add('filled')
             }
         }
     }
     
-    if (player.current && player.current.shape) {
+    if (player.current) {
         for (let r = 0; r < player.current.shape.length; r++) {
             for (let c = 0; c < player.current.shape[r].length; c++) {
                 if (player.current.shape[r][c]) {
-                    const index = (player.current.y + r) * player.cols + (player.current.x + c);
+                    const index = (player.current.y + r) * player.cols + (player.current.x + c)
                     if (index >= 0 && index < cells.length) {
-                        cells[index].style.background = player.current.color;
-                        cells[index].style.boxShadow = `0 0 12px ${player.current.color}`;
+                        const color = colors[player.current.color]
+                        cells[index].style.background = color
+                        cells[index].style.boxShadow = `0 0 12px ${color}`
+                        cells[index].classList.add('filled')
                     }
                 }
             }
@@ -1040,34 +771,46 @@ function drawOnline(player) {
     }
 }
 
-function updateDisplayOnline(player) {
-    player.scoreElement.textContent = player.score;
-    player.levelElement.textContent = player.level;
+// Aktualizace zobrazení
+function updateDisplay(player) {
+    player.scoreElement.textContent = player.score
+    player.levelElement.textContent = player.level
 }
 
-function rotateOnline(player) {
-    if (!player || !player.current || !player.current.shape) return;
-    
-    const shape = player.current.shape;
-    const N = shape.length;
-    const M = shape[0].length;
-    const rotated = [];
+// Rotace
+function rotate(player) {
+    const shape = player.current.shape
+    const N = shape.length
+    const M = shape[0].length
+    const rotated = []
     
     for (let y = 0; y < M; y++) {
-        rotated[y] = [];
+        rotated[y] = []
         for (let x = 0; x < N; x++) {
-            rotated[y][x] = shape[N - 1 - x][y] || 0;
+            rotated[y][x] = shape[N - 1 - x][y] || 0
         }
     }
     
-    const oldShape = player.current.shape;
-    player.current.shape = rotated;
+    const oldShape = player.current.shape
+    player.current.shape = rotated
     
-    if (collisionOnline(player)) {
-        player.current.shape = oldShape;
+    if (collision(player)) {
+        player.current.shape = oldShape
     }
 }
 
+// Hard drop
+function hardDrop(player) {
+    while (!collision(player, 0, 1)) {
+        player.current.y++
+    }
+    freeze(player)
+    newPiece(player)
+    player.score += 10
+    updateDisplay(player)
+}
+
+// Uložení stavu
 async function saveGameState(player) {
     try {
         await supabase
@@ -1084,14 +827,15 @@ async function saveGameState(player) {
                 updated_at: new Date().toISOString()
             }, {
                 onConflict: 'game_id,player_number'
-            });
+            })
     } catch (error) {
-        console.error('Chyba při ukládání stavu:', error);
+        console.error('Chyba při ukládání stavu:', error)
     }
 }
 
-function subscribeToGameState() {
-    gameStateSubscription = supabase
+// Sledování změn
+function subscribeToGame() {
+    gameStateChannel = supabase
         .channel(`game_state_${currentGameId}`)
         .on('postgres_changes', {
             event: '*',
@@ -1100,59 +844,38 @@ function subscribeToGameState() {
             filter: `game_id=eq.${currentGameId}`
         }, async (payload) => {
             if (payload.new.player_number !== myPlayerNumber) {
-                const otherPlayer = payload.new.player_number === 1 ? onlinePlayer1 : onlinePlayer2;
+                const otherPlayer = payload.new.player_number === 1 ? player1 : player2
                 
-                otherPlayer.grid = payload.new.grid;
-                otherPlayer.current = payload.new.current_piece;
-                otherPlayer.score = payload.new.score;
-                otherPlayer.level = payload.new.level;
-                otherPlayer.lines = payload.new.lines;
-                otherPlayer.gameOver = payload.new.game_over;
+                otherPlayer.grid = payload.new.grid
+                otherPlayer.current = payload.new.current_piece
+                otherPlayer.score = payload.new.score
+                otherPlayer.level = payload.new.level
+                otherPlayer.lines = payload.new.lines
+                otherPlayer.gameOver = payload.new.game_over
                 
-                updateDisplayOnline(otherPlayer);
-                drawOnline(otherPlayer);
+                updateDisplay(otherPlayer)
+                draw(otherPlayer)
                 
                 if (payload.new.game_over) {
-                    document.getElementById(`player${payload.new.player_number}Status`).textContent = '❌ PROHRÁL';
-                    document.getElementById(`player${payload.new.player_number}Status`).style.color = '#f00';
+                    document.getElementById(`status${payload.new.player_number}`).textContent = '❌ PROHRÁL'
+                    document.getElementById(`status${payload.new.player_number}`).style.color = '#f00'
                 }
             }
         })
-        .subscribe();
+        .subscribe()
 }
 
-function onlineGameLoop() {
-    if (!onlineGameActive) return;
+// Konec hry
+async function endGame(winnerNumber) {
+    gameActive = false
     
-    const now = Date.now();
-    const myPlayer = myPlayerNumber === 1 ? onlinePlayer1 : onlinePlayer2;
-    const otherPlayer = myPlayerNumber === 1 ? onlinePlayer2 : onlinePlayer1;
+    const { data: game } = await supabase
+        .from('tetris_multiplayer_games')
+        .select('*')
+        .eq('id', currentGameId)
+        .single()
     
-    if (myPlayer && !myPlayer.gameOver && now - myPlayer.lastDrop > myPlayer.dropInterval) {
-        moveDownOnline(myPlayer);
-        drawOnline(myPlayer);
-        myPlayer.lastDrop = now;
-        saveGameState(myPlayer);
-    }
-    
-    if (otherPlayer) {
-        drawOnline(otherPlayer);
-    }
-    
-    onlineGameLoopId = requestAnimationFrame(onlineGameLoop);
-}
-
-async function endOnlineGame(winnerNumber) {
-    onlineGameActive = false;
-    
-    if (onlineGameLoopId) {
-        cancelAnimationFrame(onlineGameLoopId);
-        onlineGameLoopId = null;
-    }
-    
-    const winner = winnerNumber === 1 ? 
-        (await supabase.from('tetris_multiplayer_games').select('player1_username').eq('id', currentGameId).single()).data.player1_username :
-        (await supabase.from('tetris_multiplayer_games').select('player2_username').eq('id', currentGameId).single()).data.player2_username;
+    const winner = winnerNumber === 1 ? game.player1_username : game.player2_username
     
     await supabase
         .from('tetris_multiplayer_games')
@@ -1160,32 +883,78 @@ async function endOnlineGame(winnerNumber) {
             status: 'finished',
             winner: winner
         })
-        .eq('id', currentGameId);
+        .eq('id', currentGameId)
     
-    setTimeout(() => {
-        alert(`🎉 ${winner} VYHRÁL! 🎉`);
-        leaveOnlineGame();
-    }, 500);
+    document.getElementById('winnerText').textContent = `${winner} VYHRÁL!`
+    document.getElementById('winnerOverlay').style.display = 'flex'
 }
 
-window.leaveOnlineGame = async function() {
-    onlineGameActive = false;
-    
-    if (onlineGameLoopId) {
-        cancelAnimationFrame(onlineGameLoopId);
-        onlineGameLoopId = null;
+// Opuštění hry
+window.leaveGame = async function() {
+    if (gameStateChannel) {
+        await gameStateChannel.unsubscribe()
     }
     
-    if (gameStateSubscription) {
-        await gameStateSubscription.unsubscribe();
-        gameStateSubscription = null;
-    }
-    
-    currentGameId = null;
-    currentGameCode = null;
-    myPlayerNumber = null;
-    onlinePlayer1 = null;
-    onlinePlayer2 = null;
-    
-    backToMainMenu();
+    gameActive = false
+    backToMenu()
 }
+
+// Herní smyčka
+function gameLoop() {
+    if (!gameActive) return
+    
+    const now = Date.now()
+    const myPlayer = myPlayerNumber === 1 ? player1 : player2
+    const otherPlayer = myPlayerNumber === 1 ? player2 : player1
+    
+    if (!myPlayer.gameOver && now - myPlayer.lastDrop > myPlayer.dropInterval) {
+        moveDown(myPlayer)
+        draw(myPlayer)
+        myPlayer.lastDrop = now
+        saveGameState(myPlayer)
+    }
+    
+    draw(otherPlayer)
+    
+    requestAnimationFrame(gameLoop)
+}
+
+// Ovládání
+document.addEventListener('keydown', e => {
+    if (!gameActive) return
+    
+    const myPlayer = myPlayerNumber === 1 ? player1 : player2
+    if (!myPlayer || myPlayer.gameOver) return
+    
+    if (e.key === 'ArrowLeft') {
+        myPlayer.current.x--
+        if (collision(myPlayer)) myPlayer.current.x++
+        draw(myPlayer)
+        saveGameState(myPlayer)
+    }
+    if (e.key === 'ArrowRight') {
+        myPlayer.current.x++
+        if (collision(myPlayer)) myPlayer.current.x--
+        draw(myPlayer)
+        saveGameState(myPlayer)
+    }
+    if (e.key === 'ArrowDown') {
+        moveDown(myPlayer)
+        draw(myPlayer)
+        saveGameState(myPlayer)
+    }
+    if (e.key === 'ArrowUp') {
+        rotate(myPlayer)
+        draw(myPlayer)
+        saveGameState(myPlayer)
+    }
+    if (e.key === ' ') {
+        e.preventDefault()
+        hardDrop(myPlayer)
+        draw(myPlayer)
+        saveGameState(myPlayer)
+    }
+})
+
+// Inicializace
+await loadUser()
