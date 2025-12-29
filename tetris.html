@@ -1846,7 +1846,51 @@ function getDifficultyEmoji(difficulty) {
     }
 }
 
+// Mobilní ovládání
+if ('ontouchstart' in window) {
+    document.getElementById('mobileLeft')?.addEventListener('touchstart', (e) => {
+        e.preventDefault();
+        if (!isPaused && !isGameOver && current) {
+            current.x--;
+            if (collision()) current.x++;
+            draw();
+        }
+    });
+
+    document.getElementById('mobileRight')?.addEventListener('touchstart', (e) => {
+        e.preventDefault();
+        if (!isPaused && !isGameOver && current) {
+            current.x++;
+            if (collision()) current.x--;
+            draw();
+        }
+    });
+
+    document.getElementById('mobileDown')?.addEventListener('touchstart', (e) => {
+        e.preventDefault();
+        if (!isPaused && !isGameOver) {
+            moveDown();
+        }
+    });
+
+    document.getElementById('mobileRotate')?.addEventListener('touchstart', (e) => {
+        e.preventDefault();
+        if (!isPaused && !isGameOver) {
+            rotate();
+            draw();
+        }
+    });
+
+    document.getElementById('mobileDrop')?.addEventListener('touchstart', (e) => {
+        e.preventDefault();
+        if (!isPaused && !isGameOver) {
+            hardDrop();
+        }
+    });
+}
+
 // Inicializace
+await loadCurrentUser()
 await loadCurrentUser()
 </script>
     <!-- Mobilní ovládání -->
@@ -1865,6 +1909,7 @@ await loadCurrentUser()
 </div>
 </body>
 </html>
+
 
 
 
