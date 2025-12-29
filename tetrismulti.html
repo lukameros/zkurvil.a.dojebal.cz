@@ -170,13 +170,6 @@ button.menuBtn:hover {
     box-shadow: 0 0 20px rgba(0, 255, 255, 0.6);
 }
 
-.loading {
-    text-align: center;
-    padding: 20px;
-    font-size: 18px;
-    color: #00ffff;
-}
-
 .game-arena {
     display: flex;
     gap: 40px;
@@ -281,24 +274,21 @@ button.menuBtn:hover {
 </head>
 <body>
 
-<button id="backBtn" onclick="leaveGame()">⬅ Zpět</button>
+<button id="backBtn">⬅ Zpět</button>
 
-<!-- Menu -->
 <div id="mainMenu" class="centered">
     <h1>🌐 TETRIS MULTIPLAYER 🌐</h1>
-    <button class="menuBtn" onclick="createGame()">🎮 Vytvořit hru</button>
-    <button class="menuBtn" onclick="showJoinMenu()">🔗 Připojit se ke hře</button>
+    <button class="menuBtn" id="createBtn">🎮 Vytvořit hru</button>
+    <button class="menuBtn" id="joinBtn">🔗 Připojit se ke hře</button>
 </div>
 
-<!-- Join Menu -->
 <div id="joinMenu" class="centered" style="display:none;">
     <h1>🔗 Připojit se ke hře</h1>
     <input id="gameInput" placeholder="Zadej kód hry (např. ABC123)" maxlength="6">
-    <button class="menuBtn" onclick="joinGame()">✅ Připojit se</button>
-    <button class="menuBtn" onclick="backToMenu()">⬅ Zpět</button>
+    <button class="menuBtn" id="joinGameBtn">✅ Připojit se</button>
+    <button class="menuBtn" id="backFromJoinBtn">⬅ Zpět</button>
 </div>
 
-<!-- Waiting Room -->
 <div id="waitingRoom" class="centered" style="display:none;">
     <h1>⏳ Čekárna</h1>
     <div id="gameCodeDisplay">
@@ -307,14 +297,12 @@ button.menuBtn:hover {
     </div>
     
     <div style="display: flex; gap: 40px; margin: 30px 0;">
-        <!-- Hráč 1 Status -->
         <div style="text-align: center; padding: 20px; background: rgba(0,255,255,0.1); border: 2px solid #0ff; border-radius: 12px; min-width: 200px;">
             <h3 style="color: #0ff; margin-bottom: 15px;">🎮 HRÁČ 1</h3>
             <p id="player1WaitName" style="font-size: 24px; color: #fff; margin-bottom: 15px;">Čeká...</p>
             <p id="player1Ready" style="font-size: 48px;">⏳</p>
         </div>
         
-        <!-- Hráč 2 Status -->
         <div style="text-align: center; padding: 20px; background: rgba(255,0,255,0.1); border: 2px solid #f0f; border-radius: 12px; min-width: 200px;">
             <h3 style="color: #f0f; margin-bottom: 15px;">🎮 HRÁČ 2</h3>
             <p id="player2WaitName" style="font-size: 24px; color: #fff; margin-bottom: 15px;">Čeká...</p>
@@ -326,12 +314,11 @@ button.menuBtn:hover {
         10
     </div>
     
-    <button id="readyBtn" class="menuBtn" onclick="setReady()" style="display:none;">✅ READY!</button>
-    <button id="startBtn" class="menuBtn" onclick="startCountdown()" style="display:none;">🚀 SPUSTIT HRU</button>
-    <button class="menuBtn" onclick="cancelGame()">❌ Zrušit</button>
+    <button id="readyBtn" class="menuBtn" style="display:none;">✅ READY!</button>
+    <button id="startBtn" class="menuBtn" style="display:none;">🚀 SPUSTIT HRU</button>
+    <button class="menuBtn" id="cancelBtn">❌ Zrušit</button>
 </div>
 
-<!-- Game Arena -->
 <div id="gameArena" style="display:none;">
     <div style="text-align: center; margin-bottom: 20px;">
         <h1>🌐 ONLINE MULTIPLAYER</h1>
@@ -339,7 +326,6 @@ button.menuBtn:hover {
     </div>
     
     <div class="game-arena">
-        <!-- Hráč 1 -->
         <div class="player-section">
             <div class="player-name" id="player1Name" style="color: #00ffff;">🎮 HRÁČ 1</div>
             <div class="player-stats">
@@ -356,7 +342,6 @@ button.menuBtn:hover {
             <p class="status-text" id="status1" style="color: #0f0;">✅ HRAJE</p>
         </div>
         
-        <!-- Hráč 2 -->
         <div class="player-section">
             <div class="player-name" id="player2Name" style="color: #ff00ff;">🎮 HRÁČ 2</div>
             <div class="player-stats">
@@ -374,15 +359,14 @@ button.menuBtn:hover {
         </div>
     </div>
     
-    <button class="menuBtn" onclick="leaveGame()" style="margin-top: 30px;">🚪 Zpět do menu</button>
+    <button class="menuBtn" id="leaveGameBtn" style="margin-top: 30px;">🚪 Zpět do menu</button>
 </div>
 
-<!-- Winner Overlay -->
 <div id="winnerOverlay" class="winner-overlay">
     <div class="winner-content">
         <h1>🏆 VÍTĚZ 🏆</h1>
         <p id="winnerText" style="font-size: 48px; color: #fff; margin-bottom: 30px;">-</p>
-        <button class="menuBtn" onclick="backToMenu()">🏠 Zpět do menu</button>
+        <button class="menuBtn" id="backToMenuBtn">🏠 Zpět do menu</button>
     </div>
 </div>
 
@@ -395,52 +379,34 @@ button.menuBtn:hover {
 </div>
 
 <script type="module">
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.3'
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.3';
 
-const SUPABASE_URL = 'https://bmmaijlbpwgzhrxzxphf.supabase.co'
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJtbWFpamxicHdnemhyeHp4cGhmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjY4NjQ5MDcsImV4cCI6MjA4MjQ0MDkwN30.s0YQVnAjMXFu1pSI1NXZ2naSab179N0vQPglsmy3Pgw'
+const SUPABASE_URL = 'https://bmmaijlbpwgzhrxzxphf.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJtbWFpamxicHdnemhyeHp4cGhmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjY4NjQ5MDcsImV4cCI6MjA4MjQ0MDkwN30.s0YQVnAjMXFu1pSI1NXZ2naSab179N0vQPglsmy3Pgw';
 
-const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-// Globální proměnné
-let currentUser = null
-let currentGameId = null
-let currentGameCode = null
-let myPlayerNumber = null
-let gameActive = false
-let player1 = null
-let player2 = null
-let gameStateChannel = null
-let waitingChannel = null
-let player1IsReady = false
-let player2IsReady = false
+let currentUser = null;
+let currentGameId = null;
+let currentGameCode = null;
+let myPlayerNumber = null;
+let gameActive = false;
+let player1 = null;
+let player2 = null;
+let gameStateChannel = null;
+let waitingChannel = null;
+let player1IsReady = false;
+let player2IsReady = false;
 
-// Barevná témata
 const themes = {
-    classic: { cyan: '#00ffff', yellow: '#ffff00', purple: '#ff00ff', green: '#00ff00', red: '#ff0000', blue: '#0000ff', orange: '#ff8800' },
-    neon: { cyan: '#00ffff', yellow: '#ffff00', purple: '#ff00ff', green: '#00ff00', red: '#ff0080', blue: '#0080ff', orange: '#ff8000' },
-    fire: { cyan: '#ff0000', yellow: '#ff4500', purple: '#ff6347', green: '#ff7f50', red: '#ffa500', blue: '#ffb84d', orange: '#ff8c00' },
-    ice: { cyan: '#00bfff', yellow: '#4169e1', purple: '#1e90ff', green: '#87ceeb', red: '#add8e6', blue: '#b0e0e6', orange: '#87cefa' },
-    forest: { cyan: '#228b22', yellow: '#32cd32', purple: '#3cb371', green: '#2e8b57', red: '#00fa9a', blue: '#90ee90', orange: '#98fb98' },
-    sunset: { cyan: '#ff6347', yellow: '#ff7f50', purple: '#ffa500', green: '#ff8c00', red: '#ff4500', blue: '#ff69b4', orange: '#ff1493' },
-    ocean: { cyan: '#006994', yellow: '#0080b3', purple: '#0099cc', green: '#00b3e6', red: '#33ccff', blue: '#66d9ff', orange: '#99e6ff' },
-    candy: { cyan: '#ff69b4', yellow: '#ffb6c1', purple: '#ff1493', green: '#ff82ab', red: '#ffc0cb', blue: '#ffaec9', orange: '#ff4da6' },
-    galaxy: { cyan: '#4b0082', yellow: '#8a2be2', purple: '#9370db', green: '#9932cc', red: '#ba55d3', blue: '#da70d6', orange: '#ee82ee' },
-    toxic: { cyan: '#7fff00', yellow: '#adff2f', purple: '#00ff00', green: '#32cd32', red: '#39ff14', blue: '#98fb98', orange: '#ccff00' },
-    rainbow: { cyan: '#ff0000', yellow: '#ff7f00', purple: '#ffff00', green: '#00ff00', red: '#0000ff', blue: '#4b0082', orange: '#9400d3' },
-    gold: { cyan: '#ffd700', yellow: '#ffdf00', purple: '#ffb347', green: '#daa520', red: '#b8860b', blue: '#cd853f', orange: '#ff8c00' },
-    matrix: { cyan: '#00ff00', yellow: '#00cc00', purple: '#00aa00', green: '#008800', red: '#00ff41', blue: '#33ff33', orange: '#66ff66' },
-    lava: { cyan: '#8b0000', yellow: '#b22222', purple: '#dc143c', green: '#ff4500', red: '#ff6347', blue: '#ff7f50', orange: '#ffa07a' },
-    midnight: { cyan: '#191970', yellow: '#000080', purple: '#00008b', green: '#0000cd', red: '#4169e1', blue: '#6495ed', orange: '#1e3a8a' },
-    crystal: { cyan: '#e0ffff', yellow: '#afeeee', purple: '#add8e6', green: '#87ceeb', red: '#b0e0e6', blue: '#d4f1f4', orange: '#c0f0f5' }
-}
+    classic: { cyan: '#00ffff', yellow: '#ffff00', purple: '#ff00ff', green: '#00ff00', red: '#ff0000', blue: '#0000ff', orange: '#ff8800' }
+};
 
 function getColorFromTheme(themeName, colorName) {
-    const theme = themes[themeName] || themes.classic
-    return theme[colorName] || theme.cyan
+    const theme = themes[themeName] || themes.classic;
+    return theme[colorName] || theme.cyan;
 }
 
-// Tvary tetris kostek
 const shapes = [
     {shape: [[1,1,1,1]], color: 'cyan'},
     {shape: [[1,1],[1,1]], color: 'yellow'},
@@ -449,62 +415,37 @@ const shapes = [
     {shape: [[1,1,0],[0,1,1]], color: 'red'},
     {shape: [[1,0,0],[1,1,1]], color: 'blue'},
     {shape: [[0,0,1],[1,1,1]], color: 'orange'}
-]
+];
 
-// Načtení uživatelských nastavení
 async function loadUserSettings() {
-    try {
-        if (currentUser && currentUser.id) {
-            const { data } = await supabase
-                .from('tetris_player_data')
-                .select('map_rows, map_cols, theme')
-                .eq('user_id', currentUser.id)
-                .single()
-            
-            if (data) {
-                return {
-                    rows: data.map_rows || 20,
-                    cols: data.map_cols || 10,
-                    theme: data.theme || 'classic'
-                }
-            }
-        }
-    } catch (e) {
-        console.log('Nastavení nenalezeno, použiji výchozí')
-    }
-    
-    return { rows: 20, cols: 10, theme: 'classic' }
+    return { rows: 20, cols: 10, theme: 'classic' };
 }
 
-// Načtení uživatele
 async function loadUser() {
-    const saved = localStorage.getItem('currentUser')
+    const saved = localStorage.getItem('currentUser');
     if (saved) {
         try {
-            currentUser = JSON.parse(saved)
-            console.log('Přihlášený uživatel:', currentUser.username)
+            currentUser = JSON.parse(saved);
         } catch (e) {
-            currentUser = { username: saved, is_guest: true }
+            currentUser = { username: saved, is_guest: true };
         }
     } else {
-        currentUser = { username: 'Host_' + Math.floor(Math.random() * 10000), is_guest: true }
+        currentUser = { username: 'Host_' + Math.floor(Math.random() * 10000), is_guest: true };
     }
 }
 
-// Generování kódu hry
 function generateGameCode() {
-    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
-    let code = ''
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+    let code = '';
     for (let i = 0; i < 6; i++) {
-        code += chars.charAt(Math.floor(Math.random() * chars.length))
+        code += chars.charAt(Math.floor(Math.random() * chars.length));
     }
-    return code
+    return code;
 }
 
-// Vytvoření hry
 async function createGame() {
-    const gameCode = generateGameCode()
-    const settings = await loadUserSettings()
+    const gameCode = generateGameCode();
+    const settings = await loadUserSettings();
     
     try {
         const { data, error } = await supabase
@@ -521,43 +462,40 @@ async function createGame() {
                 status: 'waiting'
             }])
             .select()
-            .single()
+            .single();
         
-        if (error) throw error
+        if (error) throw error;
         
-        currentGameId = data.id
-        currentGameCode = gameCode
-        myPlayerNumber = 1
+        currentGameId = data.id;
+        currentGameCode = gameCode;
+        myPlayerNumber = 1;
         
-        document.getElementById('mainMenu').style.display = 'none'
-        document.getElementById('waitingRoom').style.display = 'flex'
-        document.getElementById('gameCodeText').textContent = gameCode
-        document.getElementById('player1WaitName').textContent = currentUser.username
+        document.getElementById('mainMenu').style.display = 'none';
+        document.getElementById('waitingRoom').style.display = 'flex';
+        document.getElementById('gameCodeText').textContent = gameCode;
+        document.getElementById('player1WaitName').textContent = currentUser.username;
         
-        waitForBothPlayers()
-        
+        waitForBothPlayers();
     } catch (error) {
-        console.error('Chyba při vytváření hry:', error)
-        alert('Chyba při vytváření hry!')
+        console.error('Chyba:', error);
+        alert('Chyba při vytváření hry!');
     }
 }
 
-// Zobrazit join menu
 function showJoinMenu() {
-    document.getElementById('mainMenu').style.display = 'none'
-    document.getElementById('joinMenu').style.display = 'flex'
+    document.getElementById('mainMenu').style.display = 'none';
+    document.getElementById('joinMenu').style.display = 'flex';
 }
 
-// Připojit se ke hře
 async function joinGame() {
-    const code = document.getElementById('gameInput').value.trim().toUpperCase()
+    const code = document.getElementById('gameInput').value.trim().toUpperCase();
     
     if (!code || code.length !== 6) {
-        alert('Zadej platný 6-místný kód hry!')
-        return
+        alert('Zadej platný 6-místný kód hry!');
+        return;
     }
     
-    const settings = await loadUserSettings()
+    const settings = await loadUserSettings();
     
     try {
         const { data: game, error: fetchError } = await supabase
@@ -565,14 +503,14 @@ async function joinGame() {
             .select('*')
             .eq('game_code', code)
             .eq('status', 'waiting')
-            .single()
+            .single();
         
         if (fetchError || !game) {
-            alert('Hra s tímto kódem neexistuje nebo již byla zahájena!')
-            return
+            alert('Hra s tímto kódem neexistuje!');
+            return;
         }
         
-        const { data: updatedGame, error: updateError } = await supabase
+        await supabase
             .from('tetris_multiplayer_games')
             .update({
                 player2_id: currentUser.id || null,
@@ -581,199 +519,220 @@ async function joinGame() {
                 player2_map_cols: settings.cols,
                 player2_theme: settings.theme
             })
-            .eq('id', game.id)
-            .select()
-            .single()
+            .eq('id', game.id);
         
-        if (updateError) {
-            console.error('Chyba při připojování:', updateError)
-            alert('Chyba při připojování ke hře!')
-            return
-        }
+        currentGameId = game.id;
+        currentGameCode = code;
+        myPlayerNumber = 2;
         
-        currentGameId = game.id
-        currentGameCode = code
-        myPlayerNumber = 2
+        document.getElementById('joinMenu').style.display = 'none';
+        document.getElementById('waitingRoom').style.display = 'flex';
+        document.getElementById('gameCodeText').textContent = code;
+        document.getElementById('player1WaitName').textContent = game.player1_username;
+        document.getElementById('player2WaitName').textContent = currentUser.username;
+        document.getElementById('readyBtn').style.display = 'block';
         
-        document.getElementById('joinMenu').style.display = 'none'
-        document.getElementById('waitingRoom').style.display = 'flex'
-        document.getElementById('gameCodeText').textContent = code
-        document.getElementById('player1WaitName').textContent = game.player1_username
-        document.getElementById('player2WaitName').textContent = currentUser.username
-        document.getElementById('readyBtn').style.display = 'block'
-        
-        waitForBothPlayers()
-        
+        waitForBothPlayers();
     } catch (error) {
-        console.error('Chyba při připojování:', error)
-        alert('Chyba při připojování ke hře!')
+        console.error('Chyba:', error);
+        alert('Chyba při připojování!');
     }
 }
 
-// Čekání na oba hráče
 async function waitForBothPlayers() {
-    console.log('Čekám v místnosti, player:', myPlayerNumber)
+    if (myPlayerNumber === 1) {
+        const checkInterval = setInterval(async () => {
+            const { data: game } = await supabase
+                .from('tetris_multiplayer_games')
+                .select('*')
+                .eq('id', currentGameId)
+                .single();
+            
+            if (game && game.player2_username) {
+                clearInterval(checkInterval);
+                document.getElementById('player2WaitName').textContent = game.player2_username;
+                document.getElementById('readyBtn').style.display = 'block';
+            }
+        }, 1000);
+        window.waitInterval = checkInterval;
+    }
     
-    // Pokud jsou oba ready a host (hráč 1) je přihlášený, zobraz tlačítko START
-    if (player1IsReady && player2IsReady && myPlayerNumber === 1) {
-        document.getElementById('startBtn').style.display = 'block'
-        document.getElementById('readyBtn').style.display = 'none'
+    waitingChannel = supabase
+        .channel(`waiting_${currentGameId}`)
+        .on('postgres_changes', {
+            event: 'UPDATE',
+            schema: 'public',
+            table: 'tetris_multiplayer_games',
+            filter: `id=eq.${currentGameId}`
+        }, (payload) => {
+            if (payload.new.status === 'countdown' && myPlayerNumber === 2) {
+                document.getElementById('readyBtn').style.display = 'none';
+                
+                const countdownEl = document.getElementById('countdownDisplay');
+                countdownEl.style.display = 'block';
+                
+                let count = 10;
+                countdownEl.textContent = count;
+                
+                const interval = setInterval(() => {
+                    count--;
+                    if (count > 0) {
+                        countdownEl.textContent = count;
+                    } else {
+                        clearInterval(interval);
+                        countdownEl.textContent = 'START!';
+                    }
+                }, 1000);
+            }
+            
+            if (payload.new.status === 'playing') {
+                setTimeout(() => {
+                    startGame();
+                }, 500);
+            }
+            
+            updateReadyStatus(payload.new);
+        })
+        .subscribe();
+    
+    const { data: game } = await supabase
+        .from('tetris_multiplayer_games')
+        .select('*')
+        .eq('id', currentGameId)
+        .single();
+    
+    if (game) {
+        updateReadyStatus(game);
     }
 }
 
-// Nastavit ready
+function updateReadyStatus(game) {
+    player1IsReady = game.player1_ready || false;
+    player2IsReady = game.player2_ready || false;
+    
+    document.getElementById('player1Ready').textContent = player1IsReady ? '✅' : '⏳';
+    document.getElementById('player2Ready').textContent = player2IsReady ? '✅' : '⏳';
+    
+    if (game.player2_username) {
+        document.getElementById('player2WaitName').textContent = game.player2_username;
+    }
+    
+    if (player1IsReady && player2IsReady && myPlayerNumber === 1) {
+        document.getElementById('startBtn').style.display = 'block';
+        document.getElementById('readyBtn').style.display = 'none';
+    }
+}
+
 async function setReady() {
-    const field = myPlayerNumber === 1 ? 'player1_ready' : 'player2_ready'
+    const field = myPlayerNumber === 1 ? 'player1_ready' : 'player2_ready';
     
     await supabase
         .from('tetris_multiplayer_games')
         .update({ [field]: true })
-        .eq('id', currentGameId)
+        .eq('id', currentGameId);
     
-    document.getElementById('readyBtn').style.display = 'none'
+    document.getElementById('readyBtn').style.display = 'none';
 }
 
-// Odpočítávání
 async function startCountdown() {
-    console.log('Začínám odpočítávání!')
-    
-    // Označ hru jako countdown
     await supabase
         .from('tetris_multiplayer_games')
         .update({ status: 'countdown' })
-        .eq('id', currentGameId)
+        .eq('id', currentGameId);
     
-    // Schovej tlačítka
-    document.getElementById('startBtn').style.display = 'none'
-    document.getElementById('readyBtn').style.display = 'none'
+    document.getElementById('startBtn').style.display = 'none';
+    document.getElementById('readyBtn').style.display = 'none';
     
-    const countdownEl = document.getElementById('countdownDisplay')
-    countdownEl.style.display = 'block'
+    const countdownEl = document.getElementById('countdownDisplay');
+    countdownEl.style.display = 'block';
     
-    let count = 10
-    countdownEl.textContent = count
+    let count = 10;
+    countdownEl.textContent = count;
     
     const interval = setInterval(async () => {
-        count--
+        count--;
         if (count > 0) {
-            countdownEl.textContent = count
+            countdownEl.textContent = count;
         } else {
-            clearInterval(interval)
-            countdownEl.textContent = 'START!'
+            clearInterval(interval);
+            countdownEl.textContent = 'START!';
             
-            // Nastav status na playing
             await supabase
                 .from('tetris_multiplayer_games')
                 .update({ status: 'playing' })
-                .eq('id', currentGameId)
+                .eq('id', currentGameId);
             
             setTimeout(() => {
-                startGame()
-            }, 500)
+                startGame();
+            }, 500);
         }
-    }, 1000)
+    }, 1000);
 }
 
-// Zrušení hry
 async function cancelGame() {
     if (window.waitInterval) {
-        clearInterval(window.waitInterval)
-        window.waitInterval = null
+        clearInterval(window.waitInterval);
     }
     
     if (waitingChannel) {
-        await waitingChannel.unsubscribe()
-        waitingChannel = null
+        await waitingChannel.unsubscribe();
     }
     
     if (currentGameId) {
         await supabase
             .from('tetris_multiplayer_games')
             .delete()
-            .eq('id', currentGameId)
+            .eq('id', currentGameId);
     }
     
-    player1IsReady = false
-    player2IsReady = false
-    
-    backToMenu()
+    backToMenu();
 }
 
-// Zpět do menu
 function backToMenu() {
     if (gameStateChannel) {
-        gameStateChannel.unsubscribe()
-        gameStateChannel = null
+        gameStateChannel.unsubscribe();
     }
     
-    gameActive = false
-    currentGameId = null
-    currentGameCode = null
-    myPlayerNumber = null
+    gameActive = false;
+    currentGameId = null;
     
-    // Resetuj hráče
-    player1 = null
-    player2 = null
-    
-    document.getElementById('mainMenu').style.display = 'flex'
-    document.getElementById('joinMenu').style.display = 'none'
-    document.getElementById('waitingRoom').style.display = 'none'
-    document.getElementById('gameArena').style.display = 'none'
-    document.getElementById('winnerOverlay').style.display = 'none'
+    document.getElementById('mainMenu').style.display = 'flex';
+    document.getElementById('joinMenu').style.display = 'none';
+    document.getElementById('waitingRoom').style.display = 'none';
+    document.getElementById('gameArena').style.display = 'none';
+    document.getElementById('winnerOverlay').style.display = 'none';
 }
 
-// Start hry
 async function startGame() {
-    console.log('Spouštím hru pro hráče:', myPlayerNumber)
-    
     if (window.waitInterval) {
-        clearInterval(window.waitInterval)
-        window.waitInterval = null
+        clearInterval(window.waitInterval);
     }
     
-    document.getElementById('waitingRoom').style.display = 'none'
-    document.getElementById('joinMenu').style.display = 'none'
-    document.getElementById('gameArena').style.display = 'flex'
-    document.getElementById('currentGameCode').textContent = currentGameCode
+    document.getElementById('waitingRoom').style.display = 'none';
+    document.getElementById('gameArena').style.display = 'flex';
+    document.getElementById('currentGameCode').textContent = currentGameCode;
     
-    gameActive = true
+    gameActive = true;
     
     const { data: game } = await supabase
         .from('tetris_multiplayer_games')
         .select('*')
         .eq('id', currentGameId)
-        .single()
+        .single();
     
-    console.log('Data hry:', game)
+    document.getElementById('player1Name').textContent = `🎮 ${game.player1_username}`;
+    document.getElementById('player2Name').textContent = `🎮 ${game.player2_username}`;
     
-    document.getElementById('player1Name').textContent = `🎮 ${game.player1_username}`
-    document.getElementById('player2Name').textContent = `🎮 ${game.player2_username}`
+    player1 = createPlayer('grid1', 'score1', 'level1', 1, 20, 10, 'classic');
+    player2 = createPlayer('grid2', 'score2', 'level2', 2, 20, 10, 'classic');
     
-    // Vytvoř hráče s jejich nastavením
-    player1 = createPlayer(
-        'grid1', 'score1', 'level1', 1,
-        game.player1_map_rows || 20,
-        game.player1_map_cols || 10,
-        game.player1_theme || 'classic'
-    )
+    const myPlayer = myPlayerNumber === 1 ? player1 : player2;
+    await saveGameState(myPlayer);
     
-    player2 = createPlayer(
-        'grid2', 'score2', 'level2', 2,
-        game.player2_map_rows || 20,
-        game.player2_map_cols || 10,
-        game.player2_theme || 'classic'
-    )
-    
-    const myPlayer = myPlayerNumber === 1 ? player1 : player2
-    await saveGameState(myPlayer)
-    
-    subscribeToGame()
-    gameLoop()
-    
-    console.log('Hra spuštěna!')
+    subscribeToGame();
+    gameLoop();
 }
 
-// Vytvoření hráče
 function createPlayer(gridId, scoreId, levelId, playerNum, rows, cols, themeName) {
     const player = {
         grid: [],
@@ -792,130 +751,121 @@ function createPlayer(gridId, scoreId, levelId, playerNum, rows, cols, themeName
         cols: cols,
         playerNumber: playerNum,
         theme: themeName
-    }
+    };
     
-    // Vytvoř grid
-    player.gridElement.innerHTML = ''
-    player.gridElement.style.gridTemplateRows = `repeat(${rows}, 25px)`
-    player.gridElement.style.gridTemplateColumns = `repeat(${cols}, 25px)`
+    player.gridElement.innerHTML = '';
+    player.gridElement.style.gridTemplateRows = `repeat(${rows}, 25px)`;
+    player.gridElement.style.gridTemplateColumns = `repeat(${cols}, 25px)`;
     
     for (let r = 0; r < rows; r++) {
-        player.grid[r] = []
+        player.grid[r] = [];
         for (let c = 0; c < cols; c++) {
-            const cell = document.createElement('div')
-            cell.classList.add('cell')
-            player.gridElement.appendChild(cell)
-            player.grid[r][c] = 0
+            const cell = document.createElement('div');
+            cell.classList.add('cell');
+            player.gridElement.appendChild(cell);
+            player.grid[r][c] = 0;
         }
     }
     
-    player.nextPiece = randomShape()
-    newPiece(player)
+    player.nextPiece = randomShape();
+    newPiece(player);
     
-    return player
+    return player;
 }
 
-// Náhodný tvar
 function randomShape() {
-    const shape = shapes[Math.floor(Math.random() * shapes.length)]
+    const shape = shapes[Math.floor(Math.random() * shapes.length)];
     return {
         shape: shape.shape.map(r => r.slice()),
         color: shape.color
-    }
+    };
 }
 
-// Nový dílek
 function newPiece(player) {
-    player.current = player.nextPiece
-    player.current.x = Math.floor(player.cols / 2) - 1
-    player.current.y = 0
-    player.nextPiece = randomShape()
+    player.current = player.nextPiece;
+    player.current.x = Math.floor(player.cols / 2) - 1;
+    player.current.y = 0;
+    player.nextPiece = randomShape();
     
     if (collision(player)) {
-        player.gameOver = true
-        const winnerNumber = player.playerNumber === 1 ? 2 : 1
-        endGame(winnerNumber)
+        player.gameOver = true;
+        const winnerNumber = player.playerNumber === 1 ? 2 : 1;
+        endGame(winnerNumber);
     }
 }
 
-// Kolize
 function collision(player, offsetX = 0, offsetY = 0) {
     for (let r = 0; r < player.current.shape.length; r++) {
         for (let c = 0; c < player.current.shape[r].length; c++) {
             if (player.current.shape[r][c]) {
-                let newY = player.current.y + r + offsetY
-                let newX = player.current.x + c + offsetX
-                if (newY >= player.rows || newX < 0 || newX >= player.cols) return true
-                if (newY >= 0 && player.grid[newY][newX]) return true
+                let newY = player.current.y + r + offsetY;
+                let newX = player.current.x + c + offsetX;
+                if (newY >= player.rows || newX < 0 || newX >= player.cols) return true;
+                if (newY >= 0 && player.grid[newY][newX]) return true;
             }
         }
     }
-    return false
+    return false;
 }
 
-// Pohyb dolů
 function moveDown(player) {
-    if (player.gameOver) return
-    
-    player.current.y++
+    if (player.gameOver) return;
+    player.current.y++;
     if (collision(player)) {
-        player.current.y--
-        freeze(player)
-        newPiece(player)
+        player.current.y--;
+        freeze(player);
+        newPiece(player);
     }
 }
 
-// Zmrazení
 function freeze(player) {
     for (let r = 0; r < player.current.shape.length; r++) {
         for (let c = 0; c < player.current.shape[r].length; c++) {
             if (player.current.shape[r][c]) {
-                player.grid[player.current.y + r][player.current.x + c] = player.current.color
+                player.grid[player.current.y + r][player.current.x + c] = player.current.color;
             }
         }
     }
-    clearLines(player)
+    clearLines(player);
 }
 
-// Mazání řádků
 function clearLines(player) {
-    let cleared = 0
+    let cleared = 0;
     for (let r = player.rows - 1; r >= 0; r--) {
         if (player.grid[r].every(cell => cell !== 0)) {
-            player.grid.splice(r, 1)
-            player.grid.unshift(Array(player.cols).fill(0))
-            cleared++
-            r++
+            player.grid.splice(r, 1);
+            player.grid.unshift(Array(player.cols).fill(0));
+            cleared++;
+            r++;
         }
     }
     
     if (cleared > 0) {
-        player.lines += cleared
-        player.score += cleared * 100 * player.level
-        player.level = Math.floor(player.lines / 10) + 1
-        player.dropInterval = Math.max(100, 600 - (player.level * 50))
-        updateDisplay(player)
+        player.lines += cleared;
+        player.score += cleared * 100 * player.level;
+        player.level = Math.floor(player.lines / 10) + 1;
+        player.dropInterval = Math.max(100, 600 - (player.level * 50));
+        updateDisplay(player);
     }
 }
 
-// Vykreslení
 function draw(player) {
-    const cells = player.gridElement.querySelectorAll('.cell')
+    const cells = player.gridElement.querySelectorAll('.cell');
     
     cells.forEach(cell => {
-        cell.style.background = '#1a1a2e'
-        cell.style.boxShadow = 'none'
-        cell.classList.remove('filled')
-    })
+        cell.style.background = '#1a1a2e';
+        cell.style.boxShadow = 'none';
+        cell.classList.remove('filled');
+    });
     
     for (let r = 0; r < player.rows; r++) {
         for (let c = 0; c < player.cols; c++) {
             if (player.grid[r][c]) {
-                const cell = cells[r * player.cols + c]
-                const color = getColorFromTheme(player.theme, player.grid[r][c])
-                cell.style.background = color
-                cell.style.boxShadow = `0 0 8px ${color}`
-                cell.classList.add('filled')
+                const cell = cells[r * player.cols + c];
+                const color = getColorFromTheme(player.theme, player.grid[r][c]);
+                cell.style.background = color;
+                cell.style.boxShadow = `0 0 8px ${color}`;
+                cell.classList.add('filled');
             }
         }
     }
@@ -924,12 +874,12 @@ function draw(player) {
         for (let r = 0; r < player.current.shape.length; r++) {
             for (let c = 0; c < player.current.shape[r].length; c++) {
                 if (player.current.shape[r][c]) {
-                    const index = (player.current.y + r) * player.cols + (player.current.x + c)
+                    const index = (player.current.y + r) * player.cols + (player.current.x + c);
                     if (index >= 0 && index < cells.length) {
-                        const color = getColorFromTheme(player.theme, player.current.color)
-                        cells[index].style.background = color
-                        cells[index].style.boxShadow = `0 0 12px ${color}`
-                        cells[index].classList.add('filled')
+                        const color = getColorFromTheme(player.theme, player.current.color);
+                        cells[index].style.background = color;
+                        cells[index].style.boxShadow = `0 0 12px ${color}`;
+                        cells[index].classList.add('filled');
                     }
                 }
             }
@@ -937,82 +887,66 @@ function draw(player) {
     }
 }
 
-// Aktualizace zobrazení
 function updateDisplay(player) {
-    player.scoreElement.textContent = player.score
-    player.levelElement.textContent = player.level
+    player.scoreElement.textContent = player.score;
+    player.levelElement.textContent = player.level;
 }
 
-// Rotace
 function rotate(player) {
-    const shape = player.current.shape
-    const N = shape.length
-    const M = shape[0].length
-    const rotated = []
+    const shape = player.current.shape;
+    const N = shape.length;
+    const M = shape[0].length;
+    const rotated = [];
     
     for (let y = 0; y < M; y++) {
-        rotated[y] = []
+        rotated[y] = [];
         for (let x = 0; x < N; x++) {
-            rotated[y][x] = shape[N - 1 - x][y] || 0
+            rotated[y][x] = shape[N - 1 - x][y] || 0;
         }
     }
     
-    const oldShape = player.current.shape
-    player.current.shape = rotated
+    const oldShape = player.current.shape;
+    player.current.shape = rotated;
     
     if (collision(player)) {
-        player.current.shape = oldShape
+        player.current.shape = oldShape;
     }
 }
 
-// Hard drop
 function hardDrop(player) {
     while (!collision(player, 0, 1)) {
-        player.current.y++
+        player.current.y++;
     }
-    freeze(player)
-    newPiece(player)
-    player.score += 10
-    updateDisplay(player)
+    freeze(player);
+    newPiece(player);
+    player.score += 10;
+    updateDisplay(player);
 }
 
-// Uložení stavu
 async function saveGameState(player) {
-    if (!currentGameId || !player) return
+    if (!currentGameId || !player) return;
     
     try {
-        await supabase
-            .from('tetris_game_state')
-            .delete()
-            .eq('game_id', currentGameId)
-            .eq('player_number', player.playerNumber)
+        await supabase.from('tetris_game_state').delete().eq('game_id', currentGameId).eq('player_number', player.playerNumber);
         
-        const { error } = await supabase
-            .from('tetris_game_state')
-            .insert({
-                game_id: currentGameId,
-                player_number: player.playerNumber,
-                grid: JSON.stringify(player.grid),
-                current_piece: JSON.stringify(player.current),
-                score: player.score,
-                level: player.level,
-                lines: player.lines,
-                game_over: player.gameOver,
-                updated_at: new Date().toISOString()
-            })
-        
-        if (error) {
-            console.error('Chyba při ukládání stavu:', error)
-        }
+        await supabase.from('tetris_game_state').insert({
+            game_id: currentGameId,
+            player_number: player.playerNumber,
+            grid: JSON.stringify(player.grid),
+            current_piece: JSON.stringify(player.current),
+            score: player.score,
+            level: player.level,
+            lines: player.lines,
+            game_over: player.gameOver,
+            updated_at: new Date().toISOString()
+        });
     } catch (error) {
-        console.error('Chyba při ukládání stavu:', error)
+        console.error('Chyba:', error);
     }
 }
 
-// Sledování změn
 function subscribeToGame() {
-    gameStateChannel = supabase
-        .channel(`game_state_${currentGameId}`)
+    gameStateChannel = supabase.channel(`game_state_${currentGameId}`)
         .on('postgres_changes', {
             event: '*',
             schema: 'public',
@@ -1020,260 +954,111 @@ function subscribeToGame() {
             filter: `game_id=eq.${currentGameId}`
         }, async (payload) => {
             if (payload.new.player_number !== myPlayerNumber) {
-                const otherPlayer = payload.new.player_number === 1 ? player1 : player2
+                const otherPlayer = payload.new.player_number === 1 ? player1 : player2;
                 
                 try {
-                    otherPlayer.grid = JSON.parse(payload.new.grid)
-                    otherPlayer.current = JSON.parse(payload.new.current_piece)
+                    otherPlayer.grid = JSON.parse(payload.new.grid);
+                    otherPlayer.current = JSON.parse(payload.new.current_piece);
                 } catch (e) {
-                    otherPlayer.grid = payload.new.grid
-                    otherPlayer.current = payload.new.current_piece
+                    otherPlayer.grid = payload.new.grid;
+                    otherPlayer.current = payload.new.current_piece;
                 }
                 
-                otherPlayer.score = payload.new.score
-                otherPlayer.level = payload.new.level
-                otherPlayer.lines = payload.new.lines
-                otherPlayer.gameOver = payload.new.game_over
+                otherPlayer.score = payload.new.score;
+                otherPlayer.level = payload.new.level;
+                otherPlayer.gameOver = payload.new.game_over;
                 
-                updateDisplay(otherPlayer)
-                draw(otherPlayer)
+                updateDisplay(otherPlayer);
+                draw(otherPlayer);
                 
                 if (payload.new.game_over) {
-                    document.getElementById(`status${payload.new.player_number}`).textContent = '❌ PROHRÁL'
-                    document.getElementById(`status${payload.new.player_number}`).style.color = '#f00'
+                    document.getElementById(`status${payload.new.player_number}`).textContent = '❌ PROHRÁL';
+                    document.getElementById(`status${payload.new.player_number}`).style.color = '#f00';
                 }
             }
-        })
-        .subscribe()
+        }).subscribe();
 }
 
-// Konec hry
 async function endGame(winnerNumber) {
-    gameActive = false
+    gameActive = false;
     
-    const { data: game } = await supabase
-        .from('tetris_multiplayer_games')
-        .select('*')
-        .eq('id', currentGameId)
-        .single()
+    const { data: game } = await supabase.from('tetris_multiplayer_games').select('*').eq('id', currentGameId).single();
     
-    const winner = winnerNumber === 1 ? game.player1_username : game.player2_username
-    const winnerId = winnerNumber === 1 ? game.player1_id : game.player2_id
+    const winner = winnerNumber === 1 ? game.player1_username : game.player2_username;
     
-    await supabase
-        .from('tetris_multiplayer_games')
-        .update({
-            status: 'finished',
-            winner: winner
-        })
-        .eq('id', currentGameId)
+    await supabase.from('tetris_multiplayer_games').update({ status: 'finished', winner: winner }).eq('id', currentGameId);
     
-    if (winnerId && winnerNumber === myPlayerNumber) {
-        try {
-            const { data: playerData } = await supabase
-                .from('tetris_player_data')
-                .select('coins')
-                .eq('user_id', winnerId)
-                .single()
-            
-            if (playerData) {
-                await supabase
-                    .from('tetris_player_data')
-                    .update({ coins: (playerData.coins || 0) + 100 })
-                    .eq('user_id', winnerId)
-            }
-        } catch (e) {
-            console.error('Chyba při přidávání mincí:', e)
-        }
-    }
+    const iWon = winnerNumber === myPlayerNumber;
     
-    const iWon = winnerNumber === myPlayerNumber
-    
-    document.getElementById('winnerText').textContent = iWon ? 
-        `🎉 VYHRÁL JSI! +100 💰` : 
-        `😢 ${winner} vyhrál!`
-    document.getElementById('winnerOverlay').style.display = 'flex'
+    document.getElementById('winnerText').textContent = iWon ? '🎉 VYHRÁL JSI! +100 💰' : `😢 ${winner} vyhrál!`;
+    document.getElementById('winnerOverlay').style.display = 'flex';
 }
 
-// Opuštění hry
-async function leaveGame() {
-    if (currentGameId) {
-        try {
-            await supabase
-                .from('tetris_multiplayer_games')
-                .update({ status: 'finished' })
-                .eq('id', currentGameId)
-        } catch (e) {
-            console.error('Chyba při opouštění:', e)
-        }
-    }
-    
-    if (gameStateChannel) {
-        await gameStateChannel.unsubscribe()
-    }
-    
-    gameActive = false
-    
-    window.location.href = 'hry.html'
-}
-
-// Herní smyčka
 function gameLoop() {
-    if (!gameActive) return
+    if (!gameActive) return;
     
-    const now = Date.now()
-    const myPlayer = myPlayerNumber === 1 ? player1 : player2
-    const otherPlayer = myPlayerNumber === 1 ? player2 : player1
+    const now = Date.now();
+    const myPlayer = myPlayerNumber === 1 ? player1 : player2;
+    const otherPlayer = myPlayerNumber === 1 ? player2 : player1;
     
     if (!myPlayer.gameOver && now - myPlayer.lastDrop > myPlayer.dropInterval) {
-        moveDown(myPlayer)
-        draw(myPlayer)
-        myPlayer.lastDrop = now
-        
-        saveGameState(myPlayer)
+        moveDown(myPlayer);
+        draw(myPlayer);
+        myPlayer.lastDrop = now;
+        saveGameState(myPlayer);
     }
     
-    draw(otherPlayer)
-    
-    requestAnimationFrame(gameLoop)
+    draw(otherPlayer);
+    requestAnimationFrame(gameLoop);
 }
 
-// Ovládání
 document.addEventListener('keydown', e => {
-    if (!gameActive) return
-    
-    const myPlayer = myPlayerNumber === 1 ? player1 : player2
-    if (!myPlayer || myPlayer.gameOver) return
+    if (!gameActive) return;
+    const myPlayer = myPlayerNumber === 1 ? player1 : player2;
+    if (!myPlayer || myPlayer.gameOver) return;
     
     if (e.key === 'ArrowLeft') {
-        myPlayer.current.x--
-        if (collision(myPlayer)) myPlayer.current.x++
-        draw(myPlayer)
-        saveGameState(myPlayer)
+        myPlayer.current.x--;
+        if (collision(myPlayer)) myPlayer.current.x++;
+        draw(myPlayer);
+        saveGameState(myPlayer);
     }
     if (e.key === 'ArrowRight') {
-        myPlayer.current.x++
-        if (collision(myPlayer)) myPlayer.current.x--
-        draw(myPlayer)
-        saveGameState(myPlayer)
+        myPlayer.current.x++;
+        if (collision(myPlayer)) myPlayer.current.x--;
+        draw(myPlayer);
+        saveGameState(myPlayer);
     }
     if (e.key === 'ArrowDown') {
-        moveDown(myPlayer)
-        draw(myPlayer)
-        saveGameState(myPlayer)
+        moveDown(myPlayer);
+        draw(myPlayer);
+        saveGameState(myPlayer);
     }
     if (e.key === 'ArrowUp') {
-        rotate(myPlayer)
-        draw(myPlayer)
-        saveGameState(myPlayer)
+        rotate(myPlayer);
+        draw(myPlayer);
+        saveGameState(myPlayer);
     }
     if (e.key === ' ') {
-        e.preventDefault()
-        hardDrop(myPlayer)
-        draw(myPlayer)
-        saveGameState(myPlayer)
+        e.preventDefault();
+        hardDrop(myPlayer);
+        draw(myPlayer);
+        saveGameState(myPlayer);
     }
-})
+});
 
-// Export funkcí na window
-window.createGame = createGame
-window.showJoinMenu = showJoinMenu
-window.joinGame = joinGame
-window.cancelGame = cancelGame
-window.backToMenu = backToMenu
-window.leaveGame = leaveGame
-window.setReady = setReady
-window.startCountdown = startCountdown
+document.getElementById('createBtn').addEventListener('click', createGame);
+document.getElementById('joinBtn').addEventListener('click', showJoinMenu);
+document.getElementById('joinGameBtn').addEventListener('click', joinGame);
+document.getElementById('backFromJoinBtn').addEventListener('click', backToMenu);
+document.getElementById('readyBtn').addEventListener('click', setReady);
+document.getElementById('startBtn').addEventListener('click', startCountdown);
+document.getElementById('cancelBtn').addEventListener('click', cancelGame);
+document.getElementById('backBtn').addEventListener('click', () => window.location.href = 'hry.html');
+document.getElementById('leaveGameBtn').addEventListener('click', () => window.location.href = 'hry.html');
+document.getElementById('backToMenuBtn').addEventListener('click', backToMenu);
 
-// Inicializace
-loadUser()
+loadUser();
 </script>
 </body>
-</html> Pokud jsem hráč 1, zobraz mi ready tlačítko až když přijde hráč 2
-    if (myPlayerNumber === 1) {
-        // Sleduj, kdy přijde hráč 2
-        const checkInterval = setInterval(async () => {
-            const { data: game } = await supabase
-                .from('tetris_multiplayer_games')
-                .select('*')
-                .eq('id', currentGameId)
-                .single()
-            
-            if (game && game.player2_username) {
-                clearInterval(checkInterval)
-                document.getElementById('player2WaitName').textContent = game.player2_username
-                document.getElementById('readyBtn').style.display = 'block'
-            }
-        }, 1000)
-        window.waitInterval = checkInterval
-    }
-    
-    // Sleduj ready stavy obou hráčů a status hry
-    waitingChannel = supabase
-        .channel(`waiting_${currentGameId}`)
-        .on('postgres_changes', {
-            event: 'UPDATE',
-            schema: 'public',
-            table: 'tetris_multiplayer_games',
-            filter: `id=eq.${currentGameId}`
-        }, (payload) => {
-            console.log('Změna stavu hry:', payload.new)
-            
-            // Pokud host spustil odpočítávání
-            if (payload.new.status === 'countdown' && myPlayerNumber === 2) {
-                document.getElementById('readyBtn').style.display = 'none'
-                
-                const countdownEl = document.getElementById('countdownDisplay')
-                countdownEl.style.display = 'block'
-                
-                let count = 10
-                countdownEl.textContent = count
-                
-                const interval = setInterval(() => {
-                    count--
-                    if (count > 0) {
-                        countdownEl.textContent = count
-                    } else {
-                        clearInterval(interval)
-                        countdownEl.textContent = 'START!'
-                    }
-                }, 1000)
-            }
-            
-            // Pokud se začalo hrát
-            if (payload.new.status === 'playing') {
-                setTimeout(() => {
-                    startGame()
-                }, 500)
-            }
-            
-            updateReadyStatus(payload.new)
-        })
-        .subscribe()
-    
-    // Načti aktuální stav
-    const { data: game } = await supabase
-        .from('tetris_multiplayer_games')
-        .select('*')
-        .eq('id', currentGameId)
-        .single()
-    
-    if (game) {
-        updateReadyStatus(game)
-    }
-}
-
-// Aktualizace ready statusů
-function updateReadyStatus(game) {
-    player1IsReady = game.player1_ready || false
-    player2IsReady = game.player2_ready || false
-    
-    // Update UI
-    document.getElementById('player1Ready').textContent = player1IsReady ? '✅' : '⏳'
-    document.getElementById('player2Ready').textContent = player2IsReady ? '✅' : '⏳'
-    
-    if (game.player2_username) {
-        document.getElementById('player2WaitName').textContent = game.player2_username
-    }
-    
-    //
+</html>
