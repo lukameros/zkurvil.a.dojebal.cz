@@ -5,6 +5,71 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Tetris</title>
 <style>
+ .event-notification {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0);
+    background: linear-gradient(135deg, rgba(255, 0, 0, 0.95), rgba(255, 100, 0, 0.95));
+    border: 4px solid #ffff00;
+    border-radius: 20px;
+    padding: 40px 60px;
+    z-index: 200;
+    text-align: center;
+    box-shadow: 0 0 60px rgba(255, 255, 0, 0.8);
+    animation: eventPop 0.5s ease-out forwards;
+}
+
+@keyframes eventPop {
+    0% { transform: translate(-50%, -50%) scale(0); }
+    50% { transform: translate(-50%, -50%) scale(1.1); }
+    100% { transform: translate(-50%, -50%) scale(1); }
+}
+
+.event-notification.hide {
+    animation: eventFadeOut 0.3s ease-out forwards;
+}
+
+@keyframes eventFadeOut {
+    to { transform: translate(-50%, -50%) scale(0); opacity: 0; }
+}
+
+.event-notification h2 {
+    font-size: 48px;
+    margin-bottom: 15px;
+    color: #ffff00;
+    text-shadow: 0 0 20px #ffff00;
+}
+
+.event-notification p {
+    font-size: 24px;
+    color: white;
+    text-shadow: 0 0 10px rgba(0, 0, 0, 0.8);
+}
+
+.event-timer {
+    position: fixed;
+    top: 80px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(255, 0, 0, 0.8);
+    border: 3px solid #ffff00;
+    border-radius: 12px;
+    padding: 15px 30px;
+    font-size: 24px;
+    font-weight: bold;
+    color: #ffff00;
+    text-shadow: 0 0 15px #ffff00;
+    box-shadow: 0 0 30px rgba(255, 255, 0, 0.6);
+    z-index: 150;
+    display: none;
+    animation: timerPulse 1s ease-in-out infinite;
+}
+
+@keyframes timerPulse {
+    0%, 100% { transform: translateX(-50%) scale(1); }
+    50% { transform: translateX(-50%) scale(1.05); }
+}   
 * {
     margin: 0;
     padding: 0;
@@ -703,6 +768,10 @@ let unlockedThemes = ['classic', 'neon'];
 let unlockedMaps = ['20x10', '18x12'];
 let currentUser = null;
 let totalGamesPlayed = 0;
+// Event systém
+let activeEvent = null;
+let eventTimeout = null;
+let canRotate = true;    
 </script>
 
 <script type="module">
@@ -1023,6 +1092,162 @@ const themes = {
     midnight: ['#191970', '#000080', '#00008b', '#0000cd', '#4169e1', '#6495ed', '#1e3a8a'],
     crystal: ['#e0ffff', '#afeeee', '#add8e6', '#87ceeb', '#b0e0e6', '#d4f1f4', '#c0f0f5']
 }
+// Event typy
+const eventTypes = [
+    {
+        name: '⚡ TURBO SPEED',
+        description: 'Bloky padají 3× rychleji!',
+        duration: 10000,
+        color: 'linear-gradient(135deg, rgba(255, 215, 0, 0.95), rgba(255, 140, 0, 0.95))',
+        onStart: () => {
+            dropInterval = Math.max(50, dropInterval / 3);
+        },
+        onEnd: () => {
+            const baseSpeed = selectedDifficulty === 'easy' ? 800 : 
+                             selectedDifficulty === 'medium' ? 600 : 
+                             selectedDifficulty === 'hard' ? 400 : 250;
+            const speedMultiplier = Math.max(0.25, 1 - (Math.floor(score / 1000) * 0.08));
+            dropInterval = Math.max(100, Math.floor(baseSpeed * speedMultiplier));
+        }
+    },
+    {
+        name: '🚫 NO ROTATION',
+        description: 'Nelze otáčet bloky!',
+        duration: 10000,
+        color: 'linear-gradient(135deg, rgba(255, 0, 0, 0.95), rgba(139, 0, 0, 0.95))',
+        onStart: () => {
+            canRotate = false;
+        },
+        onEnd: () => {
+            canRotate = true;
+        }
+    },
+    {
+        name: '🐌 SLOW MOTION',
+        description: 'Vše se zpomalilo!',
+        duration: 15000,
+        color: 'linear-gradient(135deg, rgba(0, 100, 255, 0.95), rgba(0, 50, 150, 0.95))',
+        onStart: () => {
+            dropInterval = dropInterval * 2.5;
+        },
+        onEnd: () => {
+            const baseSpeed = selectedDifficulty === 'easy' ? 800 : 
+                             selectedDifficulty === 'medium' ? 600 : 
+                             selectedDifficulty === 'hard' ? 400 : 250;
+            const speedMultiplier = Math.max(0.25, 1 - (Math.floor(score / 1000) * 0.08));
+            dropInterval = Math.max(100, Math.floor(baseSpeed * speedMultiplier));
+        }
+    },
+    {
+        name: '🎁 DOUBLE POINTS',
+        description: 'Získáváš 2× body!',
+        duration: 12000,
+        color: 'linear-gradient(135deg, rgba(0, 255, 0, 0.95), rgba(0, 200, 0, 0.95))',
+        multiplier: 2
+    },
+    {
+        name: '⬅️ REVERSE CONTROLS',
+        description: 'Ovládání je obrácené!',
+        duration: 10000,
+        color: 'linear-gradient(135deg, rgba(255, 0, 255, 0.95), rgba(200, 0, 200, 0.95))',
+        reverseControls: true
+    },
+    {
+        name: '👻 INVISIBLE BLOCKS',
+        description: 'Padající blok je neviditelný!',
+        duration: 8000,
+        color: 'linear-gradient(135deg, rgba(100, 100, 100, 0.95), rgba(50, 50, 50, 0.95))',
+        invisibleCurrent: true
+    }
+];
+
+function triggerRandomEvent() {
+    if (isPaused || isGameOver || activeEvent) return;
+    
+    const event = eventTypes[Math.floor(Math.random() * eventTypes.length)];
+    activeEvent = event;
+    
+    showEventNotification(event);
+    
+    if (event.onStart) event.onStart();
+    
+    updateEventTimer(event.duration);
+    
+    eventTimeout = setTimeout(() => {
+        endEvent();
+    }, event.duration);
+}
+
+function showEventNotification(event) {
+    const notification = document.createElement('div');
+    notification.className = 'event-notification';
+    notification.style.background = event.color;
+    notification.innerHTML = `
+        <h2>${event.name}</h2>
+        <p>${event.description}</p>
+    `;
+    document.body.appendChild(notification);
+    
+    playSound('event');
+    
+    setTimeout(() => {
+        notification.classList.add('hide');
+        setTimeout(() => notification.remove(), 300);
+    }, 3000);
+}
+
+function updateEventTimer(duration) {
+    let timer = document.getElementById('eventTimer');
+    if (!timer) {
+        timer = document.createElement('div');
+        timer.id = 'eventTimer';
+        timer.className = 'event-timer';
+        document.body.appendChild(timer);
+    }
+    
+    timer.style.display = 'block';
+    let remaining = Math.floor(duration / 1000);
+    
+    const interval = setInterval(() => {
+        if (!activeEvent || isPaused) {
+            clearInterval(interval);
+            return;
+        }
+        
+        remaining--;
+        timer.textContent = `⏱️ ${activeEvent.name}: ${remaining}s`;
+        
+        if (remaining <= 0) {
+            clearInterval(interval);
+            timer.style.display = 'none';
+        }
+    }, 1000);
+}
+
+function endEvent() {
+    if (!activeEvent) return;
+    
+    if (activeEvent.onEnd) activeEvent.onEnd();
+    
+    const timer = document.getElementById('eventTimer');
+    if (timer) timer.style.display = 'none';
+    
+    activeEvent = null;
+}
+
+// Spustí náhodný event každých 20-40 sekund během hry
+function startEventSystem() {
+    const scheduleNextEvent = () => {
+        const delay = 20000 + Math.random() * 20000; // 20-40s
+        setTimeout(() => {
+            if (!isGameOver) {
+                triggerRandomEvent();
+                scheduleNextEvent();
+            }
+        }, delay);
+    };
+    scheduleNextEvent();
+}    
 
 window.backToMainMenu = function() {
     document.getElementById('mainMenu').style.display = 'flex'
@@ -1145,6 +1370,7 @@ window.startTetris = function(difficulty) {
     newTetromino()
     updateDisplay()
     gameLoop()
+    startEventSystem();
 }
 
 function randomTetromino() {
@@ -1194,29 +1420,34 @@ function drawPreview(piece, container) {
 
 function draw() {
     document.querySelectorAll('.cell').forEach(cell => {
-        cell.style.background = '#1a1a2e'
-        cell.classList.remove('filled')
-    })
+        cell.style.background = '#1a1a2e';
+        cell.classList.remove('filled');
+    });
     
     for (let r = 0; r < mapRows; r++) {
         for (let c = 0; c < mapCols; c++) {
             if (grid[r][c]) {
-                const cell = tetris.children[r * mapCols + c]
-                cell.style.background = grid[r][c]
-                cell.style.boxShadow = `0 0 10px ${grid[r][c]}`
-                cell.classList.add('filled')
+                const cell = tetris.children[r * mapCols + c];
+                cell.style.background = grid[r][c];
+                cell.style.boxShadow = `0 0 10px ${grid[r][c]}`;
+                cell.classList.add('filled');
             }
         }
+    }
+    
+    // Invisible event - nekreslí aktuální blok
+    if (activeEvent && activeEvent.invisibleCurrent) {
+        return;
     }
     
     for (let r = 0; r < current.shape.length; r++) {
         for (let c = 0; c < current.shape[r].length; c++) {
             if (current.shape[r][c]) {
-                const index = (current.y + r) * mapCols + (current.x + c)
+                const index = (current.y + r) * mapCols + (current.x + c);
                 if (index >= 0 && index < mapRows * mapCols) {
-                    tetris.children[index].style.background = current.color
-                    tetris.children[index].style.boxShadow = `0 0 15px ${current.color}`
-                    tetris.children[index].classList.add('filled')
+                    tetris.children[index].style.background = current.color;
+                    tetris.children[index].style.boxShadow = `0 0 15px ${current.color}`;
+                    tetris.children[index].classList.add('filled');
                 }
             }
         }
@@ -1284,11 +1515,16 @@ function clearLines() {
         linesCleared += cleared
         combo++
         
-        let points = cleared * 100 * level
-        if (cleared === 4) points *= 2
-        points += combo * 50
+        let points = cleared * 100 * level;
+        if (cleared === 4) points *= 2;
+        points += combo * 50;
         
-        score += points
+        // Double points event
+        if (activeEvent && activeEvent.multiplier) {
+            points *= activeEvent.multiplier;
+        }
+        
+        score += points;
         level = Math.floor(linesCleared / 10) + 1
         
         // Dynamická rychlost podle obtížnosti a skóre
@@ -1327,33 +1563,38 @@ function createParticles(count) {
 }
 
 function rotate() {
-    const shape = current.shape
-    const N = shape.length
-    const M = shape[0].length
-    const rotated = []
+    if (!canRotate) {
+        playSound('error');
+        return;
+    }
+    
+    const shape = current.shape;
+    const N = shape.length;
+    const M = shape[0].length;
+    const rotated = [];
     
     for (let y = 0; y < M; y++) {
-        rotated[y] = []
+        rotated[y] = [];
         for (let x = 0; x < N; x++) {
-            rotated[y][x] = shape[N - 1 - x][y] || 0
+            rotated[y][x] = shape[N - 1 - x][y] || 0;
         }
     }
     
-    const oldShape = current.shape
-    current.shape = rotated
+    const oldShape = current.shape;
+    current.shape = rotated;
     
     if (collision()) {
-        current.x++
+        current.x++;
         if (collision()) {
-            current.x -= 2
+            current.x -= 2;
             if (collision()) {
-                current.x++
-                current.shape = oldShape
+                current.x++;
+                current.shape = oldShape;
             }
         }
     }
     
-    playSound('rotate')
+    playSound('rotate');
 }
 
 function hardDrop() {
@@ -1432,6 +1673,15 @@ function playSound(type) {
             oscillator.frequency.value = 600
             gainNode.gain.value = 0.1
             break
+        case 'event':
+            oscillator.frequency.value = 1000;
+            gainNode.gain.value = 0.3;
+            oscillator.stop(audioContext.currentTime + 0.3);
+            break;
+        case 'error':
+            oscillator.frequency.value = 150;
+            gainNode.gain.value = 0.2;
+            break;
     }
     
     oscillator.start(audioContext.currentTime)
@@ -1439,44 +1689,56 @@ function playSound(type) {
 }
 
 document.addEventListener('keydown', e => {
-    if (isGameOver) return
+    if (isGameOver) return;
     
     if (e.key === 'p' || e.key === 'P') {
-        togglePause()
-        return
+        togglePause();
+        return;
     }
     
     if (e.key === 'Escape') {
-        backToMainMenu()
-        return
+        backToMainMenu();
+        return;
     }
     
-    if (isPaused) return
+    if (isPaused) return;
+    
+    const reversed = activeEvent && activeEvent.reverseControls;
     
     if (e.key === 'ArrowLeft') {
-        current.x--
-        if (collision()) current.x++
+        if (reversed) {
+            current.x++;
+            if (collision()) current.x--;
+        } else {
+            current.x--;
+            if (collision()) current.x++;
+        }
     }
     if (e.key === 'ArrowRight') {
-        current.x++
-        if (collision()) current.x--
+        if (reversed) {
+            current.x--;
+            if (collision()) current.x++;
+        } else {
+            current.x++;
+            if (collision()) current.x--;
+        }
     }
     if (e.key === 'ArrowDown') {
-        moveDown()
+        moveDown();
     }
     if (e.key === 'ArrowUp') {
-        rotate()
+        rotate();
     }
     if (e.key === ' ') {
-        e.preventDefault()
-        hardDrop()
+        e.preventDefault();
+        hardDrop();
     }
     if (e.key === 'c' || e.key === 'C') {
-        hold()
+        hold();
     }
     
-    draw()
-})
+    draw();
+});
 
 function gameLoop() {
     if (isPaused || isGameOver) return
@@ -1485,9 +1747,12 @@ function gameLoop() {
 }
 
 async function gameOver() {
-    isGameOver = true
+    isGameOver = true;
+    endEvent(); // PŘIDEJ TOTO
+    clearTimeout(eventTimeout); // PŘIDEJ TOTO
     
-    await updateAfterGame(score)
+    await updateAfterGame(score);
+    // ... zbytek kódu
     
     // Automatické uložení skóre pro přihlášené uživatele
     if (currentUser && !currentUser.is_guest) {
@@ -1597,6 +1862,7 @@ await loadCurrentUser()
 </script>
 </body>
 </html>
+
 
 
 
