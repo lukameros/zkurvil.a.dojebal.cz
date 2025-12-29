@@ -1,10 +1,9 @@
 <!DOCTYPE html>
 <html lang="cs">
 <head>
-<link rel="stylesheet" href="firebase-chat-styles.css">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Hlavní menu</title>
+<title>Tetris</title>
 <style>
 * {
     margin: 0;
@@ -13,1047 +12,1604 @@
 }
 
 body {
-    font-family: 'Arial Black', 'Impact', sans-serif;
-    overflow: hidden;
-    background: #000;
-}
-
-#mainMenu {
-    position: fixed;
-    top: 0; left: 0; right: 0; height: 100vh;
+    margin: 0;
+    background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 50%, #0a0a0a 100%);
+    font-family: "Segoe UI", sans-serif;
+    color: white;
+    min-height: 100vh;
     display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    padding: 20px;
-    overflow: hidden;
-    z-index: 50;
+    justify-content: center;
+    align-items: center;
+    overflow-x: hidden;
 }
 
-#menuVideo {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    z-index: 0;
-    filter: brightness(0.5) contrast(1.3);
-}
-
-#mainMenu::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background: 
-        linear-gradient(90deg, rgba(0,0,0,0.8) 0%, transparent 50%, rgba(0,0,0,0.6) 100%),
-        linear-gradient(180deg, rgba(0,0,0,0.5) 0%, transparent 30%, rgba(0,0,0,0.7) 100%);
-    z-index: 1;
-}
-
-.left-buttons {
-    position: relative;
-    z-index: 2;
+.centered {
     display: flex;
     flex-direction: column;
-    gap: 15px;
-    margin-top: 80px;
-}
-
-.left-buttons button {
-    position: relative;
-    padding: 0;
-    min-width: 280px;
-    height: 70px;
-    border: none;
-    background: transparent;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    overflow: hidden;
-}
-
-.left-buttons button::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background: 
-        linear-gradient(135deg, rgba(200,0,0,0.95) 0%, rgba(100,0,0,0.98) 100%),
-        repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(0,0,0,0.1) 10px, rgba(0,0,0,0.1) 20px);
-    clip-path: polygon(0 0, 95% 0, 100% 100%, 5% 100%);
-    box-shadow: 
-        inset 0 3px 0 rgba(255,255,255,0.25),
-        0 8px 20px rgba(0,0,0,0.8);
-    transition: all 0.3s ease;
-}
-
-.left-buttons button span {
-    position: relative;
-    z-index: 3;
-    color: #fff;
-    font-size: 20px;
-    font-weight: 900;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    text-shadow: 
-        0 0 15px rgba(255,0,0,0.9),
-        2px 2px 6px rgba(0,0,0,1);
-    display: flex;
     align-items: center;
-    gap: 12px;
-    padding-left: 30px;
+    justify-content: center;
+    animation: fadeIn 0.5s ease-in;
 }
 
-.left-buttons button:hover::before {
-    background: 
-        linear-gradient(135deg, rgba(255,20,20,1) 0%, rgba(150,0,0,1) 100%);
-    transform: translateX(8px);
+@keyframes fadeIn {
+    from { opacity: 0; transform: scale(0.95); }
+    to { opacity: 1; transform: scale(1); }
 }
 
-.left-buttons button span::before {
-    content: attr(data-icon);
-    font-size: 24px;
+h1 {
+    margin-bottom: 30px;
+    font-size: 56px;
+    text-align: center;
+    text-shadow: 0 0 20px #ff00ff, 0 0 40px #ff00ff;
+    animation: glow 2s ease-in-out infinite;
 }
 
-.admin-btn::before {
-    background: 
-        linear-gradient(135deg, rgba(200,100,0,0.95) 0%, rgba(100,50,0,0.98) 100%) !important;
+@keyframes glow {
+    0%, 100% { text-shadow: 0 0 20px #ff00ff, 0 0 40px #ff00ff; }
+    50% { text-shadow: 0 0 30px #00ffff, 0 0 60px #00ffff; }
 }
 
-#authButtons {
+#backBtn {
     position: absolute;
     top: 20px;
-    right: 30px;
-    display: flex;
-    gap: 12px;
-    align-items: center;
-    z-index: 2;
-}
-
-#onlineCounter {
-    padding: 8px 16px;
-    background: rgba(0,0,0,0.8);
-    color: #0f0;
-    font-weight: 900;
-    font-size: 14px;
-    border: 2px solid rgba(0,255,0,0.5);
-    box-shadow: 0 0 20px rgba(0,255,0,0.4);
-    text-shadow: 0 0 10px rgba(0,255,0,0.9);
-    clip-path: polygon(8% 0, 100% 0, 92% 100%, 0 100%);
-}
-
-#authButtons button {
-    padding: 12px 28px;
-    border: 2px solid rgba(200,0,0,0.7);
-    background: linear-gradient(135deg, rgba(40,40,40,0.9) 0%, rgba(20,20,20,0.95) 100%);
-    color: #fff;
-    font-weight: 900;
-    font-size: 14px;
-    letter-spacing: 1px;
-    text-transform: uppercase;
+    left: 20px;
+    padding: 12px 24px;
+    border-radius: 8px;
+    border: 2px solid #ff00ff;
+    background: rgba(180, 0, 180, 0.3);
+    color: white;
+    font-weight: bold;
     cursor: pointer;
-    box-shadow: 0 0 20px rgba(200,0,0,0.5);
-    transition: all 0.3s ease;
-    text-shadow: 0 0 10px rgba(255,0,0,0.7);
-    clip-path: polygon(8% 0, 100% 0, 92% 100%, 0 100%);
+    box-shadow: 0 0 15px rgba(255, 0, 255, 0.5);
+    z-index: 10;
+    transition: all 0.3s;
 }
 
-#authButtons button:hover {
-    background: linear-gradient(135deg, rgba(200,0,0,0.9) 0%, rgba(120,0,0,0.95) 100%);
+#backBtn:hover {
+    background: rgba(255, 0, 255, 0.5);
+    box-shadow: 0 0 25px rgba(255, 0, 255, 0.8);
     transform: translateY(-2px);
 }
 
-.modal {
+#coinsDisplay {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    padding: 15px 30px;
+    background: linear-gradient(135deg, rgba(255, 215, 0, 0.3), rgba(255, 165, 0, 0.3));
+    border: 3px solid gold;
+    border-radius: 12px;
+    font-size: 28px;
+    font-weight: bold;
+    color: gold;
+    text-shadow: 0 0 15px rgba(255, 215, 0, 0.9);
+    box-shadow: 0 0 25px rgba(255, 215, 0, 0.5);
+    z-index: 10;
+    animation: coinPulse 2s ease-in-out infinite;
+}
+
+@keyframes coinPulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+}
+
+
+
+button.menuBtn {
+    padding: 16px 48px;
+    margin: 12px 0;
+    font-size: 22px;
+    border: 2px solid #00ffff;
+    border-radius: 12px;
+    cursor: pointer;
+    font-weight: bold;
+    background: linear-gradient(135deg, rgba(0, 100, 200, 0.4), rgba(100, 0, 200, 0.4));
+    color: white;
+    box-shadow: 0 0 20px rgba(0, 255, 255, 0.4);
+    transition: all 0.3s;
+    min-width: 280px;
+    position: relative;
+}
+
+button.menuBtn:hover:not(.locked) {
+    transform: scale(1.08) translateY(-3px);
+    box-shadow: 0 0 35px rgba(0, 255, 255, 0.8);
+    background: linear-gradient(135deg, rgba(0, 150, 255, 0.6), rgba(150, 0, 255, 0.6));
+}
+
+button.menuBtn:active:not(.locked) {
+    transform: scale(1.03);
+}
+
+button.menuBtn.locked {
+    background: linear-gradient(135deg, rgba(100, 100, 100, 0.3), rgba(50, 50, 50, 0.3));
+    border-color: #666;
+    color: #999;
+    cursor: not-allowed;
+}
+
+button.menuBtn.locked::after {
+    content: '🔒';
+    position: absolute;
+    right: 15px;
+    font-size: 24px;
+}
+
+.price-tag {
+    position: absolute;
+    right: 50px;
+    background: linear-gradient(135deg, rgba(255, 215, 0, 0.3), rgba(255, 165, 0, 0.3));
+    border: 2px solid gold;
+    border-radius: 6px;
+    padding: 4px 12px;
+    font-size: 16px;
+    color: gold;
+    font-weight: bold;
+}
+
+#tetrisGame {
+    display: none;
+    position: relative;
+    gap: 30px;
+    flex-direction: row;
+}
+
+.game-container {
+    display: flex;
+    gap: 30px;
+    align-items: flex-start;
+}
+
+.side-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.info-box {
+    background: rgba(30, 30, 60, 0.7);
+    border: 2px solid #00ffff;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
+    min-width: 180px;
+}
+
+.info-box h3 {
+    text-align: center;
+    margin-bottom: 15px;
+    color: #00ffff;
+    text-shadow: 0 0 10px #00ffff;
+}
+
+#score, #level, #lines, #combo, #gameCoins {
+    font-size: 32px;
+    font-weight: bold;
+    text-align: center;
+    color: #fff;
+    text-shadow: 0 0 10px #ff00ff;
+}
+
+#gameCoins {
+    color: gold;
+    text-shadow: 0 0 10px gold;
+}
+
+#nextPiece, #holdPiece {
+    width: 120px;
+    height: 120px;
+    display: grid;
+    grid-template-columns: repeat(4, 30px);
+    grid-template-rows: repeat(4, 30px);
+    gap: 1px;
+    background: #111;
+    margin: 0 auto;
+}
+
+.preview-cell {
+    width: 28px;
+    height: 28px;
+    background: #222;
+    border-radius: 3px;
+}
+
+#tetris {
+    display: grid;
+    gap: 1px;
+    background: rgba(17, 17, 34, 0.9);
+    border: 3px solid #00ffff;
+    border-radius: 8px;
+    box-shadow: 0 0 40px rgba(0, 255, 255, 0.5);
+    padding: 3px;
+}
+
+.cell {
+    width: 30px;
+    height: 30px;
+    background: #1a1a2e;
+    border: 1px solid #111;
+    border-radius: 3px;
+    transition: all 0.1s;
+}
+
+.cell.filled {
+    box-shadow: inset 0 0 10px rgba(255, 255, 255, 0.3);
+}
+
+#leaderboard {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    max-width: 90%;
+}
+
+#leaderboard table {
+    border-collapse: collapse;
+    width: 600px;
+    background: rgba(30, 30, 60, 0.7);
+    border: 2px solid #00ffff;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 0 30px rgba(0, 255, 255, 0.4);
+    margin: 20px 0;
+}
+
+#leaderboard th {
+    background: linear-gradient(135deg, #0064c8, #6400c8);
+    padding: 15px;
+    text-align: center;
+    color: #00ffff;
+    text-shadow: 0 0 10px #00ffff;
+}
+
+#leaderboard td {
+    border-top: 1px solid rgba(0, 255, 255, 0.2);
+    padding: 12px;
+    text-align: center;
+    color: #fff;
+}
+
+#leaderboard tr:hover {
+    background: rgba(0, 255, 255, 0.1);
+}
+
+.loading {
+    text-align: center;
+    padding: 20px;
+    font-size: 18px;
+    color: #00ffff;
+}
+
+.particle {
+    position: fixed;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    pointer-events: none;
+    animation: particleFall 1s ease-out forwards;
+    z-index: 1000;
+}
+
+@keyframes particleFall {
+    0% { transform: translateY(0) scale(1); opacity: 1; }
+    100% { transform: translateY(200px) scale(0); opacity: 0; }
+}
+
+.coin-particle {
+    position: fixed;
+    font-size: 32px;
+    pointer-events: none;
+    animation: coinFloat 2s ease-out forwards;
+    z-index: 1000;
+}
+
+@keyframes coinFloat {
+    0% { transform: translateY(0) scale(1); opacity: 1; }
+    100% { transform: translateY(-200px) scale(1.5); opacity: 0; }
+}
+
+.controls {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background: rgba(30, 30, 60, 0.8);
+    border: 2px solid #00ffff;
+    border-radius: 8px;
+    padding: 15px;
+    font-size: 14px;
+    box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
+}
+
+.controls h4 {
+    color: #00ffff;
+    margin-bottom: 8px;
+}
+
+.controls div {
+    margin: 4px 0;
+}
+
+#nameModal {
     display: none;
     position: fixed;
-    inset: 0;
-    background: rgba(0, 0, 0, 0.85);
-    backdrop-filter: blur(5px);
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
     justify-content: center;
     align-items: center;
     z-index: 100;
 }
 
 .modal-content {
-    background: linear-gradient(135deg, rgba(30,30,30,0.98) 0%, rgba(15,15,15,0.99) 100%);
+    background: linear-gradient(135deg, #1a1a2e, #2a2a4e);
     padding: 40px;
-    border: 3px solid rgba(200,0,0,0.7);
-    width: 420px;
+    border-radius: 16px;
+    border: 2px solid #00ffff;
+    box-shadow: 0 0 50px rgba(0, 255, 255, 0.5);
     text-align: center;
-    box-shadow: 0 0 50px rgba(255,0,0,0.7);
-    clip-path: polygon(3% 0, 100% 0, 97% 100%, 0 100%);
-    position: relative;
 }
 
-.modal-content h3 {
-    color: #fff;
-    font-size: 28px;
-    font-weight: 900;
-    letter-spacing: 3px;
-    text-transform: uppercase;
-    text-shadow: 0 0 20px rgba(255,0,0,0.9);
+.modal-content h2 {
     margin-bottom: 20px;
+    color: #00ffff;
+    text-shadow: 0 0 15px #00ffff;
+}
+
+.modal-content .coin-reward {
+    font-size: 48px;
+    margin: 20px 0;
+    color: gold;
+    text-shadow: 0 0 20px gold;
 }
 
 .modal-content input {
-    width: 100%;
-    padding: 15px 20px;
-    margin: 10px 0;
-    border: 2px solid rgba(200,0,0,0.5);
-    background: rgba(0,0,0,0.6);
-    color: #fff;
-    font-size: 16px;
-    font-weight: bold;
-    clip-path: polygon(2% 0, 100% 0, 98% 100%, 0 100%);
-}
-
-.modal-content input::placeholder {
-    color: rgba(255, 255, 255, 0.4);
+    padding: 12px 20px;
+    font-size: 18px;
+    border: 2px solid #00ffff;
+    border-radius: 8px;
+    background: rgba(0, 0, 0, 0.5);
+    color: white;
+    width: 300px;
+    margin-bottom: 20px;
 }
 
 .modal-content input:focus {
     outline: none;
-    border-color: rgba(255,30,30,0.9);
-    box-shadow: 0 0 25px rgba(255,0,0,0.6);
+    box-shadow: 0 0 20px rgba(0, 255, 255, 0.6);
 }
 
-.modal-buttons {
-    display: flex;
-    gap: 15px;
-    margin-top: 20px;
-}
-
-.modal-btn {
-    flex: 1;
-    padding: 15px;
-    border: 2px solid rgba(200,0,0,0.7);
-    background: linear-gradient(135deg, rgba(200,0,0,0.9) 0%, rgba(100,0,0,0.95) 100%);
-    color: #fff;
-    font-weight: 900;
-    font-size: 16px;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    cursor: pointer;
-    text-shadow: 0 0 12px rgba(255,0,0,0.9);
-    clip-path: polygon(5% 0, 100% 0, 95% 100%, 0 100%);
-    transition: all 0.3s ease;
-}
-
-.modal-btn:hover {
-    background: linear-gradient(135deg, rgba(255,20,20,1) 0%, rgba(150,0,0,1) 100%);
-    transform: translateY(-3px);
-}
-
-.modal-btn.cancel {
-    background: linear-gradient(135deg, rgba(60,60,60,0.9) 0%, rgba(30,30,30,0.95) 100%);
-    border-color: rgba(100,100,100,0.6);
-}
-
-.modal-btn.cancel:hover {
-    background: linear-gradient(135deg, rgba(80,80,80,1) 0%, rgba(50,50,50,1) 100%);
-}
-
-#chatPanel {
+.pause-overlay {
     display: none;
     position: fixed;
-    bottom: 20px;
-    right: 20px;
-    width: 400px;
-    height: 500px;
-    background: linear-gradient(135deg, rgba(20,20,20,0.98) 0%, rgba(10,10,10,0.99) 100%);
-    border: 3px solid rgba(200,0,0,0.7);
-    clip-path: polygon(2% 0, 100% 0, 98% 100%, 0 100%);
-    z-index: 99;
-    flex-direction: column;
-}
-
-#chatHeader {
-    padding: 15px;
-    background: rgba(200,0,0,0.3);
-    border-bottom: 2px solid rgba(200,0,0,0.7);
-    display: flex;
-    justify-content: space-between;
-}
-
-#chatHeader h4 {
-    color: #fff;
-    font-size: 18px;
-    font-weight: 900;
-    text-transform: uppercase;
-    text-shadow: 0 0 15px rgba(255,0,0,0.9);
-}
-
-#closeChatBtn {
-    background: rgba(200,0,0,0.8);
-    border: none;
-    color: #fff;
-    font-size: 20px;
-    width: 30px;
-    height: 30px;
-    cursor: pointer;
-    font-weight: 900;
-}
-
-#chatMessages {
-    flex: 1;
-    overflow-y: auto;
-    padding: 15px;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-}
-
-.chat-message {
-    padding: 10px 15px;
-    background: rgba(40,40,40,0.8);
-    border-left: 3px solid rgba(200,0,0,0.7);
-    color: #fff;
-    font-size: 14px;
-}
-
-.chat-message .chat-user {
-    color: #ff3333;
-    font-weight: 900;
-    margin-right: 8px;
-}
-
-.chat-message.admin {
-    border-left-color: rgba(255,150,0,0.9);
-    background: rgba(60,40,20,0.8);
-}
-
-.chat-message.admin .chat-user {
-    color: #ff9900;
-}
-
-.chat-message.guest {
-    border-left-color: rgba(100,100,200,0.7);
-}
-
-.chat-message.guest .chat-user {
-    color: #6699ff;
-}
-
-#chatInput {
-    display: flex;
-    gap: 10px;
-    padding: 15px;
-    border-top: 2px solid rgba(200,0,0,0.7);
-}
-
-#chatInput input {
-    flex: 1;
-    padding: 12px;
-    border: 2px solid rgba(200,0,0,0.5);
-    background: rgba(0,0,0,0.6);
-    color: #fff;
-}
-
-#chatInput button {
-    padding: 12px 20px;
-    border: 2px solid rgba(200,0,0,0.7);
-    background: rgba(200,0,0,0.9);
-    color: #fff;
-    font-weight: 900;
-    cursor: pointer;
-}
-
-#adminPanel {
-    display: none;
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 600px;
-    max-height: 80vh;
-    background: linear-gradient(135deg, rgba(30,30,30,0.98) 0%, rgba(15,15,15,0.99) 100%);
-    border: 3px solid rgba(200,100,0,0.8);
-    z-index: 101;
-    overflow-y: auto;
-    padding: 30px;
-}
-
-#adminPanel h3 {
-    color: #ff9900;
-    font-size: 24px;
-    text-align: center;
-    margin-bottom: 20px;
-}
-
-.admin-section {
-    margin-bottom: 25px;
-    padding: 20px;
-    background: rgba(0,0,0,0.5);
-    border: 2px solid rgba(200,100,0,0.5);
-}
-
-.admin-section h4 {
-    color: #fff;
-    margin-bottom: 15px;
-}
-
-.admin-actions button {
+    top: 0;
+    left: 0;
     width: 100%;
-    padding: 12px;
-    margin: 5px 0;
-    border: 2px solid rgba(200,100,0,0.7);
-    background: rgba(200,100,0,0.8);
-    color: #fff;
-    font-weight: 900;
-    cursor: pointer;
-    text-transform: uppercase;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    justify-content: center;
+    align-items: center;
+    z-index: 50;
 }
 
-#usersList {
-    display: none;
-    margin-top: 15px;
-    max-height: 300px;
+.pause-text {
+    font-size: 72px;
+    color: #00ffff;
+    text-shadow: 0 0 30px #00ffff;
+    animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+}
+
+@media (max-width: 1024px) {
+    .game-container {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .controls {
+        position: static;
+        margin-top: 20px;
+    }
+    /* Scrollovatelné menu s grid layoutem */
+.menu-section {
+    max-height: 60vh;
     overflow-y: auto;
+    padding: 20px;
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr); /* 2 sloupce vedle sebe */
+    gap: 15px;
+    align-items: start;
 }
 
-::-webkit-scrollbar {
-    width: 8px;
+.menu-section .menuBtn {
+    margin: 0; /* Odstraň margin protože je nahrazen gap */
+    width: 100%; /* Tlačítka vyplní celou šířku sloupce */
 }
 
-::-webkit-scrollbar-thumb {
-    background: rgba(200,0,0,0.7);
+.menu-section::-webkit-scrollbar {
+    width: 10px;
+}
+
+.menu-section::-webkit-scrollbar-track {
+    background: rgba(0, 255, 255, 0.1);
+    border-radius: 5px;
+}
+
+.menu-section::-webkit-scrollbar-thumb {
+    background: rgba(0, 255, 255, 0.5);
+    border-radius: 5px;
+}
+
+.menu-section::-webkit-scrollbar-thumb:hover {
+    background: rgba(0, 255, 255, 0.8);
+}
+
+/* Pro větší obrazovky - 3 sloupce */
+@media (min-width: 1200px) {
+    .menu-section {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+/* Pro mobily - 1 sloupec */
+@media (max-width: 768px) {
+    .menu-section {
+        grid-template-columns: 1fr;
+    }
 }
 </style>
 </head>
 <body>
 
-<div id="mainMenu">
-    <video id="menuVideo" autoplay muted loop playsinline preload="auto">
-        <source src="wf.mp4" type="video/mp4">
-    </video>
+<button id="backBtn" onclick="window.location.href='hry.html'">⬅ Zpět</button>
+<div id="coinsDisplay">💰 <span id="coinCount">0</span></div>
 
-    <div class="left-buttons">
-        <button onclick="goGuide()">
-            <span data-icon="📖">Návody</span>
+<div id="mainMenu" class="centered">
+    <h1>🎮 TETRIS 🎮</h1>
+    <button class="menuBtn" onclick="startTetris(selectedDifficulty)">🚀 Singleplayer</button>
+    <button class="menuBtn" onclick="window.location.href='tetrismulti.html'">🌐 Multiplayer</button>
+    <button class="menuBtn" onclick="showDifficultyMenu()">⚙️ Nastavení</button>
+    <button class="menuBtn" onclick="showMapMenu()">📐 Mapy</button>
+    <button class="menuBtn" onclick="showThemeMenu()">🎨 Vzhled</button>
+    <button class="menuBtn" onclick="showLeaderboard()">🏆 Žebříček</button>
+</div>
+
+<div id="difficultyMenu" class="centered" style="display:none;">
+    <h1>Obtížnost</h1>
+    <button class="menuBtn" onclick="setDifficulty('easy')">😊 Snadná</button>
+    <button class="menuBtn" onclick="setDifficulty('medium')">😐 Střední</button>
+    <button class="menuBtn" onclick="setDifficulty('hard')">😈 Těžká</button>
+    <button class="menuBtn" onclick="setDifficulty('insane')">💀 Šílená</button>
+    <button class="menuBtn" onclick="backToMainMenu()">⬅ Zpět</button>
+</div>
+
+<div id="themeMenu" class="centered" style="display:none;">
+    <h1>Barevné téma</h1>
+    <div class="menu-section">
+        <button class="menuBtn" id="theme-classic" onclick="setTheme('classic')">🌈 Klasické</button>
+        <button class="menuBtn" id="theme-neon" onclick="setTheme('neon')">✨ Neon</button>
+        <button class="menuBtn locked" id="theme-fire" onclick="buyTheme('fire', 150)">
+            🔥 Oheň
+            <span class="price-tag">💰 150</span>
         </button>
-        <button onclick="goArchive()">
-            <span data-icon="🗂">Archiv</span>
+        <button class="menuBtn locked" id="theme-ice" onclick="buyTheme('ice', 180)">
+            ❄️ Led
+            <span class="price-tag">💰 180</span>
         </button>
-        <button onclick="goGames()">
-            <span data-icon="🎮">Hry</span>
+        <button class="menuBtn locked" id="theme-forest" onclick="buyTheme('forest', 220)">
+            🌲 Les
+            <span class="price-tag">💰 220</span>
         </button>
-        <button onclick="goAirsoftAction()">
-            <span data-icon="🎯">Airsoft Akce</span>
+        <button class="menuBtn locked" id="theme-sunset" onclick="buyTheme('sunset', 270)">
+            🌅 Západ slunce
+            <span class="price-tag">💰 270</span>
         </button>
-        <button onclick="goTools()">
-            <span data-icon="🔧">Nástroje</span>
+        <button class="menuBtn locked" id="theme-ocean" onclick="buyTheme('ocean', 310)">
+            🌊 Oceán
+            <span class="price-tag">💰 310</span>
         </button>
-        <button id="adminMenuBtn" class="admin-btn" onclick="openAdminPanel()" style="display:none;">
-            <span data-icon="⚙️">Admin Panel</span>
+        <button class="menuBtn locked" id="theme-candy" onclick="buyTheme('candy', 350)">
+            🍬 Candy
+            <span class="price-tag">💰 350</span>
+        </button>
+        <button class="menuBtn locked" id="theme-galaxy" onclick="buyTheme('galaxy', 400)">
+            🌌 Galaxie
+            <span class="price-tag">💰 400</span>
+        </button>
+        <button class="menuBtn locked" id="theme-toxic" onclick="buyTheme('toxic', 450)">
+            ☢️ Toxic
+            <span class="price-tag">💰 450</span>
+        </button>
+        <button class="menuBtn locked" id="theme-rainbow" onclick="buyTheme('rainbow', 500)">
+            🦄 Duha
+            <span class="price-tag">💰 500</span>
+        </button>
+        <button class="menuBtn locked" id="theme-gold" onclick="buyTheme('gold', 600)">
+            👑 Zlaté
+            <span class="price-tag">💰 600</span>
+        </button>
+        <button class="menuBtn locked" id="theme-matrix" onclick="buyTheme('matrix', 650)">
+            💻 Matrix
+            <span class="price-tag">💰 650</span>
+        </button>
+        <button class="menuBtn locked" id="theme-lava" onclick="buyTheme('lava', 700)">
+            🌋 Láva
+            <span class="price-tag">💰 700</span>
+        </button>
+        <button class="menuBtn locked" id="theme-midnight" onclick="buyTheme('midnight', 750)">
+            🌙 Půlnoc
+            <span class="price-tag">💰 750</span>
+        </button>
+        <button class="menuBtn locked" id="theme-crystal" onclick="buyTheme('crystal', 850)">
+            💎 Krystal
+            <span class="price-tag">💰 850</span>
         </button>
     </div>
+    <button class="menuBtn" onclick="backToMainMenu()">⬅ Zpět</button>
+</div>
 
-    <div id="authButtons">
-        <div id="onlineCounter">👥 Online: <span id="onlineCount">0</span></div>
-        <button onclick="toggleChat()">💬 Chat</button>
-        <button id="registerBtn" onclick="showRegister()">Register</button>
-        <button id="loginBtn" onclick="showLogin()">Login</button>
-        <button id="logoutBtn" onclick="logout()" style="display:none;">Logout</button>
+<div id="mapMenu" class="centered" style="display:none;">
+    <h1>Rozměry mapy</h1>
+    <div class="menu-section">
+        <button class="menuBtn" id="map-20x10" onclick="setMap(20,10)">📏 Standardní 20x10</button>
+        <button class="menuBtn" id="map-18x12" onclick="setMap(18,12)">↔️ Široká 18x12</button>
+        <button class="menuBtn locked" id="map-22x8" onclick="buyMap('22x8', 22, 8, 150)">
+            ↕️ Úzká 22x8
+            <span class="price-tag">💰 150</span>
+        </button>
+        <button class="menuBtn locked" id="map-16x16" onclick="buyMap('16x16', 16, 16, 180)">
+            ⬜ Čtverec 16x16
+            <span class="price-tag">💰 180</span>
+        </button>
+        <button class="menuBtn locked" id="map-24x12" onclick="buyMap('24x12', 24, 12, 220)">
+            ⬆️ Vysoká 24x12
+            <span class="price-tag">💰 220</span>
+        </button>
+        <button class="menuBtn locked" id="map-12x20" onclick="buyMap('12x20', 12, 20, 270)">
+            📱 Dlouhá 12x20
+            <span class="price-tag">💰 270</span>
+        </button>
+        <button class="menuBtn locked" id="map-15x15" onclick="buyMap('15x15', 15, 15, 310)">
+            🟦 Kompakt 15x15
+            <span class="price-tag">💰 310</span>
+        </button>
+        <button class="menuBtn locked" id="map-25x8" onclick="buyMap('25x8', 25, 8, 350)">
+            📏 Extra úzká 25x8
+            <span class="price-tag">💰 350</span>
+        </button>
+        <button class="menuBtn locked" id="map-14x18" onclick="buyMap('14x18', 14, 18, 400)">
+            🔲 Vertikální 14x18
+            <span class="price-tag">💰 400</span>
+        </button>
+        <button class="menuBtn locked" id="map-26x10" onclick="buyMap('26x10', 26, 10, 450)">
+            🏢 Mrakodrap 26x10
+            <span class="price-tag">💰 450</span>
+        </button>
+        <button class="menuBtn locked" id="map-18x18" onclick="buyMap('18x18', 18, 18, 500)">
+            ⬛ Velký čtverec 18x18
+            <span class="price-tag">💰 500</span>
+        </button>
+        <button class="menuBtn locked" id="map-10x25" onclick="buyMap('10x25', 10, 25, 550)">
+            🎯 Ultra široká 10x25
+            <span class="price-tag">💰 550</span>
+        </button>
+        <button class="menuBtn locked" id="map-28x9" onclick="buyMap('28x9', 28, 9, 600)">
+            🗼 Věž 28x9
+            <span class="price-tag">💰 600</span>
+        </button>
+        <button class="menuBtn locked" id="map-20x20" onclick="buyMap('20x20', 20, 20, 700)">
+            🎪 Aréna 20x20
+            <span class="price-tag">💰 700</span>
+        </button>
+        <button class="menuBtn locked" id="map-30x10" onclick="buyMap('30x10', 30, 10, 800)">
+            🏰 Epická 30x10
+            <span class="price-tag">💰 800</span>
+        </button>
+        <button class="menuBtn locked" id="map-25x25" onclick="buyMap('25x25', 25, 25, 1000)">
+            👑 Mega aréna 25x25
+            <span class="price-tag">💰 1000</span>
+        </button>
+    </div>
+    <button class="menuBtn" onclick="backToMainMenu()">⬅ Zpět</button>
+</div>
+<div id="leaderboard" class="centered">
+    <h1>🏆 Online žebříček 🏆</h1>
+    <div class="loading">Načítání žebříčku...</div>
+    <table id="leaderboardTable" style="display:none;">
+        <tr><th>Pozice</th><th>Hráč</th><th>Skóre</th><th>Obtížnost</th><th>Datum</th></tr>
+    </table>
+    <button class="menuBtn" onclick="backToMainMenu()" style="margin-top: 20px;">⬅ Zpět</button>
+</div>
+
+<div id="tetrisGame" class="centered">
+    <div class="game-container">
+        <div class="side-panel">
+            <div class="info-box">
+                <h3>DALŠÍ</h3>
+                <div id="nextPiece"></div>
+            </div>
+            <div class="info-box">
+                <h3>DRŽENÍ (C)</h3>
+                <div id="holdPiece"></div>
+            </div>
+        </div>
+        
+        <div>
+            <div id="tetris"></div>
+        </div>
+        
+        <div class="side-panel">
+            <div class="info-box">
+                <h3>SKÓRE</h3>
+                <div id="score">0</div>
+            </div>
+            <div class="info-box">
+                <h3>MINCE</h3>
+                <div id="gameCoins">0</div>
+            </div>
+            <div class="info-box">
+                <h3>ÚROVEŇ</h3>
+                <div id="level">1</div>
+            </div>
+            <div class="info-box">
+                <h3>ŘÁDKY</h3>
+                <div id="lines">0</div>
+            </div>
+            <div class="info-box">
+                <h3>COMBO</h3>
+                <div id="combo">0</div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="controls">
+        <h4>OVLÁDÁNÍ:</h4>
+        <div>⬅️➡️ - Pohyb</div>
+        <div>⬆️ - Rotace</div>
+        <div>⬇️ - Rychlejší pád</div>
+        <div>MEZERNÍK - Okamžité umístění</div>
+        <div>C - Držení dílku</div>
+        <div>P - Pauza</div>
+        <div>ESC - Menu</div>
     </div>
 </div>
 
-<!-- Login Modal -->
-<div id="loginModal" class="modal">
+<div class="pause-overlay" id="pauseOverlay">
+    <div class="pause-text">PAUZA</div>
+</div>
+
+<div id="nameModal">
     <div class="modal-content">
-        <h3>Přihlášení</h3>
-        <input id="loginUser" placeholder="Uživatelské jméno">
-        <input id="loginPass" type="password" placeholder="Heslo">
-        <div class="modal-buttons">
-            <button class="modal-btn" onclick="login()">Přihlásit</button>
-            <button class="modal-btn cancel" onclick="closeLogin()">Zrušit</button>
+        <h2>🎉 Skvělá hra! 🎉</h2>
+        <p style="font-size: 24px; margin-bottom: 10px;">Tvoje skóre: <span id="finalScore">0</span></p>
+        <div class="coin-reward">
+            💰 +<span id="earnedCoins">0</span> mincí!
         </div>
+        <p id="saveMessage" style="font-size: 18px; color: #00ff00; margin: 20px 0;">
+            ✅ Skóre automaticky uloženo!
+        </p>
+        <button class="menuBtn" onclick="backToMainMenu()">🏠 Zpět do menu</button>
     </div>
-</div>
-
-<!-- Register Modal -->
-<div id="registerModal" class="modal">
-    <div class="modal-content">
-        <h3>Registrace</h3>
-        <input id="registerUser" placeholder="Uživatelské jméno">
-        <input id="registerEmail" type="email" placeholder="Email (nepovinné)">
-        <input id="registerPass" type="password" placeholder="Heslo">
-        <input id="registerPassConfirm" type="password" placeholder="Potvrdit heslo">
-        <div class="modal-buttons">
-            <button class="modal-btn" onclick="register()">Registrovat</button>
-            <button class="modal-btn cancel" onclick="closeRegister()">Zrušit</button>
-        </div>
-    </div>
-</div>
-
-<!-- Chat Panel -->
-<div id="chatPanel">
-    <div id="chatHeader">
-        <h4>💬 Chat</h4>
-        <button id="closeChatBtn" onclick="toggleChat()">×</button>
-    </div>
-    <div id="chatMessages"></div>
-    <div id="chatInput">
-        <input id="messageInput" placeholder="Napište zprávu..." onkeypress="if(event.key==='Enter') sendMessage()">
-        <button onclick="sendMessage()">Odeslat</button>
-    </div>
-</div>
-
-<!-- Admin Panel -->
-<div id="adminPanel">
-    <h3>⚙️ Admin Panel</h3>
-    
-    <div class="admin-section">
-        <h4>📊 Statistiky</h4>
-        <p style="color: #fff;">Online uživatelé: <span id="adminOnlineCount">0</span></p>
-        <p style="color: #fff;">Celkem zpráv: <span id="totalMessages">0</span></p>
-        <p style="color: #fff;">Celkem uživatelů: <span id="totalUsers">0</span></p>
-    </div>
-    
-    <div class="admin-section">
-        <h4>👥 Správa uživatelů</h4>
-        <div class="admin-actions">
-            <button onclick="showUsersList()">Zobrazit seznam uživatelů</button>
-        </div>
-        <div id="usersList"></div>
-    </div>
-    
-    <div class="admin-section">
-        <h4>🗑️ Správa chatu</h4>
-        <div class="admin-actions">
-            <button onclick="clearChat()">Smazat všechny zprávy</button>
-            <button onclick="clearOldMessages()">Smazat zprávy starší 7 dní</button>
-            <button onclick="exportChatLog()">Exportovat chat log</button>
-        </div>
-    </div>
-    
-    <div class="admin-section">
-        <h4>👥 Správa presence</h4>
-        <div class="admin-actions">
-            <button onclick="clearOldPresence()">Vyčistit staré záznamy</button>
-            <button onclick="clearAllPresence()">Smazat všechny online záznamy</button>
-        </div>
-    </div>
-    
-    <div class="admin-section">
-        <h4>📊 Databáze</h4>
-        <div class="admin-actions">
-            <button onclick="showDatabaseStats()">Zobrazit statistiky DB</button>
-            <button onclick="exportAllData()">Exportovat všechna data</button>
-        </div>
-    </div>
-    
-    <div class="admin-section">
-        <h4>📢 Systémová zpráva</h4>
-        <input id="systemMessage" placeholder="Zadejte systémovou zprávu..." style="width: 100%; padding: 10px; margin-bottom: 10px; background: rgba(0,0,0,0.5); color: #fff; border: 2px solid rgba(200,100,0,0.5);">
-        <div class="admin-actions">
-            <button onclick="sendSystemMessage()">Odeslat systémovou zprávu</button>
-        </div>
-    </div>
-    
-    <button class="modal-btn cancel" onclick="closeAdminPanel()" style="width: 100%; margin-top: 20px;">Zavřít</button>
 </div>
 
 <script>
-// Navigační funkce
-function goGuide() {
-    window.location.href = "návod.html";
-}
+let selectedDifficulty = 'medium';
+let mapRows = 20;
+let mapCols = 10;
+let currentTheme = 'classic';
 
-function goArchive() {
-    window.location.href = "archive.html";
-}
+let score = 0;
+let level = 1;
+let linesCleared = 0;
+let combo = 0;
+let dropInterval = 500;
+let dropTimeout;
+let isPaused = false;
+let isGameOver = false;
+let canHold = true;
+let earnedCoinsThisGame = 0;
 
-function goGames() {
-    window.location.href = "hry.html";
-}
+let grid = [];
+let current = null;
+let nextPiece = null;
+let holdPiece = null;
 
-function goTools() {
-    window.location.href = "nastroje.html";
-}
-
-function goAirsoftAction() {
-    window.location.href = "https://www.airsoftbattles.cz/";
-}
-
-function showLogin() {
-    document.getElementById("loginModal").style.display = "flex";
-}
-
-function closeLogin() {
-    document.getElementById("loginModal").style.display = "none";
-}
-
-function showRegister() {
-    document.getElementById("registerModal").style.display = "flex";
-}
-
-function closeRegister() {
-    document.getElementById("registerModal").style.display = "none";
-}
-
-function toggleChat() {
-    const chatPanel = document.getElementById('chatPanel');
-    if (chatPanel.style.display === 'none' || !chatPanel.style.display) {
-        chatPanel.style.display = 'flex';
-    } else {
-        chatPanel.style.display = 'none';
-    }
-}
-
-function openAdminPanel() {
-    document.getElementById('adminPanel').style.display = 'block';
-    if (window.loadAdminStats) {
-        window.loadAdminStats();
-    }
-}
-
-function closeAdminPanel() {
-    document.getElementById('adminPanel').style.display = 'none';
-}
+let playerCoins = 0;
+let unlockedThemes = ['classic', 'neon'];
+let unlockedMaps = ['20x10', '18x12'];
+let currentUser = null;
+let totalGamesPlayed = 0;
 </script>
 
 <script type="module">
-import { supabase, db } from './supabase-config.js';
-import { initPresence } from './presence-utils.js';
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.3'
 
-let currentUser = null;
-let currentUserId = null;
-let isAdmin = false;
-let userPresenceId = null;
+const SUPABASE_URL = 'https://bmmaijlbpwgzhrxzxphf.supabase.co'
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJtbWFpamxicHdnemhyeHp4cGhmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjY4NjQ5MDcsImV4cCI6MjA4MjQ0MDkwN30.s0YQVnAjMXFu1pSI1NXZ2naSab179N0vQPglsmy3Pgw'
 
-// REGISTRACE
-window.register = async function() {
-    const username = document.getElementById('registerUser').value.trim();
-    const email = document.getElementById('registerEmail').value.trim();
-    const password = document.getElementById('registerPass').value;
-    const passwordConfirm = document.getElementById('registerPassConfirm').value;
-    
-    if (!username || !password) {
-        alert('Vyplňte uživatelské jméno a heslo!');
-        return;
-    }
-    
-    if (password.length < 6) {
-        alert('Heslo musí mít alespoň 6 znaků!');
-        return;
-    }
-    
-    if (password !== passwordConfirm) {
-        alert('Hesla se neshodují!');
-        return;
-    }
-    
-    const { data, error } = await db.registerUser(username, password, email || null);
-    
-    if (error) {
-        alert(error.message || 'Chyba při registraci!');
-        return;
-    }
-    
-    alert('Registrace úspěšná! Můžete se nyní přihlásit.');
-    closeRegister();
-    
-    document.getElementById('registerUser').value = '';
-    document.getElementById('registerEmail').value = '';
-    document.getElementById('registerPass').value = '';
-    document.getElementById('registerPassConfirm').value = '';
-}
+const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
 
-// LOGIN
-window.login = async function() {
-    const username = document.getElementById('loginUser').value.trim();
-    const password = document.getElementById('loginPass').value;
-    
-    if (!username || !password) {
-        alert('Vyplňte všechna pole!');
-        return;
-    }
-    
-    const { data: user, error } = await db.loginUser(username, password);
-    
-    if (error || !user) {
-        alert('Špatné přihlašovací údaje!');
-        return;
-    }
-    
-    currentUser = user.username;
-    currentUserId = user.id;
-    isAdmin = user.is_admin;
-    
-    localStorage.setItem('currentUser', JSON.stringify({
-        id: user.id,
-        username: user.username,
-        is_admin: user.is_admin,
-        email: user.email || null
-    }));
-    
-    document.getElementById('loginBtn').style.display = 'none';
-    document.getElementById('registerBtn').style.display = 'none';
-    document.getElementById('logoutBtn').style.display = 'inline-block';
-    
-    if (isAdmin) {
-        document.getElementById('adminMenuBtn').style.display = 'block';
-    }
-    
-    closeLogin();
-    alert(`Vítejte, ${user.username}!${isAdmin ? ' (Admin)' : ''}`);
-}
-
-// LOGOUT
-window.logout = function() {
-    currentUser = null;
-    currentUserId = null;
-    isAdmin = false;
-    window.guestName = null;
-    
-    localStorage.removeItem('currentUser');
-    
-    document.getElementById('loginBtn').style.display = 'inline-block';
-    document.getElementById('registerBtn').style.display = 'inline-block';
-    document.getElementById('logoutBtn').style.display = 'none';
-    document.getElementById('adminMenuBtn').style.display = 'none';
-    
-    alert('Byl jste odhlášen. Nyní píšete jako host.');
-}
-
-// Poslat zprávu
-window.sendMessage = async function() {
-    const input = document.getElementById('messageInput');
-    const message = input.value.trim();
-    
-    if (!message) return;
-    
-    let username = currentUser;
-    if (!username) {
-        if (!window.guestName) {
-            window.guestName = 'Host_' + Math.random().toString(36).substr(2, 6).toUpperCase();
-        }
-        username = window.guestName;
-    }
-    
-    await db.addMessage({
-        user: username,
-        text: message,
-        timestamp: new Date().toISOString(),
-        is_admin: isAdmin,
-        is_guest: !currentUser
-    });
-    
-    input.value = '';
-}
-
-// Systémová zpráva
-window.sendSystemMessage = async function() {
-    if (!isAdmin) return;
-    
-    const input = document.getElementById('systemMessage');
-    const message = input.value.trim();
-    
-    if (!message) return;
-    
-    await db.addMessage({
-        user: 'SYSTÉM',
-        text: message,
-        timestamp: new Date().toISOString(),
-        is_admin: true,
-        is_system: true
-    });
-    
-    input.value = '';
-    alert('Systémová zpráva byla odeslána!');
-}
-
-// Načíst zprávy
-async function loadMessages() {
-    const { data: messages } = await db.getMessages();
-    displayMessages(messages);
-    
-    db.subscribeToMessages(async () => {
-        const { data: messages } = await db.getMessages();
-        displayMessages(messages);
-    });
-}
-
-function displayMessages(messages) {
-    const messagesDiv = document.getElementById('chatMessages');
-    messagesDiv.innerHTML = '';
-    
-    if (messages && messages.length > 0) {
-        messages.forEach(msg => {
-            const div = document.createElement('div');
-            
-            let msgClass = 'chat-message';
-            if (msg.is_admin) msgClass += ' admin';
-            else if (msg.is_guest) msgClass += ' guest';
-            
-            div.className = msgClass;
-            
-            const time = msg.timestamp ? new Date(msg.timestamp).toLocaleTimeString('cs-CZ') : '';
-            
-            div.innerHTML = `
-                <span class="chat-user">${msg.username}:</span>
-                <span class="chat-text">${msg.text}</span>
-                <span class="chat-time" style="font-size: 11px; color: rgba(255,255,255,0.5); margin-left: 8px;">${time}</span>
-            `;
-            
-            messagesDiv.appendChild(div);
-        });
-        
-        messagesDiv.scrollTop = messagesDiv.scrollHeight;
-        if (document.getElementById('totalMessages')) {
-            document.getElementById('totalMessages').textContent = messages.length;
-        }
-    } else {
-        if (document.getElementById('totalMessages')) {
-            document.getElementById('totalMessages').textContent = 0;
-        }
-    }
-}
-
-// ADMIN FUNKCE
-window.loadAdminStats = async function() {
-    const { data: users } = await db.getAllUsers();
-    const { data: messages } = await db.getMessages();
-    const { count: onlineCount } = await db.getOnlineCount();
-    
-    if (document.getElementById('totalUsers')) {
-        document.getElementById('totalUsers').textContent = users ? users.length : 0;
-    }
-    if (document.getElementById('totalMessages')) {
-        document.getElementById('totalMessages').textContent = messages ? messages.length : 0;
-    }
-    if (document.getElementById('adminOnlineCount')) {
-        document.getElementById('adminOnlineCount').textContent = onlineCount || 0;
-    }
-}
-
-// Zobrazit seznam uživatelů
-window.showUsersList = async function() {
-    if (!isAdmin) return;
-    
-    const usersList = document.getElementById('usersList');
-    const { data: users } = await db.getAllUsers();
-    
-    if (usersList.style.display === 'none' || !usersList.style.display) {
-        usersList.style.display = 'block';
-        
-        usersList.innerHTML = '<table style="width: 100%; color: #fff; font-size: 13px; border-collapse: collapse;"><thead><tr style="background: rgba(200,100,0,0.3);"><th style="padding: 10px; text-align: left;">Uživatel</th><th style="padding: 10px;">Admin</th><th style="padding: 10px;">Registrován</th><th style="padding: 10px;">Akce</th></tr></thead><tbody>';
-        
-        users.forEach(user => {
-            const date = new Date(user.created_at).toLocaleDateString('cs-CZ');
-            const isUserAdmin = user.is_admin;
-            const canDelete = user.username !== 'lukamer';
-            
-            usersList.innerHTML += `
-                <tr style="border-bottom: 1px solid rgba(200,100,0,0.3);">
-                    <td style="padding: 8px;">${user.username}</td>
-                    <td style="padding: 8px; text-align: center;">${isUserAdmin ? '✅' : '❌'}</td>
-                    <td style="padding: 8px; text-align: center;">${date}</td>
-                    <td style="padding: 8px; text-align: center;">
-                        ${canDelete ? `<button onclick="deleteUserAdmin('${user.id}')" style="padding: 6px 12px; background: rgba(200,0,0,0.8); border: 1px solid rgba(200,0,0,1); color: #fff; cursor: pointer; font-size: 11px; font-weight: bold;">Smazat</button>` : '<span style="color: #666;">-</span>'}
-                    </td>
-                </tr>
-            `;
-        });
-        
-        usersList.innerHTML += '</tbody></table>';
-    } else {
-        usersList.style.display = 'none';
-    }
-}
-
-// Smazat uživatele (admin)
-window.deleteUserAdmin = async function(userId) {
-    if (!isAdmin) return;
-    
-    if (!confirm('Opravdu chcete smazat tohoto uživatele?')) return;
-    
-    const { error } = await db.deleteUser(userId);
-    
-    if (!error) {
-        alert('Uživatel byl smazán!');
-        showUsersList();
-        showUsersList();
-    } else {
-        alert('Chyba při mazání uživatele!');
-    }
-}
-
-// Vymazat chat
-window.clearChat = async function() {
-    if (!isAdmin) return;
-    
-    if (confirm('Opravdu chcete smazat všechny zprávy?')) {
-        const { error } = await db.clearMessages();
-        if (!error) {
-            alert('Chat byl vymazán!');
-            loadMessages();
-        } else {
-            alert('Chyba při mazání chatu!');
-        }
-    }
-}
-
-// Smazat staré zprávy
-window.clearOldMessages = async function() {
-    if (!isAdmin) return;
-    
-    if (confirm('Smazat zprávy starší než 7 dní?')) {
-        const sevenDaysAgo = new Date();
-        sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
-        
-        const { error } = await supabase
-            .from('messages')
-            .delete()
-            .lt('timestamp', sevenDaysAgo.toISOString());
-        
-        if (!error) {
-            alert('Staré zprávy byly smazány!');
-            loadMessages();
-        } else {
-            alert('Chyba při mazání zpráv!');
-        }
-    }
-}
-
-// Vyčistit starou presence
-window.clearOldPresence = async function() {
-    if (!isAdmin) return;
-    
-    const cleanupTime = new Date();
-    cleanupTime.setSeconds(cleanupTime.getSeconds() - 60);
-    
-    const { error } = await supabase
-        .from('presence')
-        .delete()
-        .lt('timestamp', cleanupTime.toISOString());
-    
-    if (!error) {
-        alert('Staré presence záznamy byly vyčištěny!');
-    } else {
-        alert('Chyba při čištění presence!');
-    }
-}
-
-// Smazat všechny presence
-window.clearAllPresence = async function() {
-    if (!isAdmin) return;
-    
-    if (confirm('Opravdu chcete smazat všechny online záznamy?')) {
-        const { error } = await supabase
-            .from('presence')
-            .delete()
-            .neq('id', '');
-        
-        if (!error) {
-            alert('Všechny presence záznamy byly smazány!');
-        } else {
-            alert('Chyba při mazání presence!');
-        }
-    }
-}
-
-// Exportovat chat log
-window.exportChatLog = async function() {
-    if (!isAdmin) return;
-    
-    const { data: messages } = await db.getMessages();
-    
-    if (messages && messages.length > 0) {
-        let log = 'CHAT LOG - ' + new Date().toLocaleString('cs-CZ') + '\n';
-        log += '='.repeat(60) + '\n\n';
-        
-        messages.forEach(msg => {
-            const time = msg.timestamp ? new Date(msg.timestamp).toLocaleString('cs-CZ') : '';
-            log += `[${time}] ${msg.username}: ${msg.text}\n`;
-        });
-        
-        const blob = new Blob([log], { type: 'text/plain;charset=utf-8' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = 'chat_log_' + Date.now() + '.txt';
-        a.click();
-        URL.revokeObjectURL(url);
-    } else {
-        alert('Žádné zprávy k exportu!');
-    }
-}
-
-// Exportovat všechna data
-window.exportAllData = async function() {
-    if (!isAdmin) return;
-    
-    const { data: messages } = await db.getMessages();
-    const { data: users } = await db.getAllUsers();
-    
-    const allData = {
-        exportDate: new Date().toISOString(),
-        messages: messages || [],
-        users: users || []
-    };
-    
-    const blob = new Blob([JSON.stringify(allData, null, 2)], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'database_export_' + Date.now() + '.json';
-    a.click();
-    URL.revokeObjectURL(url);
-}
-
-// Zobrazit DB statistiky
-window.showDatabaseStats = async function() {
-    if (!isAdmin) return;
-    
-    const { data: messages } = await db.getMessages();
-    const { data: users } = await db.getAllUsers();
-    const { count: onlineCount } = await db.getOnlineCount();
-    
-    const stats = `📊 DATABÁZOVÉ STATISTIKY
-
-👥 Uživatelé: ${users ? users.length : 0}
-💬 Zprávy: ${messages ? messages.length : 0}
-🟢 Online: ${onlineCount || 0}
-📅 Export: ${new Date().toLocaleString('cs-CZ')}
-`;
-    
-    alert(stats);
-}
-
-// Inicializace při načtení stránky
-window.onload = async function() {
-    console.log('🚀 Index.html - Inicializace...');
-    
-    const savedUser = localStorage.getItem('currentUser');
+// Načtení přihlášeného uživatele
+async function loadCurrentUser() {
+    const savedUser = localStorage.getItem('currentUser')
     
     if (savedUser) {
         try {
-            const user = JSON.parse(savedUser);
+            // Pokus se parsovat jako JSON
+            const parsed = JSON.parse(savedUser)
             
-            if (user && user.id && user.username) {
-                currentUser = user.username;
-                currentUserId = user.id;
-                isAdmin = user.is_admin || false;
-                
-                document.getElementById('loginBtn').style.display = 'none';
-                document.getElementById('registerBtn').style.display = 'none';
-                document.getElementById('logoutBtn').style.display = 'inline-block';
-                
-                if (isAdmin) {
-                    document.getElementById('adminMenuBtn').style.display = 'block';
-                }
+            // Zkontroluj, jestli má potřebné údaje
+            if (parsed && parsed.id && parsed.username) {
+                currentUser = parsed
+                console.log('Přihlášený uživatel (JSON):', currentUser.username, 'ID:', currentUser.id)
+                await loadUserData()
+            } else {
+                throw new Error('Neplatný formát')
             }
         } catch (e) {
-            localStorage.clear();
+            // Pokud parse selže, je to jen string (jméno)
+            console.log('currentUser je jen string:', savedUser)
+            
+            // Zkus najít uživatele v Supabase podle jména
+            try {
+                const { data: user, error } = await supabase
+                    .from('users')
+                    .select('*')
+                    .eq('username', savedUser)
+                    .single()
+                
+                if (user && !error) {
+                    currentUser = user
+                    // Ulož správný formát
+                    localStorage.setItem('currentUser', JSON.stringify(user))
+                    console.log('Uživatel načten z databáze:', user.username, 'ID:', user.id)
+                    await loadUserData()
+                } else {
+                    console.error('Uživatel nenalezen v databázi')
+                    currentUser = { username: savedUser, is_guest: true }
+                    loadLocalData()
+                }
+            } catch (error) {
+                console.error('Chyba při načítání uživatele:', error)
+                currentUser = { username: savedUser, is_guest: true }
+                loadLocalData()
+            }
+        }
+    } else {
+        // Host režim
+        currentUser = { username: 'Host', is_guest: true }
+        console.log('Host režim')
+        loadLocalData()
+    }
+}
+
+// Načtení dat uživatele ze Supabase
+async function loadUserData() {
+    if (!currentUser || currentUser.is_guest) return
+    
+    console.log('Načítám data pro uživatele:', currentUser.username, 'ID:', currentUser.id)
+    
+    try {
+        const { data, error } = await supabase
+            .from('tetris_player_data')
+            .select('*')
+            .eq('user_id', currentUser.id)
+            .single()
+        
+        if (data) {
+            playerCoins = data.coins || 0
+            unlockedThemes = data.unlocked_themes || ['classic', 'neon']
+            unlockedMaps = data.unlocked_maps || ['20x10', '18x12']
+            totalGamesPlayed = data.games_played || 0
+            console.log('Data načtena:', { playerCoins, totalGamesPlayed })
+        } else {
+            // První spuštění - vytvoř záznam
+            console.log('První spuštění - vytvářím nový záznam')
+            await supabase
+                .from('tetris_player_data')
+                .insert([{
+                    user_id: currentUser.id,
+                    username: currentUser.username,
+                    coins: 0,
+                    unlocked_themes: ['classic', 'neon'],
+                    unlocked_maps: ['20x10', '18x12'],
+                    games_played: 0,
+                    total_score: 0,
+                    best_score: 0
+                }])
+        }
+    } catch (error) {
+        console.error('Chyba při načítání dat:', error)
+    }
+    
+    updateCoinsDisplay()
+    updateUnlockedItems()
+}
+
+// Načtení lokálních dat pro host
+function loadLocalData() {
+    const saved = localStorage.getItem('tetrisPlayerData')
+    if (saved) {
+        const data = JSON.parse(saved)
+        playerCoins = data.coins || 0
+        unlockedThemes = data.themes || ['classic', 'neon']
+        unlockedMaps = data.maps || ['20x10', '18x12']
+    }
+    updateCoinsDisplay()
+    updateUnlockedItems()
+}
+
+// Uložení dat do Supabase
+async function saveUserData() {
+    if (!currentUser || currentUser.is_guest) {
+        // Host - ulož lokálně
+        const data = {
+            coins: playerCoins,
+            themes: unlockedThemes,
+            maps: unlockedMaps
+        }
+        localStorage.setItem('tetrisPlayerData', JSON.stringify(data))
+        return
+    }
+    
+    try {
+        const { error } = await supabase
+            .from('tetris_player_data')
+            .update({
+                coins: playerCoins,
+                unlocked_themes: unlockedThemes,
+                unlocked_maps: unlockedMaps,
+                games_played: totalGamesPlayed
+            })
+            .eq('user_id', currentUser.id)
+        
+        if (error) throw error
+    } catch (error) {
+        console.error('Chyba při ukládání dat:', error)
+    }
+}
+
+// Aktualizace dat po hře
+async function updateAfterGame(finalScore) {
+    totalGamesPlayed++
+    
+    // Mince za skóre: každých 100 bodů = 5 mincí
+    const coinsFromScore = Math.floor(finalScore / 100) * 5
+    // Bonus za dokončenou hru: 10 mincí
+    const totalCoins = coinsFromScore + 10
+    
+    earnedCoinsThisGame = totalCoins
+    playerCoins += totalCoins
+    
+    console.log(`Získané mince: ${totalCoins} (skóre: ${coinsFromScore}, bonus: 10)`)
+    console.log(`Celkem mincí: ${playerCoins}`)
+    
+    if (!currentUser || currentUser.is_guest) {
+        saveUserData()
+        updateCoinsDisplay()
+        return
+    }
+    
+    try {
+        // Načti aktuální data
+        const { data: current } = await supabase
+            .from('tetris_player_data')
+            .select('*')
+            .eq('user_id', currentUser.id)
+            .single()
+        
+        const newTotalScore = (current?.total_score || 0) + finalScore
+        const newBestScore = Math.max(current?.best_score || 0, finalScore)
+        
+        // Aktualizuj data včetně mincí!
+        const { error } = await supabase
+            .from('tetris_player_data')
+            .update({
+                coins: playerCoins,
+                games_played: totalGamesPlayed,
+                total_score: newTotalScore,
+                best_score: newBestScore,
+                last_played: new Date().toISOString()
+            })
+            .eq('user_id', currentUser.id)
+        
+        if (error) throw error
+        
+        console.log('Data úspěšně uložena do Supabase')
+        
+    } catch (error) {
+        console.error('Chyba při aktualizaci dat:', error)
+    }
+    
+    await saveUserData()
+    updateCoinsDisplay()
+}
+
+window.updateCoinsDisplay = function() {
+    // Vždy zobrazovat celkový počet mincí nahoře
+    document.getElementById('coinCount').textContent = playerCoins
+    
+    // Během hry zobrazit získané mince v této hře
+    const gameCoinsElement = document.getElementById('gameCoins')
+    if (gameCoinsElement) {
+        gameCoinsElement.textContent = earnedCoinsThisGame
+    }
+}
+
+window.updateUnlockedItems = function() {
+    const themes = ['classic', 'neon', 'fire', 'ice', 'forest', 'sunset', 'ocean', 'candy', 'galaxy', 'toxic', 'rainbow', 'gold', 'matrix', 'lava', 'midnight', 'crystal']
+    themes.forEach(theme => {
+        const btn = document.getElementById(`theme-${theme}`)
+        if (btn && unlockedThemes.includes(theme)) {
+            btn.classList.remove('locked')
+            const priceTag = btn.querySelector('.price-tag')
+            if (priceTag) priceTag.remove()
+        }
+    })
+    
+    const maps = ['20x10', '18x12', '22x8', '16x16', '24x12', '12x20', '15x15', '25x8', '14x18', '26x10', '18x18', '10x25', '28x9', '20x20', '30x10', '25x25']
+    maps.forEach(map => {
+        const btn = document.getElementById(`map-${map}`)
+        if (btn && unlockedMaps.includes(map)) {
+            btn.classList.remove('locked')
+            const priceTag = btn.querySelector('.price-tag')
+            if (priceTag) priceTag.remove()
+        }
+    })
+}
+
+window.buyTheme = async function(theme, price) {
+    if (unlockedThemes.includes(theme)) {
+        setTheme(theme)
+        return
+    }
+    
+    if (playerCoins >= price) {
+        if (confirm(`Koupit téma "${theme}" za ${price} mincí?`)) {
+            playerCoins -= price
+            unlockedThemes.push(theme)
+            await saveUserData()
+            updateCoinsDisplay()
+            updateUnlockedItems()
+            setTheme(theme)
+            alert('Téma odemčeno! 🎉')
+        }
+    } else {
+        alert(`Nemáš dost mincí! Potřebuješ ${price}, máš jen ${playerCoins}.`)
+    }
+}
+
+window.buyMap = async function(mapName, rows, cols, price) {
+    if (unlockedMaps.includes(mapName)) {
+        setMap(rows, cols)
+        return
+    }
+    
+    if (playerCoins >= price) {
+        if (confirm(`Koupit mapu "${mapName}" za ${price} mincí?`)) {
+            playerCoins -= price
+            unlockedMaps.push(mapName)
+            await saveUserData()
+            updateCoinsDisplay()
+            updateUnlockedItems()
+            setMap(rows, cols)
+            alert('Mapa odemčena! 🎉')
+        }
+    } else {
+        alert(`Nemáš dost mincí! Potřebuješ ${price}, máš jen ${playerCoins}.`)
+    }
+}
+
+async function addCoins(amount) {
+    earnedCoinsThisGame += amount
+    playerCoins += amount           // ⭐ důležité
+    updateCoinsDisplay()
+
+    await saveUserData()             // ⭐ uloží do Supabase
+    
+    for (let i = 0; i < 5; i++) {
+        setTimeout(() => {
+            const coin = document.createElement('div')
+            coin.className = 'coin-particle'
+            coin.textContent = '💰'
+            coin.style.left = (window.innerWidth / 2 + Math.random() * 200 - 100) + 'px'
+            coin.style.top = (window.innerHeight / 2) + 'px'
+            document.body.appendChild(coin)
+            setTimeout(() => coin.remove(), 2000)
+        }, i * 100)
+    }
+}
+
+// Barevná témata
+const themes = {
+    classic: ['cyan', 'yellow', 'purple', 'green', 'red', 'blue', 'orange'],
+    neon: ['#00ffff', '#ff00ff', '#ffff00', '#00ff00', '#ff0080', '#0080ff', '#ff8000'],
+    fire: ['#ff0000', '#ff4500', '#ff6347', '#ff7f50', '#ffa500', '#ffb84d', '#ff8c00'],
+    ice: ['#00bfff', '#4169e1', '#1e90ff', '#87ceeb', '#add8e6', '#b0e0e6', '#87cefa'],
+    forest: ['#228b22', '#32cd32', '#3cb371', '#2e8b57', '#00fa9a', '#90ee90', '#98fb98'],
+    sunset: ['#ff6347', '#ff7f50', '#ffa500', '#ff8c00', '#ff4500', '#ff69b4', '#ff1493'], 
+    ocean: ['#006994', '#0080b3', '#0099cc', '#00b3e6', '#33ccff', '#66d9ff', '#99e6ff'],
+    candy: ['#ff69b4', '#ffb6c1', '#ff1493', '#ff82ab', '#ffc0cb', '#ffaec9', '#ff4da6'],
+    galaxy: ['#4b0082', '#8a2be2', '#9370db', '#9932cc', '#ba55d3', '#da70d6', '#ee82ee'],
+    toxic: ['#7fff00', '#adff2f', '#00ff00', '#32cd32', '#39ff14', '#98fb98', '#ccff00'],
+    rainbow: ['#ff0000', '#ff7f00', '#ffff00', '#00ff00', '#0000ff', '#4b0082', '#9400d3'],
+    gold: ['#ffd700', '#ffdf00', '#ffb347', '#daa520', '#b8860b', '#cd853f', '#ff8c00'],
+    matrix: ['#00ff00', '#00cc00', '#00aa00', '#008800', '#00ff41', '#33ff33', '#66ff66'],
+    lava: ['#8b0000', '#b22222', '#dc143c', '#ff4500', '#ff6347', '#ff7f50', '#ffa07a'],
+    midnight: ['#191970', '#000080', '#00008b', '#0000cd', '#4169e1', '#6495ed', '#1e3a8a'],
+    crystal: ['#e0ffff', '#afeeee', '#add8e6', '#87ceeb', '#b0e0e6', '#d4f1f4', '#c0f0f5']
+}
+
+window.backToMainMenu = function() {
+    document.getElementById('mainMenu').style.display = 'flex'
+    document.getElementById('difficultyMenu').style.display = 'none'
+    document.getElementById('themeMenu').style.display = 'none'
+    document.getElementById('mapMenu').style.display = 'none'
+    document.getElementById('leaderboard').style.display = 'none'
+    document.getElementById('tetrisGame').style.display = 'none'
+    document.getElementById('nameModal').style.display = 'none'
+    document.getElementById('pauseOverlay').style.display = 'none'
+    clearTimeout(dropTimeout)
+    isPaused = false
+    isGameOver = false
+}
+
+window.showDifficultyMenu = function() {
+    document.getElementById('mainMenu').style.display = 'none'
+    document.getElementById('difficultyMenu').style.display = 'flex'
+}
+
+window.showThemeMenu = function() {
+    document.getElementById('mainMenu').style.display = 'none'
+    document.getElementById('themeMenu').style.display = 'flex'
+}
+
+window.showMapMenu = function() {
+    document.getElementById('mainMenu').style.display = 'none'
+    document.getElementById('mapMenu').style.display = 'flex'
+}
+
+window.showLeaderboard = async function() {
+    document.getElementById('mainMenu').style.display = 'none'
+    document.getElementById('leaderboard').style.display = 'flex'
+    await loadLeaderboard()
+}
+
+window.setDifficulty = function(level) {
+    selectedDifficulty = level
+    backToMainMenu()
+}
+
+window.setMap = function(rows, cols) {
+    mapRows = rows
+    mapCols = cols
+    backToMainMenu()
+}
+
+window.setTheme = function(theme) {
+    if (!unlockedThemes.includes(theme)) {
+        alert('Toto téma je zamčené!')
+        return
+    }
+    currentTheme = theme
+    backToMainMenu()
+}
+
+// Tetris engine
+const tetris = document.getElementById('tetris')
+const scoreDisplay = document.getElementById('score')
+const levelDisplay = document.getElementById('level')
+const linesDisplay = document.getElementById('lines')
+const comboDisplay = document.getElementById('combo')
+const nextPieceDisplay = document.getElementById('nextPiece')
+const holdPieceDisplay = document.getElementById('holdPiece')
+
+const audioContext = new (window.AudioContext || window.webkitAudioContext)()
+
+const shapes = [
+    {shape: [[1,1,1,1]], name: 'I'},
+    {shape: [[1,1],[1,1]], name: 'O'},
+    {shape: [[0,1,0],[1,1,1]], name: 'T'},
+    {shape: [[0,1,1],[1,1,0]], name: 'S'},
+    {shape: [[1,1,0],[0,1,1]], name: 'Z'},
+    {shape: [[1,0,0],[1,1,1]], name: 'J'},
+    {shape: [[0,0,1],[1,1,1]], name: 'L'}
+]
+
+function getColor(shapeIndex) {
+    const colorPalette = themes[currentTheme]
+    return colorPalette[shapeIndex % colorPalette.length]
+}
+
+function initGrid() {
+    tetris.innerHTML = ''
+    grid.length = 0
+    tetris.style.gridTemplateRows = `repeat(${mapRows}, 30px)`
+    tetris.style.gridTemplateColumns = `repeat(${mapCols}, 30px)`
+    
+    for (let r = 0; r < mapRows; r++) {
+        grid[r] = []
+        for (let c = 0; c < mapCols; c++) {
+            const cell = document.createElement('div')
+            cell.classList.add('cell')
+            tetris.appendChild(cell)
+            grid[r][c] = 0
+        }
+    }
+}
+
+window.startTetris = function(difficulty) {
+    document.getElementById('mainMenu').style.display = 'none'
+    document.getElementById('tetrisGame').style.display = 'flex'
+    
+    score = 0
+    level = 1
+    linesCleared = 0
+    combo = 0
+    canHold = true
+    isPaused = false
+    isGameOver = false
+    holdPiece = null
+    earnedCoinsThisGame = 0
+    
+    dropInterval = difficulty === 'easy' ? 800 : 
+                   difficulty === 'medium' ? 600 : 
+                   difficulty === 'hard' ? 400 : 200
+    
+    initGrid()
+    nextPiece = randomTetromino()
+    newTetromino()
+    updateDisplay()
+    gameLoop()
+}
+
+function randomTetromino() {
+    const index = Math.floor(Math.random() * shapes.length)
+    return {
+        shape: shapes[index].shape.map(r => r.slice()),
+        color: getColor(index),
+        name: shapes[index].name
+    }
+}
+
+function newTetromino() {
+    current = nextPiece
+    current.x = Math.floor(mapCols / 2) - Math.floor(current.shape[0].length / 2)
+    current.y = 0
+    
+    nextPiece = randomTetromino()
+    drawPreview(nextPiece, nextPieceDisplay)
+    canHold = true
+    
+    if (collision()) {
+        gameOver()
+    }
+}
+
+function drawPreview(piece, container) {
+    container.innerHTML = ''
+    for (let i = 0; i < 16; i++) {
+        const cell = document.createElement('div')
+        cell.classList.add('preview-cell')
+        container.appendChild(cell)
+    }
+    
+    const offsetX = Math.floor((4 - piece.shape[0].length) / 2)
+    const offsetY = Math.floor((4 - piece.shape.length) / 2)
+    
+    for (let r = 0; r < piece.shape.length; r++) {
+        for (let c = 0; c < piece.shape[r].length; c++) {
+            if (piece.shape[r][c]) {
+                const index = (offsetY + r) * 4 + (offsetX + c)
+                container.children[index].style.background = piece.color
+                container.children[index].style.boxShadow = `0 0 10px ${piece.color}`
+            }
+        }
+    }
+}
+
+function draw() {
+    document.querySelectorAll('.cell').forEach(cell => {
+        cell.style.background = '#1a1a2e'
+        cell.classList.remove('filled')
+    })
+    
+    for (let r = 0; r < mapRows; r++) {
+        for (let c = 0; c < mapCols; c++) {
+            if (grid[r][c]) {
+                const cell = tetris.children[r * mapCols + c]
+                cell.style.background = grid[r][c]
+                cell.style.boxShadow = `0 0 10px ${grid[r][c]}`
+                cell.classList.add('filled')
+            }
         }
     }
     
-    // ✅ NOVÁ INICIALIZACE PRESENCE
-    userPresenceId = await initPresence(supabase, db);
-    
-    // Načíst zprávy
-    loadMessages();
-    
-    console.log('✅ Index.html inicializován');
+    for (let r = 0; r < current.shape.length; r++) {
+        for (let c = 0; c < current.shape[r].length; c++) {
+            if (current.shape[r][c]) {
+                const index = (current.y + r) * mapCols + (current.x + c)
+                if (index >= 0 && index < mapRows * mapCols) {
+                    tetris.children[index].style.background = current.color
+                    tetris.children[index].style.boxShadow = `0 0 15px ${current.color}`
+                    tetris.children[index].classList.add('filled')
+                }
+            }
+        }
+    }
 }
+
+function moveDown() {
+    if (isPaused || isGameOver) return
+    
+    current.y++
+    if (collision()) {
+        current.y--
+        freeze()
+        newTetromino()
+    }
+    draw()
+}
+
+function collision() {
+    return collisionAt(current.x, current.y)
+}
+
+function collisionAt(x, y) {
+    for (let r = 0; r < current.shape.length; r++) {
+        for (let c = 0; c < current.shape[r].length; c++) {
+            if (current.shape[r][c]) {
+                let newY = y + r
+                let newX = x + c
+                if (newY >= mapRows || newX < 0 || newX >= mapCols) return true
+                if (newY >= 0 && grid[newY][newX]) return true
+            }
+        }
+    }
+    return false
+}
+
+function freeze() {
+    for (let r = 0; r < current.shape.length; r++) {
+        for (let c = 0; c < current.shape[r].length; c++) {
+            if (current.shape[r][c]) {
+                grid[current.y + r][current.x + c] = current.color
+            }
+        }
+    }
+    
+    const cleared = clearLines()
+    if (cleared > 0) {
+        createParticles(cleared)
+        playSound('clear')
+    }
+}
+
+function clearLines() {
+    let cleared = 0
+    for (let r = mapRows - 1; r >= 0; r--) {
+        if (grid[r].every(cell => cell !== 0)) {
+            grid.splice(r, 1)
+            grid.unshift(Array(mapCols).fill(0))
+            cleared++
+            r++
+        }
+    }
+    
+    if (cleared > 0) {
+        linesCleared += cleared
+        combo++
+        
+        let points = cleared * 100 * level
+        if (cleared === 4) points *= 2
+        points += combo * 50
+        
+        score += points
+        level = Math.floor(linesCleared / 10) + 1
+        dropInterval = Math.max(50, 600 - (level * 40))
+    } else {
+        combo = 0
+    }
+    
+    updateDisplay()
+    return cleared
+}
+
+function createParticles(count) {
+    for (let i = 0; i < count * 20; i++) {
+        const particle = document.createElement('div')
+        particle.classList.add('particle')
+        particle.style.left = (window.innerWidth / 2 + Math.random() * 400 - 200) + 'px'
+        particle.style.top = (window.innerHeight / 2 + Math.random() * 200 - 100) + 'px'
+        particle.style.background = themes[currentTheme][Math.floor(Math.random() * themes[currentTheme].length)]
+        document.body.appendChild(particle)
+        
+        setTimeout(() => particle.remove(), 1000)
+    }
+}
+
+function rotate() {
+    const shape = current.shape
+    const N = shape.length
+    const M = shape[0].length
+    const rotated = []
+    
+    for (let y = 0; y < M; y++) {
+        rotated[y] = []
+        for (let x = 0; x < N; x++) {
+            rotated[y][x] = shape[N - 1 - x][y] || 0
+        }
+    }
+    
+    const oldShape = current.shape
+    current.shape = rotated
+    
+    if (collision()) {
+        current.x++
+        if (collision()) {
+            current.x -= 2
+            if (collision()) {
+                current.x++
+                current.shape = oldShape
+            }
+        }
+    }
+    
+    playSound('rotate')
+}
+
+function hardDrop() {
+    while (!collision()) {
+        current.y++
+    }
+    current.y--
+    freeze()
+    newTetromino()
+    score += 10
+    updateDisplay()
+    playSound('drop')
+}
+
+function hold() {
+    if (!canHold) return
+    
+    if (holdPiece === null) {
+        holdPiece = {
+            shape: current.shape.map(r => r.slice()),
+            color: current.color,
+            name: current.name
+        }
+        newTetromino()
+    } else {
+        const temp = {
+            shape: current.shape.map(r => r.slice()),
+            color: current.color,
+            name: current.name
+        }
+        current = holdPiece
+        current.x = Math.floor(mapCols / 2) - Math.floor(current.shape[0].length / 2)
+        current.y = 0
+        holdPiece = temp
+    }
+    
+    drawPreview(holdPiece, holdPieceDisplay)
+    canHold = false
+    playSound('hold')
+}
+
+function updateDisplay() {
+    scoreDisplay.textContent = score
+    levelDisplay.textContent = level
+    linesDisplay.textContent = linesCleared
+    comboDisplay.textContent = combo
+    updateCoinsDisplay()
+}
+
+function togglePause() {
+    isPaused = !isPaused
+    document.getElementById('pauseOverlay').style.display = isPaused ? 'flex' : 'none'
+    if (!isPaused) {
+        gameLoop()
+    }
+}
+
+function playSound(type) {
+    const oscillator = audioContext.createOscillator()
+    const gainNode = audioContext.createGain()
+    
+    oscillator.connect(gainNode)
+    gainNode.connect(audioContext.destination)
+    
+    switch(type) {
+        case 'rotate':
+            oscillator.frequency.value = 400
+            gainNode.gain.value = 0.1
+            break
+        case 'drop':
+            oscillator.frequency.value = 200
+            gainNode.gain.value = 0.2
+            break
+        case 'clear':
+            oscillator.frequency.value = 800
+            gainNode.gain.value = 0.15
+            break
+        case 'hold':
+            oscillator.frequency.value = 600
+            gainNode.gain.value = 0.1
+            break
+    }
+    
+    oscillator.start(audioContext.currentTime)
+    oscillator.stop(audioContext.currentTime + 0.1)
+}
+
+document.addEventListener('keydown', e => {
+    if (isGameOver) return
+    
+    if (e.key === 'p' || e.key === 'P') {
+        togglePause()
+        return
+    }
+    
+    if (e.key === 'Escape') {
+        backToMainMenu()
+        return
+    }
+    
+    if (isPaused) return
+    
+    if (e.key === 'ArrowLeft') {
+        current.x--
+        if (collision()) current.x++
+    }
+    if (e.key === 'ArrowRight') {
+        current.x++
+        if (collision()) current.x--
+    }
+    if (e.key === 'ArrowDown') {
+        moveDown()
+    }
+    if (e.key === 'ArrowUp') {
+        rotate()
+    }
+    if (e.key === ' ') {
+        e.preventDefault()
+        hardDrop()
+    }
+    if (e.key === 'c' || e.key === 'C') {
+        hold()
+    }
+    
+    draw()
+})
+
+function gameLoop() {
+    if (isPaused || isGameOver) return
+    moveDown()
+    dropTimeout = setTimeout(gameLoop, dropInterval)
+}
+
+async function gameOver() {
+    isGameOver = true
+    
+    await updateAfterGame(score)
+    
+    // Automatické uložení skóre pro přihlášené uživatele
+    if (currentUser && !currentUser.is_guest) {
+        try {
+            await supabase
+                .from('tetris_scores')
+                .insert([{
+                    user_id: currentUser.id,
+                    username: currentUser.username,
+                    score: score,
+                    difficulty: selectedDifficulty,
+                    lines_cleared: linesCleared,
+                    level_reached: level,
+                    timestamp: new Date().toISOString()
+                }])
+            console.log('Skóre uloženo do žebříčku!')
+        } catch (error) {
+            console.error('Chyba při ukládání skóre:', error)
+        }
+    }
+    
+    document.getElementById('finalScore').textContent = score
+    document.getElementById('earnedCoins').textContent = earnedCoinsThisGame
+    
+    // Zobrazit zprávu podle toho, jestli je host nebo přihlášený
+    const saveMsg = document.getElementById('saveMessage')
+    if (currentUser && !currentUser.is_guest) {
+        saveMsg.textContent = '✅ Skóre automaticky uloženo do žebříčku!'
+        saveMsg.style.color = '#00ff00'
+    } else {
+        saveMsg.textContent = '⚠️ Pro uložení do žebříčku se musíš přihlásit'
+        saveMsg.style.color = '#ffaa00'
+    }
+    
+    document.getElementById('nameModal').style.display = 'flex'
+}
+
+async function loadLeaderboard() {
+    const table = document.getElementById('leaderboardTable');
+    const loading = document.querySelector('.loading');
+    
+    loading.style.display = 'block';
+    table.style.display = 'none';
+    
+    try {
+        // Získat nejlepší skóre pro každého hráče
+        const { data, error } = await supabase
+            .from('tetris_scores')
+            .select('username, score, difficulty, timestamp', { count: 'exact' })
+            .order('score', { ascending: false })
+            .limit(50);
+        
+        if (error) throw error;
+
+        // Filtrovat na nejlepší skóre každého hráče
+        const bestScoresMap = {};
+        data.forEach(s => {
+            if (!bestScoresMap[s.username] || s.score > bestScoresMap[s.username].score) {
+                bestScoresMap[s.username] = s;
+            }
+        });
+
+        const bestScores = Object.values(bestScoresMap)
+            .sort((a, b) => b.score - a.score)
+            .slice(0, 50);
+
+        // Vypsat do tabulky
+        table.innerHTML = '<tr><th>Pozice</th><th>Hráč</th><th>Skóre</th><th>Obtížnost</th><th>Datum</th></tr>';
+
+        bestScores.forEach((s, i) => {
+            const row = table.insertRow();
+            row.insertCell(0).textContent = i + 1;
+            row.insertCell(1).textContent = s.username || 'Anonymní';
+            row.insertCell(2).textContent = s.score || 0;
+            row.insertCell(3).textContent = getDifficultyEmoji(s.difficulty);
+
+            const date = s.timestamp ? new Date(s.timestamp).toLocaleDateString('cs-CZ') : 'N/A';
+            row.insertCell(4).textContent = date;
+
+            if (i === 0) row.style.background = 'rgba(255, 215, 0, 0.2)';
+            if (i === 1) row.style.background = 'rgba(192, 192, 192, 0.2)';
+            if (i === 2) row.style.background = 'rgba(205, 127, 50, 0.2)';
+        });
+
+        loading.style.display = 'none';
+        table.style.display = 'table';
+        
+    } catch (error) {
+        console.error('Chyba při načítání žebříčku:', error);
+        loading.textContent = 'Chyba při načítání žebříčku.';
+    }
+}
+
+
+function getDifficultyEmoji(difficulty) {
+    switch(difficulty) {
+        case 'easy': return '😊 Snadná'
+        case 'medium': return '😐 Střední'
+        case 'hard': return '😈 Těžká'
+        case 'insane': return '💀 Šílená'
+        default: return '❓'
+    }
+}
+
+// Inicializace
+await loadCurrentUser()
 </script>
 </body>
 </html>
+
+
+
+
+
