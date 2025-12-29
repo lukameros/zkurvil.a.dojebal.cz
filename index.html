@@ -17,6 +17,7 @@ body {
     background: #000;
 }
 
+/* Loading Screen */
 #loadingScreen {
     position: fixed;
     inset: 0;
@@ -66,7 +67,6 @@ body {
         4px 4px 10px rgba(0,0,0,1);
     margin-bottom: 40px;
     animation: pulse 2s ease-in-out infinite;
-    min-height: 60px;
 }
 
 @keyframes pulse {
@@ -139,8 +139,6 @@ body {
     text-transform: uppercase;
     text-shadow: 0 0 15px rgba(255,0,0,0.9);
     margin-top: 20px;
-    min-height: 30px;
-    transition: opacity 0.3s ease;
 }
 
 .loading-percentage {
@@ -151,6 +149,7 @@ body {
     margin-top: 15px;
 }
 
+/* Mobile responsive */
 @media (max-width: 768px) {
     .loading-title {
         font-size: 32px;
@@ -159,10 +158,6 @@ body {
     .loading-bar-container {
         width: 80%;
         max-width: 400px;
-    }
-    
-    .loading-text {
-        font-size: 14px;
     }
 }
 </style>
@@ -175,36 +170,21 @@ body {
     </video>
     
     <div class="loading-content">
-        <div class="loading-title" id="loadingTitle">NAČÍTÁNÍ</div>
+        <div class="loading-title">NAČÍTÁNÍ</div>
         <div class="loading-bar-container">
             <div class="loading-bar" id="loadingBar"></div>
         </div>
         <div class="loading-percentage" id="loadingPercentage">0%</div>
-        <div class="loading-text" id="loadingText">Inicializace systému...</div>
+        <div class="loading-text">Připravuji prostředí...</div>
     </div>
 </div>
 
 <script>
-// Texty pro různé fáze načítání
-const loadingMessages = [
-    { at: 0, title: "NAČÍTÁNÍ", text: "Inicializace systému..." },
-    { at: 15, title: "PŘIPOJOVÁNÍ", text: "Navazuji spojení s databází..." },
-    { at: 30, title: "OVĚŘOVÁNÍ", text: "Kontroluji přístupová práva..." },
-    { at: 45, title: "NAČÍTÁNÍ DAT", text: "Stahuji herní soubory..." },
-    { at: 60, title: "SYNCHRONIZACE", text: "Synchronizuji uživatelská data..." },
-    { at: 75, title: "PŘÍPRAVA UI", text: "Připravuji uživatelské rozhraní..." },
-    { at: 90, title: "DOKONČOVÁNÍ", text: "Finalizuji načítání..." },
-    { at: 98, title: "HOTOVO", text: "Vstupuji do systému..." }
-];
-
+// Simulace načítání (3-6 sekund náhodně)
 const loadingDuration = 3000 + Math.random() * 3000; // 3-6 sekund
 const startTime = Date.now();
 const loadingBar = document.getElementById('loadingBar');
 const loadingPercentage = document.getElementById('loadingPercentage');
-const loadingTitle = document.getElementById('loadingTitle');
-const loadingText = document.getElementById('loadingText');
-
-let currentMessageIndex = 0;
 
 function updateLoading() {
     const elapsed = Date.now() - startTime;
@@ -213,36 +193,12 @@ function updateLoading() {
     loadingBar.style.width = progress + '%';
     loadingPercentage.textContent = Math.floor(progress) + '%';
     
-    // Změň text podle progress
-    for (let i = loadingMessages.length - 1; i >= 0; i--) {
-        if (progress >= loadingMessages[i].at && currentMessageIndex !== i) {
-            currentMessageIndex = i;
-            
-            // Fade out
-            loadingTitle.style.opacity = '0';
-            loadingText.style.opacity = '0';
-            
-            setTimeout(() => {
-                loadingTitle.textContent = loadingMessages[i].title;
-                loadingText.textContent = loadingMessages[i].text;
-                
-                // Fade in
-                loadingTitle.style.transition = 'opacity 0.3s ease';
-                loadingText.style.transition = 'opacity 0.3s ease';
-                loadingTitle.style.opacity = '1';
-                loadingText.style.opacity = '1';
-            }, 300);
-            
-            break;
-        }
-    }
-    
     if (progress < 100) {
         requestAnimationFrame(updateLoading);
     } else {
-        // Po dokončení načítání přesměruj
+        // Po dokončení načítání přesměruj na hlavní stránku
         setTimeout(() => {
-            window.location.href = 'stranka.html'; // nebo 'menu.html' podle tvého nastavení
+            window.location.href = 'stranka.html'; // nebo tvůj název hlavní stránky
         }, 500);
     }
 }
