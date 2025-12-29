@@ -902,28 +902,16 @@ async function saveGameState(player) {
     }
 }
 
-// Globální interval ID
-let pollingInterval = null
-
 // Sledování změn
 function subscribeToGame() {
-    console.log('Subscribuji se na změny pro hru:', currentGameId)
-    
-    // Zastav starý polling pokud existuje
-    if (pollingInterval) {
-        clearInterval(pollingInterval)
-    }
-    
     gameStateChannel = supabase
-        .channel(`game_state_${currentGameId}_${Date.now()}`)
+        .channel(`game_state_${currentGameId}`)
         .on('postgres_changes', {
             event: '*',
             schema: 'public',
             table: 'tetris_game_state',
             filter: `game_id=eq.${currentGameId}`
         }, async (payload) => {
-            console.log('✅ Přijata změna od hráče:', payload.new.player_number)
-            
             if (payload.new.player_number !== myPlayerNumber) {
                 const otherPlayer = payload.new.player_number === 1 ? player1 : player2
                 
@@ -931,7 +919,8 @@ function subscribeToGame() {
                     otherPlayer.grid = JSON.parse(payload.new.grid)
                     otherPlayer.current = JSON.parse(payload.new.current_piece)
                 } catch (e) {
-                    console.error('Chyba parsování:', e)
+                    otherPlayer.grid = payload.new.grid
+                    otherPlayer.current = payload.new.current_piece
                 }
                 
                 otherPlayer.score = payload.new.score
@@ -948,66 +937,9 @@ function subscribeToGame() {
                 }
             }
         })
-        .subscribe((status) => {
-            console.log('Channel status:', status)
-        })
-    
-    // Polling jako záloha - dotazuj se každých 300ms
-    pollingInterval = setInterval(async () => {
-        if (!gameActive) {
-            console.log('⏸️ Hra není aktivní, zastavuji polling')
-            clearInterval(pollingInterval)
-            return
-        }
-        
-        const otherPlayerNum = myPlayerNumber === 1 ? 2 : 1
-        
-        try {
-            const { data, error } = await supabase
-                .from('tetris_game_state')
-                .select('*')
-                .eq('game_id', currentGameId)
-                .eq('player_number', otherPlayerNum)
-            
-            if (error) {
-                console.log('⏳ Čeká se na data protihráče...')
-                return
-            }
-            
-            if (data && data.length > 0) {
-    console.log('🔄 Aktualizace protihráče', otherPlayerNum)
-    console.log('player1 existuje?', player1 !== null)
-    console.log('player2 existuje?', player2 !== null)
-    
-    const otherPlayer = otherPlayerNum === 1 ? player1 : player2
-    
-    if (!otherPlayer) {
-        console.error('❌ otherPlayer neexistuje!')
-        return
-    }
-    
-    console.log('Data:', data[0])
-    
-    try {
-        otherPlayer.grid = JSON.parse(data[0].grid)
-        otherPlayer.current = JSON.parse(data[0].current_piece)
-        console.log('✅ Parsování OK, vykresluju...')
-    } catch (e) {
-        console.error('Chyba parsování:', e)
-        return
-    }
-    otherPlayer.score = data[0].score
-    otherPlayer.level = data[0].level
-    updateDisplay(otherPlayer)
-    draw(otherPlayer)
-    console.log('✅ Vykresleno!')
+        .subscribe()
 }
-            }
-        } catch (e) {
-            console.error('❌ Chyba při načítání:', e)
-        }
-    }, 300)
-}
+
 // Konec hry
 async function endGame(winnerNumber) {
     gameActive = false
@@ -1063,7 +995,6 @@ async function leaveGame() {
 
 // Herní smyčka
 let lastSaveTime = 0
-// Herní smyčka
 function gameLoop() {
     if (!gameActive) return
     
@@ -1073,18 +1004,21 @@ function gameLoop() {
     
     if (!myPlayer.gameOver && now - myPlayer.lastDrop > myPlayer.dropInterval) {
         moveDown(myPlayer)
+        draw(myPlayer)
         myPlayer.lastDrop = now
         
-        // Ukládej stav při každém pádu kostky
-        saveGameState(myPlayer)
+        // Ukládej stav jen každých 500ms
+        if (now - lastSaveTime > 500) {
+            saveGameState(myPlayer)
+            lastSaveTime = now
+        }
     }
     
-    // TOHLE JE DŮLEŽITÉ - vykresluj OBA hráče!
-    draw(myPlayer)
     draw(otherPlayer)
     
     requestAnimationFrame(gameLoop)
 }
+
 // Ovládání
 let lastControlSave = 0
 document.addEventListener('keydown', e => {
@@ -1145,8 +1079,3 @@ loadUser()
 </script>
 </body>
 </html>
-
-
-
-
-
