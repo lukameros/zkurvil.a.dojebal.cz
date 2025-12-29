@@ -1198,14 +1198,13 @@ window.login = async function() {
 async function saveUser() {
     if (!currentUser.id) return;
     
-    // Použij upsert - vytvoří nový záznam nebo aktualizuje existující
     const { error } = await supabase
         .from('casino_users')
         .upsert({
             id: currentUser.id,
             nickname: currentUser.nickname,
             coins: currentUser.coins,
-            lastDailyBonus: currentUser.lastDailyBonus
+            last_daily_bonus: currentUser.lastDailyBonus
         }, {
             onConflict: 'id'
         });
@@ -1352,7 +1351,7 @@ window.addEventListener('load', async () => {
             
             if (existingUser) {
     currentUser.coins = existingUser.coins;
-    currentUser.lastDailyBonus = existingUser.lastDailyBonus;
+    currentUser.lastDailyBonus = existingUser.last_daily_bonus;
 }
              else {
                 // Nový hráč - startovní mince
@@ -1375,6 +1374,7 @@ window.addEventListener('load', async () => {
 
 </body>
 </html>
+
 
 
 
