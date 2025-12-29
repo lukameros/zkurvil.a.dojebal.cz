@@ -1198,20 +1198,23 @@ window.login = async function() {
 async function saveUser() {
     if (!currentUser.id) return;
     
+    // Použij upsert - vytvoří nový záznam nebo aktualizuje existující
     const { error } = await supabase
         .from('casino_users')
-        .update({
+        .upsert({
+            id: currentUser.id,
+            nickname: currentUser.nickname,
             coins: currentUser.coins,
-            lastDailyBonus: currentUser.lastDailyBonus
-        })
-        .eq('id', currentUser.id);
+            last_daily_bonus: currentUser.lastDailyBonus
+        }, {
+            onConflict: 'id'
+        });
     
     if (error) {
         console.error('Chyba při ukládání:', error);
         localStorage.setItem('casinoUser', JSON.stringify(currentUser));
     }
 }
-
 function updateUI() {
     document.getElementById('userName').textContent = currentUser.nickname;
     document.getElementById('coinAmount').textContent = currentUser.coins;
@@ -1349,12 +1352,16 @@ window.addEventListener('load', async () => {
                 .maybeSingle();
             
             if (existingUser) {
-                currentUser.coins = existingUser.coins;
-                currentUser.lastDailyBonus = existingUser.last_daily_bonus;
-            } else {
-                currentUser.coins = 100;
-                currentUser.lastDailyBonus = null;
-                await saveUser();
+    currentUser.coins = existingUser.coins;
+    currentUser.lastDailyBonus = existingUser.last_daily_bonus;
+} else {
+    // Nový hráč - startovní mince
+    currentUser.coins = 100;
+    currentUser.lastDailyBonus = null;
+}
+
+// Ulož nebo aktualizuj uživatele
+await saveUser();
             }
             
             document.getElementById('loginModal').style.display = 'none';
@@ -1369,6 +1376,7 @@ window.addEventListener('load', async () => {
 
 </body>
 </html>
+
 
 
 
