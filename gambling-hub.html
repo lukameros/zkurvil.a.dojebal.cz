@@ -1327,20 +1327,47 @@ document.getElementById('nicknameInput').addEventListener('keypress', function(e
 });
 
 // Inicializace
-window.addEventListener('load', () => {
+// Inicializace
+window.addEventListener('load', async () => {
     initReels();
     
-    // Kontrola uloženého uživatele
-    const savedUser = localStorage.getItem('casinoUser');
+    // Zkontroluj, jestli je uživatel přihlášený z hry.html
+    const savedUser = localStorage.getItem('currentUser');
     if (savedUser) {
-        currentUser = JSON.parse(savedUser);
-        document.getElementById('loginModal').style.display = 'none';
-        updateUI();
-        checkDailyBonus();
+        try {
+            const user = JSON.parse(savedUser);
+            
+            // Nastav uživatele z hry.html účtu
+            currentUser.nickname = user.username;
+            currentUser.id = user.id;
+            
+            // Načti data z databáze nebo vytvoř nový záznam
+            const { data: existingUser, error } = await supabase
+                .from('casino_users')
+                .select('*')
+                .eq('id', user.id)
+                .maybeSingle();
+            
+            if (existingUser) {
+                currentUser.coins = existingUser.coins;
+                currentUser.lastDailyBonus = existingUser.last_daily_bonus;
+            } else {
+                currentUser.coins = 100;
+                currentUser.lastDailyBonus = null;
+                await saveUser();
+            }
+            
+            document.getElementById('loginModal').style.display = 'none';
+            updateUI();
+            checkDailyBonus();
+        } catch (e) {
+            console.error('Chyba při načítání uživatele:', e);
+        }
     }
 });
 </script>
 
 </body>
 </html>
+
 
