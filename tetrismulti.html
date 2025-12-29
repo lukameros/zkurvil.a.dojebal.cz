@@ -729,24 +729,6 @@ async function waitForBothPlayers() {
     }
 }
 
-// Aktualizace ready statusů
-function updateReadyStatus(game) {
-    player1IsReady = game.player1_ready || false
-    player2IsReady = game.player2_ready || false
-    
-    // Update UI
-    document.getElementById('player1Ready').textContent = player1IsReady ? '✅' : '⏳'
-    document.getElementById('player2Ready').textContent = player2IsReady ? '✅' : '⏳'
-    
-    if (game.player2_username) {
-        document.getElementById('player2WaitName').textContent = game.player2_username
-    }
-    
-    // Pokud jsou oba ready, začni odpočítávání
-    if (player1IsReady && player2IsReady && game.status !== 'countdown' && game.status !== 'playing') {
-        startCountdown()
-    }
-}
 
 // Nastavit ready
 async function setReady() {
@@ -760,42 +742,6 @@ async function setReady() {
     document.getElementById('readyBtn').style.display = 'none'
 }
 
-// Odpočítávání
-async function startCountdown() {
-    console.log('Začínám odpočítávání!')
-    
-    // Označ hru jako countdown
-    await supabase
-        .from('tetris_multiplayer_games')
-        .update({ status: 'countdown' })
-        .eq('id', currentGameId)
-    
-    const countdownEl = document.getElementById('countdownDisplay')
-    countdownEl.style.display = 'block'
-    
-    let count = 5
-    countdownEl.textContent = count
-    
-    const interval = setInterval(async () => {
-        count--
-        if (count > 0) {
-            countdownEl.textContent = count
-        } else {
-            clearInterval(interval)
-            countdownEl.textContent = 'START!'
-            
-            // Nastav status na playing
-            await supabase
-                .from('tetris_multiplayer_games')
-                .update({ status: 'playing' })
-                .eq('id', currentGameId)
-            
-            setTimeout(() => {
-                startGame()
-            }, 500)
-        }
-    }, 1000)
-}
 
 // Zrušení hry
 async function cancelGame() {
@@ -1336,4 +1282,5 @@ loadUser()
 </script>
 </body>
 </html>
+
 
