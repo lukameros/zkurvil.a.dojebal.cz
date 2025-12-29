@@ -1650,33 +1650,35 @@ function togglePause() {
 }
 
 function playSound(type) {
-    const oscillator = audioContext.createOscillator()
-    const gainNode = audioContext.createGain()
+    const oscillator = audioContext.createOscillator();
+    const gainNode = audioContext.createGain();
     
-    oscillator.connect(gainNode)
-    gainNode.connect(audioContext.destination)
+    oscillator.connect(gainNode);
+    gainNode.connect(audioContext.destination);
+    
+    let duration = 0.1; // výchozí délka
     
     switch(type) {
         case 'rotate':
-            oscillator.frequency.value = 400
-            gainNode.gain.value = 0.1
-            break
+            oscillator.frequency.value = 400;
+            gainNode.gain.value = 0.1;
+            break;
         case 'drop':
-            oscillator.frequency.value = 200
-            gainNode.gain.value = 0.2
-            break
+            oscillator.frequency.value = 200;
+            gainNode.gain.value = 0.2;
+            break;
         case 'clear':
-            oscillator.frequency.value = 800
-            gainNode.gain.value = 0.15
-            break
+            oscillator.frequency.value = 800;
+            gainNode.gain.value = 0.15;
+            break;
         case 'hold':
-            oscillator.frequency.value = 600
-            gainNode.gain.value = 0.1
-            break
+            oscillator.frequency.value = 600;
+            gainNode.gain.value = 0.1;
+            break;
         case 'event':
             oscillator.frequency.value = 1000;
             gainNode.gain.value = 0.3;
-            oscillator.stop(audioContext.currentTime + 0.3);
+            duration = 0.3;
             break;
         case 'error':
             oscillator.frequency.value = 150;
@@ -1684,10 +1686,9 @@ function playSound(type) {
             break;
     }
     
-    oscillator.start(audioContext.currentTime)
-    oscillator.stop(audioContext.currentTime + 0.1)
+    oscillator.start(audioContext.currentTime);
+    oscillator.stop(audioContext.currentTime + duration);
 }
-
 document.addEventListener('keydown', e => {
     if (isGameOver) return;
     
@@ -1862,6 +1863,7 @@ await loadCurrentUser()
 </script>
 </body>
 </html>
+
 
 
 
