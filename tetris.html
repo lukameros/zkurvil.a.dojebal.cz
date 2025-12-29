@@ -160,59 +160,6 @@ button.menuBtn.locked::after {
     align-items: flex-start;
 }
 
-.side-panel {
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-}
-
-.info-box {
-    background: rgba(30, 30, 60, 0.7);
-    border: 2px solid #00ffff;
-    border-radius: 12px;
-    padding: 20px;
-    box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
-    min-width: 180px;
-}
-
-.info-box h3 {
-    text-align: center;
-    margin-bottom: 15px;
-    color: #00ffff;
-    text-shadow: 0 0 10px #00ffff;
-}
-
-#score, #level, #lines, #combo, #gameCoins {
-    font-size: 32px;
-    font-weight: bold;
-    text-align: center;
-    color: #fff;
-    text-shadow: 0 0 10px #ff00ff;
-}
-
-#gameCoins {
-    color: gold;
-    text-shadow: 0 0 10px gold;
-}
-
-#nextPiece, #holdPiece {
-    width: 120px;
-    height: 120px;
-    display: grid;
-    grid-template-columns: repeat(4, 30px);
-    grid-template-rows: repeat(4, 30px);
-    gap: 1px;
-    background: #111;
-    margin: 0 auto;
-}
-
-.preview-cell {
-    width: 28px;
-    height: 28px;
-    background: #222;
-    border-radius: 3px;
-}
-
 #tetris {
     display: grid;
     gap: 1px;
@@ -629,45 +576,16 @@ button.menuBtn.locked::after {
 
 <div id="tetrisGame" class="centered">
     <div class="game-container">
-        <div class="side-panel">
-            <div class="info-box">
-                <h3>DALŠÍ</h3>
-                <div id="nextPiece"></div>
-            </div>
-            <div class="info-box">
-                <h3>DRŽENÍ (C)</h3>
-                <div id="holdPiece"></div>
-            </div>
-        </div>
+        <!-- ❌ ODSTRANĚN levý panel s DALŠÍ a DRŽENÍ -->
         
         <div>
             <div id="tetris"></div>
         </div>
         
-        <div class="side-panel">
-            <div class="info-box">
-                <h3>SKÓRE</h3>
-                <div id="score">0</div>
-            </div>
-            <div class="info-box">
-                <h3>MINCE</h3>
-                <div id="gameCoins">0</div>
-            </div>
-            <div class="info-box">
-                <h3>ÚROVEŇ</h3>
-                <div id="level">1</div>
-            </div>
-            <div class="info-box">
-                <h3>ŘÁDKY</h3>
-                <div id="lines">0</div>
-            </div>
-            <div class="info-box">
-                <h3>COMBO</h3>
-                <div id="combo">0</div>
-            </div>
-        </div>
+        <!-- ❌ ODSTRANĚN pravý panel s MINCE, ÚROVEŇ, ŘÁDKY, COMBO -->
     </div>
     
+    <!-- Ponecháno jen ovládání -->
     <div class="controls">
         <h4>OVLÁDÁNÍ:</h4>
         <div>⬅️➡️ - Pohyb</div>
@@ -678,10 +596,6 @@ button.menuBtn.locked::after {
         <div>P - Pauza</div>
         <div>ESC - Menu</div>
     </div>
-</div>
-
-<div class="pause-overlay" id="pauseOverlay">
-    <div class="pause-text">PAUZA</div>
 </div>
 
 <div id="nameModal">
@@ -1405,9 +1319,6 @@ function hold() {
 
 function updateDisplay() {
     scoreDisplay.textContent = score
-    levelDisplay.textContent = level
-    linesDisplay.textContent = linesCleared
-    comboDisplay.textContent = combo
     updateCoinsDisplay()
 }
 
@@ -1608,6 +1519,7 @@ await loadCurrentUser()
 </script>
 </body>
 </html>
+
 
 
 
