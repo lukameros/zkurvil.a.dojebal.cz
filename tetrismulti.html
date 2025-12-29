@@ -117,8 +117,8 @@ button.menuBtn:hover {
 }
 
 .cell {
-    width: 25px;
-    height: 25px;
+    width: 30px;
+    height: 30px;
     background: #1a1a2e;
     border: 1px solid #111;
     border-radius: 3px;
@@ -372,8 +372,6 @@ button.menuBtn:hover {
             <p class="status-text" id="status2" style="color: #0f0;">✅ HRAJE</p>
         </div>
     </div>
-    
-    <button class="menuBtn" onclick="leaveGame()" style="margin-top: 30px;">🚪 Zpět do menu</button>
 </div>
 
 <!-- Winner Overlay -->
@@ -438,6 +436,8 @@ function getColorFromTheme(themeName, colorName) {
     const theme = themes[themeName] || themes.classic
     return theme[colorName] || theme.cyan
 }
+
+const shapes = [
     {shape: [[1,1,1,1]], color: 'cyan'},
     {shape: [[1,1],[1,1]], color: 'yellow'},
     {shape: [[0,1,0],[1,1,1]], color: 'purple'},
@@ -460,6 +460,31 @@ async function loadUser() {
     } else {
         currentUser = { username: 'Host_' + Math.floor(Math.random() * 10000), is_guest: true }
     }
+}
+
+// Načtení nastavení uživatele
+async function loadUserSettings() {
+    try {
+        if (currentUser && currentUser.id) {
+            const { data } = await supabase
+                .from('tetris_player_data')
+                .select('map_rows, map_cols, theme')
+                .eq('user_id', currentUser.id)
+                .single()
+            
+            if (data) {
+                return {
+                    rows: data.map_rows || 20,
+                    cols: data.map_cols || 10,
+                    theme: data.theme || 'classic'
+                }
+            }
+        }
+    } catch (e) {
+        console.log('Nastavení nenalezeno, používám výchozí')
+    }
+    
+    return { rows: 20, cols: 10, theme: 'classic' }
 }
 
 // Generování kódu hry
@@ -798,10 +823,7 @@ async function startGame() {
 }
 
 // Vytvoření hráče
-function createPlayer(gridId, scoreId, levelId, playerNum) {
-    const rows = 20
-    const cols = 10
-    
+function createPlayer(gridId, scoreId, levelId, playerNum, rows, cols, theme) {
     const player = {
         grid: [],
         current: null,
@@ -817,13 +839,14 @@ function createPlayer(gridId, scoreId, levelId, playerNum) {
         levelElement: document.getElementById(levelId),
         rows: rows,
         cols: cols,
-        playerNumber: playerNum
+        playerNumber: playerNum,
+        theme: theme
     }
     
     // Vytvoř grid
     player.gridElement.innerHTML = ''
-    player.gridElement.style.gridTemplateRows = `repeat(${rows}, 25px)`
-    player.gridElement.style.gridTemplateColumns = `repeat(${cols}, 25px)`
+    player.gridElement.style.gridTemplateRows = `repeat(${rows}, 30px)`
+    player.gridElement.style.gridTemplateColumns = `repeat(${cols}, 30px)`
     
     for (let r = 0; r < rows; r++) {
         player.grid[r] = []
@@ -1099,7 +1122,7 @@ async function endGame(winnerNumber) {
         .eq('id', currentGameId)
     
     // Přidej 100 mincí vítězi
-    if (winnerId && winnerNumber === myPlayerNumber) {
+    if (winnerId) {
         try {
             const { data: playerData } = await supabase
                 .from('tetris_player_data')
@@ -1108,10 +1131,21 @@ async function endGame(winnerNumber) {
                 .single()
             
             if (playerData) {
+                const newCoins = (playerData.coins || 0) + 100
                 await supabase
                     .from('tetris_player_data')
-                    .update({ coins: (playerData.coins || 0) + 100 })
+                    .update({ coins: newCoins })
                     .eq('user_id', winnerId)
+                
+                console.log(`${winner} dostal 100 coinů! Celkem: ${newCoins}`)
+            } else {
+                // Vytvoř záznam pokud neexistuje
+                await supabase
+                    .from('tetris_player_data')
+                    .insert({
+                        user_id: winnerId,
+                        coins: 100
+                    })
             }
         } catch (e) {
             console.error('Chyba při přidávání mincí:', e)
@@ -1164,10 +1198,14 @@ function gameLoop() {
         draw(myPlayer)
         myPlayer.lastDrop = now
         
-        // Ukládej KAŽDÝ frame (vždy)
-        saveGameState(myPlayer)
+        // Ukládej každých 100ms
+        if (now - lastSaveTime > 100) {
+            saveGameState(myPlayer)
+            lastSaveTime = now
+        }
     }
     
+    draw(myPlayer)
     draw(otherPlayer)
     
     requestAnimationFrame(gameLoop)
@@ -1210,7 +1248,7 @@ document.addEventListener('keydown', e => {
     }
 })
 
-// Export funkcí na window pro onclick atributy (HNED!)
+// Export funkcí na window pro onclick atributy
 window.createGame = createGame
 window.showJoinMenu = showJoinMenu
 window.joinGame = joinGame
