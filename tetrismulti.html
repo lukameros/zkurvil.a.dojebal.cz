@@ -281,7 +281,7 @@ button.menuBtn:hover {
 </head>
 <body>
 
-<button id="backBtn" onclick="window.location.href='tetris.html'">⬅ Zpět na menu</button>
+<button id="backBtn" onclick="window.location.href='hry.html'">⬅ Zpět</button>
 
 <!-- Menu -->
 <div id="mainMenu" class="centered">
@@ -437,7 +437,7 @@ function generateGameCode() {
 }
 
 // Vytvoření hry
-window.createGame = async function() {
+async function createGame() {
     const gameCode = generateGameCode()
     
     try {
@@ -471,13 +471,13 @@ window.createGame = async function() {
 }
 
 // Zobrazit join menu
-window.showJoinMenu = function() {
+function showJoinMenu() {
     document.getElementById('mainMenu').style.display = 'none'
     document.getElementById('joinMenu').style.display = 'flex'
 }
 
 // Připojit se ke hře
-window.joinGame = async function() {
+async function joinGame() {
     const code = document.getElementById('gameInput').value.trim().toUpperCase()
     
     if (!code || code.length !== 6) {
@@ -540,7 +540,7 @@ async function waitForPlayer2() {
 }
 
 // Zrušení hry
-window.cancelGame = async function() {
+async function cancelGame() {
     if (currentGameId) {
         await supabase
             .from('tetris_multiplayer_games')
@@ -551,7 +551,7 @@ window.cancelGame = async function() {
 }
 
 // Zpět do menu
-window.backToMenu = function() {
+function backToMenu() {
     if (gameStateChannel) {
         gameStateChannel.unsubscribe()
         gameStateChannel = null
@@ -890,7 +890,7 @@ async function endGame(winnerNumber) {
 }
 
 // Opuštění hry
-window.leaveGame = async function() {
+async function leaveGame() {
     if (gameStateChannel) {
         await gameStateChannel.unsubscribe()
     }
@@ -958,3 +958,14 @@ document.addEventListener('keydown', e => {
 
 // Inicializace
 await loadUser()
+
+// Export funkcí na window pro onclick atributy
+window.createGame = createGame
+window.showJoinMenu = showJoinMenu
+window.joinGame = joinGame
+window.cancelGame = cancelGame
+window.backToMenu = backToMenu
+window.leaveGame = leaveGame
+</script>
+</body>
+</html>
