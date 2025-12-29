@@ -281,7 +281,7 @@ button.menuBtn:hover {
 </head>
 <body>
 
-<button id="backBtn" onclick="window.location.href='hry.html'">⬅ Zpět</button>
+<button id="backBtn" onclick="leaveGame()">⬅ Zpět</button>
 
 <!-- Menu -->
 <div id="mainMenu" class="centered">
@@ -352,7 +352,7 @@ button.menuBtn:hover {
         </div>
     </div>
     
-    <button class="menuBtn" onclick="leaveGame()" style="margin-top: 30px;">🚪 Opustit hru</button>
+    <button class="menuBtn" onclick="leaveGame()" style="margin-top: 30px;">🚪 Zpět do menu</button>
 </div>
 
 <!-- Winner Overlay -->
@@ -486,19 +486,21 @@ async function joinGame() {
     }
     
     try {
-        const { data: game, error } = await supabase
+        // Zkontroluj, jestli hra existuje
+        const { data: game, error: fetchError } = await supabase
             .from('tetris_multiplayer_games')
             .select('*')
             .eq('game_code', code)
             .eq('status', 'waiting')
             .single()
         
-        if (error || !game) {
+        if (fetchError || !game) {
             alert('Hra s tímto kódem neexistuje nebo již byla zahájena!')
             return
         }
         
-        const { error: updateError } = await supabase
+        // Připoj se jako hráč 2
+        const { data: updatedGame, error: updateError } = await supabase
             .from('tetris_multiplayer_games')
             .update({
                 player2_id: currentUser.id || null,
@@ -506,13 +508,20 @@ async function joinGame() {
                 status: 'playing'
             })
             .eq('id', game.id)
+            .select()
+            .single()
         
-        if (updateError) throw updateError
+        if (updateError) {
+            console.error('Chyba při připojování:', updateError)
+            alert('Chyba při připojování ke hře!')
+            return
+        }
         
         currentGameId = game.id
         currentGameCode = code
         myPlayerNumber = 2
         
+        // Přejdi rovnou do hry
         startGame()
         
     } catch (error) {
@@ -561,6 +570,10 @@ function backToMenu() {
     currentGameId = null
     currentGameCode = null
     myPlayerNumber = null
+    
+    // Resetuj hráče
+    player1 = null
+    player2 = null
     
     document.getElementById('mainMenu').style.display = 'flex'
     document.getElementById('joinMenu').style.display = 'none'
@@ -668,7 +681,10 @@ function newPiece(player) {
     
     if (collision(player)) {
         player.gameOver = true
-        endGame(player.playerNumber === 1 ? 2 : 1)
+        // KDO PROHRÁL = ten jehož hra skončila
+        // Takže pokud JÁ jsem prohrál (myPlayerNumber), DRUHÝ vyhrál
+        const winnerNumber = player.playerNumber === 1 ? 2 : 1
+        endGame(winnerNumber)
     }
 }
 
@@ -903,18 +919,37 @@ async function endGame(winnerNumber) {
         })
         .eq('id', currentGameId)
     
-    document.getElementById('winnerText').textContent = `${winner} VYHRÁL!`
+    // Zjisti, jestli JÁ jsem vyhrál
+    const iWon = winnerNumber === myPlayerNumber
+    
+    document.getElementById('winnerText').textContent = iWon ? 
+        `🎉 VYHRÁL JSI! 🎉` : 
+        `😢 ${winner} vyhrál! 😢`
     document.getElementById('winnerOverlay').style.display = 'flex'
 }
 
 // Opuštění hry
 async function leaveGame() {
+    // Pokud je hra aktivní, označ ji jako opuštěnou
+    if (currentGameId) {
+        try {
+            await supabase
+                .from('tetris_multiplayer_games')
+                .update({ status: 'finished' })
+                .eq('id', currentGameId)
+        } catch (e) {
+            console.error('Chyba při opouštění:', e)
+        }
+    }
+    
     if (gameStateChannel) {
         await gameStateChannel.unsubscribe()
     }
     
     gameActive = false
-    backToMenu()
+    
+    // Přesměruj na hry.html
+    window.location.href = 'hry.html'
 }
 
 // Herní smyčka
