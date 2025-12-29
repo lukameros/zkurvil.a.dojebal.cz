@@ -537,7 +537,8 @@ button.menuBtn.locked::after {
 
 <div id="mainMenu" class="centered">
     <h1>🎮 TETRIS 🎮</h1>
-    <button class="menuBtn" onclick="startTetris(selectedDifficulty)">🚀 Singleplayer</button>
+    <button class="menuBtn" onclick="goToKlasika()">🕹️ Classicplay</button>
+    <button class="menuBtn" onclick="startTetris(selectedDifficulty)">🚀 Magicplay</button>
     <button class="menuBtn" onclick="window.location.href='tetrismulti.html'">🌐 Multiplayer</button>
     <button class="menuBtn" onclick="showDifficultyMenu()">⚙️ Nastavení</button>
     <button class="menuBtn" onclick="showMapMenu()">📐 Mapy</button>
@@ -1248,6 +1249,11 @@ function startEventSystem() {
     };
     scheduleNextEvent();
 }
+ window.goToKlasika = function() {
+    // Předá obtížnost, mapu rozměry a téma do klasika.html
+    const url = `klasika.html?difficulty=${selectedDifficulty}&rows=${mapRows}&cols=${mapCols}&theme=${currentTheme}`;
+    window.location.href = url;
+}
 
 window.backToMainMenu = function() {
     document.getElementById('mainMenu').style.display = 'flex'
@@ -1863,6 +1869,7 @@ await loadCurrentUser()
 </script>
 </body>
 </html>
+
 
 
 
