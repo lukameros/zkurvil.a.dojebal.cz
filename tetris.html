@@ -1837,49 +1837,66 @@ function getDifficultyEmoji(difficulty) {
         default: return '❓'
     }
 }
+// Mobilní ovládání - MUSÍ BÝT AŽ PO NAČTENÍ DOM
+document.addEventListener('DOMContentLoaded', () => {
+    if ('ontouchstart' in window) {
+        const mobileLeft = document.getElementById('mobileLeft');
+        const mobileRight = document.getElementById('mobileRight');
+        const mobileDown = document.getElementById('mobileDown');
+        const mobileRotate = document.getElementById('mobileRotate');
+        const mobileDrop = document.getElementById('mobileDrop');
 
-// Mobilní ovládání
-if ('ontouchstart' in window) {
-    document.getElementById('mobileLeft')?.addEventListener('touchstart', (e) => {
-        e.preventDefault();
-        if (!isPaused && !isGameOver && current) {
-            current.x--;
-            if (collision()) current.x++;
-            draw();
+        if (mobileLeft) {
+            mobileLeft.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                if (!isPaused && !isGameOver && current) {
+                    current.x--;
+                    if (collision()) current.x++;
+                    draw();
+                }
+            });
         }
-    });
 
-    document.getElementById('mobileRight')?.addEventListener('touchstart', (e) => {
-        e.preventDefault();
-        if (!isPaused && !isGameOver && current) {
-            current.x++;
-            if (collision()) current.x--;
-            draw();
+        if (mobileRight) {
+            mobileRight.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                if (!isPaused && !isGameOver && current) {
+                    current.x++;
+                    if (collision()) current.x--;
+                    draw();
+                }
+            });
         }
-    });
 
-    document.getElementById('mobileDown')?.addEventListener('touchstart', (e) => {
-        e.preventDefault();
-        if (!isPaused && !isGameOver) {
-            moveDown();
+        if (mobileDown) {
+            mobileDown.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                if (!isPaused && !isGameOver) {
+                    moveDown();
+                }
+            });
         }
-    });
 
-    document.getElementById('mobileRotate')?.addEventListener('touchstart', (e) => {
-        e.preventDefault();
-        if (!isPaused && !isGameOver) {
-            rotate();
-            draw();
+        if (mobileRotate) {
+            mobileRotate.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                if (!isPaused && !isGameOver) {
+                    rotate();
+                    draw();
+                }
+            });
         }
-    });
 
-    document.getElementById('mobileDrop')?.addEventListener('touchstart', (e) => {
-        e.preventDefault();
-        if (!isPaused && !isGameOver) {
-            hardDrop();
+        if (mobileDrop) {
+            mobileDrop.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                if (!isPaused && !isGameOver) {
+                    hardDrop();
+                }
+            });
         }
-    });
-}
+    }
+});
 
 // Inicializace
 await loadCurrentUser()
@@ -1901,6 +1918,7 @@ await loadCurrentUser()
 </div>
 </body>
 </html>
+
 
 
 
