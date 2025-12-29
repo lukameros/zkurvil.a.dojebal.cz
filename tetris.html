@@ -891,367 +891,153 @@ window.buyMap = async function(mapName, rows, cols, price, requiredLevel) {
         }
     } else {
         alert(`Nemáš dost mincí! Potřebuješ ${price}, máš ${playerCoins}.`);
-    }
 }
  Display();
+const themes = {
+    classic: ['cyan', 'yellow', 'purple', 'green', 'red', 'blue', 'orange'],
+    neon: ['#00ffff', '#ff00ff', '#ffff00', '#00ff00', '#ff0080', '#0080ff', '#ff8000'],
+    fire: ['#ff0000', '#ff4500', '#ff6347', '#ff7f50', '#ffa500', '#ffb84d', '#ff8c00'],
+    ice: ['#00bfff', '#4169e1', '#1e90ff', '#87ceeb', '#add8e6', '#b0e0e6', '#87cefa'],
+    forest: ['#228b22', '#32cd32', '#3cb371', '#2e8b57', '#00fa9a', '#90ee90', '#98fb98'],
+    sunset: ['#ff6347', '#ff7f50', '#ffa500', '#ff8c00', '#ff4500', '#ff69b4', '#ff1493'],
+    ocean: ['#006994', '#0080b3', '#0099cc', '#00b3e6', '#33ccff', '#66d9ff', '#99e6ff'],
+    candy: ['#ff69b4', '#ffb6c1', '#ff1493', '#ff82ab', '#ffc0cb', '#ffaec9', '#ff4da6'],
+    galaxy: ['#4b0082', '#8a2be2', '#9370db', '#9932cc', '#ba55d3', '#da70d6', '#ee82ee'],
+    toxic: ['#7fff00', '#adff2f', '#00ff00', '#32cd32', '#39ff14', '#98fb98', '#ccff00'],
+    rainbow: ['#ff0000', '#ff7f00', '#ffff00', '#00ff00', '#0000ff', '#4b0082', '#9400d3'],
+    gold: ['#ffd700', '#ffdf00', '#ffb347', '#daa520', '#b8860b', '#cd853f', '#ff8c00'],
+    matrix: ['#00ff00', '#00cc00', '#00aa00', '#008800', '#00ff41', '#33ff33', '#66ff66'],
+    lava: ['#8b0000', '#b22222', '#dc143c', '#ff4500', '#ff6347', '#ff7f50', '#ffa07a'],
+    midnight: ['#191970', '#000080', '#00008b', '#0000cd', '#4169e1', '#6495ed', '#1e3a8a'],
+    crystal: ['#e0ffff', '#afeeee', '#add8e6', '#87ceeb', '#b0e0e6', '#d4f1f4', '#c0f0f5']
+};
+
+const eventTypes = [
+    {name: '⚡ TURBO SPEED', description: 'Bloky padají 3× rychleji!', duration: 10000, color: 'linear-gradient(135deg, rgba(255, 215, 0, 0.95), rgba(255, 140, 0, 0.95))', onStart: () => { dropInterval = Math.max(50, dropInterval / 3); }, onEnd: () => { const baseSpeed = selectedDifficulty === 'easy' ? 800 : selectedDifficulty === 'medium' ? 600 : selectedDifficulty === 'hard' ? 400 : 250; dropInterval = Math.max(100, Math.floor(baseSpeed * Math.max(0.25, 1 - (Math.floor(score / 1000) * 0.08)))); }},
+    {name: '🚫 NO ROTATION', description: 'Nelze otáčet bloky!', duration: 10000, color: 'linear-gradient(135deg, rgba(255, 0, 0, 0.95), rgba(139, 0, 0, 0.95))', onStart: () => { canRotate = false; }, onEnd: () => { canRotate = true; }},
+    {name: '🐌 SLOW MOTION', description: 'Vše se zpomalilo!', duration: 15000, color: 'linear-gradient(135deg, rgba(0, 100, 255, 0.95), rgba(0, 50, 150, 0.95))', onStart: () => { dropInterval = dropInterval * 2.5; }, onEnd: () => { const baseSpeed = selectedDifficulty === 'easy' ? 800 : selectedDifficulty === 'medium' ? 600 : selectedDifficulty === 'hard' ? 400 : 250; dropInterval = Math.max(100, Math.floor(baseSpeed * Math.max(0.25, 1 - (Math.floor(score / 1000) * 0.08)))); }},
+    {name: '🎁 DOUBLE POINTS', description: 'Získáváš 2× body!', duration: 12000, color: 'linear-gradient(135deg, rgba(0, 255, 0, 0.95), rgba(0, 200, 0, 0.95))', multiplier: 2},
+    {name: '⬅️ REVERSE CONTROLS', description: 'Ovládání je obrácené!', duration: 10000, color: 'linear-gradient(135deg, rgba(255, 0, 255, 0.95), rgba(200, 0, 200, 0.95))', reverseControls: true},
+    {name: '👻 INVISIBLE BLOCKS', description: 'Padající blok je neviditelný!', duration: 8000, color: 'linear-gradient(135deg, rgba(100, 100, 100, 0.95), rgba(50, 50, 50, 0.95))', invisibleCurrent: true}
+];
+
+function triggerRandomEvent() {
+    if (isPaused || isGameOver || activeEvent || !inGame) return;
+    const event = eventTypes[Math.floor(Math.random() * eventTypes.length)];
+    activeEvent = event;
+    showEventNotification(event);
+    if (event.onStart) event.onStart();
+    updateEventTimer(event.duration);
+    eventTimeout = setTimeout(() => endEvent(), event.duration);
+}
+
+function showEventNotification(event) {
+    const notification = document.createElement('div');
+    notification.className = 'event-notification';
+    notification.style.background = event.color;
+    notification.innerHTML = `<h2>${event.name}</h2><p>${event.description}</p>`;
+    document.body.appendChild(notification);
+    playSound('event');
+    setTimeout(() => {
+        notification.classList.add('hide');
+        setTimeout(() => notification.remove(), 300);
+    }, 3000);
+}
+
+function updateEventTimer(duration) {
+    let timer = document.getElementById('eventTimer');
+    if (!timer) {
+        timer = document.createElement('div');
+        timer.id = 'eventTimer';
+        timer.className = 'event-timer';
+        document.body.appendChild(timer);
+    }
+    timer.style.display = 'block';
+    let remaining = Math.floor(duration / 1000);
+    const interval = setInterval(() => {
+        if (!activeEvent || isPaused) { clearInterval(interval); return; }
+        remaining--;
+        timer.textContent = `⏱️ ${activeEvent.name}: ${remaining}s`;
+        if (remaining <= 0) { clearInterval(interval); timer.style.display = 'none'; }
+    }, 1000);
+}
+
+function endEvent() {
+    if (!activeEvent) return;
+    if (activeEvent.onEnd) activeEvent.onEnd();
+    const timer = document.getElementById('eventTimer');
+    if (timer) timer.style.display = 'none';
+    activeEvent = null;
+}
+
+function startEventSystem() {
+    const scheduleNextEvent = () => {
+        const delay = 60000 + Math.random() * 120000;
+        setTimeout(() => {
+            if (!isGameOver && inGame && !isPaused) triggerRandomEvent();
+            if (!isGameOver && inGame) scheduleNextEvent();
+        }, delay);
+    };
+    scheduleNextEvent();
+}
+
+const tetris = document.getElementById('tetris');
+const scoreDisplay = document.getElementById('score');
+const nextPieceDisplay = document.getElementById('nextPiece');
+const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+const shapes = [
+    {shape: [[1,1,1,1]], name: 'I'},
+    {shape: [[1,1],[1,1]], name: 'O'},
+    {shape: [[0,1,0],[1,1,1]], name: 'T'},
+    {shape: [[0,1,1],[1,1,0]], name: 'S'},
+    {shape: [[1,1,0],[0,1,1]], name: 'Z'},
+    {shape: [[1,0,0],[1,1,1]], name: 'J'},
+    {shape: [[0,0,1],[1,1,1]], name: 'L'}
+];
+
+function getColor(shapeIndex) {
+    return themes[currentTheme][shapeIndex % themes[currentTheme].length];
+}
+
+function initGrid() {
+    tetris.innerHTML = '';
+    grid.length = 0;
+    tetris.style.gridTemplateRows = `repeat(${mapRows}, 30px)`;
+    tetris.style.gridTemplateColumns = `repeat(${mapCols}, 30px)`;
+    for (let r = 0; r < mapRows; r++) {
+        grid[r] = [];
+        for (let c = 0; c < mapCols; c++) {
+            const cell = document.createElement('div');
+            cell.classList.add('cell');
+            tetris.appendChild(cell);
+            grid[r][c] = 0;
+        }
+    }
+}
+
+window.startTetris = function(difficulty) {
+    document.getElementById('mainMenu').style.display = 'none';
+    document.getElementById('tetrisGame').style.display = 'flex';
+    score = 0;
+    level = 1;
+    linesCleared = 0;
+    combo = 0;
+    canHold = true;
+    isPaused = false;
+    isGameOver = false;
+    holdPiece = null;
+    earnedCoinsThisGame = 0;
+    inGame = true;
+    dropInterval = difficulty === 'easy' ? 800 : difficulty === 'medium' ? 600 : difficulty === 'hard' ? 400 : 200;
+    initGrid();
+    nextPiece = randomTetromino();
+    newTetromino();
+    updateDisplay();
     gameLoop();
     startEventSystem();
 }
-
-function randomTetromino() {
-    const index = Math.floor(Math.random() * shapes.length);
-    return { shape: shapes[index].shape.map(r => r.slice()), color: getColor(index), name: shapes[index].name };
-}
-
-function newTetromino() {
-    current = nextPiece;
-    current.x = Math.floor(mapCols / 2) - Math.floor(current.shape[0].length / 2);
-    current.y = 0;
-    nextPiece = randomTetromino();
-    drawPreview(nextPiece, nextPieceDisplay);
-    canHold = true;
-    if (collision()) gameOver();
-}
-
-function drawPreview(piece, container) {
-    container.innerHTML = '';
-    for (let i = 0; i < 16; i++) {
-        const cell = document.createElement('div');
-        cell.classList.add('preview-cell');
-        container.appendChild(cell);
-    }
-    const offsetX = Math.floor((4 - piece.shape[0].length) / 2);
-    const offsetY = Math.floor((4 - piece.shape.length) / 2);
-    for (let r = 0; r < piece.shape.length; r++) {
-        for (let c = 0; c < piece.shape[r].length; c++) {
-            if (piece.shape[r][c]) {
-                const index = (offsetY + r) * 4 + (offsetX + c);
-                container.children[index].style.background = piece.color;
-                container.children[index].style.boxShadow = `0 0 10px ${piece.color}`;
-            }
-        }
-    }
-}
-
-function draw() {
-    document.querySelectorAll('.cell').forEach(cell => {
-        cell.style.background = '#1a1a2e';
-        cell.classList.remove('filled');
-    });
-    for (let r = 0; r < mapRows; r++) {
-        for (let c = 0; c < mapCols; c++) {
-            if (grid[r][c]) {
-                const cell = tetris.children[r * mapCols + c];
-                cell.style.background = grid[r][c];
-                cell.style.boxShadow = `0 0 10px ${grid[r][c]}`;
-                cell.classList.add('filled');
-            }
-        }
-    }
-    if (activeEvent && activeEvent.invisibleCurrent) return;
-    for (let r = 0; r < current.shape.length; r++) {
-        for (let c = 0; c < current.shape[r].length; c++) {
-            if (current.shape[r][c]) {
-                const index = (current.y + r) * mapCols + (current.x + c);
-                if (index >= 0 && index < mapRows * mapCols) {
-                    tetris.children[index].style.background = current.color;
-                    tetris.children[index].style.boxShadow = `0 0 15px ${current.color}`;
-                    tetris.children[index].classList.add('filled');
-                }
-            }
-        }
-    }
-}
-
-function moveDown() {
-    if (isPaused || isGameOver) return;
-    current.y++;
-    if (collision()) { current.y--; freeze(); newTetromino(); }
-    draw();
-}
-
-function collision() { return collisionAt(current.x, current.y); }
-
-function collisionAt(x, y) {
-    for (let r = 0; r < current.shape.length; r++) {
-        for (let c = 0; c < current.shape[r].length; c++) {
-            if (current.shape[r][c]) {
-                let newY = y + r, newX = x + c;
-                if (newY >= mapRows || newX < 0 || newX >= mapCols) return true;
-                if (newY >= 0 && grid[newY][newX]) return true;
-            }
-        }
-    }
-    return false;
-}
-
-function freeze() {
-    for (let r = 0; r < current.shape.length; r++) {
-        for (let c = 0; c < current.shape[r].length; c++) {
-            if (current.shape[r][c]) grid[current.y + r][current.x + c] = current.color;
-        }
-    }
-    const cleared = clearLines();
-    if (cleared > 0) { createParticles(cleared); playSound('clear'); }
-}
-
-function clearLines() {
-    let cleared = 0;
-    for (let r = mapRows - 1; r >= 0; r--) {
-        if (grid[r].every(cell => cell !== 0)) {
-            grid.splice(r, 1);
-            grid.unshift(Array(mapCols).fill(0));
-            cleared++;
-            r++;
-        }
-    }
-    if (cleared > 0) {
-        linesCleared += cleared;
-        combo++;
-        let points = cleared * 100 * level;
-        if (cleared === 4) points *= 2;
-        points += combo * 50;
-        if (activeEvent && activeEvent.multiplier) points *= activeEvent.multiplier;
-        score += points;
-        level = Math.floor(linesCleared / 10) + 1;
-        const baseSpeed = selectedDifficulty === 'easy' ? 800 : selectedDifficulty === 'medium' ? 600 : selectedDifficulty === 'hard' ? 400 : 250;
-        const minSpeed = selectedDifficulty === 'easy' ? 200 : selectedDifficulty === 'medium' ? 150 : selectedDifficulty === 'hard' ? 100 : 80;
-        dropInterval = Math.max(minSpeed, Math.floor(baseSpeed * Math.max(0.25, 1 - (Math.floor(score / 1000) * 0.08))));
-    } else combo = 0;
-    updateDisplay();
-    return cleared;
-}
-
-function createParticles(count) {
-    for (let i = 0; i < count * 20; i++) {
-        const particle = document.createElement('div');
-        particle.classList.add('particle');
-        particle.style.left = (window.innerWidth / 2 + Math.random() * 400 - 200) + 'px';
-        particle.style.top = (window.innerHeight / 2 + Math.random() * 200 - 100) + 'px';
-        particle.style.background = themes[currentTheme][Math.floor(Math.random() * themes[currentTheme].length)];
-        document.body.appendChild(particle);
-        setTimeout(() => particle.remove(), 1000);
-    }
-}
-
-function rotate() {
-    if (!canRotate) { playSound('error'); return; }
-    const shape = current.shape, N = shape.length, M = shape[0].length, rotated = [];
-    for (let y = 0; y < M; y++) {
-        rotated[y] = [];
-        for (let x = 0; x < N; x++) rotated[y][x] = shape[N - 1 - x][y] || 0;
-    }
-    const oldShape = current.shape;
-    current.shape = rotated;
-    if (collision()) { current.x++; if (collision()) { current.x -= 2; if (collision()) { current.x++; current.shape = oldShape; }}}
-    playSound('rotate');
-}
-
-function hardDrop() {
-    while (!collision()) current.y++;
-    current.y--;
-    freeze();
-    newTetromino();
-    score += 10;
-    updateDisplay();
-    playSound('drop');
-}
-
-function updateDisplay() { scoreDisplay.textContent = score; updateCoinsDisplay(); }
-function togglePause() {
-    isPaused = !isPaused;
-    document.getElementById('pauseOverlay').style.display = isPaused ? 'flex' : 'none';
-    if (!isPaused) gameLoop();
-}
-
-function playSound(type) {
-    const osc = audioContext.createOscillator(), gain = audioContext.createGain();
-    osc.connect(gain); gain.connect(audioContext.destination);
-    let dur = 0.1;
-    switch(type) {
-        case 'rotate': osc.frequency.value = 400; gain.gain.value = 0.1; break;
-        case 'drop': osc.frequency.value = 200; gain.gain.value = 0.2; break;
-        case 'clear': osc.frequency.value = 800; gain.gain.value = 0.15; break;
-        case 'event': osc.frequency.value = 1000; gain.gain.value = 0.3; dur = 0.3; break;
-        case 'error': osc.frequency.value = 150; gain.gain.value = 0.2; break;
-    }
-    osc.start(audioContext.currentTime);
-    osc.stop(audioContext.currentTime + dur);
-}
-
-document.addEventListener('keydown', e => {
-    if (isGameOver) return;
-    if (e.key === 'p' || e.key === 'P') { togglePause(); return; }
-    if (e.key === 'Escape') { backToMainMenu(); return; }
-    if (isPaused) return;
-    const reversed = activeEvent && activeEvent.reverseControls;
-    if (e.key === 'ArrowLeft') { if (reversed) { current.x++; if (collision()) current.x--; } else { current.x--; if (collision()) current.x++; }}
-    if (e.key === 'ArrowRight') { if (reversed) { current.x--; if (collision()) current.x++; } else { current.x++; if (collision()) current.x--; }}
-    if (e.key === 'ArrowDown') moveDown();
-    if (e.key === 'ArrowUp') rotate();
-    if (e.key === ' ') { e.preventDefault(); hardDrop(); }
-    draw();
-});
-
-function gameLoop() {
-    if (isPaused || isGameOver) return;
-    moveDown();
-    dropTimeout = setTimeout(gameLoop, dropInterval);
-}
-
-async function gameOver() {
-    isGameOver = true; inGame = false; endEvent(); clearTimeout(eventTimeout);
-    await updateAfterGame(score);
-    if (currentUser && !currentUser.is_guest) {
-        try {
-            await supabase.from('tetris_scores').insert([{
-                user_id: currentUser.id, username: currentUser.username,
-                score: score, difficulty: selectedDifficulty,
-                lines_cleared: linesCleared, level_reached: level,
-                timestamp: new Date().toISOString()
-            }]);
-        } catch (error) { console.error('Chyba:', error); }
-    }
-    document.getElementById('finalScore').textContent = score;
-    document.getElementById('earnedCoins').textContent = earnedCoinsThisGame;
-    const saveMsg = document.getElementById('saveMessage');
-    if (currentUser && !currentUser.is_guest) {
-        saveMsg.textContent = '✅ Skóre uloženo!';
-        saveMsg.style.color = '#00ff00';
-    } else {
-        saveMsg.textContent = '⚠️ Přihlas se pro žebříček';
-        saveMsg.style.color = '#ffaa00';
-    }
-    document.getElementById('nameModal').style.display = 'flex';
-}
-
-async function loadLeaderboard() {
-    const table = document.getElementById('leaderboardTable'), loading = document.querySelector('.loading');
-    loading.style.display = 'block'; table.style.display = 'none';
-    try {
-        const { data } = await supabase.from('tetris_scores').select('username, score, difficulty, timestamp').order('score', { ascending: false }).limit(50);
-        const bestScoresMap = {};
-        data.forEach(s => { if (!bestScoresMap[s.username] || s.score > bestScoresMap[s.username].score) bestScoresMap[s.username] = s; });
-        const bestScores = Object.values(bestScoresMap).sort((a, b) => b.score - a.score).slice(0, 50);
-        table.innerHTML = '<tr><th>Pozice</th><th>Hráč</th><th>Skóre</th><th>Obtížnost</th><th>Datum</th></tr>';
-        bestScores.forEach((s, i) => {
-            const row = table.insertRow();
-            row.insertCell(0).textContent = i + 1;
-            row.insertCell(1).textContent = s.username || 'Anonymní';
-            row.insertCell(2).textContent = s.score || 0;
-            row.insertCell(3).textContent = {'easy': '😊 Snadná', 'medium': '😐 Střední', 'hard': '😈 Těžká', 'insane': '💀 Šílená'}[s.difficulty] || '❓';
-            row.insertCell(4).textContent = s.timestamp ? new Date(s.timestamp).toLocaleDateString('cs-CZ') : 'N/A';
-            if (i === 0) row.style.background = 'rgba(255, 215, 0, 0.2)';
-            if (i === 1) row.style.background = 'rgba(192, 192, 192, 0.2)';
-            if (i === 2) row.style.background = 'rgba(205, 127, 50, 0.2)';
-        });
-        loading.style.display = 'none';
-        table.style.display = 'table';
-    } catch (error) {
-        console.error('Chyba:', error);
-        loading.textContent = 'Chyba při načítání.';
-    }
-}
-
-await loadCurrentUser();
 </script>
-</body>
-</html>
-</script>
-// Globální proměnné
-let selectedDifficulty = 'medium';
-let mapRows = 20;
-let mapCols = 10;
-let currentTheme = 'classic';
-let score = 0;
-let level = 1;
-let linesCleared = 0;
-let combo = 0;
-let dropInterval = 500;
-let dropTimeout;
-let isPaused = false;
-let isGameOver = false;
-let canHold = true;
-let earnedCoinsThisGame = 0;
-let grid = [];
-let current = null;
-let nextPiece = null;
-let holdPiece = null;
-let playerCoins = 0;
-let playerLevel = 1;
-let playerExp = 0;
-let unlockedThemes = ['classic', 'neon'];
-let unlockedMaps = ['20x10', '18x12'];
-let currentUser = null;
-let totalGamesPlayed = 0;
-let activeEvent = null;
-let eventTimeout = null;
-let canRotate = true;
-let inGame = false;
 
-// Globální funkce pro menu
-window.updateCoinsDisplay = function() {
-    document.getElementById('coinCount').textContent = playerCoins;
-}
-
-window.backToMainMenu = function() {
-    inGame = false;
-    if (activeEvent) endEvent();
-    clearTimeout(eventTimeout);
-    document.getElementById('mainMenu').style.display = 'flex';
-    document.getElementById('difficultyMenu').style.display = 'none';
-    document.getElementById('themeMenu').style.display = 'none';
-    document.getElementById('mapMenu').style.display = 'none';
-    document.getElementById('leaderboard').style.display = 'none';
-    document.getElementById('tetrisGame').style.display = 'none';
-    document.getElementById('nameModal').style.display = 'none';
-    document.getElementById('pauseOverlay').style.display = 'none';
-    clearTimeout(dropTimeout);
-    isPaused = false;
-    isGameOver = false;
-}
-
-window.showDifficultyMenu = () => {
-    document.getElementById('mainMenu').style.display = 'none';
-    document.getElementById('difficultyMenu').style.display = 'flex';
-}
-
-window.showThemeMenu = () => {
-    document.getElementById('mainMenu').style.display = 'none';
-    document.getElementById('themeMenu').style.display = 'flex';
-}
-
-window.showMapMenu = () => {
-    document.getElementById('mainMenu').style.display = 'none';
-    document.getElementById('mapMenu').style.display = 'flex';
-}
-
-window.showLeaderboard = async () => {
-    document.getElementById('mainMenu').style.display = 'none';
-    document.getElementById('leaderboard').style.display = 'flex';
-    await loadLeaderboard();
-}
-
-window.setDifficulty = (l) => {
-    selectedDifficulty = l;
-    backToMainMenu();
-}
-
-window.setMap = (r, c) => {
-    mapRows = r;
-    mapCols = c;
-    backToMainMenu();
-}
-
-window.setTheme = (t) => {
-    if (!unlockedThemes.includes(t)) {
-        alert('Zamčené!');
-        return;
-    }
-    currentTheme = t;
-    backToMainMenu();
-}
-</script>
 <script type="module">
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.3'
 
@@ -1272,7 +1058,7 @@ async function loadCurrentUser() {
         } catch (e) {
             try {
                 const savedUsername = typeof savedUser === 'string' ? savedUser : savedUser.username;
-const { data: user } = await window.supabase.from('users').select('*').eq('username', savedUsername).single()
+                const { data: user } = await window.supabase.from('users').select('*').eq('username', savedUsername).single()
                 if (user) {
                     window.currentUser = user
                     localStorage.setItem('currentUser', JSON.stringify(user))
@@ -1320,9 +1106,9 @@ async function loadUserData() {
     } catch (error) {
         console.error('Chyba při načítání dat:', error);
     }
-    updateCoinsDisplay();
-    updateLevelBar();
-    updateUnlockedItems();
+    window.updateCoinsDisplay();
+    window.updateLevelBar();
+    window.updateUnlockedItems();
 }
 
 function loadLocalData() {
@@ -1335,9 +1121,9 @@ function loadLocalData() {
         window.unlockedThemes = data.themes || ['classic', 'neon'];
         window.unlockedMaps = data.maps || ['20x10', '18x12'];
     }
-    updateCoinsDisplay();
-    updateLevelBar();
-    updateUnlockedItems();
+    window.updateCoinsDisplay();
+    window.updateLevelBar();
+    window.updateUnlockedItems();
 }
 
 async function saveUserData() {
@@ -1372,11 +1158,11 @@ async function updateAfterGame(finalScore) {
     const expFromScore = Math.floor(finalScore / 1000) * 10;
     window.earnedCoinsThisGame = totalCoins;
     window.playerCoins += totalCoins;
-    addExp(expFromScore);
+    window.addExp(expFromScore);
     
     if (!window.currentUser || window.currentUser.is_guest) {
         await saveUserData();
-        updateCoinsDisplay();
+        window.updateCoinsDisplay();
         return;
     }
     
@@ -1396,8 +1182,8 @@ async function updateAfterGame(finalScore) {
     }
     
     await saveUserData();
-    updateCoinsDisplay();
-    updateLevelBar();
+    window.updateCoinsDisplay();
+    window.updateLevelBar();
 }
 
 window.updateAfterGame = updateAfterGame;
