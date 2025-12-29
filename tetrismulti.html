@@ -610,6 +610,8 @@ function updateReadyStatus(game) {
     player1IsReady = game.player1_ready || false;
     player2IsReady = game.player2_ready || false;
     
+    console.log('Ready status - P1:', player1IsReady, 'P2:', player2IsReady, 'MyPlayer:', myPlayerNumber);
+    
     document.getElementById('player1Ready').textContent = player1IsReady ? '✅' : '⏳';
     document.getElementById('player2Ready').textContent = player2IsReady ? '✅' : '⏳';
     
@@ -617,21 +619,50 @@ function updateReadyStatus(game) {
         document.getElementById('player2WaitName').textContent = game.player2_username;
     }
     
-    if (player1IsReady && player2IsReady && myPlayerNumber === 1) {
-        document.getElementById('startBtn').style.display = 'block';
-        document.getElementById('readyBtn').style.display = 'none';
+    // Pokud jsou oba ready, zobraz tlačítko START hostu (hráč 1)
+    if (player1IsReady && player2IsReady) {
+        console.log('Oba jsou ready!');
+        if (myPlayerNumber === 1) {
+            console.log('Zobrazuji tlačítko START pro hosta');
+            document.getElementById('startBtn').style.display = 'block';
+            document.getElementById('readyBtn').style.display = 'none';
+        } else {
+            console.log('Hráč 2 čeká na spuštění');
+            document.getElementById('readyBtn').style.display = 'none';
+        }
     }
 }
 
 async function setReady() {
     const field = myPlayerNumber === 1 ? 'player1_ready' : 'player2_ready';
     
-    await supabase
+    console.log('Nastavuji ready pro:', field);
+    
+    const { data, error } = await supabase
         .from('tetris_multiplayer_games')
         .update({ [field]: true })
-        .eq('id', currentGameId);
+        .eq('id', currentGameId)
+        .select()
+        .single();
+    
+    if (error) {
+        console.error('Chyba při nastavení ready:', error);
+    } else {
+        console.log('Ready nastaveno úspěšně:', data);
+    }
     
     document.getElementById('readyBtn').style.display = 'none';
+    
+    // Načti aktuální stav a updatuj UI
+    const { data: game } = await supabase
+        .from('tetris_multiplayer_games')
+        .select('*')
+        .eq('id', currentGameId)
+        .single();
+    
+    if (game) {
+        updateReadyStatus(game);
+    }
 }
 
 async function startCountdown() {
