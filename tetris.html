@@ -1082,9 +1082,9 @@ window.setTheme = function(theme) {
 // Tetris engine
 const tetris = document.getElementById('tetris')
 const scoreDisplay = document.getElementById('score')
-const levelDisplay = document.getElementById('level')
-const linesDisplay = document.getElementById('lines')
-const comboDisplay = document.getElementById('combo')
+// const levelDisplay = document.getElementById('level')
+// const linesDisplay = document.getElementById('lines')
+// const comboDisplay = document.getElementById('combo')
 const nextPieceDisplay = document.getElementById('nextPiece')
 const holdPieceDisplay = document.getElementById('holdPiece')
 
@@ -1383,9 +1383,6 @@ function hold() {
 
 function updateDisplay() {
     scoreDisplay.textContent = score
-    levelDisplay.textContent = level
-    linesDisplay.textContent = linesCleared
-    comboDisplay.textContent = combo
     updateCoinsDisplay()
 }
 
@@ -1586,6 +1583,7 @@ await loadCurrentUser()
 </script>
 </body>
 </html>
+
 
 
 
