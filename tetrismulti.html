@@ -975,18 +975,33 @@ function subscribeToGame() {
             }
             
             if (data && data.length > 0) {
-                console.log('🔄 Aktualizace protihráče', otherPlayerNum)
-                const otherPlayer = otherPlayerNum === 1 ? player1 : player2
-                try {
-                    otherPlayer.grid = JSON.parse(data[0].grid)
-                    otherPlayer.current = JSON.parse(data[0].current_piece)
-                } catch (e) {
-                    console.error('Chyba parsování:', e)
-                }
-                otherPlayer.score = data[0].score
-                otherPlayer.level = data[0].level
-                updateDisplay(otherPlayer)
-                draw(otherPlayer)
+    console.log('🔄 Aktualizace protihráče', otherPlayerNum)
+    console.log('player1 existuje?', player1 !== null)
+    console.log('player2 existuje?', player2 !== null)
+    
+    const otherPlayer = otherPlayerNum === 1 ? player1 : player2
+    
+    if (!otherPlayer) {
+        console.error('❌ otherPlayer neexistuje!')
+        return
+    }
+    
+    console.log('Data:', data[0])
+    
+    try {
+        otherPlayer.grid = JSON.parse(data[0].grid)
+        otherPlayer.current = JSON.parse(data[0].current_piece)
+        console.log('✅ Parsování OK, vykresluju...')
+    } catch (e) {
+        console.error('Chyba parsování:', e)
+        return
+    }
+    otherPlayer.score = data[0].score
+    otherPlayer.level = data[0].level
+    updateDisplay(otherPlayer)
+    draw(otherPlayer)
+    console.log('✅ Vykresleno!')
+}
             }
         } catch (e) {
             console.error('❌ Chyba při načítání:', e)
@@ -1048,6 +1063,7 @@ async function leaveGame() {
 
 // Herní smyčka
 let lastSaveTime = 0
+// Herní smyčka
 function gameLoop() {
     if (!gameActive) return
     
@@ -1057,20 +1073,18 @@ function gameLoop() {
     
     if (!myPlayer.gameOver && now - myPlayer.lastDrop > myPlayer.dropInterval) {
         moveDown(myPlayer)
-        draw(myPlayer)
         myPlayer.lastDrop = now
         
         // Ukládej stav při každém pádu kostky
         saveGameState(myPlayer)
-        lastSaveTime = now
     }
     
+    // TOHLE JE DŮLEŽITÉ - vykresluj OBA hráče!
     draw(myPlayer)
     draw(otherPlayer)
     
     requestAnimationFrame(gameLoop)
 }
-
 // Ovládání
 let lastControlSave = 0
 document.addEventListener('keydown', e => {
@@ -1131,6 +1145,7 @@ loadUser()
 </script>
 </body>
 </html>
+
 
 
 
