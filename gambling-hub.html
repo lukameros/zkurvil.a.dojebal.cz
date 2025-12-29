@@ -963,7 +963,8 @@ let currentUser = {
     nickname: '',
     coins: 0,
     lastDailyBonus: null,
-    ownedThemes: ['default']
+    ownedThemes: ['default'],
+    activeTheme: 'default'
 };
 
 let currentGame = 'slot';
@@ -1166,12 +1167,12 @@ const ctx = canvas.getContext("2d");
 const center = 200;
 
 const wheelPrizes = [
-    { coins: 50, color: '#ff0080', weight: 30 },
-    { coins: 100, color: '#00ff80', weight: 25 },
-    { coins: 150, color: '#0080ff', weight: 20 },
-    { coins: 200, color: '#ff8000', weight: 15 },
-    { coins: 0, color: '#666666', weight: 9.9 },
-    { coins: 500, color: '#ffff00', weight: 0.1 }
+    { coins: 0, color: '#666666', weight: 50 },
+    { coins: 5, color: '#ff0080', weight: 20 },
+    { coins: 15, color: '#00ff80', weight: 15 },
+    { coins: 25, color: '#0080ff', weight: 10 },
+    { coins: 50, color: '#ff8000', weight: 4 },
+    { coins: 100, color: '#ffff00', weight: 1 }
 ];
 
 let rotation = 0;
@@ -1299,6 +1300,7 @@ function loadShop() {
     
     shopItems.forEach(item => {
         const owned = currentUser.ownedThemes.includes(item.id);
+        const isActive = currentUser.activeTheme === item.id;
         
         const shopItem = document.createElement('div');
         shopItem.className = 'shop-item' + (owned ? ' owned' : '');
@@ -1306,9 +1308,9 @@ function loadShop() {
         shopItem.innerHTML = `
             <div class="shop-icon">${item.icon}</div>
             <div class="shop-name">${item.name}</div>
-            <div class="shop-price">${item.price} 🪙</div>
-            <button class="shop-buy-btn" onclick="buyTheme('${item.id}')" ${owned ? 'disabled' : ''}>
-                ${owned ? '✅ VLASTNÍTE' : '💰 KOUPIT'}
+            <div class="shop-price">${owned ? (isActive ? 'AKTIVNÍ' : '') : item.price + ' 🪙'}</div>
+            <button class="shop-buy-btn" onclick="${owned ? `activateTheme('${item.id}')` : `buyTheme('${item.id}')`}" ${isActive ? 'disabled' : ''}>
+                ${isActive ? '✅ POUŽÍVÁTE' : (owned ? '🎨 POUŽÍT' : '💰 KOUPIT')}
             </button>
         `;
         
@@ -1345,6 +1347,53 @@ window.buyTheme = async function(themeId) {
         setTimeout(() => createConfetti(), i * 20);
     }
 };
+
+window.activateTheme = async function(themeId) {
+    const item = shopItems.find(i => i.id === themeId);
+    
+    if (!item) return;
+    
+    if (!currentUser.ownedThemes.includes(themeId)) {
+        alert('Nejdřív musíte tento vzhled koupit!');
+        return;
+    }
+    
+    currentUser.activeTheme = themeId;
+    await saveUser();
+    applyTheme(item.colors);
+    loadShop();
+    
+    alert(`✅ Vzhled ${item.name} byl aktivován!`);
+};
+
+function applyTheme(colors) {
+    document.documentElement.style.setProperty('--theme-primary', colors.primary);
+    document.documentElement.style.setProperty('--theme-secondary', colors.secondary);
+    
+    // Aplikujeme barvy na hlavní elementy
+    const userName = document.getElementById('userName');
+    if (userName) {
+        userName.style.color = colors.primary;
+        userName.style.textShadow = `0 0 15px ${colors.primary}, 0 0 30px ${colors.secondary}`;
+    }
+    
+    const slotTitle = document.getElementById('slotTitle');
+    if (slotTitle) {
+        slotTitle.style.color = colors.primary;
+        slotTitle.style.textShadow = `0 0 20px ${colors.primary}, 0 0 40px ${colors.secondary}`;
+    }
+    
+    // Aplikujeme na další prvky
+    document.querySelectorAll('.reel').forEach(reel => {
+        reel.style.borderColor = colors.primary;
+        reel.style.boxShadow = `0 0 20px ${colors.primary}`;
+    });
+    
+    document.querySelectorAll('.reel-window').forEach(window => {
+        window.style.borderColor = colors.secondary;
+        window.style.boxShadow = `0 0 15px ${colors.secondary}`;
+    });
+}
 
 // GAME SWITCHING
 window.switchGame = function(game) {
@@ -1386,6 +1435,7 @@ window.login = async function() {
     currentUser.coins = 100;
     currentUser.lastDailyBonus = new Date().toISOString().split('T')[0];
     currentUser.ownedThemes = ['default'];
+    currentUser.activeTheme = 'default';
     
     const { data, error } = await supabase
         .from('casino_users')
@@ -1393,7 +1443,8 @@ window.login = async function() {
             nickname: currentUser.nickname,
             coins: currentUser.coins,
             last_daily_bonus: currentUser.lastDailyBonus,
-            owned_themes: currentUser.ownedThemes
+            owned_themes: currentUser.ownedThemes,
+            active_theme: currentUser.activeTheme
         }])
         .select();
     
@@ -1411,7 +1462,6 @@ window.login = async function() {
     checkDailyBonus();
 };
 
-// Najdi a nahraď funkci saveUser
 async function saveUser() {
     if (!currentUser.id) return;
     
@@ -1431,7 +1481,8 @@ async function saveUser() {
                     nickname: currentUser.nickname,
                     coins: currentUser.coins,
                     last_daily_bonus: currentUser.lastDailyBonus,
-                    owned_themes: currentUser.ownedThemes
+                    owned_themes: currentUser.ownedThemes,
+                    active_theme: currentUser.activeTheme
                 })
                 .eq('id', currentUser.id);
             
@@ -1448,7 +1499,8 @@ async function saveUser() {
                     nickname: currentUser.nickname,
                     coins: currentUser.coins,
                     last_daily_bonus: currentUser.lastDailyBonus,
-                    owned_themes: currentUser.ownedThemes
+                    owned_themes: currentUser.ownedThemes,
+                    active_theme: currentUser.activeTheme
                 }]);
             
             if (error) {
@@ -1461,6 +1513,7 @@ async function saveUser() {
         localStorage.setItem('casinoUser', JSON.stringify(currentUser));
     }
 }
+
 function updateUI() {
     document.getElementById('userName').textContent = currentUser.nickname;
     document.getElementById('coinAmount').textContent = currentUser.coins;
@@ -1602,10 +1655,18 @@ window.addEventListener('load', async () => {
                 currentUser.coins = existingUser.coins;
                 currentUser.lastDailyBonus = existingUser.last_daily_bonus;
                 currentUser.ownedThemes = existingUser.owned_themes || ['default'];
+                currentUser.activeTheme = existingUser.active_theme || 'default';
+                
+                // Aplikujeme aktivní téma
+                const activeItem = shopItems.find(i => i.id === currentUser.activeTheme);
+                if (activeItem) {
+                    applyTheme(activeItem.colors);
+                }
             } else {
                 currentUser.coins = 100;
                 currentUser.lastDailyBonus = null;
                 currentUser.ownedThemes = ['default'];
+                currentUser.activeTheme = 'default';
                 console.log('Vytváření nového casino uživatele...');
             }
             
@@ -1629,4 +1690,3 @@ window.addEventListener('load', async () => {
 
 </body>
 </html>
-
