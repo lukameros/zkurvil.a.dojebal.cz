@@ -1270,33 +1270,63 @@ function freeze() {
 }
 
 function clearLines() {
-    let cleared = 0
+    let cleared = 0;
     for (let r = mapRows - 1; r >= 0; r--) {
         if (grid[r].every(cell => cell !== 0)) {
-            grid.splice(r, 1)
-            grid.unshift(Array(mapCols).fill(0))
-            cleared++
-            r++
+            grid.splice(r, 1);
+            grid.unshift(Array(mapCols).fill(0));
+            cleared++;
+            r++;
         }
     }
     
     if (cleared > 0) {
-        linesCleared += cleared
-        combo++
+        linesCleared += cleared;
+        combo++;
         
-        let points = cleared * 100 * level
-        if (cleared === 4) points *= 2
-        points += combo * 50
+        let points = cleared * 100 * level;
+        if (cleared === 4) points *= 2;
+        points += combo * 50;
         
-        score += points
-        level = Math.floor(linesCleared / 10) + 1
-        dropInterval = Math.max(50, 600 - (level * 40))
+        score += points;
+        level = Math.floor(linesCleared / 10) + 1;
+        
+        // Dynamická rychlost podle obtížnosti a skóre
+        let baseSpeed, speedMultiplier;
+        
+        switch(selectedDifficulty) {
+            case 'easy':
+                baseSpeed = 800;
+                speedMultiplier = 0.5; // Nejpomalejší zrychlování
+                break;
+            case 'medium':
+                baseSpeed = 600;
+                speedMultiplier = 1; // Střední zrychlování
+                break;
+            case 'hard':
+                baseSpeed = 400;
+                speedMultiplier = 1.5; // Rychlejší zrychlování
+                break;
+            case 'insane':
+                baseSpeed = 200;
+                speedMultiplier = 2; // Nejrychlejší zrychlování
+                break;
+            default:
+                baseSpeed = 600;
+                speedMultiplier = 1;
+        }
+        
+        // Rychlost klesá s rostoucím skóre
+        let speedReduction = Math.floor(score / 500) * 30 * speedMultiplier;
+        dropInterval = Math.max(50, baseSpeed - speedReduction);
+        
+        console.log(`Obtížnost: ${selectedDifficulty}, Skóre: ${score}, Rychlost: ${dropInterval}ms`);
     } else {
-        combo = 0
+        combo = 0;
     }
     
-    updateDisplay()
-    return cleared
+    updateDisplay();
+    return cleared;
 }
 
 function createParticles(count) {
@@ -1583,6 +1613,7 @@ await loadCurrentUser()
 </script>
 </body>
 </html>
+
 
 
 
