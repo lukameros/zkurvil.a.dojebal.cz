@@ -1007,13 +1007,12 @@ function gameLoop() {
         draw(myPlayer)
         myPlayer.lastDrop = now
         
-        // Ukládej stav jen každých 500ms
-        if (now - lastSaveTime > 500) {
-            saveGameState(myPlayer)
-            lastSaveTime = now
-        }
+        // Ukládej stav při každém pádu kostky
+        saveGameState(myPlayer)
+        lastSaveTime = now
     }
     
+    draw(myPlayer)
     draw(otherPlayer)
     
     requestAnimationFrame(gameLoop)
@@ -1079,3 +1078,4 @@ loadUser()
 </script>
 </body>
 </html>
+
