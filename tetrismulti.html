@@ -414,8 +414,30 @@ let waitingChannel = null
 let player1IsReady = false
 let player2IsReady = false
 
-// Tetris shapes
-const shapes = [
+// Barevná témata
+const themes = {
+    classic: { cyan: '#00ffff', yellow: '#ffff00', purple: '#ff00ff', green: '#00ff00', red: '#ff0000', blue: '#0000ff', orange: '#ff8800' },
+    neon: { cyan: '#00ffff', yellow: '#ffff00', purple: '#ff00ff', green: '#00ff00', red: '#ff0080', blue: '#0080ff', orange: '#ff8000' },
+    fire: { cyan: '#ff0000', yellow: '#ff4500', purple: '#ff6347', green: '#ff7f50', red: '#ffa500', blue: '#ffb84d', orange: '#ff8c00' },
+    ice: { cyan: '#00bfff', yellow: '#4169e1', purple: '#1e90ff', green: '#87ceeb', red: '#add8e6', blue: '#b0e0e6', orange: '#87cefa' },
+    forest: { cyan: '#228b22', yellow: '#32cd32', purple: '#3cb371', green: '#2e8b57', red: '#00fa9a', blue: '#90ee90', orange: '#98fb98' },
+    sunset: { cyan: '#ff6347', yellow: '#ff7f50', purple: '#ffa500', green: '#ff8c00', red: '#ff4500', blue: '#ff69b4', orange: '#ff1493' },
+    ocean: { cyan: '#006994', yellow: '#0080b3', purple: '#0099cc', green: '#00b3e6', red: '#33ccff', blue: '#66d9ff', orange: '#99e6ff' },
+    candy: { cyan: '#ff69b4', yellow: '#ffb6c1', purple: '#ff1493', green: '#ff82ab', red: '#ffc0cb', blue: '#ffaec9', orange: '#ff4da6' },
+    galaxy: { cyan: '#4b0082', yellow: '#8a2be2', purple: '#9370db', green: '#9932cc', red: '#ba55d3', blue: '#da70d6', orange: '#ee82ee' },
+    toxic: { cyan: '#7fff00', yellow: '#adff2f', purple: '#00ff00', green: '#32cd32', red: '#39ff14', blue: '#98fb98', orange: '#ccff00' },
+    rainbow: { cyan: '#ff0000', yellow: '#ff7f00', purple: '#ffff00', green: '#00ff00', red: '#0000ff', blue: '#4b0082', orange: '#9400d3' },
+    gold: { cyan: '#ffd700', yellow: '#ffdf00', purple: '#ffb347', green: '#daa520', red: '#b8860b', blue: '#cd853f', orange: '#ff8c00' },
+    matrix: { cyan: '#00ff00', yellow: '#00cc00', purple: '#00aa00', green: '#008800', red: '#00ff41', blue: '#33ff33', orange: '#66ff66' },
+    lava: { cyan: '#8b0000', yellow: '#b22222', purple: '#dc143c', green: '#ff4500', red: '#ff6347', blue: '#ff7f50', orange: '#ffa07a' },
+    midnight: { cyan: '#191970', yellow: '#000080', purple: '#00008b', green: '#0000cd', red: '#4169e1', blue: '#6495ed', orange: '#1e3a8a' },
+    crystal: { cyan: '#e0ffff', yellow: '#afeeee', purple: '#add8e6', green: '#87ceeb', red: '#b0e0e6', blue: '#d4f1f4', orange: '#c0f0f5' }
+}
+
+function getColorFromTheme(themeName, colorName) {
+    const theme = themes[themeName] || themes.classic
+    return theme[colorName] || theme.cyan
+}
     {shape: [[1,1,1,1]], color: 'cyan'},
     {shape: [[1,1],[1,1]], color: 'yellow'},
     {shape: [[0,1,0],[1,1,1]], color: 'purple'},
@@ -424,16 +446,6 @@ const shapes = [
     {shape: [[1,0,0],[1,1,1]], color: 'blue'},
     {shape: [[0,0,1],[1,1,1]], color: 'orange'}
 ]
-
-const colors = {
-    cyan: '#00ffff',
-    yellow: '#ffff00',
-    purple: '#ff00ff',
-    green: '#00ff00',
-    red: '#ff0000',
-    blue: '#0000ff',
-    orange: '#ff8800'
-}
 
 // Načtení uživatele
 async function loadUser() {
@@ -463,6 +475,7 @@ function generateGameCode() {
 // Vytvoření hry
 async function createGame() {
     const gameCode = generateGameCode()
+    const settings = await loadUserSettings()
     
     try {
         const { data, error } = await supabase
@@ -473,6 +486,9 @@ async function createGame() {
                 player1_username: currentUser.username,
                 player1_ready: false,
                 player2_ready: false,
+                player1_map_rows: settings.rows,
+                player1_map_cols: settings.cols,
+                player1_theme: settings.theme,
                 status: 'waiting'
             }])
             .select()
@@ -512,6 +528,8 @@ async function joinGame() {
         return
     }
     
+    const settings = await loadUserSettings()
+    
     try {
         const { data: game, error: fetchError } = await supabase
             .from('tetris_multiplayer_games')
@@ -529,7 +547,10 @@ async function joinGame() {
             .from('tetris_multiplayer_games')
             .update({
                 player2_id: currentUser.id || null,
-                player2_username: currentUser.username
+                player2_username: currentUser.username,
+                player2_map_rows: settings.rows,
+                player2_map_cols: settings.cols,
+                player2_theme: settings.theme
             })
             .eq('id', game.id)
             .select()
@@ -729,7 +750,6 @@ function backToMenu() {
 async function startGame() {
     console.log('Spouštím hru pro hráče:', myPlayerNumber)
     
-    // Zastav čekací interval pokud běží
     if (window.waitInterval) {
         clearInterval(window.waitInterval)
         window.waitInterval = null
@@ -742,7 +762,6 @@ async function startGame() {
     
     gameActive = true
     
-    // Načti data hry
     const { data: game } = await supabase
         .from('tetris_multiplayer_games')
         .select('*')
@@ -754,18 +773,25 @@ async function startGame() {
     document.getElementById('player1Name').textContent = `🎮 ${game.player1_username}`
     document.getElementById('player2Name').textContent = `🎮 ${game.player2_username}`
     
-    // Vytvoř hráče
-    player1 = createPlayer('grid1', 'score1', 'level1', 1)
-    player2 = createPlayer('grid2', 'score2', 'level2', 2)
+    // Vytvoř hráče s jejich nastavením
+    player1 = createPlayer(
+        'grid1', 'score1', 'level1', 1,
+        game.player1_map_rows || 20,
+        game.player1_map_cols || 10,
+        game.player1_theme || 'classic'
+    )
     
-    // Vytvoř počáteční stav
+    player2 = createPlayer(
+        'grid2', 'score2', 'level2', 2,
+        game.player2_map_rows || 20,
+        game.player2_map_cols || 10,
+        game.player2_theme || 'classic'
+    )
+    
     const myPlayer = myPlayerNumber === 1 ? player1 : player2
     await saveGameState(myPlayer)
     
-    // Sleduj změny
     subscribeToGame()
-    
-    // Start loop
     gameLoop()
     
     console.log('Hra spuštěna!')
@@ -914,7 +940,7 @@ function draw(player) {
         for (let c = 0; c < player.cols; c++) {
             if (player.grid[r][c]) {
                 const cell = cells[r * player.cols + c]
-                const color = colors[player.grid[r][c]]
+                const color = getColorFromTheme(player.theme, player.grid[r][c])
                 cell.style.background = color
                 cell.style.boxShadow = `0 0 8px ${color}`
                 cell.classList.add('filled')
@@ -928,7 +954,7 @@ function draw(player) {
                 if (player.current.shape[r][c]) {
                     const index = (player.current.y + r) * player.cols + (player.current.x + c)
                     if (index >= 0 && index < cells.length) {
-                        const color = colors[player.current.color]
+                        const color = getColorFromTheme(player.theme, player.current.color)
                         cells[index].style.background = color
                         cells[index].style.boxShadow = `0 0 12px ${color}`
                         cells[index].classList.add('filled')
@@ -1062,6 +1088,7 @@ async function endGame(winnerNumber) {
         .single()
     
     const winner = winnerNumber === 1 ? game.player1_username : game.player2_username
+    const winnerId = winnerNumber === 1 ? game.player1_id : game.player2_id
     
     await supabase
         .from('tetris_multiplayer_games')
@@ -1071,12 +1098,31 @@ async function endGame(winnerNumber) {
         })
         .eq('id', currentGameId)
     
-    // Zjisti, jestli JÁ jsem vyhrál
+    // Přidej 100 mincí vítězi
+    if (winnerId && winnerNumber === myPlayerNumber) {
+        try {
+            const { data: playerData } = await supabase
+                .from('tetris_player_data')
+                .select('coins')
+                .eq('user_id', winnerId)
+                .single()
+            
+            if (playerData) {
+                await supabase
+                    .from('tetris_player_data')
+                    .update({ coins: (playerData.coins || 0) + 100 })
+                    .eq('user_id', winnerId)
+            }
+        } catch (e) {
+            console.error('Chyba při přidávání mincí:', e)
+        }
+    }
+    
     const iWon = winnerNumber === myPlayerNumber
     
     document.getElementById('winnerText').textContent = iWon ? 
-        `🎉 VYHRÁL JSI! 🎉` : 
-        `😢 ${winner} vyhrál! 😢`
+        `🎉 VYHRÁL JSI! +100 💰` : 
+        `😢 ${winner} vyhrál!`
     document.getElementById('winnerOverlay').style.display = 'flex'
 }
 
