@@ -233,7 +233,7 @@ body::before {
 }
 
 .reel.spinning {
-    filter: blur(3px);
+    filter: blur(5px);
 }
 
 .reel.stopping {
@@ -1232,8 +1232,9 @@ function updateUI() {
     document.getElementById('coinAmount').textContent = currentUser.coins;
 }
 
+// DENNÍ BONUS - opravená část
 window.claimDailyBonus = async function() {
-    const today = new Date().toDateString();
+    const today = new Date().toISOString().split('T')[0]; // Format: YYYY-MM-DD
     
     if (currentUser.lastDailyBonus === today) {
         alert('Denní bonus již byl vybrán! Přijďte zítra! 🎁');
@@ -1258,7 +1259,7 @@ window.claimDailyBonus = async function() {
 };
 
 function checkDailyBonus() {
-    const today = new Date().toDateString();
+    const today = new Date().toISOString().split('T')[0]; // Format: YYYY-MM-DD
     const btn = document.getElementById('dailyBonus');
     
     if (currentUser.lastDailyBonus === today) {
@@ -1269,6 +1270,92 @@ function checkDailyBonus() {
         btn.textContent = '🎁 DENNÍ BONUS';
     }
 }
+
+// ANIMACE AUTOMATU - vylepšená část
+window.spinSlot = async function() {
+    if (spinning) return;
+    if (currentUser.coins < currentBet) {
+        alert('Nemáte dostatek mincí!');
+        return;
+    }
+    
+    spinning = true;
+    document.getElementById('spinSlotBtn').disabled = true;
+    document.getElementById('slotResult').textContent = '';
+    
+    currentUser.coins -= currentBet;
+    await saveUser();
+    updateUI();
+    
+    const results = [];
+    const isJackpot = Math.random() < 0.005;
+    
+    if (isJackpot) {
+        const jackpotSymbol = Math.random() < 0.5 ? '💎' : '🎰';
+        results.push(jackpotSymbol, jackpotSymbol, jackpotSymbol);
+    } else {
+        for (let i = 0; i < 3; i++) {
+            results.push(getWeightedSymbol());
+        }
+    }
+    
+    // Přidáme blur efekt při točení
+    document.querySelectorAll('.reel').forEach(reel => {
+        reel.classList.add('spinning');
+    });
+    
+    // HODNĚ vylepšená animace - rychlé točení se symbolama
+    const spinDurations = [3000, 3800, 4600];
+    const symbolHeight = 100;
+    
+    for (let i = 0; i < 3; i++) {
+        const reel = document.getElementById(`reel${i + 1}`);
+        const reelElement = reel.parentElement;
+        const targetIndex = reels[i].indexOf(results[i]);
+        const targetPosition = -(targetIndex * symbolHeight - symbolHeight);
+        
+        // VÍCE otáček pro lepší vizuální efekt
+        const spins = 15 + i * 3;
+        const totalRotation = spins * reels[i].length * symbolHeight + Math.abs(targetPosition);
+        
+        // Rychlá animace na začátku
+        let currentPos = 0;
+        const fastSpinInterval = setInterval(() => {
+            currentPos += 50; // Rychlý posun o 50px
+            reel.style.transition = 'none';
+            reel.style.transform = `translateY(${currentPos}px)`;
+        }, 16); // ~60 FPS
+        
+        // Po době zastavíme rychlé točení a spustíme zpomalení
+        setTimeout(() => {
+            clearInterval(fastSpinInterval);
+            
+            // Plynulé zpomalení k cíli
+            reel.style.transition = `transform ${spinDurations[i] * 0.4}ms cubic-bezier(0.17, 0.67, 0.35, 0.96)`;
+            reel.style.transform = `translateY(${totalRotation}px)`;
+        }, spinDurations[i] * 0.6);
+        
+        // Odebereme blur a přidáme stopping efekt
+        setTimeout(() => {
+            reelElement.classList.remove('spinning');
+            reelElement.classList.add('stopping');
+            
+            reel.style.transition = 'transform 300ms cubic-bezier(0.68, -0.55, 0.265, 1.55)';
+            reel.style.transform = `translateY(${targetPosition}px)`;
+        }, spinDurations[i]);
+        
+        // Reset pozice pro opakování
+        setTimeout(() => {
+            reelElement.classList.remove('stopping');
+            reel.style.transition = 'none';
+            reel.style.transform = `translateY(${targetPosition}px)`;
+        }, spinDurations[i] + 300);
+    }
+    
+    setTimeout(() => {
+        evaluateSlotWin(results);
+    }, 5200);
+};
 
 // LEADERBOARD
 async function loadLeaderboard() {
@@ -1393,3 +1480,4 @@ window.addEventListener('load', async () => {
 
 </body>
 </html>
+
