@@ -462,35 +462,40 @@ async function loadUser() {
     }
 }
 
-// Načtení nastavení uživatele - OPRAVENÁ VERZE
+// Načtení nastavení uživatele - OPRAVENÁ VERZE s fallbackem
 async function loadUserSettings() {
+    // Pokud uživatel není přihlášený, vrať výchozí hodnoty
+    if (!currentUser || !currentUser.id) {
+        console.log('Uživatel není přihlášený, používám výchozí nastavení')
+        return { rows: 20, cols: 10, theme: 'classic' }
+    }
+    
     try {
-        if (currentUser && currentUser.id) {
-            const { data, error } = await supabase
-                .from('tetris_player_data')
-                .select('map_rows, map_cols, theme')
-                .eq('user_id', currentUser.id)
-                .maybeSingle()  // ZMĚNA: použij maybeSingle() místo single()
-            
-            if (error) {
-                console.log('Chyba při načítání nastavení:', error)
-            }
-            
-            if (data) {
-                return {
-                    rows: data.map_rows || 20,
-                    cols: data.map_cols || 10,
-                    theme: data.theme || 'classic'
-                }
+        const { data, error } = await supabase
+            .from('tetris_player_data')
+            .select('*')  // Načti všechny sloupce
+            .eq('user_id', currentUser.id)
+            .maybeSingle()
+        
+        if (error) {
+            console.log('Chyba při načítání nastavení:', error)
+            return { rows: 20, cols: 10, theme: 'classic' }
+        }
+        
+        if (data) {
+            console.log('Načtená data z DB:', data)
+            return {
+                rows: data.map_rows || 20,
+                cols: data.map_cols || 10,
+                theme: data.theme || 'classic'
             }
         }
     } catch (e) {
-        console.log('Nastavení nenalezeno, používám výchozí:', e)
+        console.log('Výjimka při načítání nastavení:', e)
     }
     
     return { rows: 20, cols: 10, theme: 'classic' }
 }
-
 // Aktualizace ready statusů - OPRAVENÁ VERZE
 function updateReadyStatus(game) {
     player1IsReady = game.player1_ready || false
@@ -1282,5 +1287,6 @@ loadUser()
 </script>
 </body>
 </html>
+
 
 
