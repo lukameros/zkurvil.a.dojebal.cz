@@ -692,9 +692,6 @@ button.menuBtn.locked::after {
         max-width: 280px;
     }
 }
-</style>
-</head>
-<body>
 
 <button id="backBtn" onclick="window.location.href='hry.html'">⬅ Zpět</button>
 <div id="coinsDisplay">💰 <span id="coinCount">0</span></div>
@@ -1039,7 +1036,6 @@ async function loadUserData() {
     updateUnlockedItems()
 }
 
-// Načtení lokálních dat pro host
 // Načtení lokálních dat pro host
 function loadLocalData() {
     const saved = localStorage.getItem('tetrisPlayerData')
@@ -1837,90 +1833,12 @@ function getDifficultyEmoji(difficulty) {
         default: return '❓'
     }
 }
-// Mobilní ovládání - MUSÍ BÝT AŽ PO NAČTENÍ DOM
-document.addEventListener('DOMContentLoaded', () => {
-    if ('ontouchstart' in window) {
-        const mobileLeft = document.getElementById('mobileLeft');
-        const mobileRight = document.getElementById('mobileRight');
-        const mobileDown = document.getElementById('mobileDown');
-        const mobileRotate = document.getElementById('mobileRotate');
-        const mobileDrop = document.getElementById('mobileDrop');
-
-        if (mobileLeft) {
-            mobileLeft.addEventListener('touchstart', (e) => {
-                e.preventDefault();
-                if (!isPaused && !isGameOver && current) {
-                    current.x--;
-                    if (collision()) current.x++;
-                    draw();
-                }
-            });
-        }
-
-        if (mobileRight) {
-            mobileRight.addEventListener('touchstart', (e) => {
-                e.preventDefault();
-                if (!isPaused && !isGameOver && current) {
-                    current.x++;
-                    if (collision()) current.x--;
-                    draw();
-                }
-            });
-        }
-
-        if (mobileDown) {
-            mobileDown.addEventListener('touchstart', (e) => {
-                e.preventDefault();
-                if (!isPaused && !isGameOver) {
-                    moveDown();
-                }
-            });
-        }
-
-        if (mobileRotate) {
-            mobileRotate.addEventListener('touchstart', (e) => {
-                e.preventDefault();
-                if (!isPaused && !isGameOver) {
-                    rotate();
-                    draw();
-                }
-            });
-        }
-
-        if (mobileDrop) {
-            mobileDrop.addEventListener('touchstart', (e) => {
-                e.preventDefault();
-                if (!isPaused && !isGameOver) {
-                    hardDrop();
-                }
-            });
-        }
-    }
-});
 
 // Inicializace
 await loadCurrentUser()
 </script>
-
-<!-- Mobilní ovládání -->
-<div class="mobile-controls">
-    <div class="mobile-controls-row">
-        <div class="mobile-btn" id="mobileRotate">↻</div>
-    </div>
-    <div class="mobile-controls-row">
-        <div class="mobile-btn" id="mobileLeft">←</div>
-        <div class="mobile-btn" id="mobileDown">↓</div>
-        <div class="mobile-btn" id="mobileRight">→</div>
-    </div>
-    <div class="mobile-controls-row">
-        <div class="mobile-btn" id="mobileDrop">⬇</div>
-    </div>
-</div>
 </body>
 </html>
-
-
-
 
 
 
