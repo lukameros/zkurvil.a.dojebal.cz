@@ -580,11 +580,25 @@ async function evaluateSlotWin(results) {
     let winAmount = 0;
     let message = '';
 
-    const [a, b, c] = results;
+    // 🧠 spočítáme symboly
+    const counts = {};
+    results.forEach(sym => {
+        counts[sym] = (counts[sym] || 0) + 1;
+    });
 
-    // 🎰 3 stejné symboly
-    if (a === b && b === c) {
-        const multiplier = winMultipliers[a];
+    let winSymbol = null;
+    let maxCount = 0;
+
+    for (const sym in counts) {
+        if (counts[sym] > maxCount) {
+            maxCount = counts[sym];
+            winSymbol = sym;
+        }
+    }
+
+    // 🎰 3 stejné
+    if (maxCount === 3) {
+        const multiplier = winMultipliers[winSymbol];
         winAmount = currentBet * multiplier;
 
         currentUser.stats.totalWins++;
@@ -595,14 +609,14 @@ async function evaluateSlotWin(results) {
             currentUser.stats.winStreak = currentUser.stats.currentStreak;
         }
 
-        if (a === '🎰') {
+        if (winSymbol === '🎰') {
             message = `🎰 MEGA JACKPOT! 🎰 +${winAmount} 🪙`;
             currentUser.stats.jackpots++;
-        } else if (a === '💎') {
+        } else if (winSymbol === '💎') {
             message = `💎 DIAMANTOVÁ VÝHRA! 💎 +${winAmount} 🪙`;
             currentUser.stats.diamondWins++;
         } else {
-            message = `🎉 3x ${a} → +${winAmount} 🪙`;
+            message = `🎉 3x ${winSymbol} → +${winAmount} 🪙`;
         }
 
         if (multiplier >= 10) {
@@ -612,14 +626,9 @@ async function evaluateSlotWin(results) {
         updateMissionProgress('coinsWon', winAmount);
     }
 
-    // ✨ 2 stejné symboly
-    else if (a === b || a === c || b === c) {
-        const symbol =
-            a === b ? a :
-            a === c ? a :
-            b;
-
-        const multiplier = Math.max(1, Math.floor(winMultipliers[symbol] / 3));
+    // ✨ 2 stejné
+    else if (maxCount === 2) {
+        const multiplier = Math.max(1, Math.floor(winMultipliers[winSymbol] / 3));
         winAmount = currentBet * multiplier;
 
         currentUser.stats.totalWins++;
@@ -630,7 +639,7 @@ async function evaluateSlotWin(results) {
             currentUser.stats.winStreak = currentUser.stats.currentStreak;
         }
 
-        message = `✨ 2x ${symbol} → +${winAmount} 🪙`;
+        message = `✨ 2x ${winSymbol} → +${winAmount} 🪙`;
 
         updateMissionProgress('coinsWon', winAmount);
     }
@@ -645,19 +654,12 @@ async function evaluateSlotWin(results) {
 
     if (winAmount > 0) {
         currentUser.coins += winAmount;
-
         checkAchievements();
         await saveUser();
         updateUI();
 
         document.getElementById('winAmount').textContent = `+${winAmount} 🪙`;
         document.getElementById('winModal').style.display = 'flex';
-
-        if (winAmount >= currentBet * 10) {
-            for (let i = 0; i < 100; i++) {
-                setTimeout(() => createConfetti(), i * 10);
-            }
-        }
     } else {
         await saveUser();
     }
@@ -1684,6 +1686,7 @@ window.addEventListener('load', async () => {
         }
     }, 3500);
 });
+
 
 
 
