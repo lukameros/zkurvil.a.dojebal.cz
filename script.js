@@ -91,9 +91,16 @@ let currentGame = 'slot';
 let currentBet = 10; // výchozí sázka
 
 // Funkce pro změnu sázky
-function setBet(amount) {
-    currentBet = amount; 
-    document.getElementById('betDisplay').textContent = `Sázka: ${currentBet} 🪙`;
+// Funkce pro změnu sázky
+window.setBet = function(amount) {
+    currentBet = amount;
+    document.getElementById('currentBet').textContent = currentBet;
+    
+    // Aktualizuj aktivní tlačítko
+    document.querySelectorAll('.bet-btn').forEach(btn => {
+        btn.classList.remove('active');
+    });
+    event.target.classList.add('active');
 }
 
 
@@ -1706,6 +1713,7 @@ window.addEventListener('load', async () => {
         }
     }, 3500);
 });
+
 
 
 
