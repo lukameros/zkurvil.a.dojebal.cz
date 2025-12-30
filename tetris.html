@@ -580,7 +580,7 @@ button.menuBtn.locked::after {
 
 /* Loading screen */
 #loadingScreen {
-    display: none;
+    display: flex;
     position: fixed;
     top: 0;
     left: 0;
@@ -736,7 +736,7 @@ button.menuBtn.locked::after {
     <div id="coinsDisplay">💰 <span id="coinCount">0</span></div>
 </div>
 
-<div id="mainMenu" class="centered">
+<div id="mainMenu" class="centered" style="display:none;">
     <h1>🎮 TETRIS 🎮</h1>
     <button class="menuBtn" onclick="goToKlasika()">🕹️ Classicplay</button>
     <button class="menuBtn" onclick="startTetris(selectedDifficulty)">🚀 Magicplay</button>
@@ -1022,6 +1022,47 @@ let currentUser = null;
 let totalGamesPlayed = 0;
 
 let activeEvent = null;
+ function startPageLoading() {
+    const loadingTime = 3000 + Math.random() * 3000;
+    const loadingBar = document.getElementById('loadingBar');
+    const loadingText = document.getElementById('loadingText');
+    
+    const loadingMessages = [
+        'Připravuji herní pole...',
+        'Generuji bloky...',
+        'Načítám témata...',
+        'Inicializuji eventy...',
+        'Nastavuji obtížnost...',
+        'Téměř hotovo...',
+        'Připravuji se na start...'
+    ];
+    
+    let progress = 0;
+    const interval = 50;
+    const steps = loadingTime / interval;
+    const progressStep = 100 / steps;
+    
+    const loadingInterval = setInterval(() => {
+        progress += progressStep;
+        if (progress >= 100) {
+            progress = 100;
+            clearInterval(loadingInterval);
+        }
+        
+        loadingBar.style.width = progress + '%';
+        
+        if (Math.random() < 0.1) {
+            loadingText.textContent = loadingMessages[Math.floor(Math.random() * loadingMessages.length)];
+        }
+    }, interval);
+    
+    setTimeout(() => {
+        document.getElementById('loadingScreen').style.display = 'none';
+        document.getElementById('mainMenu').style.display = 'flex';
+        loadingBar.style.width = '0%';
+        loadingText.textContent = 'Připravuji herní pole...';
+    }, loadingTime);
+}
 let eventTimeout = null;
 let canRotate = true;
 
@@ -2254,8 +2295,12 @@ function getDifficultyEmoji(difficulty) {
         default: return '❓'
     }
 }
-
+// Spusť loading při načtení stránky
+window.addEventListener('DOMContentLoaded', () => {
+    startPageLoading();
+});
 await loadCurrentUser()
 </script>
 </body>
 </html>
+
