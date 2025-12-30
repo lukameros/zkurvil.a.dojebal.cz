@@ -1163,10 +1163,10 @@ window.login = async function() {
         } else {
             // Nový uživatel - vytvoř účet
             currentUser.nickname = nickname;
-            currentUser.coins = 100;
-            currentUser.lastDailyBonus = new Date().toISOString().split('T')[0];
-            currentUser.ownedThemes = ['default'];
-            currentUser.activeTheme = 'default';
+currentUser.coins = 100;
+currentUser.lastDailyBonus = null;  // ← OPRAVA: Nastavit na null, aby mohl hned vybrat
+currentUser.ownedThemes = ['default'];
+currentUser.activeTheme = 'default';
             
             const { data: newUser, error: insertError } = await supabase
                 .from('casino_users')
@@ -1660,4 +1660,5 @@ window.addEventListener('load', async () => {
         }
     }, 3500);
 });
+
 
