@@ -1661,4 +1661,3 @@ window.addEventListener('load', async () => {
     }, 3500);
 });
 
-</script>
