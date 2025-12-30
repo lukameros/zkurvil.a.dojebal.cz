@@ -4,7 +4,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>🎰 CASINO HUB - Mince a výhry! 🎰</title>
-<link rel="stylesheet" href="./styles.css">
 </head>
 <body>
 <!-- Loading Screen -->
@@ -55,11 +54,7 @@
     <button id="leaderboardBtn" class="game-btn" onclick="switchGame('leaderboard')">
         👑 ŽEBŘÍČEK
     </button>
-    <button id="slotV2Btn" class="game-btn" onclick="switchGame('slotV2')">
-        🎰 AUTOMAT V2 (4 sloty)
-    </button>
 </div>
-
 
     <!-- SLOT MACHINE GAME -->
     <div id="slotGame" class="game-container active">
@@ -98,17 +93,15 @@
             <div class="paytable">
                 <h3>💰 VÝHRY 💰</h3>
                 <div class="paytable-grid">
-    <div class="paytable-item">🍒🍒🍒 → x3</div>
-    <div class="paytable-item">🍋🍋🍋 → x4</div>
-    <div class="paytable-item">🔔🔔🔔 → x6</div>
-    <div class="paytable-item">💎💎💎 → x12</div>
-
-    <div class="paytable-item jackpot">🎰🎰🎰 → JACKPOT x25</div>
-
-    <hr style="opacity:0.3">
-
-    <div class="paytable-item">✨ 2 stejné → MENŠÍ VÝHRA</div>
-</div>
+                    <div class="paytable-item">🍒🍒🍒 → 5x</div>
+                    <div class="paytable-item">🍋🍋🍋 → 4x</div>
+                    <div class="paytable-item">🍊🍊🍊 → 6x</div>
+                    <div class="paytable-item">🍇🍇🍇 → 8x</div>
+                    <div class="paytable-item">🔔🔔🔔 → 10x</div>
+                    <div class="paytable-item">⭐⭐⭐ → 15x</div>
+                    <div class="paytable-item">💎💎💎 → 20x</div>
+                    <div class="paytable-item jackpot">🎰🎰🎰 → 50x</div>
+                </div>
             </div>
         </div>
     </div>
@@ -177,95 +170,8 @@
         <button class="modal-close" onclick="closeWinModal()">SUPER!</button>
     </div>
 </div>
-<script type="module" src="./script.js"></script>
-    <!-- UPDATE MODAL -->
-<div id="updateModal" class="modal" style="display: none;">
-    <div class="modal-content" style="max-width: 600px;">
-        <h2>🎮 CASINO HUB v2.0 🎮</h2>
-        
-        <div style="text-align: left; color: #fff; padding: 20px; background: rgba(0,0,0,0.3); border-radius: 15px; margin: 20px 0;">
-            <h3 style="color: #00ffff; margin-bottom: 15px;">🆕 Co je nového:</h3>
-            <ul style="list-style: none; padding: 0;">
-                <li style="padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.1);">
-                    ✨ Nový systém úkolů a achievementů
-                </li>
-                <li style="padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.1);">
-                    🎨 20+ nových barevných vzhledů
-                </li>
-                <li style="padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.1);">
-                    💎 Vyšší šance na výhru
-                </li>
-                <li style="padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.1);">
-                    📱 Optimalizováno pro mobily
-                </li>
-                <li style="padding: 8px 0;">
-                    🎡 Vylepšené kolo štěstí
-                </li>
-            </ul>
-            
-            <div style="margin-top: 25px; padding: 15px; background: rgba(0,255,0,0.1); border: 2px solid #00ff00; border-radius: 12px;">
-                <p style="font-size: 18px; font-weight: bold; color: #00ff00; margin: 0;">
-                    ✅ Tato hra nemá mikrotransakce!
-                </p>
-                <p style="font-size: 14px; color: #fff; margin: 8px 0 0 0;">
-                    🔞 Doporučený věk: 10+
-                </p>
-            </div>
-        </div>
-        
-        <button class="modal-close" onclick="closeUpdateModal()">ZAČÍT HRÁT!</button>
-    </div>
-</div>
-    
-<!-- NOVÝ AUTOMAT V2 (4 sloty) -->
-<div id="slotV2Game" class="game-container">
-    <div id="slotV2Container">
-        <div id="slotV2Machine">
-            <h2 id="slotV2Title">🍒 AUTOMAT V2 🍒</h2>
-            
-            <div id="reelsV2">
-                <div class="reel">
-                    <div class="reel-inner" id="reelV2_1"></div>
-                    <div class="reel-window"></div>
-                </div>
-                <div class="reel">
-                    <div class="reel-inner" id="reelV2_2"></div>
-                    <div class="reel-window"></div>
-                </div>
-                <div class="reel">
-                    <div class="reel-inner" id="reelV2_3"></div>
-                    <div class="reel-window"></div>
-                </div>
-                <div class="reel">
-                    <div class="reel-inner" id="reelV2_4"></div>
-                    <div class="reel-window"></div>
-                </div>
-            </div>
-            
-            <div id="slotV2Controls">
-                <div id="betAmountV2">Sázka: <span id="currentBetV2">50</span> 🪙</div>
-                <div>
-                    <button class="bet-btn" onclick="setBetV2(50)">50</button>
-                    <button class="bet-btn" onclick="setBetV2(100)">100</button>
-                    <button class="bet-btn" onclick="setBetV2(200)">200</button>
-                </div>
-                <button id="spinSlotV2Btn" onclick="spinSlotV2()">🎰 ZATOČIT!</button>
-                <div id="slotV2Result"></div>
-            </div>
-        </div>
-    </div>
-</div>
-
-
 </body>
 </html>
-
-
-
-
-
-
-
 
 
 
