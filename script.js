@@ -56,15 +56,12 @@ for(let i = 0; i < 30; i++) {
     star.style.animationDelay = Math.random() * 3 + 's';
     document.body.appendChild(star);
 }
+
 // Globální proměnné
 let currentUser = {
     id: null,
     nickname: '',
     coins: 0,
-    lastDailyBonus: null,
-    ownedThemes: ['default'],
-    activeTheme: 'default',
-    stats: {
         totalWins: 0,
         slotSpins: 0,
         wheelSpins: 0,
@@ -1732,6 +1729,7 @@ window.addEventListener('load', async () => {
         }
     }, 3500);
 });
+
 
 
 
