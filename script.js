@@ -56,6 +56,74 @@ for(let i = 0; i < 30; i++) {
     star.style.animationDelay = Math.random() * 3 + 's';
     document.body.appendChild(star);
 }
+let reelsV2 = [[], [], [], []]; // Pole pro 4 sloty
+
+// Funkce pro nastavení sázky na nový automat
+window.setBetV2 = function(amount) {
+    currentBet = amount;
+    
+    const betDisplay = document.getElementById('currentBetV2');
+    if (betDisplay) {
+        betDisplay.textContent = currentBet;
+    }
+    
+    document.querySelectorAll('.bet-btn').forEach(btn => {
+        btn.classList.remove('active');
+        if (btn.textContent === amount.toString()) {
+            btn.classList.add('active');
+        }
+    });
+}
+
+// Funkce pro otočení nového automatu (4 sloty)
+window.spinSlotV2 = function() {
+    if (spinning) return;
+    spinning = true;
+    
+    // Můžeme přidat kontrolu, jestli hráč má dostatek mincí
+    if (currentUser.coins < currentBet) {
+        showNotification('Nemáš dostatek mincí pro tuto hru!');
+        spinning = false;
+        return;
+    }
+
+    currentUser.coins -= currentBet;
+    updateUI();
+
+    // Animace pro 4 sloty
+    const spinResults = [[], [], [], []];
+    for (let i = 0; i < 4; i++) {
+        spinResults[i] = getReelSymbols();
+    }
+    
+    setTimeout(() => {
+        // Zobrazení výsledků
+        document.getElementById('slotV2Result').textContent = `Výsledek: ${spinResults.join(' | ')}`;
+        currentUser.coins += calculateWinnings(spinResults);
+        updateUI();
+        spinning = false;
+    }, 2000); // Po 2 sekundách se ukáže výsledek
+}
+
+// Funkce pro získání symbolů na jednom válci
+function getReelSymbols() {
+    const symbols = [];
+    for (let i = 0; i < 50; i++) {
+        symbols.push(getWeightedSymbol());
+    }
+    return symbols;
+}
+
+// Funkce pro výpočet výhry
+function calculateWinnings(results) {
+    // Tady bychom mohli přidat logiku pro výhru na 4 válcích
+    // Například zkontrolovat, jestli všechny válce mají stejné symboly a udělit výhru
+    let winnings = 0;
+    // Tady přidáme výpočet na základě výsledků
+    return winnings;
+}
+
+
 
 // Globální proměnné
 let currentUser = {
@@ -516,3 +584,4 @@ window.addEventListener('load', async () => {
         }
     }, 3500);
 });
+
