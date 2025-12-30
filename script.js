@@ -414,25 +414,25 @@ const dailyMissions = [
 // SLOT MACHINE LOGIC
 const symbols = ['🍒', '🍋', '🍊', '🍇', '🔔', '⭐', '💎', '🎰'];
 const symbolWeights = {
-    '🍒': 25,
-    '🍋': 20,
-    '🍊': 18,
-    '🍇': 15,
-    '🔔': 10,
-    '⭐': 7,
-    '💎': 4,
-    '🎰': 1
+    '🍒': 30,  // Zvýšeno z 25
+    '🍋': 25,  // Zvýšeno z 20
+    '🍊': 20,  // Zvýšeno z 18
+    '🍇': 15,  // Stejné
+    '🔔': 12,  // Zvýšeno z 10
+    '⭐': 8,   // Zvýšeno z 7
+    '💎': 5,   // Zvýšeno z 4
+    '🎰': 2    // Zvýšeno z 1 - dvojnásobná šance na jackpot!
 };
 
 const winMultipliers = {
-    '🍒': 5,
-    '🍋': 4,
-    '🍊': 6,
-    '🍇': 8,
-    '🔔': 10,
-    '⭐': 15,
-    '💎': 20,
-    '🎰': 50
+    '🍒': 6,   // Zvýšeno z 5
+    '🍋': 5,   // Zvýšeno z 4
+    '🍊': 8,   // Zvýšeno z 6
+    '🍇': 10,  // Zvýšeno z 8
+    '🔔': 15,  // Zvýšeno z 10
+    '⭐': 20,  // Zvýšeno z 15
+    '💎': 30,  // Zvýšeno z 20
+    '🎰': 75   // Zvýšeno z 50 - větší jackpot!
 };
 
 let reels = [[], [], []];
@@ -499,7 +499,7 @@ window.spinSlot = async function() {
     updateUI();
     
     const results = [];
-    const isJackpot = Math.random() < 0.005;
+const isJackpot = Math.random() < 0.015; // Zvýšeno z 0.005 na 0.015 (3x větší šance)
     
     if (isJackpot) {
         const jackpotSymbol = Math.random() < 0.5 ? '💎' : '🎰';
@@ -515,23 +515,25 @@ window.spinSlot = async function() {
     });
     
     const spinDurations = [2500, 3200, 3900];
-    const symbolHeight = 100; // Nebo použij: parseFloat(getComputedStyle(document.querySelector('.symbol')).height);
+const symbolHeight = 100;
+
+for (let i = 0; i < 3; i++) {
+    const reel = document.getElementById(`reel${i + 1}`);
+    const reelElement = reel.parentElement;
     
-    for (let i = 0; i < 3; i++) {
-        const reel = document.getElementById(`reel${i + 1}`);
-        const reelElement = reel.parentElement;
-        
-        let targetIndex = -1;
-        for (let j = 0; j < reels[i].length; j++) {
-            if (reels[i][j] === results[i]) {
-                targetIndex = j;
-                break;
-            }
+    // Najdi vhodný symbol v rozsahu 30-70 (aby byl dostatek prostoru)
+    let targetIndex = -1;
+    for (let j = 30; j < 70; j++) {
+        if (reels[i][j] === results[i]) {
+            targetIndex = j;
+            break;
         }
-        
-        if (targetIndex === -1) targetIndex = 10;
-        
-        const targetPosition = -(targetIndex * symbolHeight - symbolHeight);
+    }
+    
+    if (targetIndex === -1) targetIndex = 50; // Fallback na prostředek
+    
+    // ⭐ OPRAVA: Přesný výpočet - prostřední okno je na pozici index*100 - 100
+    const targetPosition = -(targetIndex * symbolHeight - 100);
         
         const spinSpeed = 15;
         let currentPos = 0;
@@ -1660,5 +1662,6 @@ window.addEventListener('load', async () => {
         }
     }, 3500);
 });
+
 
 
