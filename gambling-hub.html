@@ -982,10 +982,165 @@ canvas {
     background: linear-gradient(135deg, #ff00ff 0%, #00ffff 100%);
     border-radius: 4px;
 }
+    /* ACHIEVEMENTS & MISSIONS */
+.achievement-item, .mission-item {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 15px;
+    margin: 10px 0;
+    background: rgba(255,0,255,0.1);
+    border-radius: 15px;
+    border: 2px solid rgba(255,0,255,0.3);
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.achievement-item:hover, .mission-item:hover {
+    background: rgba(255,0,255,0.25);
+    transform: translateX(-5px);
+    box-shadow: 0 0 25px rgba(255,0,255,0.6);
+}
+
+.achievement-item.completed, .mission-item.completed {
+    background: rgba(0,255,0,0.2);
+    border-color: #00ff00;
+}
+
+.achievement-item.locked {
+    opacity: 0.5;
+    filter: grayscale(1);
+}
+
+.achievement-icon, .mission-icon {
+    font-size: 50px;
+    min-width: 60px;
+    text-align: center;
+    filter: drop-shadow(0 0 10px currentColor);
+}
+
+.achievement-info, .mission-info {
+    flex: 1;
+}
+
+.achievement-name, .mission-name {
+    color: #00ffff;
+    font-size: 22px;
+    margin-bottom: 5px;
+    text-shadow: 0 0 10px #00ffff;
+}
+
+.achievement-desc, .mission-desc {
+    color: #fff;
+    font-size: 16px;
+    opacity: 0.8;
+}
+
+.achievement-reward, .mission-reward {
+    color: #ffd700;
+    font-size: 24px;
+    font-weight: bold;
+    min-width: 100px;
+    text-align: right;
+}
+
+.mission-progress {
+    margin-top: 8px;
+}
+
+.progress-bar-container {
+    width: 100%;
+    height: 20px;
+    background: rgba(0,0,0,0.5);
+    border-radius: 10px;
+    overflow: hidden;
+    border: 2px solid rgba(0,255,255,0.3);
+}
+
+.progress-bar {
+    height: 100%;
+    background: linear-gradient(90deg, #00ffff, #ff00ff);
+    border-radius: 8px;
+    transition: width 0.5s ease;
+    box-shadow: 0 0 10px rgba(0,255,255,0.8);
+}
+
+.progress-text {
+    color: #00ffff;
+    font-size: 14px;
+    margin-top: 5px;
+    text-align: center;
+}
+
+.claim-btn {
+    padding: 8px 20px;
+    background: linear-gradient(135deg, #00ff00 0%, #00aa00 100%);
+    border: 3px solid #00ff00;
+    border-radius: 12px;
+    color: #000;
+    font-size: 18px;
+    font-weight: bold;
+    cursor: pointer;
+    font-family: 'Bangers', cursive;
+    transition: all 0.3s ease;
+    animation: pulseGlow 2s ease-in-out infinite;
+}
+
+@keyframes pulseGlow {
+    0%, 100% { box-shadow: 0 0 10px rgba(0,255,0,0.5); }
+    50% { box-shadow: 0 0 25px rgba(0,255,0,0.9); }
+}
+
+.claim-btn:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 30px rgba(0,255,0,1);
+}
+
+.completed-badge {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: linear-gradient(135deg, #00ff00 0%, #00aa00 100%);
+    color: #000;
+    padding: 5px 15px;
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: bold;
+    box-shadow: 0 0 15px rgba(0,255,0,0.8);
+}
+
+#missionsBtn.active, #achievementsBtn.active {
+    box-shadow: 0 0 30px currentColor;
+}
+
+.notification {
+    position: fixed;
+    top: 80px;
+    right: 20px;
+    background: linear-gradient(135deg, #00ff00 0%, #00aa00 100%);
+    color: #000;
+    padding: 15px 25px;
+    border-radius: 15px;
+    border: 3px solid #00ff00;
+    font-size: 20px;
+    font-weight: bold;
+    box-shadow: 0 0 30px rgba(0,255,0,0.9);
+    z-index: 300;
+    animation: slideInRight 0.5s ease-out, slideOutRight 0.5s ease-in 2.5s;
+}
+
+@keyframes slideInRight {
+    from { transform: translateX(400px); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+}
+
+@keyframes slideOutRight {
+    from { transform: translateX(0); opacity: 1; }
+    to { transform: translateX(400px); opacity: 0; }
+}
 </style>
 </head>
 <body>
-
 <!-- Loading Screen -->
 <div id="loadingScreen">
     <div class="loading-content">
@@ -1019,16 +1174,22 @@ canvas {
 
 <div id="wrapper">
     <div id="gameSelector">
-        <button id="slotBtn" class="game-btn active" onclick="switchGame('slot')">
-            🎰 AUTOMAT
-        </button>
-        <button id="wheelBtn" class="game-btn" onclick="switchGame('wheel')">
-            🎡 KOLO ŠTĚSTÍ
-        </button>
-        <button id="leaderboardBtn" class="game-btn" onclick="switchGame('leaderboard')">
-            🏆 ŽEBŘÍČEK
-        </button>
-    </div>
+    <button id="slotBtn" class="game-btn active" onclick="switchGame('slot')">
+        🎰 AUTOMAT
+    </button>
+    <button id="wheelBtn" class="game-btn" onclick="switchGame('wheel')">
+        🎡 KOLO ŠTĚSTÍ
+    </button>
+    <button id="missionsBtn" class="game-btn" onclick="switchGame('missions')">
+        📋 ÚKOLY
+    </button>
+    <button id="achievementsBtn" class="game-btn" onclick="switchGame('achievements')">
+        🏆 ÚSPĚCHY
+    </button>
+    <button id="leaderboardBtn" class="game-btn" onclick="switchGame('leaderboard')">
+        👑 ŽEBŘÍČEK
+    </button>
+</div>
 
     <!-- SLOT MACHINE GAME -->
     <div id="slotGame" class="game-container active">
@@ -1101,7 +1262,21 @@ canvas {
             <div id="leaderboardList"></div>
         </div>
     </div>
+    <!-- ACHIEVEMENTS -->
+    <div id="achievementsGame" class="game-container">
+        <div id="leaderboardFull">
+            <h2>🏆 ÚSPĚCHY 🏆</h2>
+            <div id="achievementsList"></div>
+        </div>
+    </div>
     
+    <!-- DAILY MISSIONS -->
+    <div id="missionsGame" class="game-container">
+        <div id="leaderboardFull">
+            <h2>📋 DENNÍ ÚKOLY 📋</h2>
+            <div id="missionsList"></div>
+        </div>
+    </div>
     <!-- SHOP -->
     <div id="shopGame" class="game-container">
         <div id="leaderboardFull">
@@ -1198,7 +1373,27 @@ let currentUser = {
     coins: 0,
     lastDailyBonus: null,
     ownedThemes: ['default'],
-    activeTheme: 'default'
+    activeTheme: 'default',
+    // Nové statistiky
+    stats: {
+        totalWins: 0,
+        slotSpins: 0,
+        wheelSpins: 0,
+        jackpots: 0,
+        winStreak: 0,
+        currentStreak: 0,
+        totalBet: 0,
+        maxCoins: 0,
+        themesOwned: 1,
+        diamondWins: 0,
+        loginStreak: 1,
+        lastLogin: null,
+        highBets: 0,
+        achievementsUnlocked: 0
+    },
+    unlockedAchievements: [],
+    dailyMissions: {},
+    lastMissionReset: null
 };
 
 let currentGame = 'slot';
@@ -1375,6 +1570,154 @@ const shopItems = [
         bgGlow1: 'rgba(255,215,0,0.6)',
         bgGlow2: 'rgba(255,20,147,0.5)'
     }}
+];
+    // ACHIEVEMENTS
+const achievements = [
+    { 
+        id: 'first_win', 
+        name: 'První výhra! 🎉', 
+        desc: 'Vyhrát na automatu poprvé',
+        icon: '🎉', 
+        reward: 50,
+        condition: (stats) => stats.totalWins >= 1
+    },
+    { 
+        id: 'slot_master', 
+        name: 'Mistr automatů', 
+        desc: 'Zatočit 100x na automatu',
+        icon: '🎰', 
+        reward: 200,
+        condition: (stats) => stats.slotSpins >= 100
+    },
+    { 
+        id: 'jackpot_king', 
+        name: 'Jackpot král 👑', 
+        desc: 'Vyhrát jackpot (50x)',
+        icon: '👑', 
+        reward: 500,
+        condition: (stats) => stats.jackpots >= 1
+    },
+    { 
+        id: 'wheel_spinner', 
+        name: 'Točitel kola', 
+        desc: 'Zatočit 50x na kole štěstí',
+        icon: '🎡', 
+        reward: 150,
+        condition: (stats) => stats.wheelSpins >= 50
+    },
+    { 
+        id: 'lucky_streak', 
+        name: 'Šťastná série 🍀', 
+        desc: '5 výher za sebou',
+        icon: '🍀', 
+        reward: 300,
+        condition: (stats) => stats.winStreak >= 5
+    },
+    { 
+        id: 'big_spender', 
+        name: 'Velký sázející', 
+        desc: 'Vsadit celkem 5000 mincí',
+        icon: '💸', 
+        reward: 250,
+        condition: (stats) => stats.totalBet >= 5000
+    },
+    { 
+        id: 'millionaire', 
+        name: 'Milionář 💰', 
+        desc: 'Mít 10000 mincí najednou',
+        icon: '💰', 
+        reward: 1000,
+        condition: (stats) => stats.maxCoins >= 10000
+    },
+    { 
+        id: 'collector', 
+        name: 'Sběratel vzhledů 🎨', 
+        desc: 'Vlastnit 5 vzhledů',
+        icon: '🎨', 
+        reward: 400,
+        condition: (stats) => stats.themesOwned >= 5
+    },
+    { 
+        id: 'diamond_hunter', 
+        name: 'Lovec diamantů', 
+        desc: 'Vyhrát 3x s 💎💎💎',
+        icon: '💎', 
+        reward: 600,
+        condition: (stats) => stats.diamondWins >= 3
+    },
+    { 
+        id: 'dedicated', 
+        name: 'Oddaný hráč 🔥', 
+        desc: 'Přihlásit se 7 dní v řadě',
+        icon: '🔥', 
+        reward: 500,
+        condition: (stats) => stats.loginStreak >= 7
+    },
+    { 
+        id: 'high_roller', 
+        name: 'High Roller', 
+        desc: 'Vsadit 100 mincí najednou 10x',
+        icon: '🎲', 
+        reward: 350,
+        condition: (stats) => stats.highBets >= 10
+    },
+    { 
+        id: 'legend', 
+        name: 'Legenda 🏆', 
+        desc: 'Dosáhnout všech ostatních úspěchů',
+        icon: '🏆', 
+        reward: 2000,
+        condition: (stats) => stats.achievementsUnlocked >= achievements.length - 1
+    }
+];
+
+// DAILY MISSIONS
+const dailyMissions = [
+    { 
+        id: 'spin_10', 
+        name: '🎰 Desetinásobný točitel', 
+        desc: 'Zatočit 10x na automatu',
+        icon: '🎰',
+        reward: 50, 
+        target: 10,
+        type: 'slotSpins'
+    },
+    { 
+        id: 'wheel_5', 
+        name: '🎡 Kolo štěstí', 
+        desc: 'Zatočit 5x na kole štěstí',
+        icon: '🎡',
+        reward: 40, 
+        target: 5,
+        type: 'wheelSpins'
+    },
+    { 
+        id: 'win_500', 
+        name: '💰 Denní zisk', 
+        desc: 'Vyhrát celkem 500 mincí',
+        icon: '💰',
+        reward: 100, 
+        target: 500,
+        type: 'coinsWon'
+    },
+    { 
+        id: 'big_win', 
+        name: '⭐ Velká výhra', 
+        desc: 'Vyhrát 10x sázku najednou',
+        icon: '⭐',
+        reward: 75, 
+        target: 1,
+        type: 'bigWins'
+    },
+    { 
+        id: 'play_both', 
+        name: '🎮 Všestranný hráč', 
+        desc: 'Zahrát si automat i kolo',
+        icon: '🎮',
+        reward: 60, 
+        target: 2,
+        type: 'gamesPlayed'
+    }
 ];
 
 // SLOT MACHINE LOGIC
@@ -2013,6 +2356,14 @@ window.switchGame = function(game) {
     } else if (game === 'wheel') {
         document.getElementById('wheelGame').classList.add('active');
         document.getElementById('wheelBtn').classList.add('active');
+    } else if (game === 'missions') {
+        document.getElementById('missionsGame').classList.add('active');
+        document.getElementById('missionsBtn').classList.add('active');
+        loadMissions();
+    } else if (game === 'achievements') {
+        document.getElementById('achievementsGame').classList.add('active');
+        document.getElementById('achievementsBtn').classList.add('active');
+        loadAchievements();
     } else if (game === 'leaderboard') {
         document.getElementById('leaderboardGame').classList.add('active');
         document.getElementById('leaderboardBtn').classList.add('active');
@@ -2022,7 +2373,6 @@ window.switchGame = function(game) {
         loadShop();
     }
 };
-
 // USER MANAGEMENT
 window.login = async function() {
     const nickname = document.getElementById('nicknameInput').value.trim();
@@ -2224,7 +2574,217 @@ async function loadLeaderboard() {
         list.appendChild(item);
     });
 }
+// ACHIEVEMENTS & MISSIONS LOGIC
 
+function initializeMissions() {
+    const today = new Date().toISOString().split('T')[0];
+    
+    if (currentUser.lastMissionReset !== today) {
+        // Reset denních úkolů
+        currentUser.lastMissionReset = today;
+        currentUser.dailyMissions = {};
+        
+        dailyMissions.forEach(mission => {
+            currentUser.dailyMissions[mission.id] = {
+                progress: 0,
+                completed: false,
+                claimed: false
+            };
+        });
+        
+        // Reset denních statistik
+        if (!currentUser.stats) currentUser.stats = {};
+        currentUser.stats.coinsWon = 0;
+        currentUser.stats.bigWins = 0;
+        currentUser.stats.gamesPlayed = [];
+        
+        saveUser();
+    }
+}
+
+function updateMissionProgress(type, amount = 1) {
+    if (!currentUser.dailyMissions) initializeMissions();
+    
+    dailyMissions.forEach(mission => {
+        if (mission.type === type) {
+            const missionData = currentUser.dailyMissions[mission.id];
+            if (missionData && !missionData.completed) {
+                missionData.progress += amount;
+                
+                if (missionData.progress >= mission.target) {
+                    missionData.progress = mission.target;
+                    missionData.completed = true;
+                    showNotification(`✅ Úkol splněn: ${mission.name}`);
+                }
+                
+                saveUser();
+                if (currentGame === 'missions') loadMissions();
+            }
+        }
+    });
+}
+
+function checkAchievements() {
+    if (!currentUser.stats) return;
+    
+    // Aktualizuj themesOwned
+    currentUser.stats.themesOwned = currentUser.ownedThemes.length;
+    
+    // Aktualizuj maxCoins
+    if (currentUser.coins > (currentUser.stats.maxCoins || 0)) {
+        currentUser.stats.maxCoins = currentUser.coins;
+    }
+    
+    achievements.forEach(achievement => {
+        if (!currentUser.unlockedAchievements.includes(achievement.id)) {
+            if (achievement.condition(currentUser.stats)) {
+                unlockAchievement(achievement.id);
+            }
+        }
+    });
+}
+
+async function unlockAchievement(achievementId) {
+    const achievement = achievements.find(a => a.id === achievementId);
+    if (!achievement) return;
+    
+    currentUser.unlockedAchievements.push(achievementId);
+    currentUser.coins += achievement.reward;
+    currentUser.stats.achievementsUnlocked = currentUser.unlockedAchievements.length;
+    
+    await saveUser();
+    updateUI();
+    
+    showNotification(`🏆 Úspěch odemčen: ${achievement.name} (+${achievement.reward} 🪙)`);
+    
+    for (let i = 0; i < 80; i++) {
+        setTimeout(() => createConfetti(), i * 15);
+    }
+    
+    if (currentGame === 'achievements') loadAchievements();
+}
+
+function loadAchievements() {
+    const list = document.getElementById('achievementsList');
+    list.innerHTML = '';
+    
+    achievements.forEach(achievement => {
+        const isUnlocked = currentUser.unlockedAchievements.includes(achievement.id);
+        
+        const item = document.createElement('div');
+        item.className = 'achievement-item' + (isUnlocked ? ' completed' : ' locked');
+        
+        item.innerHTML = `
+            <div class="achievement-icon">${achievement.icon}</div>
+            <div class="achievement-info">
+                <div class="achievement-name">${achievement.name}</div>
+                <div class="achievement-desc">${achievement.desc}</div>
+            </div>
+            <div class="achievement-reward">${isUnlocked ? '✅' : `+${achievement.reward} 🪙`}</div>
+            ${isUnlocked ? '<div class="completed-badge">SPLNĚNO</div>' : ''}
+        `;
+        
+        list.appendChild(item);
+    });
+}
+
+function loadMissions() {
+    const list = document.getElementById('missionsList');
+    list.innerHTML = '';
+    
+    if (!currentUser.dailyMissions) initializeMissions();
+    
+    dailyMissions.forEach(mission => {
+        const missionData = currentUser.dailyMissions[mission.id];
+        if (!missionData) return;
+        
+        const progress = Math.min(missionData.progress, mission.target);
+        const percentage = (progress / mission.target) * 100;
+        
+        const item = document.createElement('div');
+        item.className = 'mission-item' + (missionData.completed ? ' completed' : '');
+        
+        item.innerHTML = `
+            <div class="mission-icon">${mission.icon}</div>
+            <div class="mission-info">
+                <div class="mission-name">${mission.name}</div>
+                <div class="mission-desc">${mission.desc}</div>
+                <div class="mission-progress">
+                    <div class="progress-bar-container">
+                        <div class="progress-bar" style="width: ${percentage}%"></div>
+                    </div>
+                    <div class="progress-text">${progress} / ${mission.target}</div>
+                </div>
+            </div>
+            <div class="mission-reward">
+                ${missionData.claimed ? '✅' : (missionData.completed ? '' : `+${mission.reward} 🪙`)}
+            </div>
+            ${missionData.completed && !missionData.claimed ? 
+                `<button class="claim-btn" onclick="claimMission('${mission.id}')">VYZVEDNOUT!</button>` : 
+                (missionData.claimed ? '<div class="completed-badge">VYZVEDNUT</div>' : '')}
+        `;
+        
+        list.appendChild(item);
+    });
+}
+
+window.claimMission = async function(missionId) {
+    const mission = dailyMissions.find(m => m.id === missionId);
+    const missionData = currentUser.dailyMissions[missionId];
+    
+    if (!mission || !missionData || !missionData.completed || missionData.claimed) return;
+    
+    missionData.claimed = true;
+    currentUser.coins += mission.reward;
+    
+    await saveUser();
+    updateUI();
+    loadMissions();
+    
+    document.getElementById('winAmount').textContent = `+${mission.reward} 🪙`;
+    document.getElementById('winModal').style.display = 'flex';
+    
+    for (let i = 0; i < 50; i++) {
+        setTimeout(() => createConfetti(), i * 20);
+    }
+};
+
+function showNotification(message) {
+    const notification = document.createElement('div');
+    notification.className = 'notification';
+    notification.textContent = message;
+    document.body.appendChild(notification);
+    
+    setTimeout(() => {
+        notification.remove();
+    }, 3000);
+}
+
+function updateLoginStreak() {
+    const today = new Date().toISOString().split('T')[0];
+    const lastLogin = currentUser.stats.lastLogin;
+    
+    if (lastLogin) {
+        const lastDate = new Date(lastLogin);
+        const todayDate = new Date(today);
+        const diffTime = todayDate - lastDate;
+        const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+        
+        if (diffDays === 1) {
+            // Pokračující streak
+            currentUser.stats.loginStreak++;
+        } else if (diffDays > 1) {
+            // Přerušený streak
+            currentUser.stats.loginStreak = 1;
+        }
+        // diffDays === 0 znamená stejný den, neděláme nic
+    } else {
+        // První přihlášení
+        currentUser.stats.loginStreak = 1;
+    }
+    
+    currentUser.stats.lastLogin = today;
+}
 // UTILITIES
 function createConfetti() {
     const c = document.createElement("div");
@@ -2325,6 +2885,7 @@ window.addEventListener('load', async () => {
 
 </body>
 </html>
+
 
 
 
