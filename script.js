@@ -449,10 +449,6 @@ const winMultipliers = {
     '💎': 18,
     '🎰': 25  // Sníženo z 30 kvůli vyšší šanci
 };
-
-// Zvýšená šance na jackpot
-const isJackpot = Math.random() < 0.025; // Zvýšeno z 0.015 na 0.025
-
 let reels = [[], [], []];
 let spinning = false;
 
@@ -1736,6 +1732,7 @@ window.addEventListener('load', async () => {
         }
     }, 3500);
 });
+
 
 
 
