@@ -1205,27 +1205,176 @@ let currentGame = 'slot';
 let currentBet = 10;
 
 // SHOP ITEMS
+// SHOP ITEMS
 const shopItems = [
-    { id: 'neon', name: '💠 Neon', price: 500, icon: '💠', colors: { primary: '#00ffff', secondary: '#ff00ff' } },
-    { id: 'gold', name: '🌟 Zlatý', price: 1000, icon: '🌟', colors: { primary: '#ffd700', secondary: '#ffaa00' } },
-    { id: 'fire', name: '🔥 Ohnivý', price: 1500, icon: '🔥', colors: { primary: '#ff4500', secondary: '#ff8c00' } },
-    { id: 'ocean', name: '🌊 Oceán', price: 2000, icon: '🌊', colors: { primary: '#0080ff', secondary: '#00ffff' } },
-    { id: 'rainbow', name: '🌈 Duha', price: 3000, icon: '🌈', colors: { primary: '#ff00ff', secondary: '#00ff00' } },
-    { id: 'emerald', name: '💚 Smaragd', price: 3500, icon: '💚', colors: { primary: '#00ff88', secondary: '#00cc66' } },
-    { id: 'royal', name: '👑 Královský', price: 4000, icon: '👑', colors: { primary: '#9400d3', secondary: '#ffd700' } },
-    { id: 'toxic', name: '☢️ Toxický', price: 4500, icon: '☢️', colors: { primary: '#39ff14', secondary: '#ccff00' } },
-    { id: 'sunset', name: '🌅 Západ slunce', price: 5000, icon: '🌅', colors: { primary: '#ff6b35', secondary: '#ff8c42' } },
-    { id: 'ice', name: '❄️ Ledový', price: 5500, icon: '❄️', colors: { primary: '#00d9ff', secondary: '#a3e4f7' } },
-    { id: 'vampire', name: '🧛 Upíří', price: 6000, icon: '🧛', colors: { primary: '#8b0000', secondary: '#dc143c' } },
-    { id: 'matrix', name: '💻 Matrix', price: 6500, icon: '💻', colors: { primary: '#00ff00', secondary: '#008800' } },
-    { id: 'galaxy', name: '🌌 Galaxie', price: 7000, icon: '🌌', colors: { primary: '#4b0082', secondary: '#9370db' } },
-    { id: 'cherry', name: '🍒 Třešeň', price: 7500, icon: '🍒', colors: { primary: '#ff1493', secondary: '#ff69b4' } },
-    { id: 'cyber', name: '🤖 Cyber', price: 8000, icon: '🤖', colors: { primary: '#00ffff', secondary: '#ff00ff' } },
-    { id: 'diamond', name: '💎 Diamant', price: 9000, icon: '💎', colors: { primary: '#b9f2ff', secondary: '#ffffff' } },
-    { id: 'lava', name: '🌋 Láva', price: 10000, icon: '🌋', colors: { primary: '#ff4500', secondary: '#ff0000' } },
-    { id: 'mint', name: '🍃 Mátový', price: 11000, icon: '🍃', colors: { primary: '#98ff98', secondary: '#3cb371' } },
-    { id: 'lightning', name: '⚡ Blesk', price: 12000, icon: '⚡', colors: { primary: '#ffff00', secondary: '#ffa500' } },
-    { id: 'legend', name: '🏆 Legendární', price: 15000, icon: '🏆', colors: { primary: '#ffd700', secondary: '#ff1493' } }
+    { id: 'default', name: '🎰 Výchozí', price: 0, icon: '🎰', colors: { 
+        primary: '#00ffff', 
+        secondary: '#ff00ff',
+        bg1: '#0a0015',
+        bg2: '#1a0033',
+        bgGlow1: 'rgba(255,0,255,0.4)',
+        bgGlow2: 'rgba(0,255,255,0.4)'
+    }},
+    { id: 'neon', name: '💠 Neon', price: 500, icon: '💠', colors: { 
+        primary: '#00ffff', 
+        secondary: '#ff00ff',
+        bg1: '#000033',
+        bg2: '#330066',
+        bgGlow1: 'rgba(0,255,255,0.5)',
+        bgGlow2: 'rgba(255,0,255,0.5)'
+    }},
+    { id: 'gold', name: '🌟 Zlatý', price: 1000, icon: '🌟', colors: { 
+        primary: '#ffd700', 
+        secondary: '#ffaa00',
+        bg1: '#1a1000',
+        bg2: '#332200',
+        bgGlow1: 'rgba(255,215,0,0.4)',
+        bgGlow2: 'rgba(255,170,0,0.4)'
+    }},
+    { id: 'fire', name: '🔥 Ohnivý', price: 1500, icon: '🔥', colors: { 
+        primary: '#ff4500', 
+        secondary: '#ff8c00',
+        bg1: '#1a0000',
+        bg2: '#330000',
+        bgGlow1: 'rgba(255,69,0,0.5)',
+        bgGlow2: 'rgba(255,140,0,0.5)'
+    }},
+    { id: 'ocean', name: '🌊 Oceán', price: 2000, icon: '🌊', colors: { 
+        primary: '#0080ff', 
+        secondary: '#00ffff',
+        bg1: '#00001a',
+        bg2: '#001a33',
+        bgGlow1: 'rgba(0,128,255,0.4)',
+        bgGlow2: 'rgba(0,255,255,0.4)'
+    }},
+    { id: 'rainbow', name: '🌈 Duha', price: 3000, icon: '🌈', colors: { 
+        primary: '#ff00ff', 
+        secondary: '#00ff00',
+        bg1: '#1a001a',
+        bg2: '#330033',
+        bgGlow1: 'rgba(255,0,255,0.5)',
+        bgGlow2: 'rgba(0,255,0,0.5)'
+    }},
+    { id: 'emerald', name: '💚 Smaragd', price: 3500, icon: '💚', colors: { 
+        primary: '#00ff88', 
+        secondary: '#00cc66',
+        bg1: '#001a0a',
+        bg2: '#003320',
+        bgGlow1: 'rgba(0,255,136,0.4)',
+        bgGlow2: 'rgba(0,204,102,0.4)'
+    }},
+    { id: 'royal', name: '👑 Královský', price: 4000, icon: '👑', colors: { 
+        primary: '#9400d3', 
+        secondary: '#ffd700',
+        bg1: '#0a001a',
+        bg2: '#200033',
+        bgGlow1: 'rgba(148,0,211,0.5)',
+        bgGlow2: 'rgba(255,215,0,0.4)'
+    }},
+    { id: 'toxic', name: '☢️ Toxický', price: 4500, icon: '☢️', colors: { 
+        primary: '#39ff14', 
+        secondary: '#ccff00',
+        bg1: '#0a1a00',
+        bg2: '#1a3300',
+        bgGlow1: 'rgba(57,255,20,0.5)',
+        bgGlow2: 'rgba(204,255,0,0.4)'
+    }},
+    { id: 'sunset', name: '🌅 Západ slunce', price: 5000, icon: '🌅', colors: { 
+        primary: '#ff6b35', 
+        secondary: '#ff8c42',
+        bg1: '#1a0a00',
+        bg2: '#331400',
+        bgGlow1: 'rgba(255,107,53,0.4)',
+        bgGlow2: 'rgba(255,140,66,0.4)'
+    }},
+    { id: 'ice', name: '❄️ Ledový', price: 5500, icon: '❄️', colors: { 
+        primary: '#00d9ff', 
+        secondary: '#a3e4f7',
+        bg1: '#000a1a',
+        bg2: '#001433',
+        bgGlow1: 'rgba(0,217,255,0.4)',
+        bgGlow2: 'rgba(163,228,247,0.3)'
+    }},
+    { id: 'vampire', name: '🧛 Upíří', price: 6000, icon: '🧛', colors: { 
+        primary: '#8b0000', 
+        secondary: '#dc143c',
+        bg1: '#0a0000',
+        bg2: '#1a0000',
+        bgGlow1: 'rgba(139,0,0,0.5)',
+        bgGlow2: 'rgba(220,20,60,0.4)'
+    }},
+    { id: 'matrix', name: '💻 Matrix', price: 6500, icon: '💻', colors: { 
+        primary: '#00ff00', 
+        secondary: '#008800',
+        bg1: '#000a00',
+        bg2: '#001400',
+        bgGlow1: 'rgba(0,255,0,0.4)',
+        bgGlow2: 'rgba(0,136,0,0.3)'
+    }},
+    { id: 'galaxy', name: '🌌 Galaxie', price: 7000, icon: '🌌', colors: { 
+        primary: '#4b0082', 
+        secondary: '#9370db',
+        bg1: '#050008',
+        bg2: '#0a0010',
+        bgGlow1: 'rgba(75,0,130,0.5)',
+        bgGlow2: 'rgba(147,112,219,0.4)'
+    }},
+    { id: 'cherry', name: '🍒 Třešeň', price: 7500, icon: '🍒', colors: { 
+        primary: '#ff1493', 
+        secondary: '#ff69b4',
+        bg1: '#1a0010',
+        bg2: '#330020',
+        bgGlow1: 'rgba(255,20,147,0.4)',
+        bgGlow2: 'rgba(255,105,180,0.3)'
+    }},
+    { id: 'cyber', name: '🤖 Cyber', price: 8000, icon: '🤖', colors: { 
+        primary: '#00ffff', 
+        secondary: '#ff00ff',
+        bg1: '#000000',
+        bg2: '#0a0a0a',
+        bgGlow1: 'rgba(0,255,255,0.6)',
+        bgGlow2: 'rgba(255,0,255,0.6)'
+    }},
+    { id: 'diamond', name: '💎 Diamant', price: 9000, icon: '💎', colors: { 
+        primary: '#b9f2ff', 
+        secondary: '#ffffff',
+        bg1: '#0a0a1a',
+        bg2: '#14143a',
+        bgGlow1: 'rgba(185,242,255,0.4)',
+        bgGlow2: 'rgba(255,255,255,0.3)'
+    }},
+    { id: 'lava', name: '🌋 Láva', price: 10000, icon: '🌋', colors: { 
+        primary: '#ff4500', 
+        secondary: '#ff0000',
+        bg1: '#1a0000',
+        bg2: '#330000',
+        bgGlow1: 'rgba(255,69,0,0.6)',
+        bgGlow2: 'rgba(255,0,0,0.5)'
+    }},
+    { id: 'mint', name: '🍃 Mátový', price: 11000, icon: '🍃', colors: { 
+        primary: '#98ff98', 
+        secondary: '#3cb371',
+        bg1: '#001a0a',
+        bg2: '#003314',
+        bgGlow1: 'rgba(152,255,152,0.4)',
+        bgGlow2: 'rgba(60,179,113,0.3)'
+    }},
+    { id: 'lightning', name: '⚡ Blesk', price: 12000, icon: '⚡', colors: { 
+        primary: '#ffff00', 
+        secondary: '#ffa500',
+        bg1: '#1a1a00',
+        bg2: '#333300',
+        bgGlow1: 'rgba(255,255,0,0.5)',
+        bgGlow2: 'rgba(255,165,0,0.4)'
+    }},
+    { id: 'legend', name: '🏆 Legendární', price: 15000, icon: '🏆', colors: { 
+        primary: '#ffd700', 
+        secondary: '#ff1493',
+        bg1: '#1a0a00',
+        bg2: '#331400',
+        bgGlow1: 'rgba(255,215,0,0.6)',
+        bgGlow2: 'rgba(255,20,147,0.5)'
+    }}
 ];
 
 // SLOT MACHINE LOGIC
@@ -1627,9 +1776,144 @@ window.activateTheme = async function(themeId) {
 };
 
 function applyTheme(colors) {
+    // CSS proměnné pro globální použití
     document.documentElement.style.setProperty('--theme-primary', colors.primary);
     document.documentElement.style.setProperty('--theme-secondary', colors.secondary);
     
+    // Pozadí body
+    document.body.style.background = `linear-gradient(135deg, ${colors.bg1} 0%, ${colors.bg2} 50%, ${colors.bg1} 100%)`;
+    
+    const bodyBefore = document.querySelector('body::before');
+    const style = document.createElement('style');
+    style.textContent = `
+        body::before {
+            background: 
+                radial-gradient(circle at 20% 50%, ${colors.bgGlow1} 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, ${colors.bgGlow2} 0%, transparent 50%) !important;
+        }
+        
+        #topBar {
+            border-bottom-color: ${colors.primary} !important;
+            box-shadow: 0 5px 30px ${colors.primary}99 !important;
+        }
+        
+        #coinDisplay {
+            background: linear-gradient(135deg, ${colors.primary} 0%, ${colors.secondary} 100%) !important;
+            border-color: ${colors.primary} !important;
+            box-shadow: 0 0 25px ${colors.primary}dd !important;
+        }
+        
+        #dailyBonus {
+            background: linear-gradient(135deg, ${colors.primary} 0%, ${colors.secondary} 100%) !important;
+            border-color: ${colors.primary} !important;
+            box-shadow: 0 0 20px ${colors.primary}99 !important;
+        }
+        
+        #shopBtn {
+            background: linear-gradient(135deg, ${colors.secondary} 0%, ${colors.primary} 100%) !important;
+            border-color: ${colors.secondary} !important;
+            box-shadow: 0 0 20px ${colors.secondary}99 !important;
+        }
+        
+        #slotBtn.active {
+            box-shadow: 0 0 30px ${colors.primary} !important;
+        }
+        
+        #wheelBtn.active {
+            box-shadow: 0 0 30px ${colors.secondary} !important;
+        }
+        
+        #leaderboardBtn.active {
+            box-shadow: 0 0 30px ${colors.primary} !important;
+        }
+        
+        #slotMachine, .paytable, #leaderboardFull {
+            background: linear-gradient(135deg, ${colors.bg2}cc 0%, ${colors.bg1}cc 100%) !important;
+            border-color: ${colors.primary} !important;
+            box-shadow: 0 0 50px ${colors.primary}dd !important;
+        }
+        
+        .reel {
+            border-color: ${colors.primary} !important;
+            box-shadow: 0 0 20px ${colors.primary}88 !important;
+        }
+        
+        .reel-window {
+            border-color: ${colors.secondary} !important;
+            box-shadow: 0 0 15px ${colors.secondary}bb !important;
+        }
+        
+        #spinSlotBtn {
+            background: linear-gradient(135deg, ${colors.primary} 0%, ${colors.secondary} 100%) !important;
+            border-color: ${colors.primary} !important;
+            box-shadow: 0 0 30px ${colors.primary}99 !important;
+        }
+        
+        #spinSlotBtn:hover {
+            box-shadow: 0 0 40px ${colors.primary}dd !important;
+        }
+        
+        #spinWheelBtn {
+            background: linear-gradient(135deg, ${colors.secondary} 0%, ${colors.primary} 100%) !important;
+            border-color: ${colors.secondary} !important;
+            box-shadow: 0 0 30px ${colors.secondary}99 !important;
+        }
+        
+        .bet-btn.active {
+            background: linear-gradient(135deg, ${colors.primary} 0%, ${colors.secondary} 100%) !important;
+            border-color: ${colors.primary} !important;
+            box-shadow: 0 0 20px ${colors.primary}cc !important;
+        }
+        
+        .leaderboard-item:hover {
+            background: ${colors.primary}33 !important;
+            box-shadow: 0 0 20px ${colors.primary}88 !important;
+        }
+        
+        .shop-item {
+            border-color: ${colors.primary} !important;
+            box-shadow: 0 0 30px ${colors.primary}88 !important;
+        }
+        
+        .shop-item:hover {
+            box-shadow: 0 0 50px ${colors.primary}cc !important;
+        }
+        
+        .modal-content {
+            background: linear-gradient(135deg, ${colors.bg2} 0%, ${colors.bg1} 100%) !important;
+            border-color: ${colors.primary} !important;
+            box-shadow: 0 0 100px ${colors.primary}dd !important;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, ${colors.primary} 0%, ${colors.secondary} 100%) !important;
+        }
+        
+        canvas {
+            border-color: ${colors.secondary} !important;
+            box-shadow: 0 0 50px ${colors.primary}dd !important;
+        }
+        
+        .pointer {
+            border-top-color: ${colors.secondary} !important;
+            filter: drop-shadow(0 0 10px ${colors.secondary}) !important;
+        }
+        
+        .wheelCenter {
+            background: linear-gradient(135deg, ${colors.primary} 0%, ${colors.secondary} 100%) !important;
+            border-color: ${colors.secondary} !important;
+            box-shadow: 0 0 20px ${colors.secondary}cc !important;
+        }
+    `;
+    
+    // Odstraň starý style, pokud existuje
+    const oldStyle = document.getElementById('theme-style');
+    if (oldStyle) oldStyle.remove();
+    
+    style.id = 'theme-style';
+    document.head.appendChild(style);
+    
+    // Textové elementy
     const userName = document.getElementById('userName');
     if (userName) {
         userName.style.color = colors.primary;
@@ -1642,15 +1926,73 @@ function applyTheme(colors) {
         slotTitle.style.textShadow = `0 0 20px ${colors.primary}, 0 0 40px ${colors.secondary}`;
     }
     
-    document.querySelectorAll('.reel').forEach(reel => {
-        reel.style.borderColor = colors.primary;
-        reel.style.boxShadow = `0 0 20px ${colors.primary}`;
+    const wheelTitle = document.getElementById('wheelTitle');
+    if (wheelTitle) {
+        wheelTitle.style.color = colors.secondary;
+        wheelTitle.style.textShadow = `0 0 15px ${colors.secondary}, 0 0 30px ${colors.primary}`;
+    }
+    
+    const betAmount = document.getElementById('betAmount');
+    if (betAmount) {
+        betAmount.style.color = colors.primary;
+        betAmount.style.textShadow = `0 0 10px ${colors.primary}`;
+    }
+    
+    const slotResult = document.getElementById('slotResult');
+    if (slotResult) {
+        slotResult.style.color = colors.primary;
+        slotResult.style.textShadow = `0 0 15px ${colors.primary}`;
+    }
+    
+    const wheelCost = document.getElementById('wheelCost');
+    if (wheelCost) {
+        wheelCost.style.color = colors.secondary;
+        wheelCost.style.textShadow = `0 0 10px ${colors.secondary}`;
+    }
+    
+    // Paytable nadpis
+    const paytableTitle = document.querySelector('.paytable h3');
+    if (paytableTitle) {
+        paytableTitle.style.color = colors.primary;
+        paytableTitle.style.textShadow = `0 0 15px ${colors.primary}`;
+    }
+    
+    // Leaderboard nadpis
+    const leaderboardTitle = document.querySelector('#leaderboardFull h2');
+    if (leaderboardTitle) {
+        leaderboardTitle.style.color = colors.primary;
+        leaderboardTitle.style.textShadow = `0 0 20px ${colors.primary}, 0 0 40px ${colors.secondary}`;
+    }
+    
+    // Shop nadpis
+    const shopTitle = document.querySelector('#shopGame h2');
+    if (shopTitle) {
+        shopTitle.style.color = colors.primary;
+        shopTitle.style.textShadow = `0 0 20px ${colors.primary}, 0 0 40px ${colors.secondary}`;
+    }
+    
+    // Všechny leaderboard položky
+    document.querySelectorAll('.leaderboard-rank').forEach(el => {
+        el.style.color = colors.secondary;
     });
     
-    document.querySelectorAll('.reel-window').forEach(window => {
-        window.style.borderColor = colors.secondary;
-        window.style.boxShadow = `0 0 15px ${colors.secondary}`;
+    document.querySelectorAll('.leaderboard-coins').forEach(el => {
+        el.style.color = colors.primary;
     });
+    
+    // Shop názvy
+    document.querySelectorAll('.shop-name').forEach(el => {
+        el.style.color = colors.primary;
+        el.style.textShadow = `0 0 10px ${colors.primary}`;
+    });
+    
+    // Modal nadpisy
+    document.querySelectorAll('.modal h2').forEach(el => {
+        el.style.color = colors.primary;
+        el.style.textShadow = `0 0 20px ${colors.primary}, 0 0 40px ${colors.secondary}`;
+    });
+    
+    console.log('✨ Téma aplikováno:', colors);
 }
 
 // GAME SWITCHING
@@ -1983,6 +2325,7 @@ window.addEventListener('load', async () => {
 
 </body>
 </html>
+
 
 
 
