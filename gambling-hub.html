@@ -1646,89 +1646,93 @@ window.switchGame = function(game) {
 window.login = async function() {
     const nickname = document.getElementById('nicknameInput').value.trim();
     if (!nickname || nickname.length < 2) {
-        alert('Zadejte přezdívku (min. 2 znaky)');
+        alert('❌ Zadejte přezdívku (min. 2 znaky)');
         return;
     }
     
-    currentUser.nickname = nickname;
-    currentUser.coins = 100;
-    currentUser.lastDailyBonus = new Date().toISOString().split('T')[0];
-    currentUser.ownedThemes = ['default'];
-    currentUser.activeTheme = 'default';
-    
-    const { data, error } = await supabase
-        .from('casino_users')
-        .insert([{
-            nickname: currentUser.nickname,
-            coins: currentUser.coins,
-            last_daily_bonus: currentUser.lastDailyBonus,
-            owned_themes: currentUser.ownedThemes,
-            active_theme: currentUser.activeTheme
-        }])
-        .select();
-    
-    if (error) {
-        console.error('Chyba při vytváření uživatele:', error);
-        currentUser.id = 'user_' + Date.now();
-        localStorage.setItem('casinoUser', JSON.stringify(currentUser));
-    } else {
-        currentUser.id = data[0].id;
-    }
-    
-    document.getElementById('loginModal').style.display = 'none';
-    updateUI();
-    initReels();
-    checkDailyBonus();
-};
-
-async function saveUser() {
-    if (!currentUser.id) return;
+    // Zobraz loading na tlačítku
+    const loginBtn = document.getElementById('loginBtn');
+    const originalText = loginBtn.textContent;
+    loginBtn.textContent = '⏳ Přihlašuji...';
+    loginBtn.disabled = true;
     
     try {
-        const { data: existingUser } = await supabase
+        // Zkus najít existujícího uživatele
+        const { data: existingUser, error: searchError } = await supabase
             .from('casino_users')
-            .select('id')
-            .eq('id', currentUser.id)
+            .select('*')
+            .eq('nickname', nickname)
             .maybeSingle();
         
         if (existingUser) {
-            const { error } = await supabase
-                .from('casino_users')
-                .update({
-                    nickname: currentUser.nickname,
-                    coins: currentUser.coins,
-                    last_daily_bonus: currentUser.lastDailyBonus,
-                    owned_themes: currentUser.ownedThemes,
-                    active_theme: currentUser.activeTheme
-                })
-                .eq('id', currentUser.id);
+            // Uživatel existuje - přihlaš ho
+            currentUser.id = existingUser.id;
+            currentUser.nickname = existingUser.nickname;
+            currentUser.coins = existingUser.coins;
+            currentUser.lastDailyBonus = existingUser.last_daily_bonus;
+            currentUser.ownedThemes = existingUser.owned_themes || ['default'];
+            currentUser.activeTheme = existingUser.active_theme || 'default';
             
-            if (error) {
-                console.error('Chyba při updatu:', error);
-                localStorage.setItem('casinoUser', JSON.stringify(currentUser));
-            }
+            // Ulož do localStorage
+            localStorage.setItem('currentUser', JSON.stringify({
+                id: currentUser.id,
+                username: currentUser.nickname
+            }));
+            
+            console.log('✅ Uživatel přihlášen:', currentUser);
         } else {
-            const { error } = await supabase
+            // Nový uživatel - vytvoř účet
+            currentUser.nickname = nickname;
+            currentUser.coins = 100;
+            currentUser.lastDailyBonus = new Date().toISOString().split('T')[0];
+            currentUser.ownedThemes = ['default'];
+            currentUser.activeTheme = 'default';
+            
+            const { data: newUser, error: insertError } = await supabase
                 .from('casino_users')
                 .insert([{
-                    id: currentUser.id,
                     nickname: currentUser.nickname,
                     coins: currentUser.coins,
                     last_daily_bonus: currentUser.lastDailyBonus,
                     owned_themes: currentUser.ownedThemes,
                     active_theme: currentUser.activeTheme
-                }]);
+                }])
+                .select()
+                .single();
             
-            if (error) {
-                console.error('Chyba při insertu:', error);
-                localStorage.setItem('casinoUser', JSON.stringify(currentUser));
+            if (insertError) {
+                throw insertError;
             }
+            
+            currentUser.id = newUser.id;
+            
+            // Ulož do localStorage
+            localStorage.setItem('currentUser', JSON.stringify({
+                id: currentUser.id,
+                username: currentUser.nickname
+            }));
+            
+            console.log('✅ Nový uživatel vytvořen:', currentUser);
         }
-    } catch (e) {
-        console.error('Chyba při ukládání:', e);
-        localStorage.setItem('casinoUser', JSON.stringify(currentUser));
+        
+        // Aplikuj téma
+        const activeItem = shopItems.find(i => i.id === currentUser.activeTheme);
+        if (activeItem) {
+            applyTheme(activeItem.colors);
+        }
+        
+        // Zavři modal a zobraz hru
+        document.getElementById('loginModal').style.display = 'none';
+        updateUI();
+        checkDailyBonus();
+        
+    } catch (error) {
+        console.error('❌ Chyba při přihlášení:', error);
+        alert('❌ Nepodařilo se přihlásit. Zkuste to znovu.');
+        loginBtn.textContent = originalText;
+        loginBtn.disabled = false;
     }
-}
+};
 
 function updateUI() {
     document.getElementById('userName').textContent = currentUser.nickname;
@@ -1844,6 +1848,7 @@ document.getElementById('nicknameInput').addEventListener('keypress', function(e
 });
 
 // Inicializace
+// Inicializace
 window.addEventListener('load', async () => {
     console.log('🎰 Casino inicializace...');
     
@@ -1852,60 +1857,61 @@ window.addEventListener('load', async () => {
     
     initReels();
     
-    const savedUser = localStorage.getItem('currentUser');
-    console.log('Saved user:', savedUser);
-    
-    if (savedUser) {
-        try {
-            const user = JSON.parse(savedUser);
-            console.log('Parsed user:', user);
-            
-            currentUser.nickname = user.username;
-            currentUser.id = user.id;
-            
-            const { data: existingUser, error } = await supabase
-                .from('casino_users')
-                .select('*')
-                .eq('id', user.id)
-                .maybeSingle();
-            
-            console.log('Existing user from DB:', existingUser);
-            
-            if (existingUser) {
-                currentUser.coins = existingUser.coins;
-                currentUser.lastDailyBonus = existingUser.last_daily_bonus;
-                currentUser.ownedThemes = existingUser.owned_themes || ['default'];
-                currentUser.activeTheme = existingUser.active_theme || 'default';
+    // Po loading screenu (po 3-6 sekundách) zkontroluj přihlášení
+    setTimeout(async () => {
+        const savedUser = localStorage.getItem('currentUser');
+        console.log('Saved user:', savedUser);
+        
+        if (savedUser) {
+            try {
+                const user = JSON.parse(savedUser);
+                console.log('Parsed user:', user);
                 
-                const activeItem = shopItems.find(i => i.id === currentUser.activeTheme);
-                if (activeItem) {
-                    applyTheme(activeItem.colors);
+                currentUser.nickname = user.username;
+                currentUser.id = user.id;
+                
+                const { data: existingUser, error } = await supabase
+                    .from('casino_users')
+                    .select('*')
+                    .eq('id', user.id)
+                    .maybeSingle();
+                
+                console.log('Existing user from DB:', existingUser);
+                
+                if (existingUser) {
+                    currentUser.coins = existingUser.coins;
+                    currentUser.lastDailyBonus = existingUser.last_daily_bonus;
+                    currentUser.ownedThemes = existingUser.owned_themes || ['default'];
+                    currentUser.activeTheme = existingUser.active_theme || 'default';
+                    
+                    const activeItem = shopItems.find(i => i.id === currentUser.activeTheme);
+                    if (activeItem) {
+                        applyTheme(activeItem.colors);
+                    }
+                    
+                    updateUI();
+                    checkDailyBonus();
+                    
+                    console.log('✅ Automaticky přihlášen:', currentUser);
+                } else {
+                    // Uživatel neexistuje v DB - vymaž local storage a zobraz login
+                    localStorage.removeItem('currentUser');
+                    document.getElementById('loginModal').style.display = 'flex';
+                    console.log('⚠️ Uživatel nenalezen v DB, zobrazuji login');
                 }
-            } else {
-                currentUser.coins = 100;
-                currentUser.lastDailyBonus = null;
-                currentUser.ownedThemes = ['default'];
-                currentUser.activeTheme = 'default';
-                console.log('Vytváření nového casino uživatele...');
+            } catch (e) {
+                console.error('❌ Chyba při načítání uživatele:', e);
+                localStorage.removeItem('currentUser');
+                document.getElementById('loginModal').style.display = 'flex';
             }
-            
-            await saveUser();
-            
-            document.getElementById('loginModal').style.display = 'none';
-            updateUI();
-            checkDailyBonus();
-            
-            console.log('✅ Uživatel načten:', currentUser);
-        } catch (e) {
-            console.error('❌ Chyba při načítání uživatele:', e);
+        } else {
+            console.log('⚠️ Žádný uložený uživatel, zobrazuji login');
             document.getElementById('loginModal').style.display = 'flex';
         }
-    } else {
-        console.log('⚠️ Žádný uložený uživatel, zobrazuji login');
-        document.getElementById('loginModal').style.display = 'flex';
-    }
+    }, 3500); // Zobraz login po skončení loading screenu
 });
 </script>
 
 </body>
 </html>
+
