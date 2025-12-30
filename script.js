@@ -294,7 +294,61 @@ const winMultipliers = {
 };
 
 let reels = [[], [], []];
-let spinning = false;
+let spinning = false;  // Inicializace proměnné
+
+// Funkce pro otočení nového automatu (4 sloty)
+window.spinSlotV2 = function() {
+    if (spinning) return;
+    spinning = true;
+    
+    // Zkontroluj, jestli hráč má dostatek mincí
+    if (currentUser.coins < currentBet || currentBet <= 0 || isNaN(currentBet)) {
+        showNotification('Nemáš dostatek mincí pro tuto hru nebo neplatná sázka!');
+        spinning = false;
+        return;
+    }
+
+    currentUser.coins -= currentBet;
+    updateUI();
+
+    // Animace pro 4 sloty
+    const spinResults = [[], [], [], []];
+    for (let i = 0; i < 4; i++) {
+        spinResults[i] = getReelSymbols();
+    }
+    
+    setTimeout(() => {
+        // Zobrazení výsledků
+        document.getElementById('slotV2Result').textContent = `Výsledek: ${spinResults.map(r => r.join(' | ')).join(' | ')}`;
+        currentUser.coins += calculateWinnings(spinResults);
+        updateUI();
+        spinning = false;
+    }, 2000); // Po 2 sekundách se ukáže výsledek
+}
+
+// Funkce pro výpočet výhry
+function calculateWinnings(results) {
+    let winnings = 0;
+
+    // Zkontroluj, jestli všechny válce mají stejné symboly
+    const allSame = results.every(result => result[0] === result[1] && result[1] === result[2]);
+
+    if (allSame) {
+        winnings = currentBet * 10; // Za shodu všech symbolů násobíme sázku
+    }
+
+    return winnings;
+}
+
+// Funkce pro získání symbolů na jednom válci
+function getReelSymbols() {
+    const symbols = [];
+    for (let i = 0; i < 3; i++) {  // Tři symboly pro jeden válec
+        symbols.push(getWeightedSymbol());
+    }
+    return symbols;
+}
+
 
 function initReels() {
     for (let i = 0; i < 3; i++) {
@@ -584,4 +638,5 @@ window.addEventListener('load', async () => {
         }
     }, 3500);
 });
+
 
