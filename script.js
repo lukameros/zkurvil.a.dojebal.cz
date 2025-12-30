@@ -88,7 +88,14 @@ let currentUser = {
 };
 
 let currentGame = 'slot';
-let currentBet = 10;
+let currentBet = 10; // výchozí sázka
+
+// Funkce pro změnu sázky
+function setBet(amount) {
+    currentBet = amount; 
+    document.getElementById('betDisplay').textContent = `Sázka: ${currentBet} 🪙`;
+}
+
 
 // SHOP ITEMS
 // SHOP ITEMS
@@ -1646,14 +1653,6 @@ window.closeWinModal = function() {
 document.getElementById('nicknameInput').addEventListener('keypress', function(e) {
     if (e.key === 'Enter') login();
 });
-let currentBet = 10; // výchozí sázka
-
-function setBet(amount) {
-    currentBet = amount; 
-    document.getElementById('betDisplay').textContent = `Sázka: ${currentBet} 🪙`;
-}
-
-
 // Inicializace
 // Inicializace
 window.addEventListener('load', async () => {
@@ -1713,6 +1712,7 @@ window.addEventListener('load', async () => {
         }
     }, 3500);
 });
+
 
 
 
