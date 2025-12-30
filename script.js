@@ -433,18 +433,17 @@ const dailyMissions = [
     }
 ];
 
-// SLOT MACHINE LOGIC
+// ⭐ VYŠŠÍ ŠANCE NA VÝHRU
 const symbolWeights = {
-    '🍒': 32,
-    '🍋': 28,
-    '🍊': 24,
-    '🍇': 18,
-    '🔔': 14,
-    '⭐': 9,
-    '💎': 6,
-    '🎰': 2
+    '🍒': 35,  // Zvýšeno z 32
+    '🍋': 30,  // Zvýšeno z 28
+    '🍊': 26,  // Zvýšeno z 24
+    '🍇': 20,  // Zvýšeno z 18
+    '🔔': 16,  // Zvýšeno z 14
+    '⭐': 12,  // Zvýšeno z 9
+    '💎': 8,   // Zvýšeno z 6
+    '🎰': 3    // Zvýšeno z 2
 };
-
 
 const winMultipliers = {
     '🍒': 3,
@@ -454,8 +453,11 @@ const winMultipliers = {
     '🔔': 9,
     '⭐': 12,
     '💎': 18,
-    '🎰': 30
+    '🎰': 25  // Sníženo z 30 kvůli vyšší šanci
 };
+
+// Zvýšená šance na jackpot
+const isJackpot = Math.random() < 0.025; // Zvýšeno z 0.015 na 0.025
 
 let reels = [[], [], []];
 let spinning = false;
@@ -487,6 +489,21 @@ function initReels() {
     }
 }
 
+// Update Modal funkce
+window.closeUpdateModal = function() {
+    document.getElementById('updateModal').style.display = 'none';
+    localStorage.setItem('casino_version_seen', '2.0');
+}
+
+function checkFirstVisit() {
+    const versionSeen = localStorage.getItem('casino_version_seen');
+    if (versionSeen !== '2.0') {
+        // Zobraz update modal po načtení
+        setTimeout(() => {
+            document.getElementById('updateModal').style.display = 'flex';
+        }, 1000);
+    }
+}
 
 function getWeightedSymbol() {
     const totalWeight = Object.values(symbolWeights).reduce((a, b) => a + b, 0);
@@ -1721,6 +1738,7 @@ window.addEventListener('load', async () => {
         }
     }, 3500);
 });
+
 
 
 
