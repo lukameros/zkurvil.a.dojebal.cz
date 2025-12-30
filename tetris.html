@@ -1478,10 +1478,14 @@ function endEvent() {
 
 function startEventSystem() {
     const scheduleNextEvent = () => {
+        if (isGameOver) return;  // Zastav plánování pokud hra skončila
+        
         const delay = 60000 + Math.random() * 120000;
         setTimeout(() => {
-            if (!isGameOver) {
+            if (!isGameOver && !isPaused) {  // Kontrola před spuštěním eventu
                 triggerRandomEvent();
+            }
+            if (!isGameOver) {  // Plánuj další jen pokud hra běží
                 scheduleNextEvent();
             }
         }, delay);
@@ -1504,8 +1508,18 @@ window.backToMainMenu = function() {
     document.getElementById('nameModal').style.display = 'none'
     document.getElementById('pauseOverlay').style.display = 'none'
     clearTimeout(dropTimeout)
+    
+    // Zastavit eventy
+    isGameOver = true  // Označí že hra skončila
+    endEvent()  // Ukončí aktivní event
+    clearTimeout(eventTimeout)  // Zruší naplánovaný event
+    
+    // Skrýt event timer
+    const timer = document.getElementById('eventTimer')
+    if (timer) timer.style.display = 'none'
+    
     isPaused = false
-    isGameOver = false
+    activeEvent = null
 }
 
 window.showDifficultyMenu = function() {
@@ -1601,6 +1615,7 @@ window.startTetris = function(difficulty) {
     isGameOver = false
     holdPiece = null
     earnedCoinsThisGame = 0
+    activeEvent = null  // Reset eventu
     
     dropInterval = difficulty === 'easy' ? 800 : 
                    difficulty === 'medium' ? 600 : 
@@ -1611,7 +1626,7 @@ window.startTetris = function(difficulty) {
     newTetromino()
     updateDisplay()
     gameLoop()
-    startEventSystem();
+    startEventSystem()  // Spustí eventy jen když začne hra
 }
 
 function randomTetromino() {
