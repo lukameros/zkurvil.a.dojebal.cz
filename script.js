@@ -611,6 +611,7 @@ async function evaluateSlotWin(results) {
 
         currentUser.stats.totalWins++;
         currentUser.stats.currentStreak++;
+        if (!currentUser.stats.coinsWon) currentUser.stats.coinsWon = 0;
         currentUser.stats.coinsWon += winAmount;
 
         if (currentUser.stats.currentStreak > currentUser.stats.winStreak) {
@@ -633,33 +634,26 @@ async function evaluateSlotWin(results) {
 
         updateMissionProgress('coinsWon', winAmount);
     }
+    // ✨ 2 stejné symboly
+    else if (maxCount === 2) {
+        const multiplier = Math.max(1, Math.floor(winMultipliers[winSymbol] / 3));
+        winAmount = currentBet * multiplier;
 
-   // ✨ 2 stejné symboly
-else if (a === b || a === c || b === c) {
-    const symbol =
-        a === b ? a :
-        a === c ? a :
-        b;
+        currentUser.stats.totalWins++;
+        currentUser.stats.currentStreak++;
+        
+        if (!currentUser.stats.coinsWon) currentUser.stats.coinsWon = 0;
+        currentUser.stats.coinsWon += winAmount;
 
-    const multiplier = Math.max(1, Math.floor(winMultipliers[symbol] / 3));
-    winAmount = currentBet * multiplier;
+        if (currentUser.stats.currentStreak > currentUser.stats.winStreak) {
+            currentUser.stats.winStreak = currentUser.stats.currentStreak;
+        }
 
-    currentUser.stats.totalWins++;
-    currentUser.stats.currentStreak++;
-    currentUser.stats.coinsWon += winAmount;
+        message = `✨ ${winSymbol}${winSymbol} HIT! +${winAmount} 🪙`;
+        highlightWinningSymbols(winSymbol);
 
-    if (currentUser.stats.currentStreak > currentUser.stats.winStreak) {
-        currentUser.stats.winStreak = currentUser.stats.currentStreak;
+        updateMissionProgress('coinsWon', winAmount);
     }
-
-    // ✅ TADY PŘESNĚ
-    message = `✨ ${symbol}${symbol} HIT! +${winAmount} 🪙`;
-    highlightWinningSymbols(symbol);
-
-    updateMissionProgress('coinsWon', winAmount);
-}
-
-
     // ❌ žádná výhra
     else {
         message = '😢 Zkuste to znovu!';
@@ -1712,6 +1706,7 @@ window.addEventListener('load', async () => {
         }
     }, 3500);
 });
+
 
 
 
