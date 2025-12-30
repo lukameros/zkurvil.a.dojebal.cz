@@ -1,11 +1,9 @@
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
 
-// Supabase konfigurace
 const SUPABASE_URL = 'https://bmmaijlbpwgzhrxzxphf.supabase.co'
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJtbWFpamxicHdnemhyeHp4cGhmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjY4NjQ5MDcsImV4cCI6MjA4MjQ0MDkwN30.s0YQVnAjMXFu1pSI1NXZ2naSab179N0vQPglsmy3Pgw'
 const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-// Loading screen logika
 function startLoading() {
     const loadingTime = 3000 + Math.random() * 3000;
     const loadingBar = document.getElementById('loadingBar');
@@ -42,12 +40,9 @@ function startLoading() {
     
     setTimeout(() => {
         document.getElementById('loadingScreen').style.display = 'none';
-        loadingBar.style.width = '0%';
-        loadingText.textContent = 'Připravuji herní automaty...';
     }, loadingTime);
 }
 
-// Vytvoření hvězd
 for(let i = 0; i < 30; i++) {
     const star = document.createElement('div');
     star.className = 'star';
@@ -57,7 +52,6 @@ for(let i = 0; i < 30; i++) {
     document.body.appendChild(star);
 }
 
-// Globální proměnné
 let currentUser = {
     id: null,
     nickname: '',
@@ -92,14 +86,10 @@ let currentUser = {
 let currentGame = 'slot';
 let currentBet = 10;
 
-// Funkce pro změnu sázky
 window.setBet = function(amount) {
     currentBet = amount;
-    
     const betDisplay = document.getElementById('currentBet');
-    if (betDisplay) {
-        betDisplay.textContent = currentBet;
-    }
+    if (betDisplay) betDisplay.textContent = currentBet;
     
     document.querySelectorAll('.bet-btn').forEach(btn => {
         btn.classList.remove('active');
@@ -109,121 +99,29 @@ window.setBet = function(amount) {
     });
 }
 
-// SHOP ITEMS
 const shopItems = [
     { id: 'default', name: '🎰 Výchozí', price: 0, icon: '🎰', colors: {
-        primary: '#00ffff', 
-        secondary: '#ff00ff',
-        bg1: '#0a0015',
-        bg2: '#1a0033',
-        bgGlow1: 'rgba(255,0,255,0.4)',
-        bgGlow2: 'rgba(0,255,255,0.4)'
+        primary: '#00ffff', secondary: '#ff00ff', bg1: '#0a0015', bg2: '#1a0033',
+        bgGlow1: 'rgba(255,0,255,0.4)', bgGlow2: 'rgba(0,255,255,0.4)'
     }},
-    { id: 'neon', name: '💠 Neon', price: 500, icon: '💠', colors: { 
-        primary: '#00ffff', 
-        secondary: '#ff00ff',
-        bg1: '#000033',
-        bg2: '#330066',
-        bgGlow1: 'rgba(0,255,255,0.5)',
-        bgGlow2: 'rgba(255,0,255,0.5)'
-    }},
-    { id: 'gold', name: '🌟 Zlatý', price: 1000, icon: '🌟', colors: { 
-        primary: '#ffd700', 
-        secondary: '#ffaa00',
-        bg1: '#1a1000',
-        bg2: '#332200',
-        bgGlow1: 'rgba(255,215,0,0.4)',
-        bgGlow2: 'rgba(255,170,0,0.4)'
-    }},
-    { id: 'fire', name: '🔥 Ohnivý', price: 1500, icon: '🔥', colors: { 
-        primary: '#ff4500', 
-        secondary: '#ff8c00',
-        bg1: '#1a0000',
-        bg2: '#330000',
-        bgGlow1: 'rgba(255,69,0,0.5)',
-        bgGlow2: 'rgba(255,140,0,0.5)'
-    }},
-    { id: 'ocean', name: '🌊 Oceán', price: 2000, icon: '🌊', colors: { 
-        primary: '#0080ff', 
-        secondary: '#00ffff',
-        bg1: '#00001a',
-        bg2: '#001a33',
-        bgGlow1: 'rgba(0,128,255,0.4)',
-        bgGlow2: 'rgba(0,255,255,0.4)'
-    }},
-    { id: 'rainbow', name: '🌈 Duha', price: 3000, icon: '🌈', colors: { 
-        primary: '#ff00ff', 
-        secondary: '#00ff00',
-        bg1: '#1a001a',
-        bg2: '#330033',
-        bgGlow1: 'rgba(255,0,255,0.5)',
-        bgGlow2: 'rgba(0,255,0,0.5)'
-    }},
-    { id: 'legend', name: '🏆 Legendární', price: 15000, icon: '🏆', colors: { 
-        primary: '#ffd700', 
-        secondary: '#ff1493',
-        bg1: '#1a0a00',
-        bg2: '#331400',
-        bgGlow1: 'rgba(255,215,0,0.6)',
-        bgGlow2: 'rgba(255,20,147,0.5)'
+    { id: 'gold', name: '🌟 Zlatý', price: 1000, icon: '🌟', colors: {
+        primary: '#ffd700', secondary: '#ffaa00', bg1: '#1a1000', bg2: '#332200',
+        bgGlow1: 'rgba(255,215,0,0.4)', bgGlow2: 'rgba(255,170,0,0.4)'
     }}
 ];
 
-// ACHIEVEMENTS
 const achievements = [
-    { 
-        id: 'first_win', 
-        name: 'První výhra! 🎉', 
-        desc: 'Vyhrát na automatu poprvé',
-        icon: '🎉', 
-        reward: 50,
-        condition: (stats) => stats.totalWins >= 1
-    },
-    { 
-        id: 'slot_master', 
-        name: 'Mistr automatů', 
-        desc: 'Zatočit 100x na automatu',
-        icon: '🎰', 
-        reward: 200,
-        condition: (stats) => stats.slotSpins >= 100
-    }
+    { id: 'first_win', name: 'První výhra! 🎉', desc: 'Vyhrát na automatu poprvé', icon: '🎉', reward: 50,
+      condition: (stats) => stats.totalWins >= 1 }
 ];
 
-// DAILY MISSIONS
 const dailyMissions = [
-    { 
-        id: 'spin_10', 
-        name: '🎰 Desetinásobný točitel', 
-        desc: 'Zatočit 10x na automatu',
-        icon: '🎰',
-        reward: 50, 
-        target: 10,
-        type: 'slotSpins'
-    }
+    { id: 'spin_10', name: '🎰 Desetinásobný točitel', desc: 'Zatočit 10x na automatu', icon: '🎰',
+      reward: 50, target: 10, type: 'slotSpins' }
 ];
 
-// Symbol weights
-const symbolWeights = {
-    '🍒': 35,
-    '🍋': 30,
-    '🍊': 26,
-    '🍇': 20,
-    '🔔': 16,
-    '⭐': 12,
-    '💎': 8,
-    '🎰': 3
-};
-
-const winMultipliers = {
-    '🍒': 3,
-    '🍋': 4,
-    '🍊': 5,
-    '🍇': 7,
-    '🔔': 9,
-    '⭐': 12,
-    '💎': 18,
-    '🎰': 25
-};
+const symbolWeights = {'🍒': 35, '🍋': 30, '🍊': 26, '🍇': 20, '🔔': 16, '⭐': 12, '💎': 8, '🎰': 3};
+const winMultipliers = {'🍒': 3, '🍋': 4, '🍊': 5, '🍇': 7, '🔔': 9, '⭐': 12, '💎': 18, '🎰': 25};
 
 let reels = [[], [], []];
 let spinning = false;
@@ -232,14 +130,12 @@ function initReels() {
     for (let i = 0; i < 3; i++) {
         const reel = document.getElementById(`reel${i + 1}`);
         if (!reel) continue;
-        
         reel.innerHTML = '';
         reels[i] = [];
 
         for (let j = 0; j < 50; j++) {
             const symbol = getWeightedSymbol();
             reels[i].push(symbol);
-
             const div = document.createElement('div');
             div.className = 'symbol';
             div.textContent = symbol;
@@ -255,25 +151,9 @@ function initReels() {
     }
 }
 
-window.closeUpdateModal = function() {
-    document.getElementById('updateModal').style.display = 'none';
-    localStorage.setItem('casino_version_seen', '2.0');
-}
-
-function checkFirstVisit() {
-    const versionSeen = localStorage.getItem('casino_version_seen');
-    if (versionSeen !== '2.0') {
-        setTimeout(() => {
-            const modal = document.getElementById('updateModal');
-            if (modal) modal.style.display = 'flex';
-        }, 1000);
-    }
-}
-
 function getWeightedSymbol() {
     const totalWeight = Object.values(symbolWeights).reduce((a, b) => a + b, 0);
     let random = Math.random() * totalWeight;
-    
     for (const [symbol, weight] of Object.entries(symbolWeights)) {
         random -= weight;
         if (random <= 0) return symbol;
@@ -281,145 +161,187 @@ function getWeightedSymbol() {
     return '🍒';
 }
 
-function initializeMissions() {
-    const today = new Date().toISOString().split('T')[0];
-    
-    if (currentUser.lastMissionReset !== today) {
-        currentUser.lastMissionReset = today;
-        currentUser.dailyMissions = {};
-        
-        dailyMissions.forEach(mission => {
-            currentUser.dailyMissions[mission.id] = {
-                progress: 0,
-                completed: false,
-                claimed: false
-            };
-        });
-        
-        if (!currentUser.stats) currentUser.stats = {};
-        currentUser.stats.coinsWon = 0;
-        currentUser.stats.bigWins = 0;
-        currentUser.stats.gamesPlayed = [];
-        
-        saveUser();
+window.closeUpdateModal = function() {
+    const modal = document.getElementById('updateModal');
+    if (modal) modal.style.display = 'none';
+    localStorage.setItem('casino_version_seen', '2.0');
+}
+
+function checkFirstVisit() {
+    if (localStorage.getItem('casino_version_seen') !== '2.0') {
+        setTimeout(() => {
+            const modal = document.getElementById('updateModal');
+            if (modal) modal.style.display = 'flex';
+        }, 1000);
     }
 }
 
-function updateMissionProgress(type, amount = 1) {
-    if (!currentUser.dailyMissions) initializeMissions();
-    
-    if (type === 'gamesPlayed') {
-        if (!currentUser.stats.gamesPlayed.includes(amount)) {
-            currentUser.stats.gamesPlayed.push(amount);
-        }
-        
-        dailyMissions.forEach(mission => {
-            if (mission.type === 'gamesPlayed') {
-                const missionData = currentUser.dailyMissions[mission.id];
-                if (missionData && !missionData.completed) {
-                    missionData.progress = currentUser.stats.gamesPlayed.length;
-                    
-                    if (missionData.progress >= mission.target) {
-                        missionData.progress = mission.target;
-                        missionData.completed = true;
-                        showNotification(`✅ Úkol splněn: ${mission.name}`);
-                    }
-                }
-            }
-        });
-    } else {
-        dailyMissions.forEach(mission => {
-            if (mission.type === type) {
-                const missionData = currentUser.dailyMissions[mission.id];
-                if (missionData && !missionData.completed) {
-                    missionData.progress += amount;
-                    
-                    if (missionData.progress >= mission.target) {
-                        missionData.progress = mission.target;
-                        missionData.completed = true;
-                        showNotification(`✅ Úkol splněn: ${mission.name}`);
-                    }
-                    
-                    saveUser();
-                }
-            }
-        });
-    }
-}
-
-function showNotification(message) {
-    const notification = document.createElement('div');
-    notification.className = 'notification';
-    notification.textContent = message;
-    document.body.appendChild(notification);
-    
-    setTimeout(() => {
-        notification.remove();
-    }, 3000);
-}
-
-function checkAchievements() {
-    if (!currentUser.stats) return;
-    
-    currentUser.stats.themesOwned = currentUser.ownedThemes.length;
-    
-    if (currentUser.coins > (currentUser.stats.maxCoins || 0)) {
-        currentUser.stats.maxCoins = currentUser.coins;
+window.spinSlot = async function() {
+    if (spinning || currentUser.coins < currentBet) {
+        alert('Nemáte dostatek mincí!');
+        return;
     }
     
-    achievements.forEach(achievement => {
-        if (!currentUser.unlockedAchievements.includes(achievement.id)) {
-            if (achievement.condition(currentUser.stats)) {
-                unlockAchievement(achievement.id);
-            }
-        }
-    });
-}
-
-async function unlockAchievement(achievementId) {
-    const achievement = achievements.find(a => a.id === achievementId);
-    if (!achievement) return;
+    spinning = true;
+    document.getElementById('spinSlotBtn').disabled = true;
+    document.getElementById('slotResult').textContent = '';
     
-    currentUser.unlockedAchievements.push(achievementId);
-    currentUser.coins += achievement.reward;
-    currentUser.stats.achievementsUnlocked = currentUser.unlockedAchievements.length;
+    currentUser.coins -= currentBet;
+    currentUser.stats.slotSpins++;
+    currentUser.stats.totalBet += currentBet;
+    
+    if (currentBet >= 100) currentUser.stats.highBets++;
     
     await saveUser();
     updateUI();
     
-    showNotification(`🏆 Úspěch odemčen: ${achievement.name} (+${achievement.reward} 🪙)`);
+    const results = [];
+    const isJackpot = Math.random() < 0.025;
+    
+    if (isJackpot) {
+        const jackpotSymbol = Math.random() < 0.5 ? '💎' : '🎰';
+        results.push(jackpotSymbol, jackpotSymbol, jackpotSymbol);
+    } else {
+        for (let i = 0; i < 3; i++) results.push(getWeightedSymbol());
+    }
+    
+    document.querySelectorAll('.reel').forEach(reel => reel.classList.add('spinning'));
+    
+    setTimeout(() => evaluateSlotWin(results), 5200);
+};
+
+async function evaluateSlotWin(results) {
+    let winAmount = 0;
+    let message = '';
+
+    const counts = {};
+    results.forEach(sym => counts[sym] = (counts[sym] || 0) + 1);
+
+    let winSymbol = null;
+    let maxCount = 0;
+    for (const sym in counts) {
+        if (counts[sym] > maxCount) {
+            maxCount = counts[sym];
+            winSymbol = sym;
+        }
+    }
+
+    if (maxCount === 3) {
+        const multiplier = winMultipliers[winSymbol];
+        winAmount = currentBet * multiplier;
+        currentUser.stats.totalWins++;
+        currentUser.stats.currentStreak++;
+        
+        if (winSymbol === '🎰') {
+            message = `🎰 MEGA JACKPOT! 🎰 +${winAmount} 🪙`;
+            currentUser.stats.jackpots++;
+        } else if (winSymbol === '💎') {
+            message = `💎 DIAMANTOVÁ VÝHRA! 💎 +${winAmount} 🪙`;
+            currentUser.stats.diamondWins++;
+        } else {
+            message = `🎉 3x ${winSymbol} → +${winAmount} 🪙`;
+        }
+    } else if (maxCount === 2) {
+        const multiplier = Math.max(1, Math.floor(winMultipliers[winSymbol] / 3));
+        winAmount = currentBet * multiplier;
+        currentUser.stats.totalWins++;
+        message = `✨ ${winSymbol}${winSymbol} HIT! +${winAmount} 🪙`;
+    } else {
+        message = '😢 Zkuste to znovu!';
+        currentUser.stats.currentStreak = 0;
+    }
+
+    document.getElementById('slotResult').textContent = message;
+
+    if (winAmount > 0) {
+        currentUser.coins += winAmount;
+        await saveUser();
+        updateUI();
+        document.getElementById('winAmount').textContent = `+${winAmount} 🪙`;
+        document.getElementById('winModal').style.display = 'flex';
+    } else {
+        await saveUser();
+    }
+
+    spinning = false;
+    document.getElementById('spinSlotBtn').disabled = false;
 }
 
-async function saveUser() {
-    if (!currentUser.id) return;
+window.switchGame = function(game) {
+    currentGame = game;
+    document.querySelectorAll('.game-container').forEach(c => c.classList.remove('active'));
+    document.querySelectorAll('.game-btn').forEach(b => b.classList.remove('active'));
+    
+    const gameMap = {
+        slot: ['slotGame', 'slotBtn'],
+        wheel: ['wheelGame', 'wheelBtn'],
+        missions: ['missionsGame', 'missionsBtn'],
+        achievements: ['achievementsGame', 'achievementsBtn'],
+        leaderboard: ['leaderboardGame', 'leaderboardBtn'],
+        shop: ['shopGame', null]
+    };
+    
+    if (gameMap[game]) {
+        const [container, btn] = gameMap[game];
+        const el = document.getElementById(container);
+        if (el) el.classList.add('active');
+        if (btn) {
+            const btnEl = document.getElementById(btn);
+            if (btnEl) btnEl.classList.add('active');
+        }
+    }
+};
+
+window.login = async function() {
+    const nickname = document.getElementById('nicknameInput').value.trim();
+    if (!nickname || nickname.length < 2) {
+        alert('❌ Zadejte přezdívku (min. 2 znaky)');
+        return;
+    }
+    
+    const loginBtn = document.getElementById('loginBtn');
+    loginBtn.textContent = '⏳ Přihlašuji...';
+    loginBtn.disabled = true;
     
     try {
         const { data: existingUser } = await supabase
             .from('casino_users')
-            .select('id')
-            .eq('id', currentUser.id)
+            .select('*')
+            .eq('nickname', nickname)
             .maybeSingle();
         
         if (existingUser) {
-            const { error } = await supabase
-                .from('casino_users')
-                .update({
-                    nickname: currentUser.nickname,
-                    coins: currentUser.coins,
-                    last_daily_bonus: currentUser.lastDailyBonus,
-                    owned_themes: currentUser.ownedThemes,
-                    active_theme: currentUser.activeTheme,
-                    stats: currentUser.stats,
-                    unlocked_achievements: currentUser.unlockedAchievements,
-                    daily_missions: currentUser.dailyMissions,
-                    last_mission_reset: currentUser.lastMissionReset
-                })
-                .eq('id', currentUser.id);
+            Object.assign(currentUser, existingUser);
+        } else {
+            currentUser.nickname = nickname;
+            currentUser.coins = 100;
             
-            if (error) {
-                console.error('Chyba při updatu:', error);
-            }
+            const { data: newUser } = await supabase
+                .from('casino_users')
+                .insert([{ nickname, coins: 100 }])
+                .select()
+                .single();
+            
+            currentUser.id = newUser.id;
         }
+        
+        localStorage.setItem('currentUser', JSON.stringify({id: currentUser.id, username: currentUser.nickname}));
+        document.getElementById('loginModal').style.display = 'none';
+        updateUI();
+    } catch (error) {
+        console.error('❌ Chyba při přihlášení:', error);
+        alert('❌ Nepodařilo se přihlásit.');
+        loginBtn.disabled = false;
+    }
+};
+
+async function saveUser() {
+    if (!currentUser.id) return;
+    try {
+        await supabase.from('casino_users').update({
+            coins: currentUser.coins,
+            stats: currentUser.stats
+        }).eq('id', currentUser.id);
     } catch (e) {
         console.error('Chyba při ukládání:', e);
     }
@@ -428,33 +350,8 @@ async function saveUser() {
 function updateUI() {
     const userNameEl = document.getElementById('userName');
     const coinAmountEl = document.getElementById('coinAmount');
-    
     if (userNameEl) userNameEl.textContent = currentUser.nickname;
     if (coinAmountEl) coinAmountEl.textContent = currentUser.coins;
-}
-
-function createConfetti() {
-    const c = document.createElement("div");
-    c.className = "confetti";
-    c.style.left = Math.random() * window.innerWidth + "px";
-    c.style.top = "-10px";
-    c.style.background = `hsl(${Math.random() * 360}, 80%, 60%)`;
-    c.style.width = (5 + Math.random() * 10) + "px";
-    c.style.height = c.style.width;
-    document.body.appendChild(c);
-    
-    const speedY = 3 + Math.random() * 5;
-    const driftX = (Math.random() - 0.5) * 4;
-    let y = -10;
-    
-    function fall() {
-        y += speedY;
-        c.style.top = y + "px";
-        c.style.left = parseFloat(c.style.left) + driftX + "px";
-        if (y < window.innerHeight) requestAnimationFrame(fall);
-        else c.remove();
-    }
-    fall();
 }
 
 window.closeWinModal = function() {
@@ -462,57 +359,14 @@ window.closeWinModal = function() {
     if (modal) modal.style.display = 'none';
 };
 
-// Inicializace
 window.addEventListener('load', async () => {
     console.log('🎰 Casino inicializace...');
-    
     startLoading();
     initReels();
     checkFirstVisit();
     
-    setTimeout(async () => {
-        const savedUser = localStorage.getItem('currentUser');
-        
-        if (savedUser) {
-            try {
-                const user = JSON.parse(savedUser);
-                
-                const { data: existingUser } = await supabase
-                    .from('casino_users')
-                    .select('*')
-                    .eq('id', user.id)
-                    .maybeSingle();
-                
-                if (existingUser) {
-                    currentUser.id = existingUser.id;
-                    currentUser.nickname = existingUser.nickname;
-                    currentUser.coins = existingUser.coins;
-                    currentUser.lastDailyBonus = existingUser.last_daily_bonus;
-                    currentUser.ownedThemes = existingUser.owned_themes || ['default'];
-                    currentUser.activeTheme = existingUser.active_theme || 'default';
-                    currentUser.stats = existingUser.stats || currentUser.stats;
-                    currentUser.unlockedAchievements = existingUser.unlocked_achievements || [];
-                    currentUser.dailyMissions = existingUser.daily_missions || {};
-                    currentUser.lastMissionReset = existingUser.last_mission_reset;
-                    
-                    initializeMissions();
-                    updateUI();
-                    
-                    console.log('✅ Automaticky přihlášen:', currentUser);
-                } else {
-                    localStorage.removeItem('currentUser');
-                    const loginModal = document.getElementById('loginModal');
-                    if (loginModal) loginModal.style.display = 'flex';
-                }
-            } catch (e) {
-                console.error('❌ Chyba při načítání uživatele:', e);
-                localStorage.removeItem('currentUser');
-                const loginModal = document.getElementById('loginModal');
-                if (loginModal) loginModal.style.display = 'flex';
-            }
-        } else {
-            const loginModal = document.getElementById('loginModal');
-            if (loginModal) loginModal.style.display = 'flex';
-        }
+    setTimeout(() => {
+        const loginModal = document.getElementById('loginModal');
+        if (loginModal) loginModal.style.display = 'flex';
     }, 3500);
 });
