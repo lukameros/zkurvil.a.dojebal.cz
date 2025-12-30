@@ -79,6 +79,27 @@ let currentUser = {
         diamondWins: 0,
         loginStreak: 1,
         lastLogin: null,
+        highBets: 0,// Globální proměnné
+let currentUser = {
+    id: null,
+    nickname: '',
+    coins: 0,
+    lastDailyBonus: null,
+    ownedThemes: ['default'],
+    activeTheme: 'default',
+    stats: {
+        totalWins: 0,
+        slotSpins: 0,
+        wheelSpins: 0,
+        jackpots: 0,
+        winStreak: 0,
+        currentStreak: 0,
+        totalBet: 0,
+        maxCoins: 0,
+        themesOwned: 1,
+        diamondWins: 0,
+        loginStreak: 1,
+        lastLogin: null,
         highBets: 0,
         achievementsUnlocked: 0
     },
@@ -88,24 +109,19 @@ let currentUser = {
 };
 
 let currentGame = 'slot';
-let currentBet = 10; // výchozí sázka
+let currentBet = 10;
 
-// Funkce pro změnu sázky
-// Funkce pro změnu sázky
-windo// Funkce pro změnu sázky - OPRAVENÁ VERZE
+// Funkce pro změnu sázky - OPRAVENÁ VERZE
 window.setBet = function(amount) {
     currentBet = amount;
     
-    // Najdi element pro zobrazení sázky
     const betDisplay = document.getElementById('currentBet');
     if (betDisplay) {
         betDisplay.textContent = currentBet;
     }
     
-    // Aktualizuj aktivní tlačítko
     document.querySelectorAll('.bet-btn').forEach(btn => {
         btn.classList.remove('active');
-        // Zkontroluj, zda tlačítko odpovídá aktuální sázce
         if (btn.textContent === amount.toString()) {
             btn.classList.add('active');
         }
@@ -113,8 +129,8 @@ window.setBet = function(amount) {
 }
 
 // SHOP ITEMS
-// SHOP ITEMS
 const shopItems = [
+    // ... zbytek kódu
     { id: 'default', name: '🎰 Výchozí', price: 0, icon: '🎰', colors: { 
         primary: '#00ffff', 
         secondary: '#ff00ff',
@@ -1742,6 +1758,7 @@ window.addEventListener('load', async () => {
         }
     }, 3500);
 });
+
 
 
 
