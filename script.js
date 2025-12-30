@@ -412,27 +412,27 @@ const dailyMissions = [
 ];
 
 // SLOT MACHINE LOGIC
-const symbols = ['🍒', '🍋', '🍊', '🍇', '🔔', '⭐', '💎', '🎰'];
 const symbolWeights = {
-    '🍒': 30,  // Zvýšeno z 25
-    '🍋': 25,  // Zvýšeno z 20
-    '🍊': 20,  // Zvýšeno z 18
-    '🍇': 15,  // Stejné
-    '🔔': 12,  // Zvýšeno z 10
-    '⭐': 8,   // Zvýšeno z 7
-    '💎': 5,   // Zvýšeno z 4
-    '🎰': 2    // Zvýšeno z 1 - dvojnásobná šance na jackpot!
+    '🍒': 32,
+    '🍋': 28,
+    '🍊': 24,
+    '🍇': 18,
+    '🔔': 14,
+    '⭐': 9,
+    '💎': 6,
+    '🎰': 2
 };
 
+
 const winMultipliers = {
-    '🍒': 6,   // Zvýšeno z 5
-    '🍋': 5,   // Zvýšeno z 4
-    '🍊': 8,   // Zvýšeno z 6
-    '🍇': 10,  // Zvýšeno z 8
-    '🔔': 15,  // Zvýšeno z 10
-    '⭐': 20,  // Zvýšeno z 15
-    '💎': 30,  // Zvýšeno z 20
-    '🎰': 75   // Zvýšeno z 50 - větší jackpot!
+    '🍒': 3,
+    '🍋': 4,
+    '🍊': 5,
+    '🍇': 7,
+    '🔔': 9,
+    '⭐': 12,
+    '💎': 18,
+    '🎰': 30
 };
 
 let reels = [[], [], []];
@@ -598,6 +598,7 @@ async function evaluateSlotWin(results) {
 
     // 🎰 3 stejné
     if (maxCount === 3) {
+        highlightWinningSymbols(winSymbol);
         const multiplier = winMultipliers[winSymbol];
         winAmount = currentBet * multiplier;
 
@@ -628,6 +629,7 @@ async function evaluateSlotWin(results) {
 
     // ✨ 2 stejné
     else if (maxCount === 2) {
+        highlightWinningSymbols(winSymbol);
         const multiplier = Math.max(1, Math.floor(winMultipliers[winSymbol] / 3));
         winAmount = currentBet * multiplier;
 
@@ -1496,7 +1498,18 @@ function loadAchievements() {
         list.appendChild(item);
     });
 }
+function highlightWinningSymbols(symbol) {
+    document.querySelectorAll('.symbol').forEach(el => {
+        if (el.textContent === symbol) {
+            el.classList.add('win');
+        }
+    });
 
+    setTimeout(() => {
+        document.querySelectorAll('.symbol.win')
+            .forEach(el => el.classList.remove('win'));
+    }, 1500);
+}
 function loadMissions() {
     const list = document.getElementById('missionsList');
     list.innerHTML = '';
@@ -1686,6 +1699,7 @@ window.addEventListener('load', async () => {
         }
     }, 3500);
 });
+
 
 
 
