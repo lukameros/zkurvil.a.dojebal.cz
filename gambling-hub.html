@@ -1244,8 +1244,10 @@ function initReels() {
     for (let i = 0; i < 3; i++) {
         const reel = document.getElementById(`reel${i + 1}`);
         reel.innerHTML = '';
+        reels[i] = [];
         
-        for (let j = 0; j < 50; j++) {
+        // Vytvoř více symbolů pro plynulé točení
+        for (let j = 0; j < 100; j++) {
             const symbol = getWeightedSymbol();
             reels[i].push(symbol);
             
@@ -1299,45 +1301,54 @@ window.spinSlot = async function() {
         reel.classList.add('spinning');
     });
     
-    const spinDurations = [3000, 3800, 4600];
+    const spinDurations = [2500, 3200, 3900];
     const symbolHeight = 100;
     
     for (let i = 0; i < 3; i++) {
         const reel = document.getElementById(`reel${i + 1}`);
         const reelElement = reel.parentElement;
-        const targetIndex = reels[i].indexOf(results[i]);
+        
+        // Najdi cílový symbol
+        let targetIndex = -1;
+        for (let j = 0; j < reels[i].length; j++) {
+            if (reels[i][j] === results[i]) {
+                targetIndex = j;
+                break;
+            }
+        }
+        
+        if (targetIndex === -1) targetIndex = 10;
+        
         const targetPosition = -(targetIndex * symbolHeight - symbolHeight);
         
-        const spins = 15 + i * 3;
-        const totalRotation = spins * reels[i].length * symbolHeight + Math.abs(targetPosition);
-        
+        // Plynulá rychlá animace
+        const spinSpeed = 15; // rychlost točení
         let currentPos = 0;
-        const fastSpinInterval = setInterval(() => {
-            currentPos += 50;
-            reel.style.transition = 'none';
+        const spinInterval = setInterval(() => {
+            currentPos -= spinSpeed;
             reel.style.transform = `translateY(${currentPos}px)`;
+            
+            // Reset pozice pro nekonečné točení
+            if (Math.abs(currentPos) > reels[i].length * symbolHeight / 2) {
+                currentPos = 0;
+            }
         }, 16);
         
+        // Zastav točení po určité době
         setTimeout(() => {
-            clearInterval(fastSpinInterval);
+            clearInterval(spinInterval);
             
-            reel.style.transition = `transform ${spinDurations[i] * 0.4}ms cubic-bezier(0.17, 0.67, 0.35, 0.96)`;
-            reel.style.transform = `translateY(${totalRotation}px)`;
-        }, spinDurations[i] * 0.6);
-        
-        setTimeout(() => {
             reelElement.classList.remove('spinning');
             reelElement.classList.add('stopping');
             
-            reel.style.transition = 'transform 300ms cubic-bezier(0.68, -0.55, 0.265, 1.55)';
+            // Plynulé zastavení na cílovém symbolu
+            reel.style.transition = 'transform 800ms cubic-bezier(0.25, 0.46, 0.45, 0.94)';
             reel.style.transform = `translateY(${targetPosition}px)`;
+            
+            setTimeout(() => {
+                reelElement.classList.remove('stopping');
+            }, 800);
         }, spinDurations[i]);
-        
-        setTimeout(() => {
-            reelElement.classList.remove('stopping');
-            reel.style.transition = 'none';
-            reel.style.transform = `translateY(${targetPosition}px)`;
-        }, spinDurations[i] + 300);
     }
     
     setTimeout(() => {
@@ -1957,6 +1968,7 @@ window.addEventListener('load', async () => {
 
 </body>
 </html>
+
 
 
 
