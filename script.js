@@ -79,7 +79,7 @@ let currentUser = {
         diamondWins: 0,
         loginStreak: 1,
         lastLogin: null,
-        highBets: 0,// Globální proměnné
+// Globální proměnné
 let currentUser = {
     id: null,
     nickname: '',
@@ -101,7 +101,10 @@ let currentUser = {
         loginStreak: 1,
         lastLogin: null,
         highBets: 0,
-        achievementsUnlocked: 0
+        achievementsUnlocked: 0,
+        coinsWon: 0,
+        bigWins: 0,
+        gamesPlayed: []
     },
     unlockedAchievements: [],
     dailyMissions: {},
@@ -1758,6 +1761,7 @@ window.addEventListener('load', async () => {
         }
     }, 3500);
 });
+
 
 
 
