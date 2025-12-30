@@ -56,29 +56,6 @@ for(let i = 0; i < 30; i++) {
     star.style.animationDelay = Math.random() * 3 + 's';
     document.body.appendChild(star);
 }
-
-// Globální proměnné
-let currentUser = {
-    id: null,
-    nickname: '',
-    coins: 0,
-    lastDailyBonus: null,
-    ownedThemes: ['default'],
-    activeTheme: 'default',
-    // Nové statistiky
-    stats: {
-        totalWins: 0,
-        slotSpins: 0,
-        wheelSpins: 0,
-        jackpots: 0,
-        winStreak: 0,
-        currentStreak: 0,
-        totalBet: 0,
-        maxCoins: 0,
-        themesOwned: 1,
-        diamondWins: 0,
-        loginStreak: 1,
-        lastLogin: null,
 // Globální proměnné
 let currentUser = {
     id: null,
@@ -130,7 +107,6 @@ window.setBet = function(amount) {
         }
     });
 }
-
 // SHOP ITEMS
 const shopItems = [
     // ... zbytek kódu
@@ -1761,6 +1737,7 @@ window.addEventListener('load', async () => {
         }
     }, 3500);
 });
+
 
 
 
