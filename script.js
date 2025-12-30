@@ -1,4 +1,3 @@
-script type="module">
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
 
 // Supabase konfigurace
@@ -1661,4 +1660,5 @@ window.addEventListener('load', async () => {
         }
     }, 3500);
 });
+
 </script>
