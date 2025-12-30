@@ -109,8 +109,7 @@ window.setBet = function(amount) {
 }
 // SHOP ITEMS
 const shopItems = [
-    // ... zbytek kódu
-    { id: 'default', name: '🎰 Výchozí', price: 0, icon: '🎰', colors: { 
+    { id: 'default', name: '🎰 Výchozí', price: 0, icon: '🎰', colors: {
         primary: '#00ffff', 
         secondary: '#ff00ff',
         bg1: '#0a0015',
@@ -1737,6 +1736,7 @@ window.addEventListener('load', async () => {
         }
     }, 3500);
 });
+
 
 
 
