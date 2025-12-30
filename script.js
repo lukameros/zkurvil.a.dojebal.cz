@@ -443,19 +443,28 @@ function initReels() {
         const reel = document.getElementById(`reel${i + 1}`);
         reel.innerHTML = '';
         reels[i] = [];
-        
-        // Vytvoř více symbolů pro plynulé točení
-        for (let j = 0; j < 100; j++) {
+
+        // vytvoříme základ
+        for (let j = 0; j < 50; j++) {
             const symbol = getWeightedSymbol();
             reels[i].push(symbol);
-            
-            const symbolDiv = document.createElement('div');
-            symbolDiv.className = 'symbol';
-            symbolDiv.textContent = symbol;
-            reel.appendChild(symbolDiv);
+
+            const div = document.createElement('div');
+            div.className = 'symbol';
+            div.textContent = symbol;
+            reel.appendChild(div);
         }
+
+        // 🔁 DUPLIKACE – klíč k opravě černých políček
+        reels[i].forEach(symbol => {
+            const clone = document.createElement('div');
+            clone.className = 'symbol';
+            clone.textContent = symbol;
+            reel.appendChild(clone);
+        });
     }
 }
+
 
 function getWeightedSymbol() {
     const totalWeight = Object.values(symbolWeights).reduce((a, b) => a + b, 0);
@@ -542,8 +551,9 @@ for (let i = 0; i < 3; i++) {
             reel.style.transform = `translateY(${currentPos}px)`;
             
             if (Math.abs(currentPos) > reels[i].length * symbolHeight / 2) {
-                currentPos = 0;
-            }
+    currentPos = 0;
+}
+
         }, 16);
         
         setTimeout(() => {
@@ -569,59 +579,80 @@ for (let i = 0; i < 3; i++) {
 async function evaluateSlotWin(results) {
     let winAmount = 0;
     let message = '';
-    
-    if (results[0] === results[1] && results[1] === results[2]) {
-        const multiplier = winMultipliers[results[0]];
+
+    const [a, b, c] = results;
+
+    // 🎰 3 stejné symboly
+    if (a === b && b === c) {
+        const multiplier = winMultipliers[a];
         winAmount = currentBet * multiplier;
-        
-        // ⭐ NOVÉ: Statistiky výher
+
         currentUser.stats.totalWins++;
         currentUser.stats.currentStreak++;
         currentUser.stats.coinsWon += winAmount;
-        
-        // Kontrola win streak
+
         if (currentUser.stats.currentStreak > currentUser.stats.winStreak) {
             currentUser.stats.winStreak = currentUser.stats.currentStreak;
         }
-        
-        // Speciální výhry
-        if (results[0] === '🎰') {
+
+        if (a === '🎰') {
             message = `🎰 MEGA JACKPOT! 🎰 +${winAmount} 🪙`;
             currentUser.stats.jackpots++;
-        } else if (results[0] === '💎') {
+        } else if (a === '💎') {
             message = `💎 DIAMANTOVÁ VÝHRA! 💎 +${winAmount} 🪙`;
             currentUser.stats.diamondWins++;
         } else {
-            message = `🎉 VÝHRA! 🎉 +${winAmount} 🪙`;
+            message = `🎉 3x ${a} → +${winAmount} 🪙`;
         }
-        
-        // Big win tracking
+
         if (multiplier >= 10) {
             updateMissionProgress('bigWins', 1);
         }
-        
-        // ⭐ NOVÉ: Mission progress - výhry
+
         updateMissionProgress('coinsWon', winAmount);
-        
-    } else {
+    }
+
+    // ✨ 2 stejné symboly
+    else if (a === b || a === c || b === c) {
+        const symbol =
+            a === b ? a :
+            a === c ? a :
+            b;
+
+        const multiplier = Math.max(1, Math.floor(winMultipliers[symbol] / 3));
+        winAmount = currentBet * multiplier;
+
+        currentUser.stats.totalWins++;
+        currentUser.stats.currentStreak++;
+        currentUser.stats.coinsWon += winAmount;
+
+        if (currentUser.stats.currentStreak > currentUser.stats.winStreak) {
+            currentUser.stats.winStreak = currentUser.stats.currentStreak;
+        }
+
+        message = `✨ 2x ${symbol} → +${winAmount} 🪙`;
+
+        updateMissionProgress('coinsWon', winAmount);
+    }
+
+    // ❌ žádná výhra
+    else {
         message = '😢 Zkuste to znovu!';
         currentUser.stats.currentStreak = 0;
     }
-    
+
     document.getElementById('slotResult').textContent = message;
-    
+
     if (winAmount > 0) {
         currentUser.coins += winAmount;
-        
-        // ⭐ NOVÉ: Kontrola achievementů
+
         checkAchievements();
-        
         await saveUser();
         updateUI();
-        
+
         document.getElementById('winAmount').textContent = `+${winAmount} 🪙`;
         document.getElementById('winModal').style.display = 'flex';
-        
+
         if (winAmount >= currentBet * 10) {
             for (let i = 0; i < 100; i++) {
                 setTimeout(() => createConfetti(), i * 10);
@@ -630,20 +661,11 @@ async function evaluateSlotWin(results) {
     } else {
         await saveUser();
     }
-    
+
     spinning = false;
     document.getElementById('spinSlotBtn').disabled = false;
 }
 
-window.setBet = function(amount) {
-    currentBet = amount;
-    document.getElementById('currentBet').textContent = amount;
-    
-    document.querySelectorAll('.bet-btn').forEach(btn => {
-        btn.classList.remove('active');
-    });
-    event.target.classList.add('active');
-};
 
 // WHEEL OF FORTUNE LOGIC
 const canvas = document.getElementById("wheel");
@@ -1662,6 +1684,7 @@ window.addEventListener('load', async () => {
         }
     }, 3500);
 });
+
 
 
 
