@@ -1106,7 +1106,7 @@ canvas {
             Zadejte své herní jméno a začněte hrát!
         </p>
         <input type="text" id="nicknameInput" placeholder="Vaše přezdívka..." maxlength="15">
-        <button onclick="login()">ZAČÍT HRÁT!</button>
+        <button id="loginBtn" onclick="login()">ZAČÍT HRÁT!</button>
     </div>
 </div>
 
@@ -1763,6 +1763,36 @@ window.claimDailyBonus = async function() {
     
     checkDailyBonus();
 };
+    async function saveUser() {
+    if (!currentUser.id) return;
+    
+    try {
+        const { data: existingUser } = await supabase
+            .from('casino_users')
+            .select('id')
+            .eq('id', currentUser.id)
+            .maybeSingle();
+        
+        if (existingUser) {
+            const { error } = await supabase
+                .from('casino_users')
+                .update({
+                    nickname: currentUser.nickname,
+                    coins: currentUser.coins,
+                    last_daily_bonus: currentUser.lastDailyBonus,
+                    owned_themes: currentUser.ownedThemes,
+                    active_theme: currentUser.activeTheme
+                })
+                .eq('id', currentUser.id);
+            
+            if (error) {
+                console.error('Chyba při updatu:', error);
+            }
+        }
+    } catch (e) {
+        console.error('Chyba při ukládání:', e);
+    }
+}
 
 function checkDailyBonus() {
     const today = new Date().toISOString().split('T')[0];
@@ -1914,4 +1944,5 @@ window.addEventListener('load', async () => {
 
 </body>
 </html>
+
 
