@@ -1681,11 +1681,15 @@ document.getElementById('nicknameInput').addEventListener('keypress', function(e
 });
 // Inicializace
 // Inicializace
+// Inicializace
 window.addEventListener('load', async () => {
     console.log('🎰 Casino inicializace...');
     
     startLoading();
     initReels();
+    
+    // ⭐ NOVÉ: Zkontroluj první návštěvu a zobraz update modal
+    checkFirstVisit();
     
     setTimeout(async () => {
         const savedUser = localStorage.getItem('currentUser');
@@ -1738,6 +1742,7 @@ window.addEventListener('load', async () => {
         }
     }, 3500);
 });
+
 
 
 
