@@ -1788,7 +1788,22 @@ window.spinSlot = async function() {
     document.getElementById('spinSlotBtn').disabled = true;
     document.getElementById('slotResult').textContent = '';
     
+    // Odečti sázku
     currentUser.coins -= currentBet;
+    
+    // ⭐ NOVÉ: Aktualizuj statistiky
+    currentUser.stats.slotSpins++;
+    currentUser.stats.totalBet += currentBet;
+    
+    // High bet tracking
+    if (currentBet >= 100) {
+        currentUser.stats.highBets++;
+    }
+    
+    // ⭐ NOVÉ: Mission progress - automat
+    updateMissionProgress('slotSpins', 1);
+    updateMissionProgress('gamesPlayed', 'slot');
+    
     await saveUser();
     updateUI();
     
@@ -1809,13 +1824,12 @@ window.spinSlot = async function() {
     });
     
     const spinDurations = [2500, 3200, 3900];
-    const symbolHeight = 100;
+    const symbolHeight = 100; // Nebo použij: parseFloat(getComputedStyle(document.querySelector('.symbol')).height);
     
     for (let i = 0; i < 3; i++) {
         const reel = document.getElementById(`reel${i + 1}`);
         const reelElement = reel.parentElement;
         
-        // Najdi cílový symbol
         let targetIndex = -1;
         for (let j = 0; j < reels[i].length; j++) {
             if (reels[i][j] === results[i]) {
@@ -1828,27 +1842,23 @@ window.spinSlot = async function() {
         
         const targetPosition = -(targetIndex * symbolHeight - symbolHeight);
         
-        // Plynulá rychlá animace
-        const spinSpeed = 15; // rychlost točení
+        const spinSpeed = 15;
         let currentPos = 0;
         const spinInterval = setInterval(() => {
             currentPos -= spinSpeed;
             reel.style.transform = `translateY(${currentPos}px)`;
             
-            // Reset pozice pro nekonečné točení
             if (Math.abs(currentPos) > reels[i].length * symbolHeight / 2) {
                 currentPos = 0;
             }
         }, 16);
         
-        // Zastav točení po určité době
         setTimeout(() => {
             clearInterval(spinInterval);
             
             reelElement.classList.remove('spinning');
             reelElement.classList.add('stopping');
             
-            // Plynulé zastavení na cílovém symbolu
             reel.style.transition = 'transform 800ms cubic-bezier(0.25, 0.46, 0.45, 0.94)';
             reel.style.transform = `translateY(${targetPosition}px)`;
             
@@ -1863,6 +1873,8 @@ window.spinSlot = async function() {
     }, 5200);
 };
 
+};
+
 async function evaluateSlotWin(results) {
     let winAmount = 0;
     let message = '';
@@ -1871,21 +1883,48 @@ async function evaluateSlotWin(results) {
         const multiplier = winMultipliers[results[0]];
         winAmount = currentBet * multiplier;
         
+        // ⭐ NOVÉ: Statistiky výher
+        currentUser.stats.totalWins++;
+        currentUser.stats.currentStreak++;
+        currentUser.stats.coinsWon += winAmount;
+        
+        // Kontrola win streak
+        if (currentUser.stats.currentStreak > currentUser.stats.winStreak) {
+            currentUser.stats.winStreak = currentUser.stats.currentStreak;
+        }
+        
+        // Speciální výhry
         if (results[0] === '🎰') {
             message = `🎰 MEGA JACKPOT! 🎰 +${winAmount} 🪙`;
+            currentUser.stats.jackpots++;
         } else if (results[0] === '💎') {
             message = `💎 DIAMANTOVÁ VÝHRA! 💎 +${winAmount} 🪙`;
+            currentUser.stats.diamondWins++;
         } else {
             message = `🎉 VÝHRA! 🎉 +${winAmount} 🪙`;
         }
+        
+        // Big win tracking
+        if (multiplier >= 10) {
+            updateMissionProgress('bigWins', 1);
+        }
+        
+        // ⭐ NOVÉ: Mission progress - výhry
+        updateMissionProgress('coinsWon', winAmount);
+        
     } else {
         message = '😢 Zkuste to znovu!';
+        currentUser.stats.currentStreak = 0;
     }
     
     document.getElementById('slotResult').textContent = message;
     
     if (winAmount > 0) {
         currentUser.coins += winAmount;
+        
+        // ⭐ NOVÉ: Kontrola achievementů
+        checkAchievements();
+        
         await saveUser();
         updateUI();
         
@@ -1897,6 +1936,8 @@ async function evaluateSlotWin(results) {
                 setTimeout(() => createConfetti(), i * 10);
             }
         }
+    } else {
+        await saveUser();
     }
     
     spinning = false;
@@ -1982,6 +2023,12 @@ window.spinWheel = async function() {
     document.getElementById('spinWheelBtn').disabled = true;
     
     currentUser.coins -= wheelCost;
+    
+    // ⭐ NOVÉ: Statistiky kola
+    currentUser.stats.wheelSpins++;
+    updateMissionProgress('wheelSpins', 1);
+    updateMissionProgress('gamesPlayed', 'wheel');
+    
     await saveUser();
     updateUI();
     
@@ -2022,6 +2069,7 @@ window.spinWheel = async function() {
     requestAnimationFrame(anim);
 };
 
+
 function easeOutCubic(t) {
     return 1 - Math.pow(1 - t, 3);
 }
@@ -2032,6 +2080,17 @@ async function finishWheelSpin(coinWin) {
     autoRotating = true;
     
     currentUser.coins += coinWin;
+    
+    // ⭐ NOVÉ: Statistiky
+    if (coinWin > 0) {
+        currentUser.stats.totalWins++;
+        currentUser.stats.coinsWon += coinWin;
+        updateMissionProgress('coinsWon', coinWin);
+    }
+    
+    // ⭐ NOVÉ: Kontrola achievementů
+    checkAchievements();
+    
     await saveUser();
     updateUI();
     
@@ -2381,14 +2440,12 @@ window.login = async function() {
         return;
     }
     
-    // Zobraz loading na tlačítku
     const loginBtn = document.getElementById('loginBtn');
     const originalText = loginBtn.textContent;
     loginBtn.textContent = '⏳ Přihlašuji...';
     loginBtn.disabled = true;
     
     try {
-        // Zkus najít existujícího uživatele
         const { data: existingUser, error: searchError } = await supabase
             .from('casino_users')
             .select('*')
@@ -2396,15 +2453,18 @@ window.login = async function() {
             .maybeSingle();
         
         if (existingUser) {
-            // Uživatel existuje - přihlaš ho
+            // Uživatel existuje - načti jeho data
             currentUser.id = existingUser.id;
             currentUser.nickname = existingUser.nickname;
             currentUser.coins = existingUser.coins;
             currentUser.lastDailyBonus = existingUser.last_daily_bonus;
             currentUser.ownedThemes = existingUser.owned_themes || ['default'];
             currentUser.activeTheme = existingUser.active_theme || 'default';
+            currentUser.stats = existingUser.stats || currentUser.stats;
+            currentUser.unlockedAchievements = existingUser.unlocked_achievements || [];
+            currentUser.dailyMissions = existingUser.daily_missions || {};
+            currentUser.lastMissionReset = existingUser.last_mission_reset;
             
-            // Ulož do localStorage
             localStorage.setItem('currentUser', JSON.stringify({
                 id: currentUser.id,
                 username: currentUser.nickname
@@ -2426,7 +2486,11 @@ window.login = async function() {
                     coins: currentUser.coins,
                     last_daily_bonus: currentUser.lastDailyBonus,
                     owned_themes: currentUser.ownedThemes,
-                    active_theme: currentUser.activeTheme
+                    active_theme: currentUser.activeTheme,
+                    stats: currentUser.stats,
+                    unlocked_achievements: currentUser.unlockedAchievements,
+                    daily_missions: currentUser.dailyMissions,
+                    last_mission_reset: currentUser.lastMissionReset
                 }])
                 .select()
                 .single();
@@ -2437,7 +2501,6 @@ window.login = async function() {
             
             currentUser.id = newUser.id;
             
-            // Ulož do localStorage
             localStorage.setItem('currentUser', JSON.stringify({
                 id: currentUser.id,
                 username: currentUser.nickname
@@ -2445,6 +2508,9 @@ window.login = async function() {
             
             console.log('✅ Nový uživatel vytvořen:', currentUser);
         }
+        
+        // ⭐ NOVÉ: Inicializuj mise
+        initializeMissions();
         
         // Aplikuj téma
         const activeItem = shopItems.find(i => i.id === currentUser.activeTheme);
@@ -2464,7 +2530,6 @@ window.login = async function() {
         loginBtn.disabled = false;
     }
 };
-
 function updateUI() {
     document.getElementById('userName').textContent = currentUser.nickname;
     document.getElementById('coinAmount').textContent = currentUser.coins;
@@ -2512,7 +2577,11 @@ window.claimDailyBonus = async function() {
                     coins: currentUser.coins,
                     last_daily_bonus: currentUser.lastDailyBonus,
                     owned_themes: currentUser.ownedThemes,
-                    active_theme: currentUser.activeTheme
+                    active_theme: currentUser.activeTheme,
+                    stats: currentUser.stats,
+                    unlocked_achievements: currentUser.unlockedAchievements,
+                    daily_missions: currentUser.dailyMissions,
+                    last_mission_reset: currentUser.lastMissionReset
                 })
                 .eq('id', currentUser.id);
             
@@ -2520,6 +2589,11 @@ window.claimDailyBonus = async function() {
                 console.error('Chyba při updatu:', error);
             }
         }
+    } catch (e) {
+        console.error('Chyba při ukládání:', e);
+    }
+}
+
     } catch (e) {
         console.error('Chyba při ukládání:', e);
     }
@@ -2602,27 +2676,52 @@ function initializeMissions() {
     }
 }
 
+
 function updateMissionProgress(type, amount = 1) {
     if (!currentUser.dailyMissions) initializeMissions();
     
-    dailyMissions.forEach(mission => {
-        if (mission.type === type) {
-            const missionData = currentUser.dailyMissions[mission.id];
-            if (missionData && !missionData.completed) {
-                missionData.progress += amount;
-                
-                if (missionData.progress >= mission.target) {
-                    missionData.progress = mission.target;
-                    missionData.completed = true;
-                    showNotification(`✅ Úkol splněn: ${mission.name}`);
-                }
-                
-                saveUser();
-                if (currentGame === 'missions') loadMissions();
-            }
+    // Speciální handling pro gamesPlayed
+    if (type === 'gamesPlayed') {
+        if (!currentUser.stats.gamesPlayed.includes(amount)) {
+            currentUser.stats.gamesPlayed.push(amount);
         }
-    });
+        
+        dailyMissions.forEach(mission => {
+            if (mission.type === 'gamesPlayed') {
+                const missionData = currentUser.dailyMissions[mission.id];
+                if (missionData && !missionData.completed) {
+                    missionData.progress = currentUser.stats.gamesPlayed.length;
+                    
+                    if (missionData.progress >= mission.target) {
+                        missionData.progress = mission.target;
+                        missionData.completed = true;
+                        showNotification(`✅ Úkol splněn: ${mission.name}`);
+                    }
+                }
+            }
+        });
+    } else {
+        // Normální progress update
+        dailyMissions.forEach(mission => {
+            if (mission.type === type) {
+                const missionData = currentUser.dailyMissions[mission.id];
+                if (missionData && !missionData.completed) {
+                    missionData.progress += amount;
+                    
+                    if (missionData.progress >= mission.target) {
+                        missionData.progress = mission.target;
+                        missionData.completed = true;
+                        showNotification(`✅ Úkol splněn: ${mission.name}`);
+                    }
+                    
+                    saveUser();
+                    if (currentGame === 'missions') loadMissions();
+                }
+            }
+        });
+    }
 }
+
 
 function checkAchievements() {
     if (!currentUser.stats) return;
@@ -2663,6 +2762,7 @@ async function unlockAchievement(achievementId) {
     
     if (currentGame === 'achievements') loadAchievements();
 }
+
 
 function loadAchievements() {
     const list = document.getElementById('achievementsList');
@@ -2823,23 +2923,15 @@ document.getElementById('nicknameInput').addEventListener('keypress', function(e
 window.addEventListener('load', async () => {
     console.log('🎰 Casino inicializace...');
     
-    // Spusť loading screen
     startLoading();
-    
     initReels();
     
-    // Po loading screenu (po 3-6 sekundách) zkontroluj přihlášení
     setTimeout(async () => {
         const savedUser = localStorage.getItem('currentUser');
-        console.log('Saved user:', savedUser);
         
         if (savedUser) {
             try {
                 const user = JSON.parse(savedUser);
-                console.log('Parsed user:', user);
-                
-                currentUser.nickname = user.username;
-                currentUser.id = user.id;
                 
                 const { data: existingUser, error } = await supabase
                     .from('casino_users')
@@ -2847,13 +2939,20 @@ window.addEventListener('load', async () => {
                     .eq('id', user.id)
                     .maybeSingle();
                 
-                console.log('Existing user from DB:', existingUser);
-                
                 if (existingUser) {
+                    currentUser.id = existingUser.id;
+                    currentUser.nickname = existingUser.nickname;
                     currentUser.coins = existingUser.coins;
                     currentUser.lastDailyBonus = existingUser.last_daily_bonus;
                     currentUser.ownedThemes = existingUser.owned_themes || ['default'];
                     currentUser.activeTheme = existingUser.active_theme || 'default';
+                    currentUser.stats = existingUser.stats || currentUser.stats;
+                    currentUser.unlockedAchievements = existingUser.unlocked_achievements || [];
+                    currentUser.dailyMissions = existingUser.daily_missions || {};
+                    currentUser.lastMissionReset = existingUser.last_mission_reset;
+                    
+                    // ⭐ NOVÉ: Inicializuj mise
+                    initializeMissions();
                     
                     const activeItem = shopItems.find(i => i.id === currentUser.activeTheme);
                     if (activeItem) {
@@ -2865,10 +2964,8 @@ window.addEventListener('load', async () => {
                     
                     console.log('✅ Automaticky přihlášen:', currentUser);
                 } else {
-                    // Uživatel neexistuje v DB - vymaž local storage a zobraz login
                     localStorage.removeItem('currentUser');
                     document.getElementById('loginModal').style.display = 'flex';
-                    console.log('⚠️ Uživatel nenalezen v DB, zobrazuji login');
                 }
             } catch (e) {
                 console.error('❌ Chyba při načítání uživatele:', e);
@@ -2876,15 +2973,15 @@ window.addEventListener('load', async () => {
                 document.getElementById('loginModal').style.display = 'flex';
             }
         } else {
-            console.log('⚠️ Žádný uložený uživatel, zobrazuji login');
             document.getElementById('loginModal').style.display = 'flex';
         }
-    }, 3500); // Zobraz login po skončení loading screenu
+    }, 3500);
 });
 </script>
 
 </body>
 </html>
+
 
 
 
