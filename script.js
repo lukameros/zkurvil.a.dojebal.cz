@@ -7,39 +7,42 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 function showUpdateModal() {
     const hasSeenUpdate = localStorage.getItem('casino_update_v2');
     if (!hasSeenUpdate) {
-        const modal = document.createElement('div');
-        modal.className = 'modal';
-        modal.style.display = 'flex';
-        modal.innerHTML = `
-            <div class="modal-content">
-                <h2>🎉 NOVÁ AKTUALIZACE! 🎉</h2>
-                <div style="color: #fff; font-size: 18px; text-align: left; margin: 20px 0;">
-                    <p style="margin: 10px 0;">✨ <strong>Nové funkce:</strong></p>
-                    <ul style="margin-left: 20px;">
-                        <li>🎰 Nový automat se 4 válci!</li>
-                        <li>🏆 20+ nových úspěchů</li>
-                        <li>📋 15 denních úkolů</li>
-                        <li>🎨 Vylepšené téma obchodu</li>
-                        <li>💰 Denní bonus 300 mincí</li>
-                    </ul>
-                    <p style="margin: 15px 0; font-size: 16px; color: #ffaa00;">
-                        🎮 Hra je ZDARMA, bez mikrotransakcí<br>
-                        👶 Vhodné pro hráče 10+
-                    </p>
+        // Počkej až loading skončí
+        setTimeout(() => {
+            const modal = document.createElement('div');
+            modal.className = 'modal';
+            modal.id = 'updateModalContainer';
+            modal.style.display = 'flex';
+            modal.innerHTML = `
+                <div class="modal-content">
+                    <h2>🎉 NOVÁ AKTUALIZACE! 🎉</h2>
+                    <div style="color: #fff; font-size: 18px; text-align: left; margin: 20px 0;">
+                        <p style="margin: 10px 0;">✨ <strong>Nové funkce:</strong></p>
+                        <ul style="margin-left: 20px; line-height: 1.8;">
+                            <li>🎰 Výhry i se 2 stejnými symboly!</li>
+                            <li>🏆 20+ nových úspěchů</li>
+                            <li>📋 15 denních úkolů</li>
+                            <li>🎨 Vylepšené téma mění celou hru</li>
+                            <li>💰 Denní bonus 300 mincí každých 12h</li>
+                        </ul>
+                        <p style="margin: 15px 0; font-size: 16px; color: #00ffaa; text-align: center; padding: 10px; background: rgba(0,255,170,0.1); border-radius: 10px;">
+                            🎮 Hra je 100% ZDARMA, bez mikrotransakcí<br>
+                            👶 Vhodné pro hráče od 10 let
+                        </p>
+                    </div>
+                    <button class="modal-close" onclick="closeUpdateModal()">SUPER! ZAČNĚME HRÁT! 🎰</button>
                 </div>
-                <button class="modal-close" onclick="closeUpdateModal()">SUPER! ZAČNĚME!</button>
-            </div>
-        `;
-        document.body.appendChild(modal);
+            `;
+            document.body.appendChild(modal);
+        }, 3500); // Počká až loading screen zmizí
     }
 }
 
 window.closeUpdateModal = function() {
     localStorage.setItem('casino_update_v2', 'true');
-    document.querySelectorAll('.modal').forEach(m => {
-        if (m.querySelector('h2').textContent.includes('AKTUALIZACE')) {
-            m.remove();
-        }
+    const modal = document.getElementById('updateModalContainer');
+    if (modal) modal.remove();
+}
     });
 }
 
@@ -765,40 +768,65 @@ async function evaluateSlotWin(results) {
     let winAmount = 0;
     let message = '';
     
+    // KONTROLA 3 STEJNÝCH
     if (results[0] === results[1] && results[1] === results[2]) {
         const multiplier = winMultipliers[results[0]];
         winAmount = currentBet * multiplier;
         
-        // ⭐ NOVÉ: Statistiky výher
         currentUser.stats.totalWins++;
         currentUser.stats.currentStreak++;
         currentUser.stats.coinsWon += winAmount;
         
-        // Kontrola win streak
         if (currentUser.stats.currentStreak > currentUser.stats.winStreak) {
             currentUser.stats.winStreak = currentUser.stats.currentStreak;
         }
         
-        // Speciální výhry
         if (results[0] === '🎰') {
             message = `🎰 MEGA JACKPOT! 🎰 +${winAmount} 🪙`;
             currentUser.stats.jackpots++;
         } else if (results[0] === '💎') {
             message = `💎 DIAMANTOVÁ VÝHRA! 💎 +${winAmount} 🪙`;
             currentUser.stats.diamondWins++;
+        } else if (results[0] === '🍒') {
+            message = `🍒 TŘEŠŇOVÁ VÝHRA! 🍒 +${winAmount} 🪙`;
+            if (!currentUser.stats.cherryWins) currentUser.stats.cherryWins = 0;
+            currentUser.stats.cherryWins++;
+        } else if (results[0] === '🔔') {
+            message = `🔔 ZVONKOVÁ VÝHRA! 🔔 +${winAmount} 🪙`;
+            if (!currentUser.stats.bellWins) currentUser.stats.bellWins = 0;
+            currentUser.stats.bellWins++;
+        } else if (results[0] === '⭐') {
+            message = `⭐ HVĚZDNÁ VÝHRA! ⭐ +${winAmount} 🪙`;
+            if (!currentUser.stats.starWins) currentUser.stats.starWins = 0;
+            currentUser.stats.starWins++;
         } else {
             message = `🎉 VÝHRA! 🎉 +${winAmount} 🪙`;
         }
         
-        // Big win tracking
         if (multiplier >= 10) {
             updateMissionProgress('bigWins', 1);
         }
         
-        // ⭐ NOVÉ: Mission progress - výhry
         updateMissionProgress('coinsWon', winAmount);
+    }
+    // KONTROLA 2 STEJNÝCH (malá výhra)
+    else if (results[0] === results[1] || results[1] === results[2] || results[0] === results[2]) {
+        let symbol;
+        if (results[0] === results[1]) symbol = results[0];
+        else if (results[1] === results[2]) symbol = results[1];
+        else symbol = results[0];
         
-    } else {
+        // Malá výhra = 0.5x násobek původního
+        const smallMultiplier = Math.floor(winMultipliers[symbol] * 0.3);
+        winAmount = Math.max(currentBet * smallMultiplier, Math.floor(currentBet * 0.5));
+        
+        currentUser.stats.totalWins++;
+        currentUser.stats.coinsWon += winAmount;
+        
+        message = `💫 Malá výhra! 💫 +${winAmount} 🪙`;
+        updateMissionProgress('coinsWon', winAmount);
+    }
+    else {
         message = '😢 Zkuste to znovu!';
         currentUser.stats.currentStreak = 0;
     }
@@ -807,8 +835,6 @@ async function evaluateSlotWin(results) {
     
     if (winAmount > 0) {
         currentUser.coins += winAmount;
-        
-        // ⭐ NOVÉ: Kontrola achievementů
         checkAchievements();
         
         await saveUser();
@@ -820,6 +846,10 @@ async function evaluateSlotWin(results) {
         if (winAmount >= currentBet * 10) {
             for (let i = 0; i < 100; i++) {
                 setTimeout(() => createConfetti(), i * 10);
+            }
+        } else if (winAmount > 0) {
+            for (let i = 0; i < 30; i++) {
+                setTimeout(() => createConfetti(), i * 15);
             }
         }
     } else {
@@ -1622,7 +1652,6 @@ function applyTheme(colors) {
     console.log('✨ Téma aplikováno:', colors);
 }
 
-// GAME SWITCHING
 window.switchGame = function(game) {
     currentGame = game;
     
@@ -1643,7 +1672,7 @@ window.switchGame = function(game) {
     } else if (game === 'missions') {
         document.getElementById('missionsGame').classList.add('active');
         document.getElementById('missionsBtn').classList.add('active');
-        loadMissions();
+        loadMissions(); // DŮLEŽITÉ!
     } else if (game === 'achievements') {
         document.getElementById('achievementsGame').classList.add('active');
         document.getElementById('achievementsBtn').classList.add('active');
@@ -1654,6 +1683,7 @@ window.switchGame = function(game) {
         loadLeaderboard();
     } else if (game === 'shop') {
         document.getElementById('shopGame').classList.add('active');
+        document.getElementById('shopBtn').classList.add('active'); // Přidej toto
         loadShop();
     }
 };
@@ -2172,7 +2202,8 @@ document.getElementById('nicknameInput').addEventListener('keypress', function(e
 // Inicializace
 window.addEventListener('load', async () => {
     console.log('🎰 Casino inicializace...');
-    showUpdateModal();
+    
+    showUpdateModal(); // Zobrazí update modal po loadingu
     startLoading();
     initReels();
     
@@ -2197,11 +2228,18 @@ window.addEventListener('load', async () => {
                     currentUser.ownedThemes = existingUser.owned_themes || ['default'];
                     currentUser.activeTheme = existingUser.active_theme || 'default';
                     currentUser.stats = existingUser.stats || currentUser.stats;
+                    
+                    // INICIALIZUJ NOVÉ STATISTIKY
+                    if (!currentUser.stats.cherryWins) currentUser.stats.cherryWins = 0;
+                    if (!currentUser.stats.bellWins) currentUser.stats.bellWins = 0;
+                    if (!currentUser.stats.starWins) currentUser.stats.starWins = 0;
+                    if (!currentUser.stats.dailyBonusClaims) currentUser.stats.dailyBonusClaims = 0;
+                    if (!currentUser.stats.missionsCompleted) currentUser.stats.missionsCompleted = 0;
+                    
                     currentUser.unlockedAchievements = existingUser.unlocked_achievements || [];
                     currentUser.dailyMissions = existingUser.daily_missions || {};
                     currentUser.lastMissionReset = existingUser.last_mission_reset;
                     
-                    // ⭐ NOVÉ: Inicializuj mise
                     initializeMissions();
                     
                     const activeItem = shopItems.find(i => i.id === currentUser.activeTheme);
@@ -2227,4 +2265,5 @@ window.addEventListener('load', async () => {
         }
     }, 3500);
 });
+
 
