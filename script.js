@@ -62,6 +62,10 @@ let currentUser = {
     id: null,
     nickname: '',
     coins: 0,
+    lastDailyBonus: null,
+    ownedThemes: ['default'],
+    activeTheme: 'default',
+    stats: {
         totalWins: 0,
         slotSpins: 0,
         wheelSpins: 0,
@@ -1729,6 +1733,7 @@ window.addEventListener('load', async () => {
         }
     }, 3500);
 });
+
 
 
 
