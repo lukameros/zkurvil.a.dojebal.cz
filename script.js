@@ -627,24 +627,31 @@ async function evaluateSlotWin(results) {
         updateMissionProgress('coinsWon', winAmount);
     }
 
-    // ✨ 2 stejné
-    else if (maxCount === 2) {
-        highlightWinningSymbols(winSymbol);
-        const multiplier = Math.max(1, Math.floor(winMultipliers[winSymbol] / 3));
-        winAmount = currentBet * multiplier;
+   // ✨ 2 stejné symboly
+else if (a === b || a === c || b === c) {
+    const symbol =
+        a === b ? a :
+        a === c ? a :
+        b;
 
-        currentUser.stats.totalWins++;
-        currentUser.stats.currentStreak++;
-        currentUser.stats.coinsWon += winAmount;
+    const multiplier = Math.max(1, Math.floor(winMultipliers[symbol] / 3));
+    winAmount = currentBet * multiplier;
 
-        if (currentUser.stats.currentStreak > currentUser.stats.winStreak) {
-            currentUser.stats.winStreak = currentUser.stats.currentStreak;
-        }
+    currentUser.stats.totalWins++;
+    currentUser.stats.currentStreak++;
+    currentUser.stats.coinsWon += winAmount;
 
-        message = `✨ 2x ${winSymbol} → +${winAmount} 🪙`;
-
-        updateMissionProgress('coinsWon', winAmount);
+    if (currentUser.stats.currentStreak > currentUser.stats.winStreak) {
+        currentUser.stats.winStreak = currentUser.stats.currentStreak;
     }
+
+    // ✅ TADY PŘESNĚ
+    message = `✨ ${symbol}${symbol} HIT! +${winAmount} 🪙`;
+    highlightWinningSymbols(symbol);
+
+    updateMissionProgress('coinsWon', winAmount);
+}
+
 
     // ❌ žádná výhra
     else {
@@ -1699,6 +1706,7 @@ window.addEventListener('load', async () => {
         }
     }, 3500);
 });
+
 
 
 
