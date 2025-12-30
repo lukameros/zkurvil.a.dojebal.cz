@@ -1379,10 +1379,8 @@ canvas {
 }
 
 @media (max-width: 480px) {
-    .bet-btn {
-        padding: 6px 12px;
-        font-size: 14px;
-        min-width: 50px;
+    #topBar {
+        font-size: 12px;
     }
     
     .game-btn {
@@ -1397,10 +1395,10 @@ canvas {
     }
     
     #spinSlotBtn, #spinWheelBtn {
-        font-size: 20px;
-        padding: 10px 30px;
+        padding: 8px 25px;
+        font-size: 18px;
     }
-}  
+    
     .reel {
         width: 60px !important;
         height: 180px !important;
@@ -1469,5 +1467,4 @@ button, .game-btn, .bet-btn {
     0%, 100% { transform: scale(1); }
     50% { transform: scale(1.1); }
 }
-
 
