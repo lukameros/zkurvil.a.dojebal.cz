@@ -4,6 +4,44 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
 const SUPABASE_URL = 'https://bmmaijlbpwgzhrxzxphf.supabase.co'
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJtbWFpamxicHdnemhyeHp4cGhmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjY4NjQ5MDcsImV4cCI6MjA4MjQ0MDkwN30.s0YQVnAjMXFu1pSI1NXZ2naSab179N0vQPglsmy3Pgw'
 const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+function showUpdateModal() {
+    const hasSeenUpdate = localStorage.getItem('casino_update_v2');
+    if (!hasSeenUpdate) {
+        const modal = document.createElement('div');
+        modal.className = 'modal';
+        modal.style.display = 'flex';
+        modal.innerHTML = `
+            <div class="modal-content">
+                <h2>🎉 NOVÁ AKTUALIZACE! 🎉</h2>
+                <div style="color: #fff; font-size: 18px; text-align: left; margin: 20px 0;">
+                    <p style="margin: 10px 0;">✨ <strong>Nové funkce:</strong></p>
+                    <ul style="margin-left: 20px;">
+                        <li>🎰 Nový automat se 4 válci!</li>
+                        <li>🏆 20+ nových úspěchů</li>
+                        <li>📋 15 denních úkolů</li>
+                        <li>🎨 Vylepšené téma obchodu</li>
+                        <li>💰 Denní bonus 300 mincí</li>
+                    </ul>
+                    <p style="margin: 15px 0; font-size: 16px; color: #ffaa00;">
+                        🎮 Hra je ZDARMA, bez mikrotransakcí<br>
+                        👶 Vhodné pro hráče 10+
+                    </p>
+                </div>
+                <button class="modal-close" onclick="closeUpdateModal()">SUPER! ZAČNĚME!</button>
+            </div>
+        `;
+        document.body.appendChild(modal);
+    }
+}
+
+window.closeUpdateModal = function() {
+    localStorage.setItem('casino_update_v2', 'true');
+    document.querySelectorAll('.modal').forEach(m => {
+        if (m.querySelector('h2').textContent.includes('AKTUALIZACE')) {
+            m.remove();
+        }
+    });
+}
 
 // Loading screen logika
 function startLoading() {
@@ -262,7 +300,6 @@ const shopItems = [
         bgGlow2: 'rgba(255,20,147,0.5)'
     }}
 ];
-    // ACHIEVEMENTS
 const achievements = [
     { 
         id: 'first_win', 
@@ -353,16 +390,86 @@ const achievements = [
         condition: (stats) => stats.highBets >= 10
     },
     { 
+        id: 'spin_addict', 
+        name: 'Závislák na točení 🌀', 
+        desc: 'Zatočit celkem 500x',
+        icon: '🌀', 
+        reward: 400,
+        condition: (stats) => stats.slotSpins + stats.wheelSpins >= 500
+    },
+    { 
+        id: 'cherry_lover', 
+        name: 'Milovník třešní 🍒', 
+        desc: 'Vyhrát 10x s třešněmi',
+        icon: '🍒', 
+        reward: 300,
+        condition: (stats) => stats.cherryWins >= 10
+    },
+    { 
+        id: 'bell_ringer', 
+        name: 'Zvoník 🔔', 
+        desc: 'Vyhrát 5x se zvonky',
+        icon: '🔔', 
+        reward: 350,
+        condition: (stats) => stats.bellWins >= 5
+    },
+    { 
+        id: 'star_catcher', 
+        name: 'Lovec hvězd ⭐', 
+        desc: 'Vyhrát 8x s hvězdami',
+        icon: '⭐', 
+        reward: 450,
+        condition: (stats) => stats.starWins >= 8
+    },
+    { 
+        id: 'risk_taker', 
+        name: 'Riskující 🎯', 
+        desc: 'Vsadit maximální sázku 50x',
+        icon: '🎯', 
+        reward: 500,
+        condition: (stats) => stats.maxBets >= 50
+    },
+    { 
+        id: 'quick_winner', 
+        name: 'Rychlá výhra ⚡', 
+        desc: 'Vyhrát do 5 zatočení',
+        icon: '⚡', 
+        reward: 200,
+        condition: (stats) => stats.quickWins >= 1
+    },
+    { 
+        id: 'theme_collector', 
+        name: 'Sběratel témat 🎨', 
+        desc: 'Vlastnit 10 vzhledů',
+        icon: '🎨', 
+        reward: 800,
+        condition: (stats) => stats.themesOwned >= 10
+    },
+    { 
+        id: 'daily_player', 
+        name: 'Denní hráč 📅', 
+        desc: 'Vyzvednout denní bonus 30x',
+        icon: '📅', 
+        reward: 600,
+        condition: (stats) => stats.dailyBonusClaims >= 30
+    },
+    { 
+        id: 'mission_master', 
+        name: 'Mistr úkolů ✅', 
+        desc: 'Splnit 50 denních úkolů',
+        icon: '✅', 
+        reward: 700,
+        condition: (stats) => stats.missionsCompleted >= 50
+    },
+    { 
         id: 'legend', 
         name: 'Legenda 🏆', 
         desc: 'Dosáhnout všech ostatních úspěchů',
         icon: '🏆', 
         reward: 2000,
-        condition: (stats) => stats.achievementsUnlocked >= achievements.length - 1
+        condition: (stats) => stats.achievementsUnlocked >= 20
     }
 ];
-
-// DAILY MISSIONS
 const dailyMissions = [
     { 
         id: 'spin_10', 
@@ -408,6 +515,96 @@ const dailyMissions = [
         reward: 60, 
         target: 2,
         type: 'gamesPlayed'
+    },
+    { 
+        id: 'spin_25', 
+        name: '🔄 Točící se válce', 
+        desc: 'Zatočit celkem 25x',
+        icon: '🔄',
+        reward: 80, 
+        target: 25,
+        type: 'totalSpins'
+    },
+    { 
+        id: 'win_3', 
+        name: '🎉 Třikrát šťastný', 
+        desc: 'Vyhrát 3x za sebou',
+        icon: '🎉',
+        reward: 90, 
+        target: 3,
+        type: 'winStreak'
+    },
+    { 
+        id: 'bet_500', 
+        name: '💸 Odvážný sázející', 
+        desc: 'Vsadit celkem 500 mincí',
+        icon: '💸',
+        reward: 70, 
+        target: 500,
+        type: 'totalBet'
+    },
+    { 
+        id: 'jackpot_hunt', 
+        name: '🎰 Hon na jackpot', 
+        desc: 'Zatočit s maximální sázkou 5x',
+        icon: '🎰',
+        reward: 100, 
+        target: 5,
+        type: 'maxBets'
+    },
+    { 
+        id: 'lucky_7', 
+        name: '🍀 Šťastná sedmička', 
+        desc: 'Vyhrát právě 7x dnes',
+        icon: '🍀',
+        reward: 120, 
+        target: 7,
+        type: 'dailyWins'
+    },
+    { 
+        id: 'no_loss_10', 
+        name: '🛡️ Neporažitelný', 
+        desc: '10 zatočení bez prohry',
+        icon: '🛡️',
+        reward: 150, 
+        target: 10,
+        type: 'noLossStreak'
+    },
+    { 
+        id: 'diamond_day', 
+        name: '💎 Diamantový den', 
+        desc: 'Vyhrát jednou s 💎💎💎',
+        icon: '💎',
+        reward: 200, 
+        target: 1,
+        type: 'diamondWins'
+    },
+    { 
+        id: 'early_bird', 
+        name: '🐦 Ranní ptáče', 
+        desc: 'Vyzvednout denní bonus',
+        icon: '🐦',
+        reward: 50, 
+        target: 1,
+        type: 'dailyBonus'
+    },
+    { 
+        id: 'coin_collector', 
+        name: '🪙 Sběratel mincí', 
+        desc: 'Mít alespoň 1000 mincí',
+        icon: '🪙',
+        reward: 100, 
+        target: 1000,
+        type: 'totalCoins'
+    },
+    { 
+        id: 'speed_spinner', 
+        name: '⚡ Rychlý točitel', 
+        desc: 'Zatočit 15x za 5 minut',
+        icon: '⚡',
+        reward: 130, 
+        target: 15,
+        type: 'fastSpins'
     }
 ];
 
@@ -860,32 +1057,87 @@ window.activateTheme = async function(themeId) {
     
     currentUser.activeTheme = themeId;
     await saveUser();
+    
+    // Aplikuj téma na celou hru
     applyTheme(item.colors);
     loadShop();
     
-    alert(`✅ Vzhled ${item.name} byl aktivován!`);
+    // Zobraz potvrzení
+    document.getElementById('winAmount').textContent = `Vzhled ${item.name} aktivován!`;
+    document.getElementById('winModal').style.display = 'flex';
+    
+    for (let i = 0; i < 30; i++) {
+        setTimeout(() => createConfetti(), i * 20);
+    }
 };
 
 function applyTheme(colors) {
-    // CSS proměnné pro globální použití
-    document.documentElement.style.setProperty('--theme-primary', colors.primary);
-    document.documentElement.style.setProperty('--theme-secondary', colors.secondary);
-    
-    // Pozadí body
+    // CELKOVÉ POZADÍ STRÁNKY
     document.body.style.background = `linear-gradient(135deg, ${colors.bg1} 0%, ${colors.bg2} 50%, ${colors.bg1} 100%)`;
     
-    const bodyBefore = document.querySelector('body::before');
+    // Vytvoř kompletní CSS pro téma
     const style = document.createElement('style');
+    style.id = 'theme-style';
     style.textContent = `
+        /* POZADÍ A GLOW EFEKTY */
         body::before {
             background: 
                 radial-gradient(circle at 20% 50%, ${colors.bgGlow1} 0%, transparent 50%),
                 radial-gradient(circle at 80% 80%, ${colors.bgGlow2} 0%, transparent 50%) !important;
         }
         
+        #loadingScreen {
+            background: linear-gradient(135deg, ${colors.bg1} 0%, ${colors.bg2} 50%, ${colors.bg1} 100%) !important;
+        }
+        
+        #loadingScreen::before {
+            background: 
+                radial-gradient(circle at 20% 50%, ${colors.bgGlow1} 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, ${colors.bgGlow2} 0%, transparent 50%) !important;
+        }
+        
+        /* LOADING SCREEN */
+        .loading-content h2 {
+            color: ${colors.primary} !important;
+            text-shadow: 0 0 30px ${colors.primary}, 0 0 60px ${colors.secondary} !important;
+        }
+        
+        .loading-bar-container {
+            border-color: ${colors.primary} !important;
+            box-shadow: 0 0 40px ${colors.primary}cc !important;
+        }
+        
+        .loading-bar {
+            background: linear-gradient(90deg, ${colors.primary}, ${colors.secondary}, ${colors.primary}) !important;
+            background-size: 200% 100% !important;
+            box-shadow: 0 0 30px ${colors.primary}dd !important;
+        }
+        
+        .loading-text {
+            color: ${colors.secondary} !important;
+            text-shadow: 0 0 15px ${colors.secondary}, 0 0 30px ${colors.primary} !important;
+        }
+        
+        .spinner-dot:nth-child(1) {
+            background: ${colors.primary} !important;
+            box-shadow: 0 0 20px ${colors.primary} !important;
+        }
+        
+        .spinner-dot:nth-child(2) {
+            background: ${colors.secondary} !important;
+            box-shadow: 0 0 20px ${colors.secondary} !important;
+        }
+        
+        /* TOP BAR */
         #topBar {
+            background: linear-gradient(135deg, ${colors.bg1}f8 0%, ${colors.bg2}f8 100%) !important;
             border-bottom-color: ${colors.primary} !important;
             box-shadow: 0 5px 30px ${colors.primary}99 !important;
+        }
+        
+        #userName {
+            color: ${colors.primary} !important;
+            text-shadow: 0 0 15px ${colors.primary}, 0 0 30px ${colors.secondary} !important;
         }
         
         #coinDisplay {
@@ -895,36 +1147,82 @@ function applyTheme(colors) {
         }
         
         #dailyBonus {
-            background: linear-gradient(135deg, ${colors.primary} 0%, ${colors.secondary} 100%) !important;
-            border-color: ${colors.primary} !important;
-            box-shadow: 0 0 20px ${colors.primary}99 !important;
-        }
-        
-        #shopBtn {
             background: linear-gradient(135deg, ${colors.secondary} 0%, ${colors.primary} 100%) !important;
             border-color: ${colors.secondary} !important;
             box-shadow: 0 0 20px ${colors.secondary}99 !important;
         }
         
-        #slotBtn.active {
+        #dailyBonus:hover {
+            box-shadow: 0 0 30px ${colors.secondary}dd !important;
+        }
+        
+        #shopBtn {
+            background: linear-gradient(135deg, ${colors.primary} 0%, ${colors.secondary} 100%) !important;
+            border-color: ${colors.primary} !important;
+            box-shadow: 0 0 20px ${colors.primary}99 !important;
+        }
+        
+        #shopBtn:hover {
+            box-shadow: 0 0 30px ${colors.primary}dd !important;
+        }
+        
+        /* GAME SELECTOR */
+        #gameSelector {
+            background: ${colors.bg1}66 !important;
+        }
+        
+        .game-btn.active {
             box-shadow: 0 0 30px ${colors.primary} !important;
         }
         
-        #wheelBtn.active {
+        #slotBtn {
+            background: linear-gradient(135deg, ${colors.primary} 0%, ${colors.secondary} 100%) !important;
+            border-color: ${colors.primary} !important;
+        }
+        
+        #slotBtn:hover, #slotBtn.active {
+            box-shadow: 0 0 30px ${colors.primary} !important;
+        }
+        
+        #wheelBtn {
+            background: linear-gradient(135deg, ${colors.secondary} 0%, ${colors.primary} 100%) !important;
+            border-color: ${colors.secondary} !important;
+        }
+        
+        #wheelBtn:hover, #wheelBtn.active {
             box-shadow: 0 0 30px ${colors.secondary} !important;
         }
         
-        #leaderboardBtn.active {
+        #leaderboardBtn, #missionsBtn, #achievementsBtn {
+            background: linear-gradient(135deg, ${colors.primary} 0%, ${colors.secondary} 100%) !important;
+            border-color: ${colors.primary} !important;
+        }
+        
+        #leaderboardBtn:hover, #leaderboardBtn.active,
+        #missionsBtn:hover, #missionsBtn.active,
+        #achievementsBtn:hover, #achievementsBtn.active {
             box-shadow: 0 0 30px ${colors.primary} !important;
         }
         
-        #slotMachine, .paytable, #leaderboardFull {
-            background: linear-gradient(135deg, ${colors.bg2}cc 0%, ${colors.bg1}cc 100%) !important;
+        /* SLOT MACHINE */
+        #slotMachine {
+            background: linear-gradient(135deg, ${colors.bg2}dd 0%, ${colors.bg1}dd 50%, ${colors.bg2}dd 100%) !important;
             border-color: ${colors.primary} !important;
             box-shadow: 0 0 50px ${colors.primary}dd !important;
         }
         
+        #slotTitle {
+            color: ${colors.primary} !important;
+            text-shadow: 0 0 20px ${colors.primary}, 0 0 40px ${colors.secondary} !important;
+        }
+        
+        #reels {
+            background: ${colors.bg1} !important;
+            box-shadow: inset 0 0 30px ${colors.primary}88 !important;
+        }
+        
         .reel {
+            background: linear-gradient(135deg, ${colors.bg2} 0%, ${colors.bg1} 100%) !important;
             border-color: ${colors.primary} !important;
             box-shadow: 0 0 20px ${colors.primary}88 !important;
         }
@@ -932,6 +1230,36 @@ function applyTheme(colors) {
         .reel-window {
             border-color: ${colors.secondary} !important;
             box-shadow: 0 0 15px ${colors.secondary}bb !important;
+        }
+        
+        .symbol {
+            background: linear-gradient(135deg, ${colors.bg2} 0%, ${colors.bg1} 100%) !important;
+            border-bottom-color: ${colors.primary}44 !important;
+        }
+        
+        .symbol.win {
+            background: radial-gradient(circle, ${colors.secondary} 0%, ${colors.primary} 70%) !important;
+            box-shadow: 0 0 25px ${colors.secondary}, inset 0 0 15px ${colors.primary} !important;
+        }
+        
+        #betAmount {
+            color: ${colors.primary} !important;
+            text-shadow: 0 0 10px ${colors.primary} !important;
+        }
+        
+        .bet-btn {
+            background: linear-gradient(135deg, ${colors.secondary} 0%, ${colors.primary} 100%) !important;
+            border-color: ${colors.secondary} !important;
+        }
+        
+        .bet-btn:hover {
+            box-shadow: 0 0 20px ${colors.secondary}99 !important;
+        }
+        
+        .bet-btn.active {
+            background: linear-gradient(135deg, ${colors.primary} 0%, ${colors.secondary} 100%) !important;
+            border-color: ${colors.primary} !important;
+            box-shadow: 0 0 20px ${colors.primary}cc !important;
         }
         
         #spinSlotBtn {
@@ -944,40 +1272,47 @@ function applyTheme(colors) {
             box-shadow: 0 0 40px ${colors.primary}dd !important;
         }
         
-        #spinWheelBtn {
-            background: linear-gradient(135deg, ${colors.secondary} 0%, ${colors.primary} 100%) !important;
-            border-color: ${colors.secondary} !important;
-            box-shadow: 0 0 30px ${colors.secondary}99 !important;
+        #slotResult {
+            color: ${colors.primary} !important;
+            text-shadow: 0 0 15px ${colors.primary} !important;
         }
         
-        .bet-btn.active {
-            background: linear-gradient(135deg, ${colors.primary} 0%, ${colors.secondary} 100%) !important;
-            border-color: ${colors.primary} !important;
-            box-shadow: 0 0 20px ${colors.primary}cc !important;
-        }
-        
-        .leaderboard-item:hover {
-            background: ${colors.primary}33 !important;
-            box-shadow: 0 0 20px ${colors.primary}88 !important;
-        }
-        
-        .shop-item {
+        /* PAYTABLE */
+        .paytable {
+            background: linear-gradient(135deg, ${colors.bg2}cc 0%, ${colors.bg1}cc 100%) !important;
             border-color: ${colors.primary} !important;
             box-shadow: 0 0 30px ${colors.primary}88 !important;
         }
         
-        .shop-item:hover {
-            box-shadow: 0 0 50px ${colors.primary}cc !important;
+        .paytable h3 {
+            color: ${colors.primary} !important;
+            text-shadow: 0 0 15px ${colors.primary} !important;
         }
         
-        .modal-content {
-            background: linear-gradient(135deg, ${colors.bg2} 0%, ${colors.bg1} 100%) !important;
-            border-color: ${colors.primary} !important;
-            box-shadow: 0 0 100px ${colors.primary}dd !important;
+        .paytable-item {
+            background: ${colors.primary}26 !important;
+            border-color: ${colors.primary}4d !important;
         }
         
-        ::-webkit-scrollbar-thumb {
-            background: linear-gradient(135deg, ${colors.primary} 0%, ${colors.secondary} 100%) !important;
+        .paytable-item:hover {
+            background: ${colors.primary}40 !important;
+        }
+        
+        .paytable-item.jackpot {
+            background: ${colors.secondary}4d !important;
+            border-color: ${colors.secondary} !important;
+            color: ${colors.secondary} !important;
+        }
+        
+        /* WHEEL OF FORTUNE */
+        #wheelTitle {
+            color: ${colors.secondary} !important;
+            text-shadow: 0 0 15px ${colors.secondary}, 0 0 30px ${colors.primary} !important;
+        }
+        
+        #wheelCost {
+            color: ${colors.primary} !important;
+            text-shadow: 0 0 10px ${colors.primary} !important;
         }
         
         canvas {
@@ -995,14 +1330,215 @@ function applyTheme(colors) {
             border-color: ${colors.secondary} !important;
             box-shadow: 0 0 20px ${colors.secondary}cc !important;
         }
+        
+        #spinWheelBtn {
+            background: linear-gradient(135deg, ${colors.secondary} 0%, ${colors.primary} 100%) !important;
+            border-color: ${colors.secondary} !important;
+            box-shadow: 0 0 30px ${colors.secondary}99 !important;
+        }
+        
+        #spinWheelBtn:hover {
+            box-shadow: 0 0 40px ${colors.secondary}dd !important;
+        }
+        
+        /* LEADERBOARD */
+        #leaderboardFull {
+            background: linear-gradient(135deg, ${colors.bg2}f5 0%, ${colors.bg1}f5 100%) !important;
+            border-color: ${colors.primary} !important;
+            box-shadow: 0 0 50px ${colors.primary}bb !important;
+        }
+        
+        #leaderboardFull h2 {
+            color: ${colors.primary} !important;
+            text-shadow: 0 0 20px ${colors.primary}, 0 0 40px ${colors.secondary} !important;
+        }
+        
+        .leaderboard-item {
+            background: ${colors.primary}1a !important;
+            border-color: ${colors.primary}4d !important;
+        }
+        
+        .leaderboard-item:hover {
+            background: ${colors.primary}4d !important;
+            box-shadow: 0 0 20px ${colors.primary}88 !important;
+        }
+        
+        .leaderboard-item.top3 {
+            background: linear-gradient(135deg, ${colors.secondary}4d 0%, ${colors.primary}4d 100%) !important;
+            border-color: ${colors.primary} !important;
+        }
+        
+        .leaderboard-rank {
+            color: ${colors.secondary} !important;
+        }
+        
+        .leaderboard-coins {
+            color: ${colors.primary} !important;
+        }
+        
+        /* ACHIEVEMENTS & MISSIONS */
+        .achievement-item, .mission-item {
+            background: ${colors.primary}1a !important;
+            border-color: ${colors.primary}4d !important;
+        }
+        
+        .achievement-item:hover, .mission-item:hover {
+            background: ${colors.primary}40 !important;
+            box-shadow: 0 0 25px ${colors.primary}99 !important;
+        }
+        
+        .achievement-item.completed, .mission-item.completed {
+            background: ${colors.secondary}33 !important;
+            border-color: ${colors.secondary} !important;
+        }
+        
+        .achievement-name, .mission-name {
+            color: ${colors.primary} !important;
+            text-shadow: 0 0 10px ${colors.primary} !important;
+        }
+        
+        .achievement-reward, .mission-reward {
+            color: ${colors.secondary} !important;
+        }
+        
+        .progress-bar-container {
+            border-color: ${colors.primary}4d !important;
+        }
+        
+        .progress-bar {
+            background: linear-gradient(90deg, ${colors.primary}, ${colors.secondary}) !important;
+            box-shadow: 0 0 10px ${colors.primary}cc !important;
+        }
+        
+        .progress-text {
+            color: ${colors.primary} !important;
+        }
+        
+        .claim-btn {
+            background: linear-gradient(135deg, ${colors.secondary} 0%, ${colors.primary} 100%) !important;
+            border-color: ${colors.secondary} !important;
+        }
+        
+        .claim-btn:hover {
+            box-shadow: 0 0 30px ${colors.secondary} !important;
+        }
+        
+        .completed-badge {
+            background: linear-gradient(135deg, ${colors.secondary} 0%, ${colors.primary} 100%) !important;
+            box-shadow: 0 0 15px ${colors.secondary}cc !important;
+        }
+        
+        /* SHOP */
+        #shopGrid h2 {
+            color: ${colors.primary} !important;
+            text-shadow: 0 0 20px ${colors.primary}, 0 0 40px ${colors.secondary} !important;
+        }
+        
+        .shop-item {
+            background: linear-gradient(135deg, ${colors.bg2}e6 0%, ${colors.bg1}e6 100%) !important;
+            border-color: ${colors.primary} !important;
+            box-shadow: 0 0 30px ${colors.primary}88 !important;
+        }
+        
+        .shop-item:hover {
+            box-shadow: 0 0 50px ${colors.primary}cc !important;
+        }
+        
+        .shop-item.owned {
+            border-color: ${colors.secondary} !important;
+            box-shadow: 0 0 30px ${colors.secondary}88 !important;
+        }
+        
+        .shop-name {
+            color: ${colors.primary} !important;
+            text-shadow: 0 0 10px ${colors.primary} !important;
+        }
+        
+        .shop-price {
+            color: ${colors.secondary} !important;
+        }
+        
+        .shop-buy-btn {
+            background: linear-gradient(135deg, ${colors.secondary} 0%, ${colors.primary} 100%) !important;
+            border-color: ${colors.secondary} !important;
+        }
+        
+        .shop-buy-btn:hover {
+            box-shadow: 0 0 20px ${colors.secondary}cc !important;
+        }
+        
+        /* MODALS */
+        .modal-content {
+            background: linear-gradient(135deg, ${colors.bg2} 0%, ${colors.bg1} 100%) !important;
+            border-color: ${colors.primary} !important;
+            box-shadow: 0 0 100px ${colors.primary}dd !important;
+        }
+        
+        .modal h2 {
+            color: ${colors.primary} !important;
+            text-shadow: 0 0 20px ${colors.primary}, 0 0 40px ${colors.secondary} !important;
+        }
+        
+        .modal-close {
+            background: linear-gradient(135deg, ${colors.primary} 0%, ${colors.secondary} 100%) !important;
+            border-color: ${colors.primary} !important;
+        }
+        
+        .modal-close:hover {
+            box-shadow: 0 0 30px ${colors.primary}cc !important;
+        }
+        
+        #loginModal input {
+            border-color: ${colors.primary} !important;
+            background: ${colors.bg1}cc !important;
+        }
+        
+        #loginModal input:focus {
+            border-color: ${colors.secondary} !important;
+            box-shadow: 0 0 20px ${colors.secondary}88 !important;
+        }
+        
+        #loginModal button {
+            background: linear-gradient(135deg, ${colors.secondary} 0%, ${colors.primary} 100%) !important;
+            border-color: ${colors.secondary} !important;
+        }
+        
+        #loginModal button:hover {
+            box-shadow: 0 0 30px ${colors.secondary}cc !important;
+        }
+        
+        #winAmount {
+            color: ${colors.primary} !important;
+            text-shadow: 0 0 30px ${colors.primary}, 0 0 60px ${colors.secondary} !important;
+        }
+        
+        /* NOTIFICATION */
+        .notification {
+            background: linear-gradient(135deg, ${colors.secondary} 0%, ${colors.primary} 100%) !important;
+            border-color: ${colors.secondary} !important;
+            box-shadow: 0 0 30px ${colors.secondary}dd !important;
+        }
+        
+        /* SCROLLBAR */
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, ${colors.primary} 0%, ${colors.secondary} 100%) !important;
+        }
+        
+        /* HVĚZDY */
+        .star {
+            background: ${colors.primary} !important;
+            box-shadow: 0 0 5px ${colors.primary} !important;
+        }
     `;
     
     // Odstraň starý style, pokud existuje
     const oldStyle = document.getElementById('theme-style');
     if (oldStyle) oldStyle.remove();
     
-    style.id = 'theme-style';
     document.head.appendChild(style);
+    
+    console.log('✨ Téma plně aplikováno na celou hru:', colors);
+}
     
     // Textové elementy
     const userName = document.getElementById('userName');
@@ -1225,19 +1761,35 @@ function updateUI() {
 }
 
 window.claimDailyBonus = async function() {
-    const today = new Date().toISOString().split('T')[0];
+    const now = Date.now();
+    const TWELVE_HOURS = 12 * 60 * 60 * 1000; // 12 hodin v milisekundách
     
-    if (currentUser.lastDailyBonus === today) {
-        alert('Denní bonus již byl vybrán! Přijďte zítra! 🎁');
-        return;
+    if (currentUser.lastDailyBonus) {
+        const lastClaim = new Date(currentUser.lastDailyBonus).getTime();
+        const timeSince = now - lastClaim;
+        
+        if (timeSince < TWELVE_HOURS) {
+            const timeLeft = TWELVE_HOURS - timeSince;
+            const hoursLeft = Math.floor(timeLeft / (60 * 60 * 1000));
+            const minutesLeft = Math.floor((timeLeft % (60 * 60 * 1000)) / (60 * 1000));
+            
+            alert(`⏰ Denní bonus lze vyzvednout až za ${hoursLeft}h ${minutesLeft}m!`);
+            return;
+        }
     }
     
-    const bonus = 100;
+    const bonus = 300;
     currentUser.coins += bonus;
-    currentUser.lastDailyBonus = today;
+    currentUser.lastDailyBonus = new Date().toISOString();
+    
+    if (!currentUser.stats.dailyBonusClaims) currentUser.stats.dailyBonusClaims = 0;
+    currentUser.stats.dailyBonusClaims++;
+    
+    updateMissionProgress('dailyBonus', 1);
     
     await saveUser();
     updateUI();
+    checkDailyBonus();
     
     document.getElementById('winAmount').textContent = `+${bonus} 🪙 DENNÍ BONUS!`;
     document.getElementById('winModal').style.display = 'flex';
@@ -1245,8 +1797,6 @@ window.claimDailyBonus = async function() {
     for (let i = 0; i < 50; i++) {
         setTimeout(() => createConfetti(), i * 20);
     }
-    
-    checkDailyBonus();
 };
     async function saveUser() {
     if (!currentUser.id) return;
@@ -1283,15 +1833,32 @@ window.claimDailyBonus = async function() {
     }
 }
 function checkDailyBonus() {
-    const today = new Date().toISOString().split('T')[0];
     const btn = document.getElementById('dailyBonus');
+    if (!btn) return;
     
-    if (currentUser.lastDailyBonus === today) {
-        btn.disabled = true;
-        btn.textContent = '✅ BONUS VYBRÁN';
+    const TWELVE_HOURS = 12 * 60 * 60 * 1000;
+    
+    if (currentUser.lastDailyBonus) {
+        const lastClaim = new Date(currentUser.lastDailyBonus).getTime();
+        const timeSince = Date.now() - lastClaim;
+        
+        if (timeSince < TWELVE_HOURS) {
+            const timeLeft = TWELVE_HOURS - timeSince;
+            const hoursLeft = Math.floor(timeLeft / (60 * 60 * 1000));
+            const minutesLeft = Math.floor((timeLeft % (60 * 60 * 1000)) / (60 * 1000));
+            
+            btn.disabled = true;
+            btn.textContent = `⏰ ${hoursLeft}h ${minutesLeft}m`;
+            
+            // Aktualizuj čas každou minutu
+            setTimeout(checkDailyBonus, 60000);
+        } else {
+            btn.disabled = false;
+            btn.textContent = '🎁 DENNÍ BONUS (300🪙)';
+        }
     } else {
         btn.disabled = false;
-        btn.textContent = '🎁 DENNÍ BONUS';
+        btn.textContent = '🎁 DENNÍ BONUS (300🪙)';
     }
 }
 
@@ -1605,7 +2172,7 @@ document.getElementById('nicknameInput').addEventListener('keypress', function(e
 // Inicializace
 window.addEventListener('load', async () => {
     console.log('🎰 Casino inicializace...');
-    
+    showUpdateModal();
     startLoading();
     initReels();
     
@@ -1660,3 +2227,4 @@ window.addEventListener('load', async () => {
         }
     }, 3500);
 });
+
