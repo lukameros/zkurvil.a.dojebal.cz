@@ -613,6 +613,7 @@ button.menuBtn.locked::after {
     border-radius: 10px;
     overflow: hidden;
     box-shadow: 0 0 30px rgba(0, 255, 255, 0.5);
+    margin: 0 auto;
 }
 
 .loading-bar {
@@ -1793,49 +1794,8 @@ function initGrid() {
 }
 
 window.startTetris = function(difficulty) {
-    // Zobraz loading screen
-    document.getElementById('mainMenu').style.display = 'none'
-    document.getElementById('loadingScreen').style.display = 'flex'
-    
-    // Náhodný loading čas 3-6 sekund
-    const loadingTime = 3000 + Math.random() * 3000; // 3000-6000ms
-    const loadingBar = document.getElementById('loadingBar');
-    const loadingText = document.getElementById('loadingText');
-    
-    const loadingMessages = [
-        'Připravuji herní pole...',
-        'Generuji bloky...',
-        'Načítám témata...',
-        'Inicializuji eventy...',
-        'Nastavuji obtížnost...',
-        'Téměř hotovo...',
-        'Připravuji se na start...'
-    ];
-    
-    let progress = 0;
-    const interval = 50; // Update každých 50ms
-    const steps = loadingTime / interval;
-    const progressStep = 100 / steps;
-    
-    const loadingInterval = setInterval(() => {
-        progress += progressStep;
-        if (progress >= 100) {
-            progress = 100;
-            clearInterval(loadingInterval);
-        }
-        
-        loadingBar.style.width = progress + '%';
-        
-        // Změň text náhodně
-        if (Math.random() < 0.1) {
-            loadingText.textContent = loadingMessages[Math.floor(Math.random() * loadingMessages.length)];
-        }
-    }, interval);
-    
-    // Po dokončení loadingu spusť hru
-    setTimeout(() => {
-        document.getElementById('loadingScreen').style.display = 'none'
-        document.getElementById('tetrisGame').style.display = 'flex'
+document.getElementById('mainMenu').style.display = 'none'
+document.getElementById('tetrisGame').style.display = 'flex'
         
         score = 0
         level = 1
@@ -1858,11 +1818,6 @@ window.startTetris = function(difficulty) {
         updateDisplay()
         gameLoop()
         startEventSystem()
-        
-        // Reset loading baru pro příště
-        loadingBar.style.width = '0%';
-        loadingText.textContent = 'Připravuji herní pole...';
-    }, loadingTime);
 }
 
 function randomTetromino() {
@@ -2349,5 +2304,6 @@ await loadCurrentUser()
 </script>
 </body>
 </html>
+
 
 
