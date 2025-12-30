@@ -212,8 +212,50 @@
         <button class="modal-close" onclick="closeUpdateModal()">ZAČÍT HRÁT!</button>
     </div>
 </div>
+    
+<!-- NOVÝ AUTOMAT V2 (4 sloty) -->
+<div id="slotV2Game" class="game-container">
+    <div id="slotV2Container">
+        <div id="slotV2Machine">
+            <h2 id="slotV2Title">🍒 AUTOMAT V2 🍒</h2>
+            
+            <div id="reelsV2">
+                <div class="reel">
+                    <div class="reel-inner" id="reelV2_1"></div>
+                    <div class="reel-window"></div>
+                </div>
+                <div class="reel">
+                    <div class="reel-inner" id="reelV2_2"></div>
+                    <div class="reel-window"></div>
+                </div>
+                <div class="reel">
+                    <div class="reel-inner" id="reelV2_3"></div>
+                    <div class="reel-window"></div>
+                </div>
+                <div class="reel">
+                    <div class="reel-inner" id="reelV2_4"></div>
+                    <div class="reel-window"></div>
+                </div>
+            </div>
+            
+            <div id="slotV2Controls">
+                <div id="betAmountV2">Sázka: <span id="currentBetV2">50</span> 🪙</div>
+                <div>
+                    <button class="bet-btn" onclick="setBetV2(50)">50</button>
+                    <button class="bet-btn" onclick="setBetV2(100)">100</button>
+                    <button class="bet-btn" onclick="setBetV2(200)">200</button>
+                </div>
+                <button id="spinSlotV2Btn" onclick="spinSlotV2()">🎰 ZATOČIT!</button>
+                <div id="slotV2Result"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
 </body>
 </html>
+
 
 
 
