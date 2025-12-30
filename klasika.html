@@ -71,26 +71,75 @@ h1 {
     transform: translateY(-2px);
 }
 
-#coinsDisplay {
+/* Level & Coins display */
+#playerStats {
     position: absolute;
     top: 20px;
     right: 20px;
-    padding: 15px 30px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    z-index: 10;
+}
+
+#coinsDisplay {
+    padding: 12px 25px;
     background: linear-gradient(135deg, rgba(255, 215, 0, 0.3), rgba(255, 165, 0, 0.3));
     border: 3px solid gold;
     border-radius: 12px;
-    font-size: 28px;
+    font-size: 24px;
     font-weight: bold;
     color: gold;
     text-shadow: 0 0 15px rgba(255, 215, 0, 0.9);
     box-shadow: 0 0 25px rgba(255, 215, 0, 0.5);
-    z-index: 10;
     animation: coinPulse 2s ease-in-out infinite;
+}
+
+#levelDisplay {
+    padding: 12px 25px;
+    background: linear-gradient(135deg, rgba(138, 43, 226, 0.3), rgba(75, 0, 130, 0.3));
+    border: 3px solid #9370db;
+    border-radius: 12px;
+    font-size: 24px;
+    font-weight: bold;
+    color: #da70d6;
+    text-shadow: 0 0 15px rgba(218, 112, 214, 0.9);
+    box-shadow: 0 0 25px rgba(147, 112, 219, 0.5);
+    animation: levelPulse 2s ease-in-out infinite;
+}
+
+.xp-bar-container {
+    width: 100%;
+    height: 8px;
+    background: rgba(0, 0, 0, 0.5);
+    border-radius: 4px;
+    margin-top: 8px;
+    overflow: hidden;
+}
+
+.xp-bar {
+    height: 100%;
+    background: linear-gradient(90deg, #9370db, #da70d6);
+    border-radius: 4px;
+    transition: width 0.3s ease;
+    box-shadow: 0 0 10px #da70d6;
+}
+
+.xp-text {
+    font-size: 14px;
+    text-align: center;
+    margin-top: 5px;
+    color: #da70d6;
 }
 
 @keyframes coinPulse {
     0%, 100% { transform: scale(1); }
     50% { transform: scale(1.05); }
+}
+
+@keyframes levelPulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.03); }
 }
 
 button.menuBtn {
@@ -287,6 +336,13 @@ button.menuBtn:active {
     text-shadow: 0 0 20px gold;
 }
 
+.modal-content .xp-reward {
+    font-size: 36px;
+    margin: 10px 0;
+    color: #da70d6;
+    text-shadow: 0 0 20px #da70d6;
+}
+
 .pause-overlay {
     display: none;
     position: fixed;
@@ -312,6 +368,48 @@ button.menuBtn:active {
     50% { transform: scale(1.1); }
 }
 
+.level-up-notification {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0);
+    background: linear-gradient(135deg, rgba(138, 43, 226, 0.95), rgba(75, 0, 130, 0.95));
+    border: 4px solid #da70d6;
+    border-radius: 20px;
+    padding: 40px 60px;
+    z-index: 200;
+    text-align: center;
+    box-shadow: 0 0 60px rgba(218, 112, 214, 0.8);
+    animation: levelUpPop 0.5s ease-out forwards;
+}
+
+@keyframes levelUpPop {
+    0% { transform: translate(-50%, -50%) scale(0); }
+    50% { transform: translate(-50%, -50%) scale(1.2); }
+    100% { transform: translate(-50%, -50%) scale(1); }
+}
+
+.level-up-notification.hide {
+    animation: levelUpFadeOut 0.3s ease-out forwards;
+}
+
+@keyframes levelUpFadeOut {
+    to { transform: translate(-50%, -50%) scale(0); opacity: 0; }
+}
+
+.level-up-notification h2 {
+    font-size: 56px;
+    margin-bottom: 15px;
+    color: #da70d6;
+    text-shadow: 0 0 30px #da70d6;
+}
+
+.level-up-notification p {
+    font-size: 28px;
+    color: white;
+    text-shadow: 0 0 10px rgba(0, 0, 0, 0.8);
+}
+
 @media (max-width: 1024px) {
     .game-container {
         flex-direction: column;
@@ -328,7 +426,17 @@ button.menuBtn:active {
 <body>
 
 <button id="backBtn" onclick="window.location.href='tetris.html'">⬅ Zpět</button>
-<div id="coinsDisplay">💰 <span id="coinCount">0</span></div>
+
+<div id="playerStats">
+    <div id="levelDisplay">
+        ⭐ Level <span id="playerLevel">1</span>
+        <div class="xp-bar-container">
+            <div class="xp-bar" id="xpBar"></div>
+        </div>
+        <div class="xp-text" id="xpText">0 / 50 XP</div>
+    </div>
+    <div id="coinsDisplay">💰 <span id="coinCount">0</span></div>
+</div>
 
 <div id="tetrisGame" class="centered">
     <div class="game-container">
@@ -372,6 +480,9 @@ button.menuBtn:active {
         <div class="coin-reward">
             💰 +<span id="earnedCoins">0</span> mincí!
         </div>
+        <div class="xp-reward">
+            ⭐ +<span id="earnedXP">0</span> XP
+        </div>
         <p id="saveMessage" style="font-size: 18px; color: #00ff00; margin: 20px 0;">
             ✅ Skóre automaticky uloženo!
         </p>
@@ -411,11 +522,84 @@ let current = null;
 let nextPiece = null;
 let holdPiece = null;
 
+// Level system
+let playerLevel = 1;
+let playerXP = 0;
 let playerCoins = 0;
 let unlockedThemes = ['classic', 'neon'];
 let unlockedMaps = ['20x10', '18x12'];
 let currentUser = null;
 let totalGamesPlayed = 0;
+
+// XP requirements for each level
+const xpRequirements = [
+    0,    // Level 1
+    50,   // Level 2
+    150,  // Level 3 (50 + 100)
+    300,  // Level 4 (150 + 150)
+    500,  // Level 5 (300 + 200)
+    750,  // Level 6 (500 + 250)
+    1050, // Level 7 (750 + 300)
+    1400, // Level 8 (1050 + 350)
+    1800, // Level 9 (1400 + 400)
+    2250  // Level 10 (1800 + 450)
+];
+
+function getXPForNextLevel(currentLevel) {
+    if (currentLevel >= 10) return 0;
+    return xpRequirements[currentLevel];
+}
+
+function updateLevelDisplay() {
+    document.getElementById('playerLevel').textContent = playerLevel;
+    
+    if (playerLevel >= 10) {
+        document.getElementById('xpText').textContent = 'MAX LEVEL';
+        document.getElementById('xpBar').style.width = '100%';
+        return;
+    }
+    
+    const currentLevelXP = xpRequirements[playerLevel - 1];
+    const nextLevelXP = xpRequirements[playerLevel];
+    const xpNeeded = nextLevelXP - currentLevelXP;
+    const currentProgress = playerXP - currentLevelXP;
+    
+    const percentage = Math.min(100, (currentProgress / xpNeeded) * 100);
+    
+    document.getElementById('xpBar').style.width = percentage + '%';
+    document.getElementById('xpText').textContent = `${currentProgress} / ${xpNeeded} XP`;
+}
+
+function addXP(amount) {
+    if (playerLevel >= 10) return;
+    
+    playerXP += amount;
+    
+    while (playerLevel < 10 && playerXP >= xpRequirements[playerLevel]) {
+        playerLevel++;
+        showLevelUpNotification();
+    }
+    
+    updateLevelDisplay();
+}
+
+function showLevelUpNotification() {
+    const notification = document.createElement('div');
+    notification.className = 'level-up-notification';
+    notification.innerHTML = `
+        <h2>🎉 LEVEL UP! 🎉</h2>
+        <p>Dosáhl jsi Level ${playerLevel}!</p>
+        <p style="font-size: 20px; margin-top: 10px;">Nové položky odemčeny v shopu! 🛒</p>
+    `;
+    document.body.appendChild(notification);
+    
+    playSound('levelup');
+    
+    setTimeout(() => {
+        notification.classList.add('hide');
+        setTimeout(() => notification.remove(), 300);
+    }, 4000);
+}
 </script>
 
 <script type="module">
@@ -489,10 +673,12 @@ async function loadUserData() {
         
         if (data) {
             playerCoins = data.coins || 0
+            playerLevel = data.level || 1
+            playerXP = data.xp || 0
             unlockedThemes = data.unlocked_themes || ['classic', 'neon']
             unlockedMaps = data.unlocked_maps || ['20x10', '18x12']
             totalGamesPlayed = data.games_played || 0
-            console.log('Data načtena:', { playerCoins, totalGamesPlayed })
+            console.log('Data načtena:', { playerCoins, playerLevel, playerXP, totalGamesPlayed })
         } else {
             console.log('První spuštění - vytvářím nový záznam')
             await supabase
@@ -501,6 +687,8 @@ async function loadUserData() {
                     user_id: currentUser.id,
                     username: currentUser.username,
                     coins: 0,
+                    level: 1,
+                    xp: 0,
                     unlocked_themes: ['classic', 'neon'],
                     unlocked_maps: ['20x10', '18x12'],
                     games_played: 0,
@@ -513,6 +701,7 @@ async function loadUserData() {
     }
     
     updateCoinsDisplay()
+    updateLevelDisplay()
 }
 
 // Načtení lokálních dat pro host
@@ -521,10 +710,13 @@ function loadLocalData() {
     if (saved) {
         const data = JSON.parse(saved)
         playerCoins = data.coins || 0
+        playerLevel = data.level || 1
+        playerXP = data.xp || 0
         unlockedThemes = data.themes || ['classic', 'neon']
         unlockedMaps = data.maps || ['20x10', '18x12']
     }
     updateCoinsDisplay()
+    updateLevelDisplay()
 }
 
 // Uložení dat do Supabase
@@ -532,6 +724,8 @@ async function saveUserData() {
     if (!currentUser || currentUser.is_guest) {
         const data = {
             coins: playerCoins,
+            level: playerLevel,
+            xp: playerXP,
             themes: unlockedThemes,
             maps: unlockedMaps
         }
@@ -544,6 +738,8 @@ async function saveUserData() {
             .from('tetris_player_data')
             .update({
                 coins: playerCoins,
+                level: playerLevel,
+                xp: playerXP,
                 unlocked_themes: unlockedThemes,
                 unlocked_maps: unlockedMaps,
                 games_played: totalGamesPlayed
@@ -563,16 +759,22 @@ async function updateAfterGame(finalScore) {
     const coinsFromScore = Math.floor(finalScore / 100) * 5
     const totalCoins = coinsFromScore + 10
     
+    // XP: každých 1000 bodů = 10 XP
+    const earnedXP = Math.floor(finalScore / 1000) * 10
+    
     earnedCoinsThisGame = totalCoins
     playerCoins += totalCoins
     
-    console.log(`Získané mince: ${totalCoins} (skóre: ${coinsFromScore}, bonus: 10)`)
-    console.log(`Celkem mincí: ${playerCoins}`)
+    addXP(earnedXP)
+    
+    console.log(`Získané mince: ${totalCoins}, XP: ${earnedXP}`)
+    console.log(`Celkem mincí: ${playerCoins}, Level: ${playerLevel}, XP: ${playerXP}`)
     
     if (!currentUser || currentUser.is_guest) {
         saveUserData()
         updateCoinsDisplay()
-        return
+        updateLevelDisplay()
+        return earnedXP
     }
     
     try {
@@ -589,6 +791,8 @@ async function updateAfterGame(finalScore) {
             .from('tetris_player_data')
             .update({
                 coins: playerCoins,
+                level: playerLevel,
+                xp: playerXP,
                 games_played: totalGamesPlayed,
                 total_score: newTotalScore,
                 best_score: newBestScore,
@@ -606,6 +810,8 @@ async function updateAfterGame(finalScore) {
     
     await saveUserData()
     updateCoinsDisplay()
+    updateLevelDisplay()
+    return earnedXP
 }
 
 window.updateCoinsDisplay = function() {
@@ -930,6 +1136,8 @@ function playSound(type) {
     oscillator.connect(gainNode)
     gainNode.connect(audioContext.destination)
     
+    let duration = 0.1
+    
     switch(type) {
         case 'rotate':
             oscillator.frequency.value = 400
@@ -943,10 +1151,15 @@ function playSound(type) {
             oscillator.frequency.value = 800
             gainNode.gain.value = 0.15
             break
+        case 'levelup':
+            oscillator.frequency.value = 1200
+            gainNode.gain.value = 0.3
+            duration = 0.5
+            break
     }
     
     oscillator.start(audioContext.currentTime)
-    oscillator.stop(audioContext.currentTime + 0.1)
+    oscillator.stop(audioContext.currentTime + duration)
 }
 
 document.addEventListener('keydown', e => {
@@ -995,7 +1208,7 @@ function gameLoop() {
 async function gameOver() {
     isGameOver = true
     
-    await updateAfterGame(score)
+    const earnedXP = await updateAfterGame(score)
     
     if (currentUser && !currentUser.is_guest) {
         try {
@@ -1018,6 +1231,7 @@ async function gameOver() {
     
     document.getElementById('finalScore').textContent = score
     document.getElementById('earnedCoins').textContent = earnedCoinsThisGame
+    document.getElementById('earnedXP').textContent = earnedXP
     
     const saveMsg = document.getElementById('saveMessage')
     if (currentUser && !currentUser.is_guest) {
