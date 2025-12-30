@@ -92,17 +92,25 @@ let currentBet = 10; // výchozí sázka
 
 // Funkce pro změnu sázky
 // Funkce pro změnu sázky
+windo// Funkce pro změnu sázky - OPRAVENÁ VERZE
 window.setBet = function(amount) {
     currentBet = amount;
-    document.getElementById('currentBet').textContent = currentBet;
+    
+    // Najdi element pro zobrazení sázky
+    const betDisplay = document.getElementById('currentBet');
+    if (betDisplay) {
+        betDisplay.textContent = currentBet;
+    }
     
     // Aktualizuj aktivní tlačítko
     document.querySelectorAll('.bet-btn').forEach(btn => {
         btn.classList.remove('active');
+        // Zkontroluj, zda tlačítko odpovídá aktuální sázce
+        if (btn.textContent === amount.toString()) {
+            btn.classList.add('active');
+        }
     });
-    event.target.classList.add('active');
 }
-
 
 // SHOP ITEMS
 // SHOP ITEMS
@@ -1713,6 +1721,7 @@ window.addEventListener('load', async () => {
         }
     }, 3500);
 });
+
 
 
 
