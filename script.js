@@ -1506,12 +1506,6 @@ function updateLoginStreak() {
     currentUser.stats.lastLogin = today;
 }
 
-function togglePaytable() {
-    const paytable = document.querySelector('.paytable');  // Vybere tabulku s výhrami podle třídy
-    // Pokud je tabulka skrytá, zobrazí ji; pokud je zobrazená, skryje ji
-    paytable.style.display = (paytable.style.display === 'none' || paytable.style.display === '') ? 'block' : 'none';
-}
-
 function createConfetti() {
     const c = document.createElement("div");
     c.className = "confetti";
