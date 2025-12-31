@@ -1131,117 +1131,6 @@ body {
         touch-action: none;
     }
 }
-
- /* ========================================== */
-/* TOUCH OVLÁDÁNÍ PRO MOBILY */
-/* ========================================== */
-
-.mobile-controls {
-    display: none;
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    background: rgba(30, 30, 60, 0.95);
-    border-top: 3px solid #00ffff;
-    padding: 15px;
-    z-index: 100;
-    box-shadow: 0 -5px 30px rgba(0, 255, 255, 0.3);
-}
-
-.mobile-controls-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 10px;
-    max-width: 500px;
-    margin: 0 auto;
-}
-
-.mobile-btn {
-    background: linear-gradient(135deg, rgba(0, 100, 200, 0.6), rgba(100, 0, 200, 0.6));
-    border: 2px solid #00ffff;
-    border-radius: 12px;
-    color: white;
-    font-size: 32px;
-    font-weight: bold;
-    padding: 20px;
-    cursor: pointer;
-    box-shadow: 0 0 20px rgba(0, 255, 255, 0.4);
-    transition: all 0.1s;
-    touch-action: manipulation;
-    user-select: none;
-    -webkit-tap-highlight-color: transparent;
-}
-
-.mobile-btn:active {
-    transform: scale(0.95);
-    box-shadow: 0 0 30px rgba(0, 255, 255, 0.8);
-    background: linear-gradient(135deg, rgba(0, 150, 255, 0.8), rgba(150, 0, 255, 0.8));
-}
-
-.mobile-btn.rotate-btn {
-    grid-column: 2;
-    background: linear-gradient(135deg, rgba(255, 0, 100, 0.6), rgba(255, 100, 0, 0.6));
-    border-color: #ff00ff;
-}
-
-.mobile-btn.drop-btn {
-    grid-column: 2;
-    grid-row: 2;
-    background: linear-gradient(135deg, rgba(255, 215, 0, 0.6), rgba(255, 140, 0, 0.6));
-    border-color: gold;
-}
-
-.mobile-btn.hold-btn {
-    grid-column: 3;
-    grid-row: 2;
-    background: linear-gradient(135deg, rgba(0, 255, 100, 0.6), rgba(0, 200, 150, 0.6));
-    border-color: #00ff88;
-    font-size: 24px;
-}
-
-.mobile-btn.pause-btn {
-    grid-column: 1;
-    grid-row: 2;
-    background: linear-gradient(135deg, rgba(100, 100, 100, 0.6), rgba(50, 50, 50, 0.6));
-    border-color: #888;
-    font-size: 24px;
-}
-
-/* Zobraz touch ovládání jen na mobilech */
-@media (hover: none) and (pointer: coarse) {
-    .mobile-controls {
-        display: block;
-    }
-    
-    /* Skryj původní controls info na mobilech */
-    .controls {
-        display: none;
-    }
-    
-    /* Přidej padding dole aby se hra nepřekrývala s ovládáním */
-    #tetrisGame {
-        padding-bottom: 180px;
-    }
-}
-
-@media (max-width: 768px) {
-    .mobile-btn {
-        padding: 15px;
-        font-size: 28px;
-    }
-}
-
-@media (max-width: 480px) {
-    .mobile-btn {
-        padding: 12px;
-        font-size: 24px;
-    }
-    
-    .mobile-controls {
-        padding: 10px;
-    }
-}
 </style>
 </head>
 <body>
@@ -1506,24 +1395,13 @@ body {
         <div class="xp-reward">
             ⭐ +<span id="earnedXP">0</span> XP
         </div>
-        <p id="saveMessage" style="font-size: 18px; color: #00
+        <p id="saveMessage" style="font-size: 18px; color: #00ff00; margin: 20px 0;">
             ✅ Skóre automaticky uloženo!
         </p>
         <button class="menuBtn" onclick="backToMainMenu()">🏠 Zpět do menu</button>
     </div>
 </div>
-<!-- Touch ovládání pro mobily -->
-<div class="mobile-controls">
-    <div class="mobile-controls-grid">
-        <button class="mobile-btn" id="btnLeft">⬅️</button>
-        <button class="mobile-btn rotate-btn" id="btnRotate">🔄</button>
-        <button class="mobile-btn" id="btnRight">➡️</button>
-        
-        <button class="mobile-btn pause-btn" id="btnPause">⏸️</button>
-        <button class="mobile-btn drop-btn" id="btnDrop">⬇️</button>
-        <button class="mobile-btn hold-btn" id="btnHold">📦</button>
-    </div>
-</div>
+
 <script>
 let selectedDifficulty = 'medium';
 let mapRows = 20;
@@ -2821,170 +2699,10 @@ function getDifficultyEmoji(difficulty) {
         default: return '❓'
     }
 }
- // ========================================
-// TOUCH OVLÁDÁNÍ PRO MOBILY
-// ========================================
-
-function initMobileControls() {
-    const btnLeft = document.getElementById('btnLeft');
-    const btnRight = document.getElementById('btnRight');
-    const btnRotate = document.getElementById('btnRotate');
-    const btnDrop = document.getElementById('btnDrop');
-    const btnHold = document.getElementById('btnHold');
-    const btnPause = document.getElementById('btnPause');
-    
-    if (!btnLeft) return; // Pokud tlačítka neexistují, ukonči
-    
-    // Pohyb doleva
-    btnLeft.addEventListener('touchstart', (e) => {
-        e.preventDefault();
-        if (isPaused || isGameOver) return;
-        
-        const reversed = activeEvent && activeEvent.reverseControls;
-        if (reversed) {
-            current.x++;
-            if (collision()) current.x--;
-        } else {
-            current.x--;
-            if (collision()) current.x++;
-        }
-        draw();
-    });
-    
-    // Pohyb doprava
-    btnRight.addEventListener('touchstart', (e) => {
-        e.preventDefault();
-        if (isPaused || isGameOver) return;
-        
-        const reversed = activeEvent && activeEvent.reverseControls;
-        if (reversed) {
-            current.x--;
-            if (collision()) current.x++;
-        } else {
-            current.x++;
-            if (collision()) current.x--;
-        }
-        draw();
-    });
-    
-    // Rotace
-    btnRotate.addEventListener('touchstart', (e) => {
-        e.preventDefault();
-        if (isPaused || isGameOver) return;
-        rotate();
-        draw();
-    });
-    
-    // Rychlý pád
-    let dropInterval;
-    btnDrop.addEventListener('touchstart', (e) => {
-        e.preventDefault();
-        if (isPaused || isGameOver) return;
-        
-        // Dlouhý stisk = tvrdý drop
-        dropInterval = setTimeout(() => {
-            hardDrop();
-        }, 300);
-        
-        // Krátký stisk = posun dolů
-        moveDown();
-    });
-    
-    btnDrop.addEventListener('touchend', (e) => {
-        e.preventDefault();
-        clearTimeout(dropInterval);
-    });
-    
-    // Hold
-    btnHold.addEventListener('touchstart', (e) => {
-        e.preventDefault();
-        if (isPaused || isGameOver) return;
-        hold();
-    });
-    
-    // Pauza
-    btnPause.addEventListener('touchstart', (e) => {
-        e.preventDefault();
-        if (isGameOver) return;
-        togglePause();
-    });
-}
-
-// Inicializuj touch ovládání při startu hry
-const originalStartTetris = window.startTetris;
-window.startTetris = function(difficulty) {
-    originalStartTetris(difficulty);
-    
-    // Počkej na vytvoření DOM elementů
-    setTimeout(() => {
-        initMobileControls();
-    }, 100);
-};
-
-// Swipe detekce pro alternativní ovládání
-let touchStartX = 0;
-let touchStartY = 0;
-let touchEndX = 0;
-let touchEndY = 0;
-
-document.addEventListener('touchstart', (e) => {
-    if (e.target.closest('.mobile-btn') || e.target.closest('button')) return;
-    if (isPaused || isGameOver) return;
-    
-    touchStartX = e.changedTouches[0].screenX;
-    touchStartY = e.changedTouches[0].screenY;
-});
-
-document.addEventListener('touchend', (e) => {
-    if (e.target.closest('.mobile-btn') || e.target.closest('button')) return;
-    if (isPaused || isGameOver) return;
-    
-    touchEndX = e.changedTouches[0].screenX;
-    touchEndY = e.changedTouches[0].screenY;
-    handleSwipe();
-});
-
-function handleSwipe() {
-    const diffX = touchEndX - touchStartX;
-    const diffY = touchEndY - touchStartY;
-    const minSwipeDistance = 30;
-    
-    // Horizontální swipe
-    if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > minSwipeDistance) {
-        const reversed = activeEvent && activeEvent.reverseControls;
-        
-        if (diffX > 0) { // Swipe doprava
-            if (reversed) {
-                current.x--;
-                if (collision()) current.x++;
-            } else {
-                current.x++;
-                if (collision()) current.x--;
-            }
-        } else { // Swipe doleva
-            if (reversed) {
-                current.x++;
-                if (collision()) current.x--;
-            } else {
-                current.x--;
-                if (collision()) current.x++;
-            }
-        }
-        draw();
-    }
-    
-    // Vertikální swipe dolů = rychlý pád
-    if (diffY > minSwipeDistance && Math.abs(diffY) > Math.abs(diffX)) {
-        hardDrop();
-    }
-}
 await loadCurrentUser()
 </script>
 </body>
 </html>
-
-
-
 
 
 
