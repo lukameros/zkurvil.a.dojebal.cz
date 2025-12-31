@@ -1666,7 +1666,7 @@ window.addEventListener('load', async () => {
                     .eq('id', user.id)
                     .maybeSingle();
                 
-                if (existingUser) {
+               if (existingUser) {
                     currentUser.id = existingUser.id;
                     currentUser.nickname = existingUser.nickname;
                     currentUser.coins = existingUser.coins;
@@ -1684,6 +1684,8 @@ window.addEventListener('load', async () => {
                     const activeItem = shopItems.find(i => i.id === currentUser.activeTheme);
                     if (activeItem) applyTheme(activeItem.colors);
                     
+                    document.getElementById('loginModal').style.display = 'none';  
+                    
                     updateUI();
                     checkDailyBonus();
                 } else {
@@ -1700,6 +1702,7 @@ window.addEventListener('load', async () => {
         }
     }, 3500);
 });
+
 
 
 
