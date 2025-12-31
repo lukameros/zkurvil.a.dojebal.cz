@@ -2098,4 +2098,32 @@ button, .game-btn, .bet-btn {
     }
 }
 
+@media (max-width: 768px) {
+    .reel-container {
+        position: relative;
+    }
+    
+    .reel-window {
+        position: absolute;
+        top: 50% !important;
+        left: 0;
+        right: 0;
+        height: 28vw !important;
+        max-height: 90px;
+        transform: translateY(-50%);
+        border: 3px solid #ff00ff;
+        border-radius: 8px;
+        pointer-events: none;
+        box-shadow: 0 0 15px rgba(255,0,255,0.7);
+        z-index: 10;
+    }
+}
+
+@media (max-width: 480px) {
+    .reel-window {
+        height: 30vw !important;
+        max-height: 75px;
+    }
+}
+
 
