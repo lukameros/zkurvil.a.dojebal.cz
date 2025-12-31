@@ -1768,6 +1768,35 @@ button, .game-btn, .bet-btn {
     }
 }
 
+    @keyframes diamondGlow {
+    0%, 100% { 
+        box-shadow: 0 0 30px rgba(0,191,255,0.5);
+    }
+    50% { 
+        box-shadow: 0 0 50px rgba(0,191,255,0.9);
+    }
+}
+
+@keyframes jackpotGlowBig {
+    0%, 100% { 
+        box-shadow: 0 0 40px rgba(255,0,255,0.7);
+    }
+    50% { 
+        box-shadow: 0 0 70px rgba(255,215,0,1);
+    }
+}
+
+/* Responsive pro paytable grid */
+@media (max-width: 768px) {
+    #paytableGrid {
+        grid-template-columns: 1fr !important;
+    }
+    
+    #paytableGrid .shop-item[style*="grid-column"] {
+        grid-column: span 1 !important;
+    }
+}
+
 
 
 
