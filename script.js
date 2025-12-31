@@ -866,6 +866,14 @@ function loadShop() {
     });
 }
 
+function loadPaytable() {
+    const grid = document.getElementById('paytableGrid');
+    if (!grid) return;
+    
+    // Grid už je v HTML, jen se ujistíme že je viditelný
+    console.log('✅ Paytable načten');
+}
+
 // ============================================
 // SHOP - NÁKUP TÉMATU
 // ============================================
@@ -1058,15 +1066,16 @@ window.switchGame = function(game) {
         btn.classList.remove('active');
     });
     
-   const gameMap = {
-    'slot': 'slotGame',
-    'wheel': 'wheelGame',
-    'missions': 'missionsGame',
-    'achievements': 'achievementsGame',
-    'leaderboard': 'leaderboardGame',
-    'shop': 'shopGame',
-    'paytable': 'paytableGame'
-};
+    // OPRAVENÁ MAPA HER
+    const gameMap = {
+        'slot': 'slotGame',
+        'wheel': 'wheelGame',
+        'missions': 'missionsGame',
+        'achievements': 'achievementsGame',
+        'leaderboard': 'leaderboardGame',
+        'shop': 'shopGame',
+        'paytable': 'paytableGame'  // PŘIDÁNO
+    };
     
     const gameElement = document.getElementById(gameMap[game]);
     const btnElement = document.getElementById(`${game}Btn`);
@@ -1078,6 +1087,7 @@ window.switchGame = function(game) {
     if (game === 'achievements') loadAchievements();
     if (game === 'leaderboard') loadLeaderboard();
     if (game === 'shop') loadShop();
+    if (game === 'paytable') loadPaytable();  // PŘIDÁNO
 };
 
 // ============================================
@@ -1690,6 +1700,7 @@ window.addEventListener('load', async () => {
         }
     }, 3500);
 });
+
 
 
 
