@@ -392,9 +392,6 @@ function getWeightedSymbol() {
     return '🍒';
 }
 
-// ============================================
-// SLOT MACHINE - SPIN
-// ============================================
 window.spinSlot = async function() {
     if (spinning) return;
     if (currentUser.coins < currentBet) {
@@ -444,48 +441,64 @@ window.spinSlot = async function() {
         reel.classList.add('spinning');
     });
     
-    const spinDurations = [2500, 3200, 3900];
+   const spinDurations = [2500, 3200, 3900];
     const symbolHeight = 100;
     
     for (let i = 0; i < 3; i++) {
         const reel = document.getElementById(`reel${i + 1}`);
         const reelElement = reel.parentElement;
         
-        let targetIndex = reels[i].indexOf(results[i]);
-        if (targetIndex === -1) targetIndex = 10;
+        // Najdi index cílového symbolu
+        let targetIndex = reels[i].findIndex((sym, idx) => idx > 10 && sym === results[i]);
+        if (targetIndex === -1) targetIndex = Math.floor(reels[i].length / 2);
         
+        // Vypočti cílovou pozici tak, aby symbol byl přesně uprostřed
         const targetPosition = -(targetIndex * symbolHeight - symbolHeight);
         
-        const spinSpeed = 15;
+        // Reset pozice na začátek
+        reel.style.transition = 'none';
+        reel.style.transform = 'translateY(0px)';
+        
+        // Přidej spinning class
+        setTimeout(() => {
+            reelElement.classList.add('spinning');
+        }, 10);
+        
+        // Animace rychlého točení
+        const spinSpeed = 20;
         let currentPos = 0;
         const spinInterval = setInterval(() => {
             currentPos -= spinSpeed;
             reel.style.transform = `translateY(${currentPos}px)`;
             
+            // Loop když dojdeš na konec
             if (Math.abs(currentPos) > reels[i].length * symbolHeight / 2) {
                 currentPos = 0;
             }
         }, 16);
         
+        // Zastav točení po určité době
         setTimeout(() => {
             clearInterval(spinInterval);
             reelElement.classList.remove('spinning');
             reelElement.classList.add('stopping');
             
+            // Plynule zastav na cílové pozici
             reel.style.transition = 'transform 800ms cubic-bezier(0.25, 0.46, 0.45, 0.94)';
             reel.style.transform = `translateY(${targetPosition}px)`;
             
+            // Odstran stopping class
             setTimeout(() => {
                 reelElement.classList.remove('stopping');
             }, 800);
         }, spinDurations[i]);
     }
     
+    // Vyhodnoť výhru po dokončení všech animací
     setTimeout(() => {
         evaluateSlotWin(results);
     }, 5200);
 };
-
 // ============================================
 // SLOT MACHINE - VYHODNOCENÍ VÝHRY
 // ============================================
@@ -1593,3 +1606,4 @@ window.addEventListener('load', async () => {
         }
     }, 3500);
 });
+
