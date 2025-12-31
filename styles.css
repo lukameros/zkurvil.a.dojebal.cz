@@ -1469,7 +1469,7 @@ button, .game-btn, .bet-btn {
         margin: 0;
         padding: 0;
         font-size: 12px;
-        overflow: hidden; 
+        overflow: hidden;
         height: 100vh;
     }
 
@@ -1511,38 +1511,6 @@ button, .game-btn, .bet-btn {
         padding: 2px;
     }
 
-    #slotTitle {
-        font-size: 13px;
-        margin-bottom: 2px;
-        text-align: center;
-        flex-shrink: 0;
-    }
-
-    #reels {
-        display: flex;
-        justify-content: center;
-        gap: 3px;
-        flex: 1;
-        min-height: 0;
-    }
-
-    .reel {
-        width: 45px !important;
-        height: 100% !important; /* výška se přizpůsobí */
-        max-height: 120px;
-    }
-
-    .symbol {
-        height: calc(100% / 3) !important; /* 3 symboly na výšku */
-        font-size: 25px !important;
-        line-height: calc(100% / 3);
-    }
-
-    .reel-window {
-        top: calc(100% / 3) !important;
-        height: calc(100% / 3) !important;
-    }
-
     .side-controls {
         flex: 0.8;
         max-width: 45%;
@@ -1555,55 +1523,49 @@ button, .game-btn, .bet-btn {
         font-size: 11px;
     }
 
-    .bet-controls {
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 2px;
-    }
-
-    .bet-btn {
-        padding: 4px 2px;
-        font-size: 10px;
-    }
-
-    #spinSlotBtn {
-        width: 100%;
+    #tableToggleBtn {
         padding: 6px;
-        font-size: 15px;
-        font-weight: bold;
-        margin-top: 1px;
+        font-size: 12px;
+        background: rgba(0,0,0,0.7);
+        color: white;
+        border: none;
+        cursor: pointer;
     }
 
-    #slotResult {
-        font-size: 11px;
-        min-height: 14px;
+    #tableToggleBtn:hover {
+        background: rgba(0,0,0,0.9);
+    }
+
+    #tableContainer {
+        position: absolute;
+        top: 50px; /* Pod top barem */
+        left: 10px;
+        right: 10px;
+        background-color: rgba(255, 255, 255, 0.9);
+        padding: 10px;
+        border-radius: 8px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        max-height: 80vh;
+        overflow-y: auto;
+        display: none; /* Tabulka skrytá */
+    }
+
+    #scoreTable {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    #scoreTable th, #scoreTable td {
+        border: 1px solid #ddd;
+        padding: 8px;
         text-align: center;
     }
 
-    #wheelContainer {
-        display: flex;
-        flex-direction: row;
-        align-items: center;
-        justify-content: center;
-        gap: 8px;
-        flex-wrap: wrap;
-    }
-
-    canvas {
-        width: 25vh !important;
-        height: 25vh !important;
-        max-width: 110px !important;
-    }
-
-    .modal-content {
-        max-height: 90vh;
-        width: 90%;
-    }
-
-    .star {
-        display: none;
+    #scoreTable th {
+        background-color: #f2f2f2;
     }
 }
+
 
 
 
