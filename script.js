@@ -1484,18 +1484,6 @@ function showNotification(message) {
     }, 3000);
 }
 
-document.getElementById('paytableToggleBtn').addEventListener('click', function() {
-    const paytableContainer = document.getElementById('paytableContainer');
-    
-    // Přepínání zobrazení tabulky výher
-    if (paytableContainer.style.display === 'none' || paytableContainer.style.display === '') {
-        paytableContainer.style.display = 'block'; // Ukáže tabulku výher
-    } else {
-        paytableContainer.style.display = 'none'; // Skryje tabulku výher
-    }
-});
-
-
 function updateLoginStreak() {
     const today = new Date().toISOString().split('T')[0];
     const lastLogin = currentUser.stats.lastLogin;
@@ -1621,9 +1609,6 @@ window.addEventListener('load', async () => {
         }
     }, 3500);
 });
-
-
-
 
 
 
