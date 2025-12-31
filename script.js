@@ -1,12 +1,267 @@
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
 
-// Supabase konfigurace
-const SUPABASE_URL = 'https://bmmaijlbpwgzhrxzxphf.supabase.co'
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJtbWFpamxicHdnemhyeHp4cGhmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjY4NjQ5MDcsImV4cCI6MjA4MjQ0MDkwN30.s0YQVnAjMXFu1pSI1NXZ2naSab179N0vQPglsmy3Pgw'
+// ============================================
+// SUPABASE KONFIGURACE
+// ============================================
+const SUPABASE_URL = 'https://bmmaijlbpwgzhrxzxphf.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJtbWFpamxicHdnemhyeHp4cGhmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjY4NjQ5MDcsImV4cCI6MjA4MjQ0MDkwN30.s0YQVnAjMXFu1pSI1NXZ2naSab179N0vQPglsmy3Pgw';
 const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-// Session storage pro update modal (místo localStorage)
-let hasSeenUpdateModal = false;
 
+// ============================================
+// GLOBÁLNÍ PROMĚNNÉ
+// ============================================
+let hasSeenUpdateModal = false;
+let currentGame = 'slot';
+let currentBet = 10;
+let spinning = false;
+let wheelSpinning = false;
+let autoRotating = true;
+let rotation = 0;
+let reels = [[], [], []];
+
+let currentUser = {
+    id: null,
+    nickname: '',
+    coins: 0,
+    lastDailyBonus: null,
+    ownedThemes: ['default'],
+    activeTheme: 'default',
+    stats: {
+        totalWins: 0,
+        slotSpins: 0,
+        wheelSpins: 0,
+        jackpots: 0,
+        winStreak: 0,
+        currentStreak: 0,
+        totalBet: 0,
+        maxCoins: 0,
+        themesOwned: 1,
+        diamondWins: 0,
+        loginStreak: 1,
+        lastLogin: null,
+        highBets: 0,
+        achievementsUnlocked: 0,
+        coinsWon: 0,
+        gamesPlayed: [],
+        cherryWins: 0,
+        bellWins: 0,
+        starWins: 0,
+        dailyBonusClaims: 0,
+        missionsCompleted: 0,
+        bigWins: 0,
+        totalSpins: 0,
+        dailyWins: 0,
+        noLossStreak: 0,
+        fastSpins: 0,
+        maxBets: 0
+    },
+    unlockedAchievements: [],
+    dailyMissions: {},
+    lastMissionReset: null
+};
+
+// ============================================
+// SHOP ITEMS
+// ============================================
+const shopItems = [
+    { id: 'default', name: '🎰 Výchozí', price: 0, icon: '🎰', colors: { 
+        primary: '#00ffff', secondary: '#ff00ff', bg1: '#0a0015', bg2: '#1a0033',
+        bgGlow1: 'rgba(255,0,255,0.4)', bgGlow2: 'rgba(0,255,255,0.4)'
+    }},
+    { id: 'neon', name: '💠 Neon', price: 500, icon: '💠', colors: { 
+        primary: '#00ffff', secondary: '#ff00ff', bg1: '#000033', bg2: '#330066',
+        bgGlow1: 'rgba(0,255,255,0.5)', bgGlow2: 'rgba(255,0,255,0.5)'
+    }},
+    { id: 'gold', name: '🌟 Zlatý', price: 1000, icon: '🌟', colors: { 
+        primary: '#ffd700', secondary: '#ffaa00', bg1: '#1a1000', bg2: '#332200',
+        bgGlow1: 'rgba(255,215,0,0.4)', bgGlow2: 'rgba(255,170,0,0.4)'
+    }},
+    { id: 'fire', name: '🔥 Ohnivý', price: 1500, icon: '🔥', colors: { 
+        primary: '#ff4500', secondary: '#ff8c00', bg1: '#1a0000', bg2: '#330000',
+        bgGlow1: 'rgba(255,69,0,0.5)', bgGlow2: 'rgba(255,140,0,0.5)'
+    }},
+    { id: 'ocean', name: '🌊 Oceán', price: 2000, icon: '🌊', colors: { 
+        primary: '#0080ff', secondary: '#00ffff', bg1: '#00001a', bg2: '#001a33',
+        bgGlow1: 'rgba(0,128,255,0.4)', bgGlow2: 'rgba(0,255,255,0.4)'
+    }},
+    { id: 'rainbow', name: '🌈 Duha', price: 3000, icon: '🌈', colors: { 
+        primary: '#ff00ff', secondary: '#00ff00', bg1: '#1a001a', bg2: '#330033',
+        bgGlow1: 'rgba(255,0,255,0.5)', bgGlow2: 'rgba(0,255,0,0.5)'
+    }},
+    { id: 'emerald', name: '💚 Smaragd', price: 3500, icon: '💚', colors: { 
+        primary: '#00ff88', secondary: '#00cc66', bg1: '#001a0a', bg2: '#003320',
+        bgGlow1: 'rgba(0,255,136,0.4)', bgGlow2: 'rgba(0,204,102,0.4)'
+    }},
+    { id: 'royal', name: '👑 Královský', price: 4000, icon: '👑', colors: { 
+        primary: '#9400d3', secondary: '#ffd700', bg1: '#0a001a', bg2: '#200033',
+        bgGlow1: 'rgba(148,0,211,0.5)', bgGlow2: 'rgba(255,215,0,0.4)'
+    }},
+    { id: 'toxic', name: '☢️ Toxický', price: 4500, icon: '☢️', colors: { 
+        primary: '#39ff14', secondary: '#ccff00', bg1: '#0a1a00', bg2: '#1a3300',
+        bgGlow1: 'rgba(57,255,20,0.5)', bgGlow2: 'rgba(204,255,0,0.4)'
+    }},
+    { id: 'sunset', name: '🌅 Západ slunce', price: 5000, icon: '🌅', colors: { 
+        primary: '#ff6b35', secondary: '#ff8c42', bg1: '#1a0a00', bg2: '#331400',
+        bgGlow1: 'rgba(255,107,53,0.4)', bgGlow2: 'rgba(255,140,66,0.4)'
+    }},
+    { id: 'ice', name: '❄️ Ledový', price: 5500, icon: '❄️', colors: { 
+        primary: '#00d9ff', secondary: '#a3e4f7', bg1: '#000a1a', bg2: '#001433',
+        bgGlow1: 'rgba(0,217,255,0.4)', bgGlow2: 'rgba(163,228,247,0.3)'
+    }},
+    { id: 'vampire', name: '🧛 Upíří', price: 6000, icon: '🧛', colors: { 
+        primary: '#8b0000', secondary: '#dc143c', bg1: '#0a0000', bg2: '#1a0000',
+        bgGlow1: 'rgba(139,0,0,0.5)', bgGlow2: 'rgba(220,20,60,0.4)'
+    }},
+    { id: 'matrix', name: '💻 Matrix', price: 6500, icon: '💻', colors: { 
+        primary: '#00ff00', secondary: '#008800', bg1: '#000a00', bg2: '#001400',
+        bgGlow1: 'rgba(0,255,0,0.4)', bgGlow2: 'rgba(0,136,0,0.3)'
+    }},
+    { id: 'galaxy', name: '🌌 Galaxie', price: 7000, icon: '🌌', colors: { 
+        primary: '#4b0082', secondary: '#9370db', bg1: '#050008', bg2: '#0a0010',
+        bgGlow1: 'rgba(75,0,130,0.5)', bgGlow2: 'rgba(147,112,219,0.4)'
+    }},
+    { id: 'cherry', name: '🍒 Třešeň', price: 7500, icon: '🍒', colors: { 
+        primary: '#ff1493', secondary: '#ff69b4', bg1: '#1a0010', bg2: '#330020',
+        bgGlow1: 'rgba(255,20,147,0.4)', bgGlow2: 'rgba(255,105,180,0.3)'
+    }},
+    { id: 'cyber', name: '🤖 Cyber', price: 8000, icon: '🤖', colors: { 
+        primary: '#00ffff', secondary: '#ff00ff', bg1: '#000000', bg2: '#0a0a0a',
+        bgGlow1: 'rgba(0,255,255,0.6)', bgGlow2: 'rgba(255,0,255,0.6)'
+    }},
+    { id: 'diamond', name: '💎 Diamant', price: 9000, icon: '💎', colors: { 
+        primary: '#b9f2ff', secondary: '#ffffff', bg1: '#0a0a1a', bg2: '#14143a',
+        bgGlow1: 'rgba(185,242,255,0.4)', bgGlow2: 'rgba(255,255,255,0.3)'
+    }},
+    { id: 'lava', name: '🌋 Láva', price: 10000, icon: '🌋', colors: { 
+        primary: '#ff4500', secondary: '#ff0000', bg1: '#1a0000', bg2: '#330000',
+        bgGlow1: 'rgba(255,69,0,0.6)', bgGlow2: 'rgba(255,0,0,0.5)'
+    }},
+    { id: 'mint', name: '🍃 Mátový', price: 11000, icon: '🍃', colors: { 
+        primary: '#98ff98', secondary: '#3cb371', bg1: '#001a0a', bg2: '#003314',
+        bgGlow1: 'rgba(152,255,152,0.4)', bgGlow2: 'rgba(60,179,113,0.3)'
+    }},
+    { id: 'lightning', name: '⚡ Blesk', price: 12000, icon: '⚡', colors: { 
+        primary: '#ffff00', secondary: '#ffa500', bg1: '#1a1a00', bg2: '#333300',
+        bgGlow1: 'rgba(255,255,0,0.5)', bgGlow2: 'rgba(255,165,0,0.4)'
+    }},
+    { id: 'legend', name: '🏆 Legendární', price: 15000, icon: '🏆', colors: { 
+        primary: '#ffd700', secondary: '#ff1493', bg1: '#1a0a00', bg2: '#331400',
+        bgGlow1: 'rgba(255,215,0,0.6)', bgGlow2: 'rgba(255,20,147,0.5)'
+    }}
+];
+
+// ============================================
+// ACHIEVEMENTS
+// ============================================
+const achievements = [
+    { id: 'first_win', name: 'První výhra! 🎉', desc: 'Vyhrát na automatu poprvé', icon: '🎉', reward: 50,
+        condition: (stats) => stats.totalWins >= 1 },
+    { id: 'slot_master', name: 'Mistr automatů', desc: 'Zatočit 100x na automatu', icon: '🎰', reward: 200,
+        condition: (stats) => stats.slotSpins >= 100 },
+    { id: 'jackpot_king', name: 'Jackpot král 👑', desc: 'Vyhrát jackpot (50x)', icon: '👑', reward: 500,
+        condition: (stats) => stats.jackpots >= 1 },
+    { id: 'wheel_spinner', name: 'Točitel kola', desc: 'Zatočit 50x na kole štěstí', icon: '🎡', reward: 150,
+        condition: (stats) => stats.wheelSpins >= 50 },
+    { id: 'lucky_streak', name: 'Šťastná série 🍀', desc: '5 výher za sebou', icon: '🍀', reward: 300,
+        condition: (stats) => stats.winStreak >= 5 },
+    { id: 'big_spender', name: 'Velký sázející', desc: 'Vsadit celkem 5000 mincí', icon: '💸', reward: 250,
+        condition: (stats) => stats.totalBet >= 5000 },
+    { id: 'millionaire', name: 'Milionář 💰', desc: 'Mít 10000 mincí najednou', icon: '💰', reward: 1000,
+        condition: (stats) => stats.maxCoins >= 10000 },
+    { id: 'collector', name: 'Sběratel vzhledů 🎨', desc: 'Vlastnit 5 vzhledů', icon: '🎨', reward: 400,
+        condition: (stats) => stats.themesOwned >= 5 },
+    { id: 'diamond_hunter', name: 'Lovec diamantů', desc: 'Vyhrát 3x s 💎💎💎', icon: '💎', reward: 600,
+        condition: (stats) => stats.diamondWins >= 3 },
+    { id: 'dedicated', name: 'Oddaný hráč 🔥', desc: 'Přihlásit se 7 dní v řadě', icon: '🔥', reward: 500,
+        condition: (stats) => stats.loginStreak >= 7 },
+    { id: 'high_roller', name: 'High Roller', desc: 'Vsadit 100 mincí najednou 10x', icon: '🎲', reward: 350,
+        condition: (stats) => stats.highBets >= 10 },
+    { id: 'spin_addict', name: 'Závislák na točení 🌀', desc: 'Zatočit celkem 500x', icon: '🌀', reward: 400,
+        condition: (stats) => (stats.slotSpins + stats.wheelSpins) >= 500 },
+    { id: 'cherry_lover', name: 'Milovník třešní 🍒', desc: 'Vyhrát 10x s třešněmi', icon: '🍒', reward: 300,
+        condition: (stats) => stats.cherryWins >= 10 },
+    { id: 'bell_ringer', name: 'Zvoník 🔔', desc: 'Vyhrát 5x se zvonky', icon: '🔔', reward: 350,
+        condition: (stats) => stats.bellWins >= 5 },
+    { id: 'star_catcher', name: 'Lovec hvězd ⭐', desc: 'Vyhrát 8x s hvězdami', icon: '⭐', reward: 450,
+        condition: (stats) => stats.starWins >= 8 },
+    { id: 'risk_taker', name: 'Riskující 🎯', desc: 'Vsadit maximální sázku 50x', icon: '🎯', reward: 500,
+        condition: (stats) => stats.maxBets >= 50 },
+    { id: 'quick_winner', name: 'Rychlá výhra ⚡', desc: 'Vyhrát do 5 zatočení', icon: '⚡', reward: 200,
+        condition: (stats) => stats.quickWins >= 1 },
+    { id: 'theme_collector', name: 'Sběratel témat 🎨', desc: 'Vlastnit 10 vzhledů', icon: '🎨', reward: 800,
+        condition: (stats) => stats.themesOwned >= 10 },
+    { id: 'daily_player', name: 'Denní hráč 📅', desc: 'Vyzvednout denní bonus 30x', icon: '📅', reward: 600,
+        condition: (stats) => stats.dailyBonusClaims >= 30 },
+    { id: 'mission_master', name: 'Mistr úkolů ✅', desc: 'Splnit 50 denních úkolů', icon: '✅', reward: 700,
+        condition: (stats) => stats.missionsCompleted >= 50 },
+    { id: 'legend', name: 'Legenda 🏆', desc: 'Dosáhnout všech ostatních úspěchů', icon: '🏆', reward: 2000,
+        condition: (stats) => stats.achievementsUnlocked >= 20 }
+];
+
+// ============================================
+// DAILY MISSIONS
+// ============================================
+const dailyMissions = [
+    { id: 'spin_10', name: '🎰 Desetinásobný točitel', desc: 'Zatočit 10x na automatu', icon: '🎰',
+        reward: 50, target: 10, type: 'slotSpins' },
+    { id: 'wheel_5', name: '🎡 Kolo štěstí', desc: 'Zatočit 5x na kole štěstí', icon: '🎡',
+        reward: 40, target: 5, type: 'wheelSpins' },
+    { id: 'win_500', name: '💰 Denní zisk', desc: 'Vyhrát celkem 500 mincí', icon: '💰',
+        reward: 100, target: 500, type: 'coinsWon' },
+    { id: 'big_win', name: '⭐ Velká výhra', desc: 'Vyhrát 10x sázku najednou', icon: '⭐',
+        reward: 75, target: 1, type: 'bigWins' },
+    { id: 'play_both', name: '🎮 Všestranný hráč', desc: 'Zahrát si automat i kolo', icon: '🎮',
+        reward: 60, target: 2, type: 'gamesPlayed' },
+    { id: 'spin_25', name: '🔄 Točící se válce', desc: 'Zatočit celkem 25x', icon: '🔄',
+        reward: 80, target: 25, type: 'totalSpins' },
+    { id: 'win_3', name: '🎉 Třikrát šťastný', desc: 'Vyhrát 3x za sebou', icon: '🎉',
+        reward: 90, target: 3, type: 'winStreak' },
+    { id: 'bet_500', name: '💸 Odvážný sázející', desc: 'Vsadit celkem 500 mincí', icon: '💸',
+        reward: 70, target: 500, type: 'totalBet' },
+    { id: 'jackpot_hunt', name: '🎰 Hon na jackpot', desc: 'Zatočit s maximální sázkou 5x', icon: '🎰',
+        reward: 100, target: 5, type: 'maxBets' },
+    { id: 'lucky_7', name: '🍀 Šťastná sedmička', desc: 'Vyhrát právě 7x dnes', icon: '🍀',
+        reward: 120, target: 7, type: 'dailyWins' },
+    { id: 'no_loss_10', name: '🛡️ Neporažitelný', desc: '10 zatočení bez prohry', icon: '🛡️',
+        reward: 150, target: 10, type: 'noLossStreak' },
+    { id: 'diamond_day', name: '💎 Diamantový den', desc: 'Vyhrát jednou s 💎💎💎', icon: '💎',
+        reward: 200, target: 1, type: 'diamondWins' },
+    { id: 'early_bird', name: '🐦 Ranní ptáče', desc: 'Vyzvednout denní bonus', icon: '🐦',
+        reward: 50, target: 1, type: 'dailyBonus' },
+    { id: 'coin_collector', name: '🪙 Sběratel mincí', desc: 'Mít alespoň 1000 mincí', icon: '🪙',
+        reward: 100, target: 1000, type: 'totalCoins' },
+    { id: 'speed_spinner', name: '⚡ Rychlý točitel', desc: 'Zatočit 15x za 5 minut', icon: '⚡',
+        reward: 130, target: 15, type: 'fastSpins' }
+];
+
+// ============================================
+// SLOT MACHINE KONFIGURACE
+// ============================================
+const symbols = ['🍒', '🍋', '🍊', '🍇', '🔔', '⭐', '💎', '🎰'];
+const symbolWeights = {
+    '🍒': 25, '🍋': 20, '🍊': 18, '🍇': 15,
+    '🔔': 10, '⭐': 7, '💎': 4, '🎰': 1
+};
+const winMultipliers = {
+    '🍒': 5, '🍋': 4, '🍊': 6, '🍇': 8,
+    '🔔': 10, '⭐': 15, '💎': 20, '🎰': 50
+};
+
+// ============================================
+// WHEEL OF FORTUNE KONFIGURACE
+// ============================================
+const wheelPrizes = [
+    { coins: 0, color: '#666666', weight: 50 },
+    { coins: 5, color: '#ff0080', weight: 20 },
+    { coins: 15, color: '#00ff80', weight: 15 },
+    { coins: 25, color: '#0080ff', weight: 10 },
+    { coins: 50, color: '#ff8000', weight: 4 },
+    { coins: 100, color: '#ffff00', weight: 1 }
+];
+
+// ============================================
+// UPDATE MODAL
+// ============================================
 function showUpdateModal() {
     if (!hasSeenUpdateModal) {
         setTimeout(() => {
@@ -43,10 +298,13 @@ window.closeUpdateModal = function() {
     hasSeenUpdateModal = true;
     const modal = document.getElementById('updateModalContainer');
     if (modal) modal.remove();
-}
-// Loading screen logika
+};
+
+// ============================================
+// LOADING SCREEN
+// ============================================
 function startLoading() {
-    const loadingTime = 3000 + Math.random() * 3000; // 3-6 sekund
+    const loadingTime = 3000 + Math.random() * 3000;
     const loadingBar = document.getElementById('loadingBar');
     const loadingText = document.getElementById('loadingText');
     
@@ -86,565 +344,31 @@ function startLoading() {
     }, loadingTime);
 }
 
-// Vytvoření hvězd
-for(let i = 0; i < 30; i++) {
-    const star = document.createElement('div');
-    star.className = 'star';
-    star.style.left = Math.random() * 100 + '%';
-    star.style.top = Math.random() * 100 + '%';
-    star.style.animationDelay = Math.random() * 3 + 's';
-    document.body.appendChild(star);
+// ============================================
+// HVĚZDY NA POZADÍ
+// ============================================
+function createStars() {
+    for(let i = 0; i < 30; i++) {
+        const star = document.createElement('div');
+        star.className = 'star';
+        star.style.left = Math.random() * 100 + '%';
+        star.style.top = Math.random() * 100 + '%';
+        star.style.animationDelay = Math.random() * 3 + 's';
+        document.body.appendChild(star);
+    }
 }
 
-// Globální proměnné
-let currentUser = {
-    id: null,
-    nickname: '',
-    coins: 0,
-    lastDailyBonus: null,
-    ownedThemes: ['default'],
-    activeTheme: 'default',
-    // Nové statistiky
-   stats: {
-    totalWins: 0,
-    slotSpins: 0,
-    wheelSpins: 0,
-    jackpots: 0,
-    winStreak: 0,
-    currentStreak: 0,
-    totalBet: 0,
-    maxCoins: 0,
-    themesOwned: 1,
-    diamondWins: 0,
-    loginStreak: 1,
-    lastLogin: null,
-    highBets: 0,
-    achievementsUnlocked: 0,
-    coinsWon: 0,       
-    gamesPlayed: []
-    },
-    unlockedAchievements: [],
-    dailyMissions: {},
-    lastMissionReset: null
-};
-
-let currentGame = 'slot';
-let currentBet = 10;
-
-// SHOP ITEMS
-// SHOP ITEMS
-const shopItems = [
-    { id: 'default', name: '🎰 Výchozí', price: 0, icon: '🎰', colors: { 
-        primary: '#00ffff', 
-        secondary: '#ff00ff',
-        bg1: '#0a0015',
-        bg2: '#1a0033',
-        bgGlow1: 'rgba(255,0,255,0.4)',
-        bgGlow2: 'rgba(0,255,255,0.4)'
-    }},
-    { id: 'neon', name: '💠 Neon', price: 500, icon: '💠', colors: { 
-        primary: '#00ffff', 
-        secondary: '#ff00ff',
-        bg1: '#000033',
-        bg2: '#330066',
-        bgGlow1: 'rgba(0,255,255,0.5)',
-        bgGlow2: 'rgba(255,0,255,0.5)'
-    }},
-    { id: 'gold', name: '🌟 Zlatý', price: 1000, icon: '🌟', colors: { 
-        primary: '#ffd700', 
-        secondary: '#ffaa00',
-        bg1: '#1a1000',
-        bg2: '#332200',
-        bgGlow1: 'rgba(255,215,0,0.4)',
-        bgGlow2: 'rgba(255,170,0,0.4)'
-    }},
-    { id: 'fire', name: '🔥 Ohnivý', price: 1500, icon: '🔥', colors: { 
-        primary: '#ff4500', 
-        secondary: '#ff8c00',
-        bg1: '#1a0000',
-        bg2: '#330000',
-        bgGlow1: 'rgba(255,69,0,0.5)',
-        bgGlow2: 'rgba(255,140,0,0.5)'
-    }},
-    { id: 'ocean', name: '🌊 Oceán', price: 2000, icon: '🌊', colors: { 
-        primary: '#0080ff', 
-        secondary: '#00ffff',
-        bg1: '#00001a',
-        bg2: '#001a33',
-        bgGlow1: 'rgba(0,128,255,0.4)',
-        bgGlow2: 'rgba(0,255,255,0.4)'
-    }},
-    { id: 'rainbow', name: '🌈 Duha', price: 3000, icon: '🌈', colors: { 
-        primary: '#ff00ff', 
-        secondary: '#00ff00',
-        bg1: '#1a001a',
-        bg2: '#330033',
-        bgGlow1: 'rgba(255,0,255,0.5)',
-        bgGlow2: 'rgba(0,255,0,0.5)'
-    }},
-    { id: 'emerald', name: '💚 Smaragd', price: 3500, icon: '💚', colors: { 
-        primary: '#00ff88', 
-        secondary: '#00cc66',
-        bg1: '#001a0a',
-        bg2: '#003320',
-        bgGlow1: 'rgba(0,255,136,0.4)',
-        bgGlow2: 'rgba(0,204,102,0.4)'
-    }},
-    { id: 'royal', name: '👑 Královský', price: 4000, icon: '👑', colors: { 
-        primary: '#9400d3', 
-        secondary: '#ffd700',
-        bg1: '#0a001a',
-        bg2: '#200033',
-        bgGlow1: 'rgba(148,0,211,0.5)',
-        bgGlow2: 'rgba(255,215,0,0.4)'
-    }},
-    { id: 'toxic', name: '☢️ Toxický', price: 4500, icon: '☢️', colors: { 
-        primary: '#39ff14', 
-        secondary: '#ccff00',
-        bg1: '#0a1a00',
-        bg2: '#1a3300',
-        bgGlow1: 'rgba(57,255,20,0.5)',
-        bgGlow2: 'rgba(204,255,0,0.4)'
-    }},
-    { id: 'sunset', name: '🌅 Západ slunce', price: 5000, icon: '🌅', colors: { 
-        primary: '#ff6b35', 
-        secondary: '#ff8c42',
-        bg1: '#1a0a00',
-        bg2: '#331400',
-        bgGlow1: 'rgba(255,107,53,0.4)',
-        bgGlow2: 'rgba(255,140,66,0.4)'
-    }},
-    { id: 'ice', name: '❄️ Ledový', price: 5500, icon: '❄️', colors: { 
-        primary: '#00d9ff', 
-        secondary: '#a3e4f7',
-        bg1: '#000a1a',
-        bg2: '#001433',
-        bgGlow1: 'rgba(0,217,255,0.4)',
-        bgGlow2: 'rgba(163,228,247,0.3)'
-    }},
-    { id: 'vampire', name: '🧛 Upíří', price: 6000, icon: '🧛', colors: { 
-        primary: '#8b0000', 
-        secondary: '#dc143c',
-        bg1: '#0a0000',
-        bg2: '#1a0000',
-        bgGlow1: 'rgba(139,0,0,0.5)',
-        bgGlow2: 'rgba(220,20,60,0.4)'
-    }},
-    { id: 'matrix', name: '💻 Matrix', price: 6500, icon: '💻', colors: { 
-        primary: '#00ff00', 
-        secondary: '#008800',
-        bg1: '#000a00',
-        bg2: '#001400',
-        bgGlow1: 'rgba(0,255,0,0.4)',
-        bgGlow2: 'rgba(0,136,0,0.3)'
-    }},
-    { id: 'galaxy', name: '🌌 Galaxie', price: 7000, icon: '🌌', colors: { 
-        primary: '#4b0082', 
-        secondary: '#9370db',
-        bg1: '#050008',
-        bg2: '#0a0010',
-        bgGlow1: 'rgba(75,0,130,0.5)',
-        bgGlow2: 'rgba(147,112,219,0.4)'
-    }},
-    { id: 'cherry', name: '🍒 Třešeň', price: 7500, icon: '🍒', colors: { 
-        primary: '#ff1493', 
-        secondary: '#ff69b4',
-        bg1: '#1a0010',
-        bg2: '#330020',
-        bgGlow1: 'rgba(255,20,147,0.4)',
-        bgGlow2: 'rgba(255,105,180,0.3)'
-    }},
-    { id: 'cyber', name: '🤖 Cyber', price: 8000, icon: '🤖', colors: { 
-        primary: '#00ffff', 
-        secondary: '#ff00ff',
-        bg1: '#000000',
-        bg2: '#0a0a0a',
-        bgGlow1: 'rgba(0,255,255,0.6)',
-        bgGlow2: 'rgba(255,0,255,0.6)'
-    }},
-    { id: 'diamond', name: '💎 Diamant', price: 9000, icon: '💎', colors: { 
-        primary: '#b9f2ff', 
-        secondary: '#ffffff',
-        bg1: '#0a0a1a',
-        bg2: '#14143a',
-        bgGlow1: 'rgba(185,242,255,0.4)',
-        bgGlow2: 'rgba(255,255,255,0.3)'
-    }},
-    { id: 'lava', name: '🌋 Láva', price: 10000, icon: '🌋', colors: { 
-        primary: '#ff4500', 
-        secondary: '#ff0000',
-        bg1: '#1a0000',
-        bg2: '#330000',
-        bgGlow1: 'rgba(255,69,0,0.6)',
-        bgGlow2: 'rgba(255,0,0,0.5)'
-    }},
-    { id: 'mint', name: '🍃 Mátový', price: 11000, icon: '🍃', colors: { 
-        primary: '#98ff98', 
-        secondary: '#3cb371',
-        bg1: '#001a0a',
-        bg2: '#003314',
-        bgGlow1: 'rgba(152,255,152,0.4)',
-        bgGlow2: 'rgba(60,179,113,0.3)'
-    }},
-    { id: 'lightning', name: '⚡ Blesk', price: 12000, icon: '⚡', colors: { 
-        primary: '#ffff00', 
-        secondary: '#ffa500',
-        bg1: '#1a1a00',
-        bg2: '#333300',
-        bgGlow1: 'rgba(255,255,0,0.5)',
-        bgGlow2: 'rgba(255,165,0,0.4)'
-    }},
-    { id: 'legend', name: '🏆 Legendární', price: 15000, icon: '🏆', colors: { 
-        primary: '#ffd700', 
-        secondary: '#ff1493',
-        bg1: '#1a0a00',
-        bg2: '#331400',
-        bgGlow1: 'rgba(255,215,0,0.6)',
-        bgGlow2: 'rgba(255,20,147,0.5)'
-    }}
-];
-const achievements = [
-    { 
-        id: 'first_win', 
-        name: 'První výhra! 🎉', 
-        desc: 'Vyhrát na automatu poprvé',
-        icon: '🎉', 
-        reward: 50,
-        condition: (stats) => stats.totalWins >= 1
-    },
-    { 
-        id: 'slot_master', 
-        name: 'Mistr automatů', 
-        desc: 'Zatočit 100x na automatu',
-        icon: '🎰', 
-        reward: 200,
-        condition: (stats) => stats.slotSpins >= 100
-    },
-    { 
-        id: 'jackpot_king', 
-        name: 'Jackpot král 👑', 
-        desc: 'Vyhrát jackpot (50x)',
-        icon: '👑', 
-        reward: 500,
-        condition: (stats) => stats.jackpots >= 1
-    },
-    { 
-        id: 'wheel_spinner', 
-        name: 'Točitel kola', 
-        desc: 'Zatočit 50x na kole štěstí',
-        icon: '🎡', 
-        reward: 150,
-        condition: (stats) => stats.wheelSpins >= 50
-    },
-    { 
-        id: 'lucky_streak', 
-        name: 'Šťastná série 🍀', 
-        desc: '5 výher za sebou',
-        icon: '🍀', 
-        reward: 300,
-        condition: (stats) => stats.winStreak >= 5
-    },
-    { 
-        id: 'big_spender', 
-        name: 'Velký sázející', 
-        desc: 'Vsadit celkem 5000 mincí',
-        icon: '💸', 
-        reward: 250,
-        condition: (stats) => stats.totalBet >= 5000
-    },
-    { 
-        id: 'millionaire', 
-        name: 'Milionář 💰', 
-        desc: 'Mít 10000 mincí najednou',
-        icon: '💰', 
-        reward: 1000,
-        condition: (stats) => stats.maxCoins >= 10000
-    },
-    { 
-        id: 'collector', 
-        name: 'Sběratel vzhledů 🎨', 
-        desc: 'Vlastnit 5 vzhledů',
-        icon: '🎨', 
-        reward: 400,
-        condition: (stats) => stats.themesOwned >= 5
-    },
-    { 
-        id: 'diamond_hunter', 
-        name: 'Lovec diamantů', 
-        desc: 'Vyhrát 3x s 💎💎💎',
-        icon: '💎', 
-        reward: 600,
-        condition: (stats) => stats.diamondWins >= 3
-    },
-    { 
-        id: 'dedicated', 
-        name: 'Oddaný hráč 🔥', 
-        desc: 'Přihlásit se 7 dní v řadě',
-        icon: '🔥', 
-        reward: 500,
-        condition: (stats) => stats.loginStreak >= 7
-    },
-    { 
-        id: 'high_roller', 
-        name: 'High Roller', 
-        desc: 'Vsadit 100 mincí najednou 10x',
-        icon: '🎲', 
-        reward: 350,
-        condition: (stats) => stats.highBets >= 10
-    },
-    { 
-        id: 'spin_addict', 
-        name: 'Závislák na točení 🌀', 
-        desc: 'Zatočit celkem 500x',
-        icon: '🌀', 
-        reward: 400,
-        condition: (stats) => stats.slotSpins + stats.wheelSpins >= 500
-    },
-    { 
-        id: 'cherry_lover', 
-        name: 'Milovník třešní 🍒', 
-        desc: 'Vyhrát 10x s třešněmi',
-        icon: '🍒', 
-        reward: 300,
-        condition: (stats) => stats.cherryWins >= 10
-    },
-    { 
-        id: 'bell_ringer', 
-        name: 'Zvoník 🔔', 
-        desc: 'Vyhrát 5x se zvonky',
-        icon: '🔔', 
-        reward: 350,
-        condition: (stats) => stats.bellWins >= 5
-    },
-    { 
-        id: 'star_catcher', 
-        name: 'Lovec hvězd ⭐', 
-        desc: 'Vyhrát 8x s hvězdami',
-        icon: '⭐', 
-        reward: 450,
-        condition: (stats) => stats.starWins >= 8
-    },
-    { 
-        id: 'risk_taker', 
-        name: 'Riskující 🎯', 
-        desc: 'Vsadit maximální sázku 50x',
-        icon: '🎯', 
-        reward: 500,
-        condition: (stats) => stats.maxBets >= 50
-    },
-    { 
-        id: 'quick_winner', 
-        name: 'Rychlá výhra ⚡', 
-        desc: 'Vyhrát do 5 zatočení',
-        icon: '⚡', 
-        reward: 200,
-        condition: (stats) => stats.quickWins >= 1
-    },
-    { 
-        id: 'theme_collector', 
-        name: 'Sběratel témat 🎨', 
-        desc: 'Vlastnit 10 vzhledů',
-        icon: '🎨', 
-        reward: 800,
-        condition: (stats) => stats.themesOwned >= 10
-    },
-    { 
-        id: 'daily_player', 
-        name: 'Denní hráč 📅', 
-        desc: 'Vyzvednout denní bonus 30x',
-        icon: '📅', 
-        reward: 600,
-        condition: (stats) => stats.dailyBonusClaims >= 30
-    },
-    { 
-        id: 'mission_master', 
-        name: 'Mistr úkolů ✅', 
-        desc: 'Splnit 50 denních úkolů',
-        icon: '✅', 
-        reward: 700,
-        condition: (stats) => stats.missionsCompleted >= 50
-    },
-    { 
-        id: 'legend', 
-        name: 'Legenda 🏆', 
-        desc: 'Dosáhnout všech ostatních úspěchů',
-        icon: '🏆', 
-        reward: 2000,
-        condition: (stats) => stats.achievementsUnlocked >= 20
-    }
-];
-const dailyMissions = [
-    { 
-        id: 'spin_10', 
-        name: '🎰 Desetinásobný točitel', 
-        desc: 'Zatočit 10x na automatu',
-        icon: '🎰',
-        reward: 50, 
-        target: 10,
-        type: 'slotSpins'
-    },
-    { 
-        id: 'wheel_5', 
-        name: '🎡 Kolo štěstí', 
-        desc: 'Zatočit 5x na kole štěstí',
-        icon: '🎡',
-        reward: 40, 
-        target: 5,
-        type: 'wheelSpins'
-    },
-    { 
-        id: 'win_500', 
-        name: '💰 Denní zisk', 
-        desc: 'Vyhrát celkem 500 mincí',
-        icon: '💰',
-        reward: 100, 
-        target: 500,
-        type: 'coinsWon'
-    },
-    { 
-        id: 'big_win', 
-        name: '⭐ Velká výhra', 
-        desc: 'Vyhrát 10x sázku najednou',
-        icon: '⭐',
-        reward: 75, 
-        target: 1,
-        type: 'bigWins'
-    },
-    { 
-        id: 'play_both', 
-        name: '🎮 Všestranný hráč', 
-        desc: 'Zahrát si automat i kolo',
-        icon: '🎮',
-        reward: 60, 
-        target: 2,
-        type: 'gamesPlayed'
-    },
-    { 
-        id: 'spin_25', 
-        name: '🔄 Točící se válce', 
-        desc: 'Zatočit celkem 25x',
-        icon: '🔄',
-        reward: 80, 
-        target: 25,
-        type: 'totalSpins'
-    },
-    { 
-        id: 'win_3', 
-        name: '🎉 Třikrát šťastný', 
-        desc: 'Vyhrát 3x za sebou',
-        icon: '🎉',
-        reward: 90, 
-        target: 3,
-        type: 'winStreak'
-    },
-    { 
-        id: 'bet_500', 
-        name: '💸 Odvážný sázející', 
-        desc: 'Vsadit celkem 500 mincí',
-        icon: '💸',
-        reward: 70, 
-        target: 500,
-        type: 'totalBet'
-    },
-    { 
-        id: 'jackpot_hunt', 
-        name: '🎰 Hon na jackpot', 
-        desc: 'Zatočit s maximální sázkou 5x',
-        icon: '🎰',
-        reward: 100, 
-        target: 5,
-        type: 'maxBets'
-    },
-    { 
-        id: 'lucky_7', 
-        name: '🍀 Šťastná sedmička', 
-        desc: 'Vyhrát právě 7x dnes',
-        icon: '🍀',
-        reward: 120, 
-        target: 7,
-        type: 'dailyWins'
-    },
-    { 
-        id: 'no_loss_10', 
-        name: '🛡️ Neporažitelný', 
-        desc: '10 zatočení bez prohry',
-        icon: '🛡️',
-        reward: 150, 
-        target: 10,
-        type: 'noLossStreak'
-    },
-    { 
-        id: 'diamond_day', 
-        name: '💎 Diamantový den', 
-        desc: 'Vyhrát jednou s 💎💎💎',
-        icon: '💎',
-        reward: 200, 
-        target: 1,
-        type: 'diamondWins'
-    },
-    { 
-        id: 'early_bird', 
-        name: '🐦 Ranní ptáče', 
-        desc: 'Vyzvednout denní bonus',
-        icon: '🐦',
-        reward: 50, 
-        target: 1,
-        type: 'dailyBonus'
-    },
-    { 
-        id: 'coin_collector', 
-        name: '🪙 Sběratel mincí', 
-        desc: 'Mít alespoň 1000 mincí',
-        icon: '🪙',
-        reward: 100, 
-        target: 1000,
-        type: 'totalCoins'
-    },
-    { 
-        id: 'speed_spinner', 
-        name: '⚡ Rychlý točitel', 
-        desc: 'Zatočit 15x za 5 minut',
-        icon: '⚡',
-        reward: 130, 
-        target: 15,
-        type: 'fastSpins'
-    }
-];
-
-// SLOT MACHINE LOGIC
-const symbols = ['🍒', '🍋', '🍊', '🍇', '🔔', '⭐', '💎', '🎰'];
-const symbolWeights = {
-    '🍒': 25,
-    '🍋': 20,
-    '🍊': 18,
-    '🍇': 15,
-    '🔔': 10,
-    '⭐': 7,
-    '💎': 4,
-    '🎰': 1
-};
-
-const winMultipliers = {
-    '🍒': 5,
-    '🍋': 4,
-    '🍊': 6,
-    '🍇': 8,
-    '🔔': 10,
-    '⭐': 15,
-    '💎': 20,
-    '🎰': 50
-};
-
-let reels = [[], [], []];
-let spinning = false;
-
+// ============================================
+// SLOT MACHINE - INICIALIZACE REELS
+// ============================================
 function initReels() {
     for (let i = 0; i < 3; i++) {
         const reel = document.getElementById(`reel${i + 1}`);
+        if (!reel) continue;
+        
         reel.innerHTML = '';
         reels[i] = [];
         
-        // Vytvoř více symbolů pro plynulé točení
         for (let j = 0; j < 100; j++) {
             const symbol = getWeightedSymbol();
             reels[i].push(symbol);
@@ -668,6 +392,9 @@ function getWeightedSymbol() {
     return '🍒';
 }
 
+// ============================================
+// SLOT MACHINE - SPIN
+// ============================================
 window.spinSlot = async function() {
     if (spinning) return;
     if (currentUser.coins < currentBet) {
@@ -679,21 +406,24 @@ window.spinSlot = async function() {
     document.getElementById('spinSlotBtn').disabled = true;
     document.getElementById('slotResult').textContent = '';
     
-    // Odečti sázku
     currentUser.coins -= currentBet;
-    
-    // ⭐ NOVÉ: Aktualizuj statistiky
     currentUser.stats.slotSpins++;
     currentUser.stats.totalBet += currentBet;
+    currentUser.stats.totalSpins++;
     
-    // High bet tracking
     if (currentBet >= 100) {
         currentUser.stats.highBets++;
+        currentUser.stats.maxBets++;
     }
     
-    // ⭐ NOVÉ: Mission progress - automat
     updateMissionProgress('slotSpins', 1);
+    updateMissionProgress('totalSpins', 1);
     updateMissionProgress('gamesPlayed', 'slot');
+    updateMissionProgress('totalBet', currentBet);
+    
+    if (currentBet >= 100) {
+        updateMissionProgress('maxBets', 1);
+    }
     
     await saveUser();
     updateUI();
@@ -715,20 +445,13 @@ window.spinSlot = async function() {
     });
     
     const spinDurations = [2500, 3200, 3900];
-    const symbolHeight = 100; // Nebo použij: parseFloat(getComputedStyle(document.querySelector('.symbol')).height);
+    const symbolHeight = 100;
     
     for (let i = 0; i < 3; i++) {
         const reel = document.getElementById(`reel${i + 1}`);
         const reelElement = reel.parentElement;
         
-        let targetIndex = -1;
-        for (let j = 0; j < reels[i].length; j++) {
-            if (reels[i][j] === results[i]) {
-                targetIndex = j;
-                break;
-            }
-        }
-        
+        let targetIndex = reels[i].indexOf(results[i]);
         if (targetIndex === -1) targetIndex = 10;
         
         const targetPosition = -(targetIndex * symbolHeight - symbolHeight);
@@ -746,7 +469,6 @@ window.spinSlot = async function() {
         
         setTimeout(() => {
             clearInterval(spinInterval);
-            
             reelElement.classList.remove('spinning');
             reelElement.classList.add('stopping');
             
@@ -764,17 +486,23 @@ window.spinSlot = async function() {
     }, 5200);
 };
 
+// ============================================
+// SLOT MACHINE - VYHODNOCENÍ VÝHRY
+// ============================================
 async function evaluateSlotWin(results) {
     let winAmount = 0;
     let message = '';
+    let isWin = false;
     
     // KONTROLA 3 STEJNÝCH
     if (results[0] === results[1] && results[1] === results[2]) {
         const multiplier = winMultipliers[results[0]];
         winAmount = currentBet * multiplier;
+        isWin = true;
         
         currentUser.stats.totalWins++;
         currentUser.stats.currentStreak++;
+        currentUser.stats.dailyWins++;
         currentUser.stats.coinsWon += winAmount;
         
         if (currentUser.stats.currentStreak > currentUser.stats.winStreak) {
@@ -787,17 +515,15 @@ async function evaluateSlotWin(results) {
         } else if (results[0] === '💎') {
             message = `💎 DIAMANTOVÁ VÝHRA! 💎 +${winAmount} 🪙`;
             currentUser.stats.diamondWins++;
+            updateMissionProgress('diamondWins', 1);
         } else if (results[0] === '🍒') {
             message = `🍒 TŘEŠŇOVÁ VÝHRA! 🍒 +${winAmount} 🪙`;
-            if (!currentUser.stats.cherryWins) currentUser.stats.cherryWins = 0;
             currentUser.stats.cherryWins++;
         } else if (results[0] === '🔔') {
             message = `🔔 ZVONKOVÁ VÝHRA! 🔔 +${winAmount} 🪙`;
-            if (!currentUser.stats.bellWins) currentUser.stats.bellWins = 0;
             currentUser.stats.bellWins++;
         } else if (results[0] === '⭐') {
             message = `⭐ HVĚZDNÁ VÝHRA! ⭐ +${winAmount} 🪙`;
-            if (!currentUser.stats.starWins) currentUser.stats.starWins = 0;
             currentUser.stats.starWins++;
         } else {
             message = `🎉 VÝHRA! 🎉 +${winAmount} 🪙`;
@@ -808,23 +534,27 @@ async function evaluateSlotWin(results) {
         }
         
         updateMissionProgress('coinsWon', winAmount);
+        updateMissionProgress('dailyWins', 1);
+        updateMissionProgress('winStreak', currentUser.stats.currentStreak);
     }
-    // KONTROLA 2 STEJNÝCH (malá výhra)
+    // KONTROLA 2 STEJNÝCH
     else if (results[0] === results[1] || results[1] === results[2] || results[0] === results[2]) {
         let symbol;
         if (results[0] === results[1]) symbol = results[0];
         else if (results[1] === results[2]) symbol = results[1];
         else symbol = results[0];
         
-        // Malá výhra = 0.5x násobek původního
         const smallMultiplier = Math.floor(winMultipliers[symbol] * 0.3);
         winAmount = Math.max(currentBet * smallMultiplier, Math.floor(currentBet * 0.5));
+        isWin = true;
         
         currentUser.stats.totalWins++;
+        currentUser.stats.dailyWins++;
         currentUser.stats.coinsWon += winAmount;
         
         message = `💫 Malá výhra! 💫 +${winAmount} 🪙`;
         updateMissionProgress('coinsWon', winAmount);
+        updateMissionProgress('dailyWins', 1);
     }
     else {
         message = '😢 Zkuste to znovu!';
@@ -833,24 +563,23 @@ async function evaluateSlotWin(results) {
     
     document.getElementById('slotResult').textContent = message;
     
-    if (winAmount > 0) {
+    if (isWin) {
         currentUser.coins += winAmount;
-        checkAchievements();
         
+        if (currentUser.coins > currentUser.stats.maxCoins) {
+            currentUser.stats.maxCoins = currentUser.coins;
+        }
+        
+        checkAchievements();
         await saveUser();
         updateUI();
         
         document.getElementById('winAmount').textContent = `+${winAmount} 🪙`;
         document.getElementById('winModal').style.display = 'flex';
         
-        if (winAmount >= currentBet * 10) {
-            for (let i = 0; i < 100; i++) {
-                setTimeout(() => createConfetti(), i * 10);
-            }
-        } else if (winAmount > 0) {
-            for (let i = 0; i < 30; i++) {
-                setTimeout(() => createConfetti(), i * 15);
-            }
+        const confettiCount = winAmount >= currentBet * 10 ? 100 : 30;
+        for (let i = 0; i < confettiCount; i++) {
+            setTimeout(() => createConfetti(), i * (winAmount >= currentBet * 10 ? 10 : 15));
         }
     } else {
         await saveUser();
@@ -860,6 +589,9 @@ async function evaluateSlotWin(results) {
     document.getElementById('spinSlotBtn').disabled = false;
 }
 
+// ============================================
+// SLOT MACHINE - NASTAVENÍ SÁZKY
+// ============================================
 window.setBet = function(amount) {
     currentBet = amount;
     document.getElementById('currentBet').textContent = amount;
@@ -870,25 +602,16 @@ window.setBet = function(amount) {
     event.target.classList.add('active');
 };
 
-// WHEEL OF FORTUNE LOGIC
-const canvas = document.getElementById("wheel");
-const ctx = canvas.getContext("2d");
-const center = 200;
-
-const wheelPrizes = [
-    { coins: 0, color: '#666666', weight: 50 },
-    { coins: 5, color: '#ff0080', weight: 20 },
-    { coins: 15, color: '#00ff80', weight: 15 },
-    { coins: 25, color: '#0080ff', weight: 10 },
-    { coins: 50, color: '#ff8000', weight: 4 },
-    { coins: 100, color: '#ffff00', weight: 1 }
-];
-
-let rotation = 0;
-let wheelSpinning = false;
-let autoRotating = true;
-
+// ============================================
+// WHEEL OF FORTUNE - KRESLENÍ
+// ============================================
 function drawWheel() {
+    const canvas = document.getElementById("wheel");
+    if (!canvas) return;
+    
+    const ctx = canvas.getContext("2d");
+    const center = 200;
+    
     ctx.clearRect(0, 0, 400, 400);
     const slice = 2 * Math.PI / wheelPrizes.length;
     
@@ -923,8 +646,10 @@ function autoRotate() {
     drawWheel();
     requestAnimationFrame(autoRotate);
 }
-autoRotate();
 
+// ============================================
+// WHEEL OF FORTUNE - SPIN
+// ============================================
 window.spinWheel = async function() {
     const wheelCost = 10;
     
@@ -939,11 +664,14 @@ window.spinWheel = async function() {
     document.getElementById('spinWheelBtn').disabled = true;
     
     currentUser.coins -= wheelCost;
-    
-    // ⭐ NOVÉ: Statistiky kola
     currentUser.stats.wheelSpins++;
+    currentUser.stats.totalSpins++;
+    currentUser.stats.totalBet += wheelCost;
+    
     updateMissionProgress('wheelSpins', 1);
+    updateMissionProgress('totalSpins', 1);
     updateMissionProgress('gamesPlayed', 'wheel');
+    updateMissionProgress('totalBet', wheelCost);
     
     await saveUser();
     updateUI();
@@ -985,11 +713,13 @@ window.spinWheel = async function() {
     requestAnimationFrame(anim);
 };
 
-
 function easeOutCubic(t) {
     return 1 - Math.pow(1 - t, 3);
 }
 
+// ============================================
+// WHEEL OF FORTUNE - VYHODNOCENÍ
+// ============================================
 async function finishWheelSpin(coinWin) {
     wheelSpinning = false;
     document.getElementById('spinWheelBtn').disabled = false;
@@ -997,16 +727,20 @@ async function finishWheelSpin(coinWin) {
     
     currentUser.coins += coinWin;
     
-    // ⭐ NOVÉ: Statistiky
     if (coinWin > 0) {
         currentUser.stats.totalWins++;
+        currentUser.stats.dailyWins++;
         currentUser.stats.coinsWon += coinWin;
+        
         updateMissionProgress('coinsWon', coinWin);
+        updateMissionProgress('dailyWins', 1);
     }
     
-    // ⭐ NOVÉ: Kontrola achievementů
-    checkAchievements();
+    if (currentUser.coins > currentUser.stats.maxCoins) {
+        currentUser.stats.maxCoins = currentUser.coins;
+    }
     
+    checkAchievements();
     await saveUser();
     updateUI();
     
@@ -1020,9 +754,13 @@ async function finishWheelSpin(coinWin) {
     }
 }
 
-// SHOP LOGIC
+// ============================================
+// SHOP - NAČTENÍ
+// ============================================
 function loadShop() {
     const grid = document.getElementById('shopGrid');
+    if (!grid) return;
+    
     grid.innerHTML = '';
     
     shopItems.forEach(item => {
@@ -1045,9 +783,11 @@ function loadShop() {
     });
 }
 
+// ============================================
+// SHOP - NÁKUP TÉMATU
+// ============================================
 window.buyTheme = async function(themeId) {
     const item = shopItems.find(i => i.id === themeId);
-    
     if (!item) return;
     
     if (currentUser.ownedThemes.includes(themeId)) {
@@ -1062,7 +802,9 @@ window.buyTheme = async function(themeId) {
     
     currentUser.coins -= item.price;
     currentUser.ownedThemes.push(themeId);
+    currentUser.stats.themesOwned = currentUser.ownedThemes.length;
     
+    checkAchievements();
     await saveUser();
     updateUI();
     loadShop();
@@ -1075,24 +817,20 @@ window.buyTheme = async function(themeId) {
     }
 };
 
+// ============================================
+// SHOP - AKTIVACE TÉMATU
+// ============================================
 window.activateTheme = async function(themeId) {
     const item = shopItems.find(i => i.id === themeId);
-    
-    if (!item) return;
-    
-    if (!currentUser.ownedThemes.includes(themeId)) {
-        alert('Nejdřív musíte tento vzhled koupit!');
-        return;
-    }
+    if (!item || !currentUser.ownedThemes.includes(themeId)) return;
     
     currentUser.activeTheme = themeId;
-    await saveUser();
-    
-    // Aplikuj téma na celou hru
     applyTheme(item.colors);
+    
+    await saveUser();
+    updateUI();
     loadShop();
     
-    // Zobraz potvrzení
     document.getElementById('winAmount').textContent = `Vzhled ${item.name} aktivován!`;
     document.getElementById('winModal').style.display = 'flex';
     
@@ -1101,15 +839,15 @@ window.activateTheme = async function(themeId) {
     }
 };
 
+// ============================================
+// APLIKACE TÉMATU
+// ============================================
 function applyTheme(colors) {
-    // CELKOVÉ POZADÍ STRÁNKY
     document.body.style.background = `linear-gradient(135deg, ${colors.bg1} 0%, ${colors.bg2} 50%, ${colors.bg1} 100%)`;
     
-    // Vytvoř kompletní CSS pro téma
     const style = document.createElement('style');
     style.id = 'theme-style';
     style.textContent = `
-        /* POZADÍ A GLOW EFEKTY */
         body::before {
             background: 
                 radial-gradient(circle at 20% 50%, ${colors.bgGlow1} 0%, transparent 50%),
@@ -1120,45 +858,16 @@ function applyTheme(colors) {
             background: linear-gradient(135deg, ${colors.bg1} 0%, ${colors.bg2} 50%, ${colors.bg1} 100%) !important;
         }
         
-        #loadingScreen::before {
-            background: 
-                radial-gradient(circle at 20% 50%, ${colors.bgGlow1} 0%, transparent 50%),
-                radial-gradient(circle at 80% 80%, ${colors.bgGlow2} 0%, transparent 50%) !important;
-        }
-        
-        /* LOADING SCREEN */
         .loading-content h2 {
             color: ${colors.primary} !important;
             text-shadow: 0 0 30px ${colors.primary}, 0 0 60px ${colors.secondary} !important;
         }
         
-        .loading-bar-container {
-            border-color: ${colors.primary} !important;
-            box-shadow: 0 0 40px ${colors.primary}cc !important;
-        }
-        
         .loading-bar {
             background: linear-gradient(90deg, ${colors.primary}, ${colors.secondary}, ${colors.primary}) !important;
-            background-size: 200% 100% !important;
             box-shadow: 0 0 30px ${colors.primary}dd !important;
         }
         
-        .loading-text {
-            color: ${colors.secondary} !important;
-            text-shadow: 0 0 15px ${colors.secondary}, 0 0 30px ${colors.primary} !important;
-        }
-        
-        .spinner-dot:nth-child(1) {
-            background: ${colors.primary} !important;
-            box-shadow: 0 0 20px ${colors.primary} !important;
-        }
-        
-        .spinner-dot:nth-child(2) {
-            background: ${colors.secondary} !important;
-            box-shadow: 0 0 20px ${colors.secondary} !important;
-        }
-        
-        /* TOP BAR */
         #topBar {
             background: linear-gradient(135deg, ${colors.bg1}f8 0%, ${colors.bg2}f8 100%) !important;
             border-bottom-color: ${colors.primary} !important;
@@ -1170,85 +879,25 @@ function applyTheme(colors) {
             text-shadow: 0 0 15px ${colors.primary}, 0 0 30px ${colors.secondary} !important;
         }
         
-        #coinDisplay {
+        #coinDisplay, #dailyBonus, #shopBtn {
             background: linear-gradient(135deg, ${colors.primary} 0%, ${colors.secondary} 100%) !important;
             border-color: ${colors.primary} !important;
             box-shadow: 0 0 25px ${colors.primary}dd !important;
         }
         
-        #dailyBonus {
-            background: linear-gradient(135deg, ${colors.secondary} 0%, ${colors.primary} 100%) !important;
-            border-color: ${colors.secondary} !important;
-            box-shadow: 0 0 20px ${colors.secondary}99 !important;
-        }
-        
-        #dailyBonus:hover {
-            box-shadow: 0 0 30px ${colors.secondary}dd !important;
-        }
-        
-        #shopBtn {
+        .game-btn {
             background: linear-gradient(135deg, ${colors.primary} 0%, ${colors.secondary} 100%) !important;
             border-color: ${colors.primary} !important;
-            box-shadow: 0 0 20px ${colors.primary}99 !important;
-        }
-        
-        #shopBtn:hover {
-            box-shadow: 0 0 30px ${colors.primary}dd !important;
-        }
-        
-        /* GAME SELECTOR */
-        #gameSelector {
-            background: ${colors.bg1}66 !important;
         }
         
         .game-btn.active {
             box-shadow: 0 0 30px ${colors.primary} !important;
         }
         
-        #slotBtn {
-            background: linear-gradient(135deg, ${colors.primary} 0%, ${colors.secondary} 100%) !important;
-            border-color: ${colors.primary} !important;
-        }
-        
-        #slotBtn:hover, #slotBtn.active {
-            box-shadow: 0 0 30px ${colors.primary} !important;
-        }
-        
-        #wheelBtn {
-            background: linear-gradient(135deg, ${colors.secondary} 0%, ${colors.primary} 100%) !important;
-            border-color: ${colors.secondary} !important;
-        }
-        
-        #wheelBtn:hover, #wheelBtn.active {
-            box-shadow: 0 0 30px ${colors.secondary} !important;
-        }
-        
-        #leaderboardBtn, #missionsBtn, #achievementsBtn {
-            background: linear-gradient(135deg, ${colors.primary} 0%, ${colors.secondary} 100%) !important;
-            border-color: ${colors.primary} !important;
-        }
-        
-        #leaderboardBtn:hover, #leaderboardBtn.active,
-        #missionsBtn:hover, #missionsBtn.active,
-        #achievementsBtn:hover, #achievementsBtn.active {
-            box-shadow: 0 0 30px ${colors.primary} !important;
-        }
-        
-        /* SLOT MACHINE */
         #slotMachine {
             background: linear-gradient(135deg, ${colors.bg2}dd 0%, ${colors.bg1}dd 50%, ${colors.bg2}dd 100%) !important;
             border-color: ${colors.primary} !important;
             box-shadow: 0 0 50px ${colors.primary}dd !important;
-        }
-        
-        #slotTitle {
-            color: ${colors.primary} !important;
-            text-shadow: 0 0 20px ${colors.primary}, 0 0 40px ${colors.secondary} !important;
-        }
-        
-        #reels {
-            background: ${colors.bg1} !important;
-            box-shadow: inset 0 0 30px ${colors.primary}88 !important;
         }
         
         .reel {
@@ -1257,92 +906,15 @@ function applyTheme(colors) {
             box-shadow: 0 0 20px ${colors.primary}88 !important;
         }
         
-        .reel-window {
-            border-color: ${colors.secondary} !important;
-            box-shadow: 0 0 15px ${colors.secondary}bb !important;
-        }
-        
-        .symbol {
-            background: linear-gradient(135deg, ${colors.bg2} 0%, ${colors.bg1} 100%) !important;
-            border-bottom-color: ${colors.primary}44 !important;
-        }
-        
-        .symbol.win {
-            background: radial-gradient(circle, ${colors.secondary} 0%, ${colors.primary} 70%) !important;
-            box-shadow: 0 0 25px ${colors.secondary}, inset 0 0 15px ${colors.primary} !important;
-        }
-        
-        #betAmount {
-            color: ${colors.primary} !important;
-            text-shadow: 0 0 10px ${colors.primary} !important;
-        }
-        
-        .bet-btn {
-            background: linear-gradient(135deg, ${colors.secondary} 0%, ${colors.primary} 100%) !important;
-            border-color: ${colors.secondary} !important;
-        }
-        
-        .bet-btn:hover {
-            box-shadow: 0 0 20px ${colors.secondary}99 !important;
-        }
-        
         .bet-btn.active {
             background: linear-gradient(135deg, ${colors.primary} 0%, ${colors.secondary} 100%) !important;
-            border-color: ${colors.primary} !important;
             box-shadow: 0 0 20px ${colors.primary}cc !important;
         }
         
-        #spinSlotBtn {
+        #spinSlotBtn, #spinWheelBtn {
             background: linear-gradient(135deg, ${colors.primary} 0%, ${colors.secondary} 100%) !important;
             border-color: ${colors.primary} !important;
             box-shadow: 0 0 30px ${colors.primary}99 !important;
-        }
-        
-        #spinSlotBtn:hover {
-            box-shadow: 0 0 40px ${colors.primary}dd !important;
-        }
-        
-        #slotResult {
-            color: ${colors.primary} !important;
-            text-shadow: 0 0 15px ${colors.primary} !important;
-        }
-        
-        /* PAYTABLE */
-        .paytable {
-            background: linear-gradient(135deg, ${colors.bg2}cc 0%, ${colors.bg1}cc 100%) !important;
-            border-color: ${colors.primary} !important;
-            box-shadow: 0 0 30px ${colors.primary}88 !important;
-        }
-        
-        .paytable h3 {
-            color: ${colors.primary} !important;
-            text-shadow: 0 0 15px ${colors.primary} !important;
-        }
-        
-        .paytable-item {
-            background: ${colors.primary}26 !important;
-            border-color: ${colors.primary}4d !important;
-        }
-        
-        .paytable-item:hover {
-            background: ${colors.primary}40 !important;
-        }
-        
-        .paytable-item.jackpot {
-            background: ${colors.secondary}4d !important;
-            border-color: ${colors.secondary} !important;
-            color: ${colors.secondary} !important;
-        }
-        
-        /* WHEEL OF FORTUNE */
-        #wheelTitle {
-            color: ${colors.secondary} !important;
-            text-shadow: 0 0 15px ${colors.secondary}, 0 0 30px ${colors.primary} !important;
-        }
-        
-        #wheelCost {
-            color: ${colors.primary} !important;
-            text-shadow: 0 0 10px ${colors.primary} !important;
         }
         
         canvas {
@@ -1350,154 +922,6 @@ function applyTheme(colors) {
             box-shadow: 0 0 50px ${colors.primary}dd !important;
         }
         
-        .pointer {
-            border-top-color: ${colors.secondary} !important;
-            filter: drop-shadow(0 0 10px ${colors.secondary}) !important;
-        }
-        
-        .wheelCenter {
-            background: linear-gradient(135deg, ${colors.primary} 0%, ${colors.secondary} 100%) !important;
-            border-color: ${colors.secondary} !important;
-            box-shadow: 0 0 20px ${colors.secondary}cc !important;
-        }
-        
-        #spinWheelBtn {
-            background: linear-gradient(135deg, ${colors.secondary} 0%, ${colors.primary} 100%) !important;
-            border-color: ${colors.secondary} !important;
-            box-shadow: 0 0 30px ${colors.secondary}99 !important;
-        }
-        
-        #spinWheelBtn:hover {
-            box-shadow: 0 0 40px ${colors.secondary}dd !important;
-        }
-        
-        /* LEADERBOARD */
-        #leaderboardFull {
-            background: linear-gradient(135deg, ${colors.bg2}f5 0%, ${colors.bg1}f5 100%) !important;
-            border-color: ${colors.primary} !important;
-            box-shadow: 0 0 50px ${colors.primary}bb !important;
-        }
-        
-        #leaderboardFull h2 {
-            color: ${colors.primary} !important;
-            text-shadow: 0 0 20px ${colors.primary}, 0 0 40px ${colors.secondary} !important;
-        }
-        
-        .leaderboard-item {
-            background: ${colors.primary}1a !important;
-            border-color: ${colors.primary}4d !important;
-        }
-        
-        .leaderboard-item:hover {
-            background: ${colors.primary}4d !important;
-            box-shadow: 0 0 20px ${colors.primary}88 !important;
-        }
-        
-        .leaderboard-item.top3 {
-            background: linear-gradient(135deg, ${colors.secondary}4d 0%, ${colors.primary}4d 100%) !important;
-            border-color: ${colors.primary} !important;
-        }
-        
-        .leaderboard-rank {
-            color: ${colors.secondary} !important;
-        }
-        
-        .leaderboard-coins {
-            color: ${colors.primary} !important;
-        }
-        
-        /* ACHIEVEMENTS & MISSIONS */
-        .achievement-item, .mission-item {
-            background: ${colors.primary}1a !important;
-            border-color: ${colors.primary}4d !important;
-        }
-        
-        .achievement-item:hover, .mission-item:hover {
-            background: ${colors.primary}40 !important;
-            box-shadow: 0 0 25px ${colors.primary}99 !important;
-        }
-        
-        .achievement-item.completed, .mission-item.completed {
-            background: ${colors.secondary}33 !important;
-            border-color: ${colors.secondary} !important;
-        }
-        
-        .achievement-name, .mission-name {
-            color: ${colors.primary} !important;
-            text-shadow: 0 0 10px ${colors.primary} !important;
-        }
-        
-        .achievement-reward, .mission-reward {
-            color: ${colors.secondary} !important;
-        }
-        
-        .progress-bar-container {
-            border-color: ${colors.primary}4d !important;
-        }
-        
-        .progress-bar {
-            background: linear-gradient(90deg, ${colors.primary}, ${colors.secondary}) !important;
-            box-shadow: 0 0 10px ${colors.primary}cc !important;
-        }
-        
-        .progress-text {
-            color: ${colors.primary} !important;
-        }
-        
-        .claim-btn {
-            background: linear-gradient(135deg, ${colors.secondary} 0%, ${colors.primary} 100%) !important;
-            border-color: ${colors.secondary} !important;
-        }
-        
-        .claim-btn:hover {
-            box-shadow: 0 0 30px ${colors.secondary} !important;
-        }
-        
-        .completed-badge {
-            background: linear-gradient(135deg, ${colors.secondary} 0%, ${colors.primary} 100%) !important;
-            box-shadow: 0 0 15px ${colors.secondary}cc !important;
-        }
-        
-        /* SHOP */
-        #shopGrid h2 {
-            color: ${colors.primary} !important;
-            text-shadow: 0 0 20px ${colors.primary}, 0 0 40px ${colors.secondary} !important;
-        }
-        
-        .shop-item {
-            background: linear-gradient(135deg, ${colors.bg2}e6 0%, ${colors.bg1}e6 100%) !important;
-            border-color: ${colors.primary} !important;
-            box-shadow: 0 0 30px ${colors.primary}88 !important;
-        }
-        
-        .shop-item:hover {
-            box-shadow: 0 0 50px ${colors.primary}cc !important;
-        }
-        
-        .shop-item.owned {
-            border-color: ${colors.secondary} !important;
-            box-shadow: 0 0 30px ${colors.secondary}88 !important;
-        }
-        
-        .shop-name {
-            color: ${colors.primary} !important;
-            text-shadow: 0 0 10px ${colors.primary} !important;
-        }
-        
-        .shop-price {
-            color: ${colors.secondary} !important;
-        }
-        
-        .shop-buy-btn {
-            background: linear-gradient(135deg, ${colors.secondary} 0%, ${colors.primary} 100%) !important;
-            border-color: ${colors.secondary} !important;
-        }
-        
-        .shop-buy-btn:hover {
-            box-shadow: 0 0 20px ${colors.secondary}cc !important;
-        }
-        
-        /* MODALS */
         .modal-content {
             background: linear-gradient(135deg, ${colors.bg2} 0%, ${colors.bg1} 100%) !important;
             border-color: ${colors.primary} !important;
@@ -1509,67 +933,37 @@ function applyTheme(colors) {
             text-shadow: 0 0 20px ${colors.primary}, 0 0 40px ${colors.secondary} !important;
         }
         
-        .modal-close {
-            background: linear-gradient(135deg, ${colors.primary} 0%, ${colors.secondary} 100%) !important;
+        .shop-item {
+            background: linear-gradient(135deg, ${colors.bg2}e6 0%, ${colors.bg1}e6 100%) !important;
             border-color: ${colors.primary} !important;
+            box-shadow: 0 0 30px ${colors.primary}88 !important;
         }
         
-        .modal-close:hover {
-            box-shadow: 0 0 30px ${colors.primary}cc !important;
+        .achievement-item, .mission-item {
+            background: ${colors.primary}1a !important;
+            border-color: ${colors.primary}4d !important;
         }
         
-        #loginModal input {
-            border-color: ${colors.primary} !important;
-            background: ${colors.bg1}cc !important;
+        .progress-bar {
+            background: linear-gradient(90deg, ${colors.primary}, ${colors.secondary}) !important;
+            box-shadow: 0 0 10px ${colors.primary}cc !important;
         }
         
-        #loginModal input:focus {
-            border-color: ${colors.secondary} !important;
-            box-shadow: 0 0 20px ${colors.secondary}88 !important;
-        }
-        
-        #loginModal button {
-            background: linear-gradient(135deg, ${colors.secondary} 0%, ${colors.primary} 100%) !important;
-            border-color: ${colors.secondary} !important;
-        }
-        
-        #loginModal button:hover {
-            box-shadow: 0 0 30px ${colors.secondary}cc !important;
-        }
-        
-        #winAmount {
-            color: ${colors.primary} !important;
-            text-shadow: 0 0 30px ${colors.primary}, 0 0 60px ${colors.secondary} !important;
-        }
-        
-        /* NOTIFICATION */
-        .notification {
-            background: linear-gradient(135deg, ${colors.secondary} 0%, ${colors.primary} 100%) !important;
-            border-color: ${colors.secondary} !important;
-            box-shadow: 0 0 30px ${colors.secondary}dd !important;
-        }
-        
-        /* SCROLLBAR */
-        ::-webkit-scrollbar-thumb {
-            background: linear-gradient(135deg, ${colors.primary} 0%, ${colors.secondary} 100%) !important;
-        }
-        
-        /* HVĚZDY */
         .star {
             background: ${colors.primary} !important;
             box-shadow: 0 0 5px ${colors.primary} !important;
         }
     `;
     
-    // Odstraň starý style, pokud existuje
     const oldStyle = document.getElementById('theme-style');
     if (oldStyle) oldStyle.remove();
     
     document.head.appendChild(style);
-    
-    console.log('✨ Téma aplikováno:', colors);
 }
 
+// ============================================
+// PŘEPÍNÁNÍ HER
+// ============================================
 window.switchGame = function(game) {
     currentGame = game;
     
@@ -1581,31 +975,30 @@ window.switchGame = function(game) {
         btn.classList.remove('active');
     });
     
-    if (game === 'slot') {
-        document.getElementById('slotGame').classList.add('active');
-        document.getElementById('slotBtn').classList.add('active');
-    } else if (game === 'wheel') {
-        document.getElementById('wheelGame').classList.add('active');
-        document.getElementById('wheelBtn').classList.add('active');
-    } else if (game === 'missions') {
-        document.getElementById('missionsGame').classList.add('active');
-        document.getElementById('missionsBtn').classList.add('active');
-        loadMissions();
-    } else if (game === 'achievements') {
-        document.getElementById('achievementsGame').classList.add('active');
-        document.getElementById('achievementsBtn').classList.add('active');
-        loadAchievements();
-    } else if (game === 'leaderboard') {
-        document.getElementById('leaderboardGame').classList.add('active');
-        document.getElementById('leaderboardBtn').classList.add('active');
-        loadLeaderboard();
-    } else if (game === 'shop') {
-        document.getElementById('shopGame').classList.add('active');
-        document.getElementById('shopBtn').classList.add('active');
-        loadShop();
-    }
+    const gameMap = {
+        'slot': 'slotGame',
+        'wheel': 'wheelGame',
+        'missions': 'missionsGame',
+        'achievements': 'achievementsGame',
+        'leaderboard': 'leaderboardGame',
+        'shop': 'shopGame'
+    };
+    
+    const gameElement = document.getElementById(gameMap[game]);
+    const btnElement = document.getElementById(`${game}Btn`);
+    
+    if (gameElement) gameElement.classList.add('active');
+    if (btnElement) btnElement.classList.add('active');
+    
+    if (game === 'missions') loadMissions();
+    if (game === 'achievements') loadAchievements();
+    if (game === 'leaderboard') loadLeaderboard();
+    if (game === 'shop') loadShop();
 };
 
+// ============================================
+// PŘIHLÁŠENÍ
+// ============================================
 window.login = async function() {
     const nickname = document.getElementById('nicknameInput').value.trim();
     if (!nickname || nickname.length < 2) {
@@ -1619,36 +1012,29 @@ window.login = async function() {
     loginBtn.disabled = true;
     
     try {
-        const { data: existingUser, error: searchError } = await supabase
+        const { data: existingUser } = await supabase
             .from('casino_users')
             .select('*')
             .eq('nickname', nickname)
             .maybeSingle();
         
         if (existingUser) {
-            // Načti existujícího uživatele
             currentUser.id = existingUser.id;
             currentUser.nickname = existingUser.nickname;
             currentUser.coins = existingUser.coins;
             currentUser.lastDailyBonus = existingUser.last_daily_bonus;
             currentUser.ownedThemes = existingUser.owned_themes || ['default'];
             currentUser.activeTheme = existingUser.active_theme || 'default';
-            currentUser.stats = {
-                ...currentUser.stats,
-                ...(existingUser.stats || {})
-            };
+            currentUser.stats = { ...currentUser.stats, ...(existingUser.stats || {}) };
             currentUser.unlockedAchievements = existingUser.unlocked_achievements || [];
             currentUser.dailyMissions = existingUser.daily_missions || {};
             currentUser.lastMissionReset = existingUser.last_mission_reset;
-            
-            console.log('✅ Uživatel přihlášen:', currentUser);
         } else {
-            // Vytvoř nového uživatele
             currentUser.nickname = nickname;
             currentUser.coins = 100;
             currentUser.lastDailyBonus = new Date().toISOString();
             
-            const { data: newUser, error: insertError } = await supabase
+            const { data: newUser } = await supabase
                 .from('casino_users')
                 .insert([{
                     nickname: currentUser.nickname,
@@ -1664,20 +1050,16 @@ window.login = async function() {
                 .select()
                 .single();
             
-            if (insertError) {
-                throw insertError;
-            }
-            
             currentUser.id = newUser.id;
-            console.log('✅ Nový uživatel vytvořen:', currentUser);
         }
         
+        updateLoginStreak();
         initializeMissions();
         
         const activeItem = shopItems.find(i => i.id === currentUser.activeTheme);
-        if (activeItem) {
-            applyTheme(activeItem.colors);
-        }
+        if (activeItem) applyTheme(activeItem.colors);
+        
+        localStorage.setItem('currentUser', JSON.stringify({ id: currentUser.id }));
         
         document.getElementById('loginModal').style.display = 'none';
         updateUI();
@@ -1690,14 +1072,24 @@ window.login = async function() {
         loginBtn.disabled = false;
     }
 };
+
+// ============================================
+// AKTUALIZACE UI
+// ============================================
 function updateUI() {
-    document.getElementById('userName').textContent = currentUser.nickname;
-    document.getElementById('coinAmount').textContent = currentUser.coins;
+    const userNameEl = document.getElementById('userName');
+    const coinAmountEl = document.getElementById('coinAmount');
+    
+    if (userNameEl) userNameEl.textContent = currentUser.nickname;
+    if (coinAmountEl) coinAmountEl.textContent = currentUser.coins;
 }
 
+// ============================================
+// DENNÍ BONUS
+// ============================================
 window.claimDailyBonus = async function() {
     const now = Date.now();
-    const TWELVE_HOURS = 12 * 60 * 60 * 1000; // 12 hodin v milisekundách
+    const TWELVE_HOURS = 12 * 60 * 60 * 1000;
     
     if (currentUser.lastDailyBonus) {
         const lastClaim = new Date(currentUser.lastDailyBonus).getTime();
@@ -1716,8 +1108,6 @@ window.claimDailyBonus = async function() {
     const bonus = 300;
     currentUser.coins += bonus;
     currentUser.lastDailyBonus = new Date().toISOString();
-    
-    if (!currentUser.stats.dailyBonusClaims) currentUser.stats.dailyBonusClaims = 0;
     currentUser.stats.dailyBonusClaims++;
     
     updateMissionProgress('dailyBonus', 1);
@@ -1733,50 +1123,7 @@ window.claimDailyBonus = async function() {
         setTimeout(() => createConfetti(), i * 20);
     }
 };
-   async function saveUser() {
-    if (!currentUser.id) return;
-    
-    // Aktualizuj totalCoins mission
-    if (currentUser.dailyMissions && currentUser.dailyMissions.coin_collector) {
-        const mission = currentUser.dailyMissions.coin_collector;
-        if (!mission.completed && currentUser.coins >= 1000) {
-            mission.progress = currentUser.coins;
-            mission.completed = true;
-            showNotification(`✅ Úkol splněn: Sběratel mincí`);
-        }
-    }
-    
-    try {
-        const { data: existingUser } = await supabase
-            .from('casino_users')
-            .select('id')
-            .eq('id', currentUser.id)
-            .maybeSingle();
-        
-        if (existingUser) {
-            const { error } = await supabase
-                .from('casino_users')
-                .update({
-                    nickname: currentUser.nickname,
-                    coins: currentUser.coins,
-                    last_daily_bonus: currentUser.lastDailyBonus,
-                    owned_themes: currentUser.ownedThemes,
-                    active_theme: currentUser.activeTheme,
-                    stats: currentUser.stats,
-                    unlocked_achievements: currentUser.unlockedAchievements,
-                    daily_missions: currentUser.dailyMissions,
-                    last_mission_reset: currentUser.lastMissionReset
-                })
-                .eq('id', currentUser.id);
-            
-            if (error) {
-                console.error('Chyba při updatu:', error);
-            }
-        }
-    } catch (e) {
-        console.error('Chyba při ukládání:', e);
-    }
-}
+
 function checkDailyBonus() {
     const btn = document.getElementById('dailyBonus');
     if (!btn) return;
@@ -1794,8 +1141,6 @@ function checkDailyBonus() {
             
             btn.disabled = true;
             btn.textContent = `⏰ ${hoursLeft}h ${minutesLeft}m`;
-            
-            // Aktualizuj čas každou minutu
             setTimeout(checkDailyBonus, 60000);
         } else {
             btn.disabled = false;
@@ -1807,12 +1152,50 @@ function checkDailyBonus() {
     }
 }
 
+// ============================================
+// ULOŽENÍ UŽIVATELE
+// ============================================
+async function saveUser() {
+    if (!currentUser.id) return;
+    
+    if (currentUser.dailyMissions && currentUser.dailyMissions.coin_collector) {
+        const mission = currentUser.dailyMissions.coin_collector;
+        if (!mission.completed && currentUser.coins >= 1000) {
+            mission.progress = currentUser.coins;
+            mission.completed = true;
+        }
+    }
+    
+    try {
+        await supabase
+            .from('casino_users')
+            .update({
+                nickname: currentUser.nickname,
+                coins: currentUser.coins,
+                last_daily_bonus: currentUser.lastDailyBonus,
+                owned_themes: currentUser.ownedThemes,
+                active_theme: currentUser.activeTheme,
+                stats: currentUser.stats,
+                unlocked_achievements: currentUser.unlockedAchievements,
+                daily_missions: currentUser.dailyMissions,
+                last_mission_reset: currentUser.lastMissionReset
+            })
+            .eq('id', currentUser.id);
+    } catch (e) {
+        console.error('Chyba při ukládání:', e);
+    }
+}
+
+// ============================================
 // LEADERBOARD
+// ============================================
 async function loadLeaderboard() {
     const list = document.getElementById('leaderboardList');
+    if (!list) return;
+    
     list.innerHTML = '<div style="text-align: center; color: #fff; font-size: 20px;">Načítám žebříček...</div>';
     
-    const { data, error } = await supabase
+    const { data } = await supabase
         .from('casino_users')
         .select('*')
         .order('coins', { ascending: false })
@@ -1820,7 +1203,7 @@ async function loadLeaderboard() {
     
     list.innerHTML = '';
     
-    if (error || !data || data.length === 0) {
+    if (!data || data.length === 0) {
         list.innerHTML = '<div style="text-align: center; color: #fff; font-size: 20px;">Žádní hráči v žebříčku</div>';
         return;
     }
@@ -1843,93 +1226,15 @@ async function loadLeaderboard() {
         list.appendChild(item);
     });
 }
-// ACHIEVEMENTS & MISSIONS LOGIC
 
-function initializeMissions() {
-    const today = new Date().toISOString().split('T')[0];
-    
-    if (currentUser.lastMissionReset !== today) {
-        // Reset denních úkolů
-        currentUser.lastMissionReset = today;
-        currentUser.dailyMissions = {};
-        
-        dailyMissions.forEach(mission => {
-            currentUser.dailyMissions[mission.id] = {
-                progress: 0,
-                completed: false,
-                claimed: false
-            };
-        });
-        
-        // Reset denních statistik
-        if (!currentUser.stats) currentUser.stats = {};
-        currentUser.stats.coinsWon = 0;
-        currentUser.stats.bigWins = 0;
-        currentUser.stats.gamesPlayed = [];
-        
-        saveUser();
-    }
-}
-
-
-function updateMissionProgress(type, amount = 1) {
-    if (!currentUser.dailyMissions) initializeMissions();
-    
-    // Inicializuj gamesPlayed pokud neexistuje
-    if (!currentUser.stats.gamesPlayed) {
-        currentUser.stats.gamesPlayed = [];
-    }
-    
-    // Speciální handling pro gamesPlayed
-    if (type === 'gamesPlayed') {
-        if (!currentUser.stats.gamesPlayed.includes(amount)) {
-            currentUser.stats.gamesPlayed.push(amount);
-        }
-        
-        dailyMissions.forEach(mission => {
-            if (mission.type === 'gamesPlayed') {
-                const missionData = currentUser.dailyMissions[mission.id];
-                if (missionData && !missionData.completed) {
-                    missionData.progress = currentUser.stats.gamesPlayed.length;
-                    
-                    if (missionData.progress >= mission.target) {
-                        missionData.progress = mission.target;
-                        missionData.completed = true;
-                        showNotification(`✅ Úkol splněn: ${mission.name}`);
-                    }
-                }
-            }
-        });
-    } else {
-        // Normální progress update
-        dailyMissions.forEach(mission => {
-            if (mission.type === type) {
-                const missionData = currentUser.dailyMissions[mission.id];
-                if (missionData && !missionData.completed) {
-                    missionData.progress += amount;
-                    
-                    if (missionData.progress >= mission.target) {
-                        missionData.progress = mission.target;
-                        missionData.completed = true;
-                        showNotification(`✅ Úkol splněn: ${mission.name}`);
-                    }
-                    
-                    saveUser();
-                    if (currentGame === 'missions') loadMissions();
-                }
-            }
-        });
-    }
-}
-
-
+// ============================================
+// ACHIEVEMENTS
+// ============================================
 function checkAchievements() {
     if (!currentUser.stats) return;
     
-    // Aktualizuj themesOwned
     currentUser.stats.themesOwned = currentUser.ownedThemes.length;
     
-    // Aktualizuj maxCoins
     if (currentUser.coins > (currentUser.stats.maxCoins || 0)) {
         currentUser.stats.maxCoins = currentUser.coins;
     }
@@ -1963,9 +1268,10 @@ async function unlockAchievement(achievementId) {
     if (currentGame === 'achievements') loadAchievements();
 }
 
-
 function loadAchievements() {
     const list = document.getElementById('achievementsList');
+    if (!list) return;
+    
     list.innerHTML = '';
     
     achievements.forEach(achievement => {
@@ -1988,8 +1294,93 @@ function loadAchievements() {
     });
 }
 
+// ============================================
+// MISSIONS
+// ============================================
+function initializeMissions() {
+    const today = new Date().toISOString().split('T')[0];
+    
+    if (currentUser.lastMissionReset !== today) {
+        currentUser.lastMissionReset = today;
+        currentUser.dailyMissions = {};
+        
+        dailyMissions.forEach(mission => {
+            currentUser.dailyMissions[mission.id] = {
+                progress: 0,
+                completed: false,
+                claimed: false
+            };
+        });
+        
+        currentUser.stats.coinsWon = 0;
+        currentUser.stats.bigWins = 0;
+        currentUser.stats.gamesPlayed = [];
+        currentUser.stats.dailyWins = 0;
+        currentUser.stats.totalSpins = 0;
+        
+        saveUser();
+    }
+}
+
+function updateMissionProgress(type, amount = 1) {
+    if (!currentUser.dailyMissions) initializeMissions();
+    if (!currentUser.stats.gamesPlayed) currentUser.stats.gamesPlayed = [];
+    
+    if (type === 'gamesPlayed') {
+        if (!currentUser.stats.gamesPlayed.includes(amount)) {
+            currentUser.stats.gamesPlayed.push(amount);
+        }
+        
+        dailyMissions.forEach(mission => {
+            if (mission.type === 'gamesPlayed') {
+                const missionData = currentUser.dailyMissions[mission.id];
+                if (missionData && !missionData.completed) {
+                    missionData.progress = currentUser.stats.gamesPlayed.length;
+                    
+                    if (missionData.progress >= mission.target) {
+                        missionData.progress = mission.target;
+                        missionData.completed = true;
+                    }
+                }
+            }
+        });
+    } else if (type === 'totalCoins') {
+        // Speciální handling pro coin_collector mission
+        dailyMissions.forEach(mission => {
+            if (mission.type === 'totalCoins') {
+                const missionData = currentUser.dailyMissions[mission.id];
+                if (missionData && !missionData.completed) {
+                    if (currentUser.coins >= mission.target) {
+                        missionData.progress = mission.target;
+                        missionData.completed = true;
+                    }
+                }
+            }
+        });
+    } else {
+        dailyMissions.forEach(mission => {
+            if (mission.type === type) {
+                const missionData = currentUser.dailyMissions[mission.id];
+                if (missionData && !missionData.completed) {
+                    missionData.progress += amount;
+                    
+                    if (missionData.progress >= mission.target) {
+                        missionData.progress = mission.target;
+                        missionData.completed = true;
+                    }
+                }
+            }
+        });
+    }
+    
+    saveUser();
+    if (currentGame === 'missions') loadMissions();
+}
+
 function loadMissions() {
     const list = document.getElementById('missionsList');
+    if (!list) return;
+    
     list.innerHTML = '';
     
     if (!currentUser.dailyMissions) initializeMissions();
@@ -2036,6 +1427,7 @@ window.claimMission = async function(missionId) {
     
     missionData.claimed = true;
     currentUser.coins += mission.reward;
+    currentUser.stats.missionsCompleted++;
     
     await saveUser();
     updateUI();
@@ -2049,10 +1441,26 @@ window.claimMission = async function(missionId) {
     }
 };
 
+// ============================================
+// UTILITY FUNKCE
+// ============================================
 function showNotification(message) {
     const notification = document.createElement('div');
     notification.className = 'notification';
     notification.textContent = message;
+    notification.style.cssText = `
+        position: fixed;
+        top: 100px;
+        right: 20px;
+        background: linear-gradient(135deg, #00ffff, #ff00ff);
+        color: white;
+        padding: 15px 25px;
+        border-radius: 10px;
+        font-size: 18px;
+        font-weight: bold;
+        z-index: 10000;
+        animation: slideIn 0.5s ease;
+    `;
     document.body.appendChild(notification);
     
     setTimeout(() => {
@@ -2071,29 +1479,30 @@ function updateLoginStreak() {
         const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
         
         if (diffDays === 1) {
-            // Pokračující streak
             currentUser.stats.loginStreak++;
         } else if (diffDays > 1) {
-            // Přerušený streak
             currentUser.stats.loginStreak = 1;
         }
-        // diffDays === 0 znamená stejný den, neděláme nic
     } else {
-        // První přihlášení
         currentUser.stats.loginStreak = 1;
     }
     
     currentUser.stats.lastLogin = today;
 }
-// UTILITIES
+
 function createConfetti() {
     const c = document.createElement("div");
     c.className = "confetti";
-    c.style.left = Math.random() * window.innerWidth + "px";
-    c.style.top = "-10px";
-    c.style.background = `hsl(${Math.random() * 360}, 80%, 60%)`;
-    c.style.width = (5 + Math.random() * 10) + "px";
-    c.style.height = c.style.width;
+    c.style.cssText = `
+        position: fixed;
+        width: ${5 + Math.random() * 10}px;
+        height: ${5 + Math.random() * 10}px;
+        background: hsl(${Math.random() * 360}, 80%, 60%);
+        left: ${Math.random() * window.innerWidth}px;
+        top: -10px;
+        z-index: 9999;
+        pointer-events: none;
+    `;
     document.body.appendChild(c);
     
     const speedY = 3 + Math.random() * 5;
@@ -2111,19 +1520,31 @@ function createConfetti() {
 }
 
 window.closeWinModal = function() {
-    document.getElementById('winModal').style.display = 'none';
+    const modal = document.getElementById('winModal');
+    if (modal) modal.style.display = 'none';
 };
 
-document.getElementById('nicknameInput').addEventListener('keypress', function(e) {
-    if (e.key === 'Enter') login();
-});
+// ============================================
+// EVENT LISTENERS
+// ============================================
+const nicknameInput = document.getElementById('nicknameInput');
+if (nicknameInput) {
+    nicknameInput.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') login();
+    });
+}
 
+// ============================================
+// INICIALIZACE
+// ============================================
 window.addEventListener('load', async () => {
     console.log('🎰 Casino inicializace...');
     
-    showUpdateModal(); // Zobrazí update modal po loadingu
+    createStars();
+    showUpdateModal();
     startLoading();
     initReels();
+    autoRotate();
     
     setTimeout(async () => {
         const savedUser = localStorage.getItem('currentUser');
@@ -2132,7 +1553,7 @@ window.addEventListener('load', async () => {
             try {
                 const user = JSON.parse(savedUser);
                 
-                const { data: existingUser, error } = await supabase
+                const { data: existingUser } = await supabase
                     .from('casino_users')
                     .select('*')
                     .eq('id', user.id)
@@ -2145,30 +1566,19 @@ window.addEventListener('load', async () => {
                     currentUser.lastDailyBonus = existingUser.last_daily_bonus;
                     currentUser.ownedThemes = existingUser.owned_themes || ['default'];
                     currentUser.activeTheme = existingUser.active_theme || 'default';
-                    currentUser.stats = existingUser.stats || currentUser.stats;
-                    
-                    // INICIALIZUJ NOVÉ STATISTIKY
-                    if (!currentUser.stats.cherryWins) currentUser.stats.cherryWins = 0;
-                    if (!currentUser.stats.bellWins) currentUser.stats.bellWins = 0;
-                    if (!currentUser.stats.starWins) currentUser.stats.starWins = 0;
-                    if (!currentUser.stats.dailyBonusClaims) currentUser.stats.dailyBonusClaims = 0;
-                    if (!currentUser.stats.missionsCompleted) currentUser.stats.missionsCompleted = 0;
-                    
+                    currentUser.stats = { ...currentUser.stats, ...(existingUser.stats || {}) };
                     currentUser.unlockedAchievements = existingUser.unlocked_achievements || [];
                     currentUser.dailyMissions = existingUser.daily_missions || {};
                     currentUser.lastMissionReset = existingUser.last_mission_reset;
+                    
                     updateLoginStreak();
                     initializeMissions();
                     
                     const activeItem = shopItems.find(i => i.id === currentUser.activeTheme);
-                    if (activeItem) {
-                        applyTheme(activeItem.colors);
-                    }
+                    if (activeItem) applyTheme(activeItem.colors);
                     
                     updateUI();
                     checkDailyBonus();
-                    
-                    console.log('✅ Automaticky přihlášen:', currentUser);
                 } else {
                     localStorage.removeItem('currentUser');
                     document.getElementById('loginModal').style.display = 'flex';
@@ -2183,10 +1593,3 @@ window.addEventListener('load', async () => {
         }
     }, 3500);
 });
-
-
-
-
-
-
-
