@@ -269,7 +269,7 @@ const dailyMissions = [
     { id: 'coin_collector', name: '🪙 Sběratel mincí', desc: 'Mít alespoň 1000 mincí', icon: '🪙',
         reward: 100, target: 1000, type: 'totalCoins' },
     { id: 'speed_spinner', name: '⚡ Rychlý točitel', desc: 'Zatočit 15x za 5 minut', icon: '⚡',
-        reward: 130, target: 15, type: 'fastSpins' },  // <-- OPRAVENÁ ČÁRKA
+        reward: 130, target: 15, type: 'fastSpins' },
     { id: 'win_1000', name: '💰 Král mincí', desc: 'Vyhrát celkem 1000 mincí', icon: '💰',
         reward: 150, target: 1000, type: 'coinsWon' },
     { id: 'play_3_games', name: '🎮 Hraní 3 her', desc: 'Zahrát 3 různé hry', icon: '🎮',
@@ -294,7 +294,7 @@ const dailyMissions = [
         reward: 250, target: 100, type: 'totalSpins' },
     { id: 'spin_200', name: '🔄 Kralující točitel', desc: 'Zatočit celkem 200x', icon: '🔄',
         reward: 300, target: 200, type: 'totalSpins' },
-    { id: 'fast_bet', name: '⚡ Rychlá sázka', desc: 'Vsadit 100 mincí za 1 minutu', icon: '⚡',
+    { id: 'fast_bet', name: '⚡ Rychlá sázka', desc: 'Vsadit 100 mincí rychle', icon: '⚡',
         reward: 150, target: 100, type: 'fastBets' },
     { id: 'play_4_games', name: '🎮 Herní maraton', desc: 'Zahrát 4 různé hry', icon: '🎮',
         reward: 120, target: 4, type: 'gamesPlayed' },
@@ -1677,6 +1677,7 @@ window.addEventListener('load', async () => {
         }
     }, 3500);
 });
+
 
 
 
