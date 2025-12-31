@@ -438,13 +438,16 @@ window.spinSlot = async function() {
     }
     
     const spinDurations = [2500, 3200, 3900];
-    const symbolHeight = 100;
     
     for (let i = 0; i < 3; i++) {
         const reel = document.getElementById(`reel${i + 1}`);
         const reelElement = reel.parentElement;
         
-        // Najdi cílový symbol v bezpečné vzdálenosti od začátku i konce
+        // KLÍČOVÁ OPRAVA: Získej skutečnou výšku symbolu z DOM
+        const firstSymbol = reel.querySelector('.symbol');
+        const symbolHeight = firstSymbol ? firstSymbol.offsetHeight : 100;
+        
+        // Najdi cílový symbol v bezpečné vzdálenosti
         let targetIndex = -1;
         for (let j = 30; j < reels[i].length - 30; j++) {
             if (reels[i][j] === results[i]) {
@@ -457,12 +460,11 @@ window.spinSlot = async function() {
             targetIndex = 50;
         }
         
-        // KLÍČOVÁ ZMĚNA: Cílová pozice musí být tak, aby středový symbol byl ve středu okna
-        // Okno ukazuje 3 symboly (indexy 0, 1, 2), chceme targetIndex na pozici 1 (uprostřed)
-        // Proto: posuneme reel tak, aby targetIndex byl na 2. pozici
+        // Výpočet pozice s použitím skutečné výšky symbolu
+        // Symbol má být přesně uprostřed (na 2. pozici ze 3 viditelných)
         const targetPosition = -(targetIndex * symbolHeight) + symbolHeight;
         
-        // Reset
+        // Reset pozice
         reel.style.transition = 'none';
         reel.style.transform = 'translateY(0px)';
         
@@ -471,9 +473,6 @@ window.spinSlot = async function() {
             
             // Rychlé točení
             let currentPos = 0;
-            const totalSpinDistance = reels[i].length * symbolHeight * 3; // 3 celé otočky
-            const finalPosition = (totalSpinDistance + Math.abs(targetPosition)) % (reels[i].length * symbolHeight);
-            
             const spinInterval = setInterval(() => {
                 currentPos -= 30;
                 if (currentPos <= -(reels[i].length * symbolHeight)) {
@@ -1610,6 +1609,7 @@ window.addEventListener('load', async () => {
         }
     }, 3500);
 });
+
 
 
 
