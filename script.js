@@ -43,9 +43,6 @@ window.closeUpdateModal = function() {
     const modal = document.getElementById('updateModalContainer');
     if (modal) modal.remove();
 }
-    });
-}
-
 // Loading screen logika
 function startLoading() {
     const loadingTime = 3000 + Math.random() * 3000; // 3-6 sekund
@@ -121,7 +118,9 @@ let currentUser = {
         loginStreak: 1,
         lastLogin: null,
         highBets: 0,
-        achievementsUnlocked: 0
+        achievementsUnlocked: 0,
+        coinsWon: 0,       
+        gamesPlayed: []       
     },
     unlockedAchievements: [],
     dailyMissions: {},
@@ -1828,8 +1827,18 @@ window.claimDailyBonus = async function() {
         setTimeout(() => createConfetti(), i * 20);
     }
 };
-    async function saveUser() {
+   async function saveUser() {
     if (!currentUser.id) return;
+    
+    // Aktualizuj totalCoins mission
+    if (currentUser.dailyMissions && currentUser.dailyMissions.coin_collector) {
+        const mission = currentUser.dailyMissions.coin_collector;
+        if (!mission.completed && currentUser.coins >= 1000) {
+            mission.progress = currentUser.coins;
+            mission.completed = true;
+            showNotification(`✅ Úkol splněn: Sběratel mincí`);
+        }
+    }
     
     try {
         const { data: existingUser } = await supabase
@@ -1959,6 +1968,11 @@ function initializeMissions() {
 
 function updateMissionProgress(type, amount = 1) {
     if (!currentUser.dailyMissions) initializeMissions();
+    
+    // Inicializuj gamesPlayed pokud neexistuje
+    if (!currentUser.stats.gamesPlayed) {
+        currentUser.stats.gamesPlayed = [];
+    }
     
     // Speciální handling pro gamesPlayed
     if (type === 'gamesPlayed') {
@@ -2239,7 +2253,7 @@ window.addEventListener('load', async () => {
                     currentUser.unlockedAchievements = existingUser.unlocked_achievements || [];
                     currentUser.dailyMissions = existingUser.daily_missions || {};
                     currentUser.lastMissionReset = existingUser.last_mission_reset;
-                    
+                    updateLoginStreak();
                     initializeMissions();
                     
                     const activeItem = shopItems.find(i => i.id === currentUser.activeTheme);
@@ -2265,5 +2279,6 @@ window.addEventListener('load', async () => {
         }
     }, 3500);
 });
+
 
 
