@@ -1,238 +1,221 @@
 <!DOCTYPE html>
 <html lang="cs">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>🎰 CASINO HUB - Mince a výhry! 🎰</title>
-<link rel="stylesheet" href="styles.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎰 Casino Royale - Herní automat zdarma</title>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-<!-- Loading Screen -->
-<div id="loadingScreen">
-    <div class="loading-content">
-        <h2>🎰 CASINO NAČÍTÁNÍ 🎰</h2>
-        <div class="loading-bar-container">
-            <div class="loading-bar" id="loadingBar"></div>
-        </div>
-        <div class="loading-text" id="loadingText">Připravuji herní automaty...</div>
-        <div class="loading-spinner">
-            <div class="spinner-dot"></div>
-            <div class="spinner-dot"></div>
-            <div class="spinner-dot"></div>
-        </div>
-        <div class="loading-coins">🪙</div>
-    </div>
-</div>
-
-<div id="topBar">
-    <div id="userInfo">
-        <span id="userName">Hráč</span>
-        <div id="coinDisplay">
-            <span>🪙</span>
-            <span id="coinAmount">0</span>
+    <!-- LOADING SCREEN -->
+    <div id="loadingScreen">
+        <div class="loading-content">
+            <h2>🎰 CASINO ROYALE 🎰</h2>
+            <div class="loading-bar-container">
+                <div class="loading-bar" id="loadingBar"></div>
+            </div>
+            <div class="loading-text" id="loadingText">Připravuji herní automaty...</div>
+            <div class="loading-spinner">
+                <div class="spinner-dot"></div>
+                <div class="spinner-dot"></div>
+                <div class="spinner-dot"></div>
+            </div>
+            <div class="loading-coins">🪙</div>
         </div>
     </div>
-    <div id="topButtons">
-        <button id="dailyBonus" onclick="claimDailyBonus()">🎁 DENNÍ BONUS</button>
-        <button id="shopBtn" onclick="switchGame('shop')">🛍️ OBCHOD</button>
-        <button id="paytableBtn" onclick="switchGame('paytable')">💰 VÝHRY</button>
-    </div>
-</div>
 
-<div id="wrapper">
-    <div id="gameSelector">
-        <button id="slotBtn" class="game-btn active" onclick="switchGame('slot')">
-            🎰 AUTOMAT
-        </button>
-        <button id="wheelBtn" class="game-btn" onclick="switchGame('wheel')">
-            🎡 KOLO ŠTĚSTÍ
-        </button>
-        <button id="missionsBtn" class="game-btn" onclick="switchGame('missions')">
-            📋 ÚKOLY
-        </button>
-        <button id="achievementsBtn" class="game-btn" onclick="switchGame('achievements')">
-            🏆 ÚSPĚCHY
-        </button>
-        <button id="leaderboardBtn" class="game-btn" onclick="switchGame('leaderboard')">
-            👑 ŽEBŘÍČEK
-        </button>
-    </div>
+    <!-- MAIN WRAPPER -->
+    <div id="wrapper">
+        <!-- TOP BAR -->
+        <div id="topBar">
+            <div id="userInfo">
+                <span id="userName">Hráč</span>
+                <div id="coinDisplay">
+                    <span>🪙</span>
+                    <span id="coinAmount">0</span>
+                </div>
+            </div>
+            <div id="topButtons">
+                <button id="dailyBonus" onclick="claimDailyBonus()">🎁 DENNÍ BONUS</button>
+                <button id="shopBtn" onclick="switchGame('shop')">🛒 OBCHOD</button>
+                <button id="paytableBtn" onclick="switchGame('paytable')">💰 VÝHRY</button>
+            </div>
+        </div>
 
-    <!-- SLOT MACHINE GAME -->
-    <div id="slotGame" class="game-container active">
-        <div id="slotContainer">
-            <div id="slotMachine">
-                <h2 id="slotTitle">🍒 AUTOMAT 🍒</h2>
-                
-                <div id="reels">
-                    <div class="reel">
-                        <div class="reel-inner" id="reel1"></div>
-                        <div class="reel-window"></div>
+        <!-- GAME SELECTOR -->
+        <div id="gameSelector">
+            <button class="game-btn active" id="slotBtn" onclick="switchGame('slot')">🎰 AUTOMAT</button>
+            <button class="game-btn" id="wheelBtn" onclick="switchGame('wheel')">🎡 KOLO ŠTĚSTÍ</button>
+            <button class="game-btn" id="missionsBtn" onclick="switchGame('missions')">📋 ÚKOLY</button>
+            <button class="game-btn" id="achievementsBtn" onclick="switchGame('achievements')">🏆 ÚSPĚCHY</button>
+            <button class="game-btn" id="leaderboardBtn" onclick="switchGame('leaderboard')">👑 ŽEBŘÍČEK</button>
+        </div>
+
+        <!-- SLOT GAME -->
+        <div id="slotGame" class="game-container active">
+            <div id="slotContainer">
+                <div id="slotMachine">
+                    <h2 id="slotTitle">🎰 HERNÍ AUTOMAT 🎰</h2>
+                    
+                    <div id="reels">
+                        <div class="reel">
+                            <div class="reel-inner" id="reel1"></div>
+                            <div class="reel-window"></div>
+                        </div>
+                        <div class="reel">
+                            <div class="reel-inner" id="reel2"></div>
+                            <div class="reel-window"></div>
+                        </div>
+                        <div class="reel">
+                            <div class="reel-inner" id="reel3"></div>
+                            <div class="reel-window"></div>
+                        </div>
                     </div>
-                    <div class="reel">
-                        <div class="reel-inner" id="reel2"></div>
-                        <div class="reel-window"></div>
-                    </div>
-                    <div class="reel">
-                        <div class="reel-inner" id="reel3"></div>
-                        <div class="reel-window"></div>
+
+                    <div id="slotControls">
+                        <div id="betAmount">Sázka: <span id="currentBet">10</span> 🪙</div>
+                        <div class="bet-controls">
+                            <button class="bet-btn" onclick="setBet(10)">10 🪙</button>
+                            <button class="bet-btn" onclick="setBet(25)">25 🪙</button>
+                            <button class="bet-btn" onclick="setBet(50)">50 🪙</button>
+                            <button class="bet-btn" onclick="setBet(100)">100 🪙</button>
+                        </div>
+                        <button id="spinSlotBtn" onclick="spinSlot()">🎰 ZATOČIT 🎰</button>
+                        <div id="slotResult"></div>
                     </div>
                 </div>
-                
-                <div id="slotControls">
-                    <div id="betAmount">Sázka: <span id="currentBet">10</span> 🪙</div>
-                    <div>
-                        <button class="bet-btn active" onclick="setBet(10)">10</button>
-                        <button class="bet-btn" onclick="setBet(25)">25</button>
-                        <button class="bet-btn" onclick="setBet(50)">50</button>
-                        <button class="bet-btn" onclick="setBet(100)">100</button>
+
+                <div class="paytable">
+                    <h3>💰 VÝPLATNÍ TABULKA 💰</h3>
+                    <div class="paytable-grid">
+                        <div class="paytable-item jackpot">🎰🎰🎰 = 50x sázka</div>
+                        <div class="paytable-item jackpot">💎💎💎 = 20x sázka</div>
+                        <div class="paytable-item">⭐⭐⭐ = 15x sázka</div>
+                        <div class="paytable-item">🔔🔔🔔 = 10x sázka</div>
+                        <div class="paytable-item">🍇🍇🍇 = 8x sázka</div>
+                        <div class="paytable-item">🍊🍊🍊 = 6x sázka</div>
+                        <div class="paytable-item">🍒🍒🍒 = 5x sázka</div>
+                        <div class="paytable-item">🍋🍋🍋 = 4x sázka</div>
+                        <div class="paytable-item" style="grid-column: span 2; margin-top: 10px; background: rgba(255,170,0,0.2); border-color: #ffaa00;">
+                            💫 2 stejné symboly = 30% výhry! 💫
+                        </div>
                     </div>
-                    <button id="spinSlotBtn" onclick="spinSlot()">🎰 ZATOČIT!</button>
-                    <div id="slotResult"></div>
                 </div>
             </div>
         </div>
-    </div>
-    
-    <!-- WHEEL OF FORTUNE GAME -->
-    <div id="wheelGame" class="game-container">
-        <div id="wheelContainer">
-            <div class="pointer"></div>
-            <canvas id="wheel" width="400" height="400"></canvas>
-            <div class="wheelCenter">🎡</div>
-        </div>
-        
-        <h2 id="wheelTitle">ZATOČTE A ZÍSKEJTE MINCE!</h2>
-        <div id="wheelCost">Cena: 10 🪙</div>
-        
-        <button id="spinWheelBtn" onclick="spinWheel()">🎯 ZATOČIT!</button>
-    </div>
-    
-    <!-- LEADERBOARD -->
-    <div id="leaderboardGame" class="game-container">
-        <div id="leaderboardFull">
-            <h2>🏆 ONLINE ŽEBŘÍČEK 🏆</h2>
-            <div id="leaderboardList"></div>
-        </div>
-    </div>
 
-    <!-- ACHIEVEMENTS -->
-    <div id="achievementsGame" class="game-container">
-        <div id="leaderboardFull">
-            <h2>🏆 ÚSPĚCHY 🏆</h2>
-            <div id="achievementsList"></div>
+        <!-- WHEEL GAME -->
+        <div id="wheelGame" class="game-container">
+            <h2 id="wheelTitle">🎡 KOLO ŠTĚSTÍ 🎡</h2>
+            <div id="wheelContainer">
+                <div class="pointer"></div>
+                <canvas id="wheel" width="400" height="400"></canvas>
+                <div class="wheelCenter">🍀</div>
+            </div>
+            <button id="spinWheelBtn" onclick="spinWheel()">🎡 ZATOČIT KOLEM 🎡</button>
+            <div id="wheelCost">Cena: 10 🪙</div>
         </div>
-    </div>
-    
-    <!-- DAILY MISSIONS -->
-    <div id="missionsGame" class="game-container">
-        <div id="leaderboardFull">
-            <h2>📋 DENNÍ ÚKOLY 📋</h2>
-            <div id="missionsList"></div>
-        </div>
-    </div>
 
-    <!-- SHOP -->
-    <div id="shopGame" class="game-container">
-        <div id="leaderboardFull">
-            <h2>🛍️ OBCHOD SE VZHLEDEM 🛍️</h2>
+        <!-- MISSIONS GAME -->
+        <div id="missionsGame" class="game-container">
+            <div style="width: 100%; max-width: 800px;">
+                <h2 style="color: #00ffff; font-size: 36px; text-align: center; margin-bottom: 20px; text-shadow: 0 0 20px #00ffff;">📋 DENNÍ ÚKOLY 📋</h2>
+                <div id="missionsList"></div>
+            </div>
+        </div>
+
+        <!-- ACHIEVEMENTS GAME -->
+        <div id="achievementsGame" class="game-container">
+            <div style="width: 100%; max-width: 800px;">
+                <h2 style="color: #00ffff; font-size: 36px; text-align: center; margin-bottom: 20px; text-shadow: 0 0 20px #00ffff;">🏆 ÚSPĚCHY 🏆</h2>
+                <div id="achievementsList"></div>
+            </div>
+        </div>
+
+        <!-- LEADERBOARD GAME -->
+        <div id="leaderboardGame" class="game-container">
+            <div id="leaderboardFull">
+                <h2>👑 ŽEBŘÍČEK NEJLEPŠÍCH 👑</h2>
+                <div id="leaderboardList"></div>
+            </div>
+        </div>
+
+        <!-- SHOP GAME -->
+        <div id="shopGame" class="game-container">
+            <h2 style="color: #00ffff; font-size: 36px; text-align: center; margin-bottom: 20px; text-shadow: 0 0 20px #00ffff;">🛒 OBCHOD S VZHLEDY 🛒</h2>
             <div id="shopGrid"></div>
         </div>
-    </div>
-</div>
-    
-<!-- PAYTABLE (VÝHRY) -->  
-<div id="paytableGame" class="game-container">
-    <div id="leaderboardFull">
-        <h2>💰 TABULKA VÝHER 💰</h2>
-        <div id="paytableGrid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; max-width: 900px; width: 100%; margin: 0 auto;">
-            
-            <div class="shop-item" style="background: linear-gradient(135deg, rgba(255,20,147,0.3), rgba(255,0,255,0.3)); border-color: #ff1493;">
-                <div class="shop-icon">🍒</div>
-                <div class="shop-name">Třešně</div>
-                <div class="shop-price">5x SÁZKA</div>
+
+        <!-- PAYTABLE GAME (NEW) -->
+        <div id="paytableGame" class="game-container">
+            <div class="paytable-fullscreen">
+                <h2 style="color: #00ffff; font-size: 36px; text-align: center; margin-bottom: 20px; text-shadow: 0 0 20px #00ffff;">💰 VÝPLATNÍ TABULKA 💰</h2>
+                <div class="paytable-grid-large" id="paytableGrid">
+                    <div class="paytable-item-large jackpot" style="grid-column: span 2;">
+                        🎰🎰🎰<br>
+                        <span style="font-size: 48px; color: #ffd700;">JACKPOT!</span><br>
+                        50x sázka
+                    </div>
+                    <div class="paytable-item-large jackpot">
+                        💎💎💎<br>
+                        <span style="font-size: 36px; color: #00bfff;">DIAMANT!</span><br>
+                        20x sázka
+                    </div>
+                    <div class="paytable-item-large special">
+                        ⭐⭐⭐<br>
+                        15x sázka
+                    </div>
+                    <div class="paytable-item-large">
+                        🔔🔔🔔<br>
+                        10x sázka
+                    </div>
+                    <div class="paytable-item-large">
+                        🍇🍇🍇<br>
+                        8x sázka
+                    </div>
+                    <div class="paytable-item-large">
+                        🍊🍊🍊<br>
+                        6x sázka
+                    </div>
+                    <div class="paytable-item-large">
+                        🍒🍒🍒<br>
+                        5x sázka
+                    </div>
+                    <div class="paytable-item-large">
+                        🍋🍋🍋<br>
+                        4x sázka
+                    </div>
+                    <div class="paytable-item-large" style="grid-column: span 2; background: linear-gradient(135deg, rgba(255,170,0,0.3), rgba(255,215,0,0.3)); border-color: #ffaa00; font-size: 24px;">
+                        💫 BONUS: 2 stejné symboly 💫<br>
+                        <span style="font-size: 20px;">Vyhrajte 30% hodnoty!</span>
+                    </div>
+                </div>
             </div>
-            
-            <div class="shop-item" style="background: linear-gradient(135deg, rgba(255,255,0,0.3), rgba(255,215,0,0.3)); border-color: #ffff00;">
-                <div class="shop-icon">🍋</div>
-                <div class="shop-name">Citrony</div>
-                <div class="shop-price">4x SÁZKA</div>
-            </div>
-            
-            <div class="shop-item" style="background: linear-gradient(135deg, rgba(255,140,0,0.3), rgba(255,69,0,0.3)); border-color: #ff8c00;">
-                <div class="shop-icon">🍊</div>
-                <div class="shop-name">Pomeranče</div>
-                <div class="shop-price">6x SÁZKA</div>
-            </div>
-            
-            <div class="shop-item" style="background: linear-gradient(135deg, rgba(138,43,226,0.3), rgba(75,0,130,0.3)); border-color: #8a2be2;">
-                <div class="shop-icon">🍇</div>
-                <div class="shop-name">Hrozny</div>
-                <div class="shop-price">8x SÁZKA</div>
-            </div>
-            
-            <div class="shop-item" style="background: linear-gradient(135deg, rgba(255,215,0,0.3), rgba(255,140,0,0.3)); border-color: #ffd700;">
-                <div class="shop-icon">🔔</div>
-                <div class="shop-name">Zvonky</div>
-                <div class="shop-price">10x SÁZKA</div>
-            </div>
-            
-            <div class="shop-item" style="background: linear-gradient(135deg, rgba(255,255,0,0.4), rgba(255,215,0,0.4)); border-color: #ffff00;">
-                <div class="shop-icon">⭐</div>
-                <div class="shop-name">Hvězdy</div>
-                <div class="shop-price">15x SÁZKA</div>
-            </div>
-            
-            <div class="shop-item" style="background: linear-gradient(135deg, rgba(0,191,255,0.4), rgba(64,224,208,0.4)); border-color: #00bfff; animation: diamondGlow 2s ease-in-out infinite;">
-                <div class="shop-icon">💎</div>
-                <div class="shop-name">Diamanty</div>
-                <div class="shop-price">20x SÁZKA</div>
-            </div>
-            
-            <div class="shop-item" style="background: linear-gradient(135deg, rgba(255,0,255,0.5), rgba(255,215,0,0.5)); border-color: #ff00ff; animation: jackpotGlowBig 2s ease-in-out infinite; transform: scale(1.05);">
-                <div class="shop-icon" style="font-size: 90px;">🎰</div>
-                <div class="shop-name" style="font-size: 28px; color: #ff00ff;">JACKPOT!</div>
-                <div class="shop-price" style="font-size: 36px; color: #ffd700;">50x SÁZKA</div>
-            </div>
-            
-            <div class="shop-item" style="background: linear-gradient(135deg, rgba(255,170,0,0.3), rgba(255,215,0,0.3)); border-color: #ffaa00; grid-column: span 2;">
-                <div class="shop-icon" style="font-size: 50px;">🍒🍒❓</div>
-                <div class="shop-name">Malá výhra (2 stejné)</div>
-                <div class="shop-price">0.5x SÁZKA</div>
-            </div>
-            
-        </div>
-        
-        <div style="margin-top: 40px; text-align: center; color: #00ffff; font-size: 24px; text-shadow: 0 0 15px #00ffff;">
-            💡 <strong>Tip:</strong> Vyšší sázka = Vyšší výhra!
         </div>
     </div>
-</div>
-    
-<!-- MODALS -->
-<div id="loginModal" class="modal" style="display: none;">
-    <div class="modal-content">
-        <h2>🎮 VÍTEJTE V CASINU 🎮</h2>
-        <p style="color: #fff; text-align: center; font-size: 18px; margin-bottom: 15px;">
-            Zadejte své herní jméno a začněte hrát!
-        </p>
-        <input type="text" id="nicknameInput" placeholder="Vaše přezdívka..." maxlength="15">
-        <button id="loginBtn" onclick="login()">ZAČÍT HRÁT!</button>
-    </div>
-</div>
 
-<div id="winModal" class="modal">
-    <div class="modal-content">
-        <h2>🎉 VÝHRA! 🎉</h2>
-        <div id="winAmount">+100 🪙</div>
-        <button class="modal-close" onclick="closeWinModal()">SUPER!</button>
+    <!-- WIN MODAL -->
+    <div id="winModal" class="modal">
+        <div class="modal-content">
+            <h2>🎉 VÝHRA! 🎉</h2>
+            <div id="winAmount" style="color: #ffd700; font-size: 48px; font-weight: bold;">+100 🪙</div>
+            <button class="modal-close" onclick="closeWinModal()">SUPER! 🎰</button>
+        </div>
     </div>
-</div>
 
-<script type="module" src="script.js"></script>
+    <!-- LOGIN MODAL -->
+    <div id="loginModal" class="modal" style="display: flex;">
+        <div class="modal-content">
+            <h2>🎰 VÍTEJTE V CASINU! 🎰</h2>
+            <p style="color: #fff; font-size: 18px; margin: 15px 0;">Zadejte svou přezdívku a začněte hrát!</p>
+            <input type="text" id="nicknameInput" placeholder="Vaše přezdívka..." maxlength="20">
+            <button id="loginBtn" onclick="login()">🎮 ZAČÍT HRÁT</button>
+            <p style="color: #aaa; font-size: 14px; margin-top: 10px;">
+                🎁 Startovací bonus: 100 mincí zdarma!
+            </p>
+        </div>
+    </div>
+
+    <script type="module" src="script.js"></script>
 </body>
 </html>
-
-
-
-
