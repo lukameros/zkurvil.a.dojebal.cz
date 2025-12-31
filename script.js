@@ -196,7 +196,7 @@ const achievements = [
         condition: (stats) => stats.missionsCompleted >= 50 },
     { id: 'legend', name: 'Legenda 🏆', desc: 'Dosáhnout všech ostatních úspěchů', icon: '🏆', reward: 2000,
         condition: (stats) => stats.achievementsUnlocked >= 20 }
-        { id: 'lucky_winner', name: 'Šťastný vítěz 🍀', desc: 'Vyhrát poprvé s 3 stejné symboly', icon: '🍀', reward: 100,
+    { id: 'lucky_winner', name: 'Šťastný vítěz 🍀', desc: 'Vyhrát poprvé s 3 stejné symboly', icon: '🍀', reward: 100,
         condition: (stats) => stats.sameSymbolsWins >= 1 },
     { id: 'big_earning', name: 'Velký výdělek 💸', desc: 'Vyhrát celkem 5000 mincí', icon: '💸', reward: 400,
         condition: (stats) => stats.coinsWon >= 5000 },
@@ -1683,6 +1683,7 @@ window.addEventListener('load', async () => {
         }
     }, 3500);
 });
+
 
 
 
