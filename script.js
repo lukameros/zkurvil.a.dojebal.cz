@@ -269,37 +269,31 @@ const dailyMissions = [
     { id: 'coin_collector', name: '🪙 Sběratel mincí', desc: 'Mít alespoň 1000 mincí', icon: '🪙',
         reward: 100, target: 1000, type: 'totalCoins' },
     { id: 'speed_spinner', name: '⚡ Rychlý točitel', desc: 'Zatočit 15x za 5 minut', icon: '⚡',
-        reward: 130, target: 15, type: 'fastSpins' }
+        reward: 130, target: 15, type: 'fastSpins' },  // <-- OPRAVENÁ ČÁRKA
     { id: 'win_1000', name: '💰 Král mincí', desc: 'Vyhrát celkem 1000 mincí', icon: '💰',
         reward: 150, target: 1000, type: 'coinsWon' },
     { id: 'play_3_games', name: '🎮 Hraní 3 her', desc: 'Zahrát 3 různé hry', icon: '🎮',
         reward: 50, target: 3, type: 'gamesPlayed' },
-    { id: 'double_win', name: '🌟 Dvojitá výhra', desc: 'Vyhrát 2x za sebou v jednom kole', icon: '🌟',
+    { id: 'double_win', name: '🌟 Dvojitá výhra', desc: 'Vyhrát 2x za sebou', icon: '🌟',
         reward: 80, target: 2, type: 'winStreak' },
     { id: 'spin_50', name: '🔄 Mega točitel', desc: 'Zatočit celkem 50x', icon: '🔄',
         reward: 150, target: 50, type: 'totalSpins' },
     { id: 'bet_1000', name: '💸 Velký sázkař', desc: 'Vsadit celkem 1000 mincí', icon: '💸',
         reward: 120, target: 1000, type: 'totalBet' },
-    { id: 'jackpot_spin', name: '🎰 Sázka na jackpot', desc: 'Zatočit s maximální sázkou 1x', icon: '🎰',
+    { id: 'jackpot_spin', name: '🎰 Sázka na jackpot', desc: 'Zatočit s max. sázkou', icon: '🎰',
         reward: 200, target: 1, type: 'maxBets' },
-    { id: 'win_2x_in_row', name: '🍀 Šťastná dvojka', desc: 'Vyhrát 2x po sobě v jednom dni', icon: '🍀',
+    { id: 'win_2x_in_row', name: '🍀 Šťastná dvojka', desc: 'Vyhrát 2x po sobě', icon: '🍀',
         reward: 70, target: 2, type: 'dailyWins' },
     { id: 'no_loss_5', name: '🛡️ Bez prohry', desc: '5 zatočení bez prohry', icon: '🛡️',
         reward: 90, target: 5, type: 'noLossStreak' },
-    { id: 'play_2_slot', name: '🎰 Dvojitý automat', desc: 'Zahrát 2x automat', icon: '🎰',
-        reward: 60, target: 2, type: 'gamesPlayed' },
     { id: 'lucky_10', name: '🍀 Šťastných 10', desc: 'Vyhrát právě 10x dnes', icon: '🍀',
         reward: 100, target: 10, type: 'dailyWins' },
     { id: 'bet_2000', name: '💸 Mega sázející', desc: 'Vsadit celkem 2000 mincí', icon: '💸',
         reward: 150, target: 2000, type: 'totalBet' },
     { id: 'spin_100', name: '🔄 Super točitel', desc: 'Zatočit celkem 100x', icon: '🔄',
         reward: 250, target: 100, type: 'totalSpins' },
-    { id: 'diamond_win', name: '💎 Diamantová výhra', desc: 'Vyhrát jednou s 💎💎💎', icon: '💎',
-        reward: 200, target: 1, type: 'diamondWins' },
     { id: 'spin_200', name: '🔄 Kralující točitel', desc: 'Zatočit celkem 200x', icon: '🔄',
         reward: 300, target: 200, type: 'totalSpins' },
-    { id: 'win_100', name: '💰 Král výher', desc: 'Vyhrát 100x celkem', icon: '💰',
-        reward: 100, target: 100, type: 'coinsWon' },
     { id: 'fast_bet', name: '⚡ Rychlá sázka', desc: 'Vsadit 100 mincí za 1 minutu', icon: '⚡',
         reward: 150, target: 100, type: 'fastBets' },
     { id: 'play_4_games', name: '🎮 Herní maraton', desc: 'Zahrát 4 různé hry', icon: '🎮',
@@ -1683,6 +1677,7 @@ window.addEventListener('load', async () => {
         }
     }, 3500);
 });
+
 
 
 
