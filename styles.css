@@ -1465,151 +1465,103 @@ button, .game-btn, .bet-btn {
 /* Základní úpravy pro mobilní zařízení */
 /* Landscape mód pro mobilní zařízení */
 @media (max-width: 950px) and (max-height: 550px) and (orientation: landscape) {
-    body {
+    html, body {
+        margin: 0;
         padding: 0;
         font-size: 13px;
-        overflow: hidden; /* Na šířku nechceme scrollovat vůbec */
+        overflow: hidden; /* žádné scrollování */
+        height: 100vh; 
     }
 
     #wrapper {
-        padding-top: 0;
         height: 100vh;
         display: flex;
         flex-direction: column;
+        overflow: hidden;
     }
 
-    /* Top Bar - co nejtenčí, aby nezabíral drahocenné místo na výšku */
     #topBar {
         height: 35px;
         min-height: 35px;
-        padding: 2px 15px;
+        padding: 2px 10px;
         display: flex;
         align-items: center;
         justify-content: space-between;
         background: rgba(0,0,0,0.9);
+        flex-shrink: 0; /* nenechat topBar zmenšit */
     }
 
-    #userName { font-size: 14px; }
-    #coinDisplay { font-size: 13px; padding: 2px 8px; }
-    #dailyBonus, #shopBtn { padding: 4px 8px; font-size: 11px; }
-
-    /* Hlavní kontejner: Rozdělení obrazovky na dvě poloviny (levá: automat, pravá: ovládání) */
     #slotContainer {
-        display: flex !important;
-        flex-direction: row !important; 
-        align-items: center;
-        justify-content: space-around;
-        flex: 1; /* Vyplní zbytek výšky pod top barem */
-        padding: 5px 20px;
-        gap: 15px;
+        display: flex;
+        flex-direction: row;
+        flex: 1;
+        padding: 5px 10px;
+        gap: 10px;
+        align-items: stretch; /* aby všechny boxy vyplnily výšku */
+        justify-content: space-between;
     }
 
-    /* Levá strana: Slot Machine */
     #slotMachine {
         flex: 1.2;
         max-width: 50%;
         margin: 0;
-        padding: 10px;
-        transform: scale(0.95); /* Přizpůsobení výšce */
+        padding: 5px;
         display: flex;
         flex-direction: column;
         justify-content: center;
+        transform: scale(0.85); /* zmenšení pro mobil */
+        transform-origin: top center;
     }
 
-    #slotTitle {
-        font-size: 18px;
-        margin-bottom: 5px;
-        text-align: center;
-    }
-
-    /* Úprava válců pro širokoúhlé zobrazení */
-    #reels {
-        gap: 8px;
-        padding: 5px;
-        justify-content: center;
-    }
-
-    .reel {
-        width: 70px !important;
-        height: 160px !important; /* Fixní výška pro landscape */
-    }
-
-    .symbol {
-        height: 50px !important;
-        font-size: 35px !important;
-        line-height: 50px;
-    }
-
-    .reel-window {
-        top: 55px !important; /* Pozice prostředního symbolu */
-        height: 50px !important;
-    }
-
-    /* Pravá strana: Ovládání */
     .side-controls {
         flex: 0.8;
         max-width: 40%;
         display: flex;
         flex-direction: column;
-        gap: 10px;
-        background: rgba(255, 255, 255, 0.08);
-        padding: 15px;
-        border-radius: 12px;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        gap: 6px;
+        padding: 10px;
+        border-radius: 8px;
+        overflow: hidden; /* zabránění scrollu uvnitř */
     }
 
-    /* Kompaktní mřížka tlačítek sázek */
     .bet-controls {
         display: grid;
         grid-template-columns: repeat(3, 1fr);
-        gap: 6px;
-    }
-
-    .bet-btn {
-        padding: 8px 2px;
-        font-size: 11px;
-        min-width: 0;
+        gap: 4px;
     }
 
     #spinSlotBtn {
-        width: 100%;
-        padding: 12px;
-        font-size: 20px;
-        font-weight: bold;
-        text-transform: uppercase;
-        margin-top: 5px;
+        font-size: 18px;
+        padding: 10px;
+        margin-top: 2px;
     }
 
     #slotResult {
-        font-size: 14px;
-        min-height: 18px;
-        text-align: center;
+        font-size: 12px;
     }
 
-    /* Kolo štěstí - upraveno vedle sebe */
     #wheelContainer {
-        display: flex !important;
-        flex-direction: row !important;
-        align-items: center;
-        justify-content: center;
-        gap: 30px;
+        gap: 15px;
+        flex-wrap: wrap; /* pokud se nevejde, přehoupne se dolů */
     }
 
     canvas {
-        width: 42vh !important;
-        height: 42vh !important;
-        max-width: 200px !important;
+        width: 35vh !important;
+        height: 35vh !important;
+        max-width: 150px !important;
     }
 
-    /* Modály a dekorace */
     .modal-content {
         max-height: 90vh;
-        width: 80%;
-        overflow-y: auto;
+        width: 90%;
     }
 
-    .star { display: none; } /* Odstranění efektů pro plynulost na mobilech */
+    .star {
+        display: none;
+    }
 }
+
+
 
 
 
