@@ -35,6 +35,7 @@
     <div id="topButtons">
         <button id="dailyBonus" onclick="claimDailyBonus()">🎁 DENNÍ BONUS</button>
         <button id="shopBtn" onclick="switchGame('shop')">🛍️ OBCHOD</button>
+        <button id="paytableBtn" onclick="switchGame('paytable')">💰 VÝHRY</button>
     </div>
 </div>
 
@@ -90,21 +91,6 @@
                     <div id="slotResult"></div>
                 </div>
             </div>
-            
-            <div class="paytable">
-                <h3>💰 VÝHRY 💰</h3>
-                <div class="paytable-grid">
-                    <div class="paytable-item">🍒🍒🍒 → 5x</div>
-                    <div class="paytable-item">🍋🍋🍋 → 4x</div>
-                    <div class="paytable-item">🍊🍊🍊 → 6x</div>
-                    <div class="paytable-item">🍇🍇🍇 → 8x</div>
-                    <div class="paytable-item">🔔🔔🔔 → 10x</div>
-                    <div class="paytable-item">⭐⭐⭐ → 15x</div>
-                    <div class="paytable-item">💎💎💎 → 20x</div>
-                    <div class="paytable-item jackpot">🎰🎰🎰 → 50x</div>
-                    <div class="paytable-item" style="font-size: 14px; margin-top: 8px; border-color: #ffaa00;">2 stejné → 0.5x</div>
-                </div>
-            </div>
         </div>
     </div>
     
@@ -154,6 +140,28 @@
         </div>
     </div>
 </div>
+    <!-- PAYTABLE (VÝHRY) -->
+<div id="paytableGame" class="game-container">
+    <div id="leaderboardFull">
+        <h2>💰 TABULKA VÝHER 💰</h2>
+        <div class="paytable-fullscreen">
+            <div class="paytable-grid-large">
+                <div class="paytable-item-large">🍒🍒🍒 → 5x sázky</div>
+                <div class="paytable-item-large">🍋🍋🍋 → 4x sázky</div>
+                <div class="paytable-item-large">🍊🍊🍊 → 6x sázky</div>
+                <div class="paytable-item-large">🍇🍇🍇 → 8x sázky</div>
+                <div class="paytable-item-large">🔔🔔🔔 → 10x sázky</div>
+                <div class="paytable-item-large">⭐⭐⭐ → 15x sázky</div>
+                <div class="paytable-item-large">💎💎💎 → 20x sázky</div>
+                <div class="paytable-item-large jackpot">🎰🎰🎰 → 50x sázky (JACKPOT!)</div>
+                <div class="paytable-item-large special">🍒🍒❓ → 0.5x sázky (Malá výhra)</div>
+            </div>
+            <div style="margin-top: 30px; text-align: center; color: #00ffff; font-size: 20px;">
+                💡 Tip: Vyšší sázka = vyšší výhra!
+            </div>
+        </div>
+    </div>
+</div>
 
 <!-- MODALS -->
 <div id="loginModal" class="modal" style="display: none;">
@@ -178,3 +186,4 @@
 <script type="module" src="script.js"></script>
 </body>
 </html>
+
