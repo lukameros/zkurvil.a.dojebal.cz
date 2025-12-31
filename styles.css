@@ -525,14 +525,8 @@ body::before {
 }
 
 .paytable {
-    background: linear-gradient(135deg, rgba(26,0,51,0.8) 0%, rgba(10,0,21,0.8) 100%);
-    padding: 20px;
-    border-radius: 20px;
-    border: 3px solid #00ffff;
-    flex: 0 0 220px;
-    display: flex;
-    flex-direction: column;
-    box-shadow: 0 0 30px rgba(0,255,255,0.5);
+    .paytable {
+    display: none; /* Skryjeme původní paytable */
 }
 
 .paytable h3 {
@@ -1773,6 +1767,7 @@ button, .game-btn, .bet-btn {
         font-size: 26px;
     }
 }
+
 
 
 
