@@ -35,7 +35,6 @@
     <div id="topButtons">
         <button id="dailyBonus" onclick="claimDailyBonus()">🎁 DENNÍ BONUS</button>
         <button id="shopBtn" onclick="switchGame('shop')">🛍️ OBCHOD</button>
-        <button id="showPaytableBtn" onclick="togglePaytable()">💰 ZOBRAZIT VÝHRY</button>
     </div>
 </div>
 
@@ -92,22 +91,22 @@
                 </div>
             </div>
             
-            <div id="paytableContainer" class="paytable" style="display: none;">
-    <h3>💰 VÝHRY 💰</h3>
-    <div class="paytable-grid">
-        <div class="paytable-item">🍒🍒🍒 → <span class="pay-multiplier">5x</span></div>
-        <div class="paytable-item">🍋🍋🍋 → <span class="pay-multiplier">4x</span></div>
-        <div class="paytable-item">🍊🍊🍊 → <span class="pay-multiplier">6x</span></div>
-        <div class="paytable-item">🍇🍇🍇 → <span class="pay-multiplier">8x</span></div>
-        <div class="paytable-item">🔔🔔🔔 → <span class="pay-multiplier">10x</span></div>
-        <div class="paytable-item">⭐⭐⭐ → <span class="pay-multiplier">15x</span></div>
-        <div class="paytable-item">💎💎💎 → <span class="pay-multiplier">20x</span></div>
-        <div class="paytable-item jackpot">🎰🎰🎰 → <span class="pay-multiplier">50x</span></div>
-        <div class="paytable-item" style="font-size: 14px; margin-top: 8px; border-color: #ffaa00;">
-            2 stejné → <span class="pay-multiplier">0.5x</span>
+            <div class="paytable">
+                <h3>💰 VÝHRY 💰</h3>
+                <div class="paytable-grid">
+                    <div class="paytable-item">🍒🍒🍒 → 5x</div>
+                    <div class="paytable-item">🍋🍋🍋 → 4x</div>
+                    <div class="paytable-item">🍊🍊🍊 → 6x</div>
+                    <div class="paytable-item">🍇🍇🍇 → 8x</div>
+                    <div class="paytable-item">🔔🔔🔔 → 10x</div>
+                    <div class="paytable-item">⭐⭐⭐ → 15x</div>
+                    <div class="paytable-item">💎💎💎 → 20x</div>
+                    <div class="paytable-item jackpot">🎰🎰🎰 → 50x</div>
+                    <div class="paytable-item" style="font-size: 14px; margin-top: 8px; border-color: #ffaa00;">2 stejné → 0.5x</div>
+                </div>
+            </div>
         </div>
     </div>
-</div>
     
     <!-- WHEEL OF FORTUNE GAME -->
     <div id="wheelGame" class="game-container">
@@ -179,5 +178,3 @@
 <script type="module" src="script.js"></script>
 </body>
 </html>
-
-
