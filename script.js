@@ -1484,16 +1484,17 @@ function showNotification(message) {
     }, 3000);
 }
 
-document.getElementById('tableToggleBtn').addEventListener('click', function() {
-    const tableContainer = document.getElementById('tableContainer');
+document.getElementById('paytableToggleBtn').addEventListener('click', function() {
+    const paytableContainer = document.getElementById('paytableContainer');
     
-    // Přepínání zobrazení tabulky
-    if (tableContainer.style.display === 'none' || tableContainer.style.display === '') {
-        tableContainer.style.display = 'block'; // Ukáže tabulku
+    // Přepínání zobrazení tabulky výher
+    if (paytableContainer.style.display === 'none' || paytableContainer.style.display === '') {
+        paytableContainer.style.display = 'block'; // Ukáže tabulku výher
     } else {
-        tableContainer.style.display = 'none'; // Skryje tabulku
+        paytableContainer.style.display = 'none'; // Skryje tabulku výher
     }
 });
+
 
 function updateLoginStreak() {
     const today = new Date().toISOString().split('T')[0];
@@ -1620,6 +1621,7 @@ window.addEventListener('load', async () => {
         }
     }, 3500);
 });
+
 
 
 
