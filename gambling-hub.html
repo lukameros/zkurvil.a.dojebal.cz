@@ -35,7 +35,6 @@
     <div id="topButtons">
         <button id="dailyBonus" onclick="claimDailyBonus()">🎁 DENNÍ BONUS</button>
         <button id="shopBtn" onclick="switchGame('shop')">🛍️ OBCHOD</button>
-        <button id="paytableToggleBtn">💰 VÝHRY</button> 
     </div>
 </div>
 
@@ -91,6 +90,23 @@
                     <div id="slotResult"></div>
                 </div>
             </div>
+            
+            <div class="paytable">
+                <h3>💰 VÝHRY 💰</h3>
+                <div class="paytable-grid">
+                    <div class="paytable-item">🍒🍒🍒 → 5x</div>
+                    <div class="paytable-item">🍋🍋🍋 → 4x</div>
+                    <div class="paytable-item">🍊🍊🍊 → 6x</div>
+                    <div class="paytable-item">🍇🍇🍇 → 8x</div>
+                    <div class="paytable-item">🔔🔔🔔 → 10x</div>
+                    <div class="paytable-item">⭐⭐⭐ → 15x</div>
+                    <div class="paytable-item">💎💎💎 → 20x</div>
+                    <div class="paytable-item jackpot">🎰🎰🎰 → 50x</div>
+                    <div class="paytable-item" style="font-size: 14px; margin-top: 8px; border-color: #ffaa00;">2 stejné → 0.5x</div>
+                </div>
+            </div>
+        </div>
+    </div>
     
     <!-- WHEEL OF FORTUNE GAME -->
     <div id="wheelGame" class="game-container">
@@ -162,7 +178,3 @@
 <script type="module" src="script.js"></script>
 </body>
 </html>
-
-
-
-
