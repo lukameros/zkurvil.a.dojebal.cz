@@ -1469,7 +1469,7 @@ button, .game-btn, .bet-btn {
         margin: 0;
         padding: 0;
         font-size: 12px;
-        overflow: hidden;
+        overflow: hidden; 
         height: 100vh;
     }
 
@@ -1492,96 +1492,118 @@ button, .game-btn, .bet-btn {
         font-size: 11px;
     }
 
-    #userInfo {
+    #slotContainer {
         display: flex;
-        align-items: center;
+        flex-direction: row;
+        flex: 1;
+        gap: 5px;
+        padding: 2px;
+        height: calc(100vh - 28px); /* zbývající výška po top baru */
     }
 
-    #coinDisplay {
-        margin-left: 10px;
-    }
-
-    #topButtons {
+    #slotMachine {
+        flex: 1.2;
+        max-width: 50%;
         display: flex;
-        gap: 10px;
+        flex-direction: column;
+        justify-content: space-between;
+        height: 100%;
+        padding: 2px;
     }
 
-    /* Stejné styly pro všechna tlačítka (Obchod, VÝHRY, atd.) */
-    #topButtons button {
+    #slotTitle {
+        font-size: 13px;
+        margin-bottom: 2px;
+        text-align: center;
+        flex-shrink: 0;
+    }
+
+    #reels {
+        display: flex;
+        justify-content: center;
+        gap: 3px;
+        flex: 1;
+        min-height: 0;
+    }
+
+    .reel {
+        width: 45px !important;
+        height: 100% !important; /* výška se přizpůsobí */
+        max-height: 120px;
+    }
+
+    .symbol {
+        height: calc(100% / 3) !important; /* 3 symboly na výšku */
+        font-size: 25px !important;
+        line-height: calc(100% / 3);
+    }
+
+    .reel-window {
+        top: calc(100% / 3) !important;
+        height: calc(100% / 3) !important;
+    }
+
+    .side-controls {
+        flex: 0.8;
+        max-width: 45%;
+        display: flex;
+        flex-direction: column;
+        gap: 3px;
+        padding: 5px;
+        border-radius: 6px;
+        overflow: hidden;
+        font-size: 11px;
+    }
+
+    .bet-controls {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 2px;
+    }
+
+    .bet-btn {
+        padding: 4px 2px;
+        font-size: 10px;
+    }
+
+    #spinSlotBtn {
+        width: 100%;
         padding: 6px;
-        font-size: 12px;
-        background: rgba(0,0,0,0.7);
-        color: white;
-        border: none;
-        cursor: pointer;
-        border-radius: 5px;
+        font-size: 15px;
+        font-weight: bold;
+        margin-top: 1px;
     }
 
-    /* Hover efekt pro tlačítka */
-    #topButtons button:hover {
-        background: rgba(0,0,0,0.9);
-    }
-
-    /* Tlačítko pro výhry (paytable) */
-    #paytableToggleBtn {
-        padding: 6px;
-        font-size: 12px;
-        background: rgba(0,0,0,0.7);
-        color: white;
-        border: none;
-        cursor: pointer;
-        border-radius: 5px;
-    }
-
-    /* Hover efekt pro tlačítko výher */
-    #paytableToggleBtn:hover {
-        background: rgba(0,0,0,0.9);
-    }
-
-    #paytableContainer {
-        position: absolute;
-        top: 50px; /* Pod top barem */
-        left: 10px;
-        right: 10px;
-        background-color: rgba(255, 255, 255, 0.9);
-        padding: 10px;
-        border-radius: 8px;
-        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-        max-height: 80vh;
-        overflow-y: auto;
-        display: none; /* Tabulka skrytá */
-    }
-
-    .paytable {
+    #slotResult {
+        font-size: 11px;
+        min-height: 14px;
         text-align: center;
     }
 
-    .paytable-grid {
-        display: grid;
-        grid-template-columns: repeat(2, 1fr);
-        gap: 10px;
-        margin-top: 10px;
+    #wheelContainer {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        flex-wrap: wrap;
     }
 
-    .paytable-item {
-        padding: 8px;
-        background-color: #f2f2f2;
-        border: 1px solid #ddd;
-        border-radius: 5px;
-        font-size: 14px;
+    canvas {
+        width: 25vh !important;
+        height: 25vh !important;
+        max-width: 110px !important;
     }
 
-    .paytable-item.jackpot {
-        background-color: #ffcc00;
-        font-weight: bold;
+    .modal-content {
+        max-height: 90vh;
+        width: 90%;
+    }
+
+    .star {
+        display: none;
     }
 }
-
-
-
-
-
-
 
 
 
