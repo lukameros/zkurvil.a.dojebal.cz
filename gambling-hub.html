@@ -141,28 +141,74 @@
     </div>
 </div>
     <!-- PAYTABLE (VÝHRY) -->
+<!-- PAYTABLE (VÝHRY) -->
 <div id="paytableGame" class="game-container">
     <div id="leaderboardFull">
         <h2>💰 TABULKA VÝHER 💰</h2>
-        <div class="paytable-fullscreen">
-            <div class="paytable-grid-large">
-                <div class="paytable-item-large">🍒🍒🍒 → 5x sázky</div>
-                <div class="paytable-item-large">🍋🍋🍋 → 4x sázky</div>
-                <div class="paytable-item-large">🍊🍊🍊 → 6x sázky</div>
-                <div class="paytable-item-large">🍇🍇🍇 → 8x sázky</div>
-                <div class="paytable-item-large">🔔🔔🔔 → 10x sázky</div>
-                <div class="paytable-item-large">⭐⭐⭐ → 15x sázky</div>
-                <div class="paytable-item-large">💎💎💎 → 20x sázky</div>
-                <div class="paytable-item-large jackpot">🎰🎰🎰 → 50x sázky (JACKPOT!)</div>
-                <div class="paytable-item-large special">🍒🍒❓ → 0.5x sázky (Malá výhra)</div>
+        <div id="paytableGrid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; max-width: 900px; width: 100%; margin: 0 auto;">
+            
+            <div class="shop-item" style="background: linear-gradient(135deg, rgba(255,20,147,0.3), rgba(255,0,255,0.3)); border-color: #ff1493;">
+                <div class="shop-icon">🍒</div>
+                <div class="shop-name">Třešně</div>
+                <div class="shop-price">5x SÁZKA</div>
             </div>
-            <div style="margin-top: 30px; text-align: center; color: #00ffff; font-size: 20px;">
-                💡 Tip: Vyšší sázka = vyšší výhra!
+            
+            <div class="shop-item" style="background: linear-gradient(135deg, rgba(255,255,0,0.3), rgba(255,215,0,0.3)); border-color: #ffff00;">
+                <div class="shop-icon">🍋</div>
+                <div class="shop-name">Citrony</div>
+                <div class="shop-price">4x SÁZKA</div>
             </div>
+            
+            <div class="shop-item" style="background: linear-gradient(135deg, rgba(255,140,0,0.3), rgba(255,69,0,0.3)); border-color: #ff8c00;">
+                <div class="shop-icon">🍊</div>
+                <div class="shop-name">Pomeranče</div>
+                <div class="shop-price">6x SÁZKA</div>
+            </div>
+            
+            <div class="shop-item" style="background: linear-gradient(135deg, rgba(138,43,226,0.3), rgba(75,0,130,0.3)); border-color: #8a2be2;">
+                <div class="shop-icon">🍇</div>
+                <div class="shop-name">Hrozny</div>
+                <div class="shop-price">8x SÁZKA</div>
+            </div>
+            
+            <div class="shop-item" style="background: linear-gradient(135deg, rgba(255,215,0,0.3), rgba(255,140,0,0.3)); border-color: #ffd700;">
+                <div class="shop-icon">🔔</div>
+                <div class="shop-name">Zvonky</div>
+                <div class="shop-price">10x SÁZKA</div>
+            </div>
+            
+            <div class="shop-item" style="background: linear-gradient(135deg, rgba(255,255,0,0.4), rgba(255,215,0,0.4)); border-color: #ffff00;">
+                <div class="shop-icon">⭐</div>
+                <div class="shop-name">Hvězdy</div>
+                <div class="shop-price">15x SÁZKA</div>
+            </div>
+            
+            <div class="shop-item" style="background: linear-gradient(135deg, rgba(0,191,255,0.4), rgba(64,224,208,0.4)); border-color: #00bfff; animation: diamondGlow 2s ease-in-out infinite;">
+                <div class="shop-icon">💎</div>
+                <div class="shop-name">Diamanty</div>
+                <div class="shop-price">20x SÁZKA</div>
+            </div>
+            
+            <div class="shop-item" style="background: linear-gradient(135deg, rgba(255,0,255,0.5), rgba(255,215,0,0.5)); border-color: #ff00ff; animation: jackpotGlowBig 2s ease-in-out infinite; transform: scale(1.05);">
+                <div class="shop-icon" style="font-size: 90px;">🎰</div>
+                <div class="shop-name" style="font-size: 28px; color: #ff00ff;">JACKPOT!</div>
+                <div class="shop-price" style="font-size: 36px; color: #ffd700;">50x SÁZKA</div>
+            </div>
+            
+            <div class="shop-item" style="background: linear-gradient(135deg, rgba(255,170,0,0.3), rgba(255,215,0,0.3)); border-color: #ffaa00; grid-column: span 2;">
+                <div class="shop-icon" style="font-size: 50px;">🍒🍒❓</div>
+                <div class="shop-name">Malá výhra (2 stejné)</div>
+                <div class="shop-price">0.5x SÁZKA</div>
+            </div>
+            
+        </div>
+        
+        <div style="margin-top: 40px; text-align: center; color: #00ffff; font-size: 24px; text-shadow: 0 0 15px #00ffff;">
+            💡 <strong>Tip:</strong> Vyšší sázka = Vyšší výhra!
         </div>
     </div>
 </div>
-
+    
 <!-- MODALS -->
 <div id="loginModal" class="modal" style="display: none;">
     <div class="modal-content">
@@ -186,4 +232,5 @@
 <script type="module" src="script.js"></script>
 </body>
 </html>
+
 
