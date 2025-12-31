@@ -1058,14 +1058,15 @@ window.switchGame = function(game) {
         btn.classList.remove('active');
     });
     
-    const gameMap = {
-        'slot': 'slotGame',
-        'wheel': 'wheelGame',
-        'missions': 'missionsGame',
-        'achievements': 'achievementsGame',
-        'leaderboard': 'leaderboardGame',
-        'shop': 'shopGame'
-    };
+   const gameMap = {
+    'slot': 'slotGame',
+    'wheel': 'wheelGame',
+    'missions': 'missionsGame',
+    'achievements': 'achievementsGame',
+    'leaderboard': 'leaderboardGame',
+    'shop': 'shopGame',
+    'paytable': 'paytableGame'
+};
     
     const gameElement = document.getElementById(gameMap[game]);
     const btnElement = document.getElementById(`${game}Btn`);
@@ -1689,6 +1690,7 @@ window.addEventListener('load', async () => {
         }
     }, 3500);
 });
+
 
 
 
