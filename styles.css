@@ -1462,8 +1462,8 @@ button, .game-btn, .bet-btn {
 /* MOBILNÍ RESPONZIVITA - POKROČILÁ */
 /* ========================================== */
 
+/* Základní úpravy pro mobilní zařízení */
 @media (max-width: 768px) {
-    /* Základní úpravy */
     body {
         padding: 0;
         overflow-x: hidden;
@@ -1872,8 +1872,8 @@ button, .game-btn, .bet-btn {
     }
 }
 
+/* Extra malé mobily */
 @media (max-width: 480px) {
-    /* Extra malé mobily */
     #wrapper {
         padding-top: 95px;
     }
@@ -2035,7 +2035,7 @@ button, .game-btn, .bet-btn {
     }
 }
 
-/* LANDSCAPE MODE PRO MOBILY */
+/* Landscape mód pro mobilní zařízení */
 @media (max-width: 900px) and (max-height: 500px) and (orientation: landscape) {
     #wrapper {
         padding-top: 60px;
@@ -2086,7 +2086,7 @@ button, .game-btn, .bet-btn {
     }
 }
 
-/* TOUCH OPTIMALIZACE */
+/* Optimalizace pro dotyková zařízení */
 @media (hover: none) and (pointer: coarse) {
     button, .game-btn, .bet-btn, .shop-buy-btn, .claim-btn, .modal-close {
         min-height: 44px;
@@ -2098,6 +2098,7 @@ button, .game-btn, .bet-btn {
     }
 }
 
+/* Reels - fix pro malá zařízení */
 @media (max-width: 768px) {
     .reel-container {
         position: relative;
@@ -2125,6 +2126,7 @@ button, .game-btn, .bet-btn {
         max-height: 75px;
     }
 }
+
 
 
 
