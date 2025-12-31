@@ -1667,7 +1667,7 @@ window.addEventListener('load', async () => {
     initReels();
     autoRotate();
     
-    setTimeout(async () => {
+   setTimeout(async () => {
         const savedUser = localStorage.getItem('currentUser');
         
         if (savedUser) {
@@ -1680,7 +1680,7 @@ window.addEventListener('load', async () => {
                     .eq('id', user.id)
                     .maybeSingle();
                 
-               if (existingUser) {
+                if (existingUser) {
                     currentUser.id = existingUser.id;
                     currentUser.nickname = existingUser.nickname;
                     currentUser.coins = existingUser.coins;
@@ -1698,7 +1698,8 @@ window.addEventListener('load', async () => {
                     const activeItem = shopItems.find(i => i.id === currentUser.activeTheme);
                     if (activeItem) applyTheme(activeItem.colors);
                     
-                    document.getElementById('loginModal').style.display = 'none';  
+                    // SKRYTÍ MODALU - KRITICKÉ!
+                    document.getElementById('loginModal').style.display = 'none';
                     
                     updateUI();
                     checkDailyBonus();
@@ -1716,6 +1717,7 @@ window.addEventListener('load', async () => {
         }
     }, 3500);
 });
+
 
 
 
