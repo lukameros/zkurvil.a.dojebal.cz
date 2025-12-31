@@ -2,7 +2,7 @@
 <html lang="cs">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Tetris - Enhanced</title>
 <style>
  .event-notification {
@@ -1129,6 +1129,65 @@ body {
     
     .cell {
         touch-action: none;
+    }
+}
+ @media (max-width: 768px) {
+    /* Hlavní kontejner hry */
+    #tetrisGame {
+        flex-direction: column !important;
+        align-items: center;
+        padding: 10px;
+        gap: 10px;
+    }
+
+    .game-container {
+        flex-direction: column !important; /* Vše pod sebe */
+        width: 100%;
+        max-width: 320px; /* Šířka akorát pro telefon */
+    }
+
+    /* Horní lišta s informacemi (Next, Hold, Score) */
+    .side-panel {
+        flex-direction: row !important; /* Info boxy vedle sebe */
+        justify-content: space-between;
+        width: 100%;
+        gap: 5px;
+    }
+
+    .info-box {
+        flex: 1;
+        padding: 5px !important;
+        min-width: 0 !important; /* Aby se nesrazily */
+        margin-bottom: 0;
+    }
+
+    .info-box h3 {
+        font-size: 10px !important;
+        margin-bottom: 5px;
+    }
+
+    /* Zmenšení herního pole, aby se vešlo i s ovládáním */
+    #tetris {
+        transform: scale(0.9); /* Podle potřeby uprav */
+        margin: -20px 0; /* Kompenzace místa po zmenšení */
+    }
+
+    /* Náhledy kostek */
+    #nextPiece, #holdPiece {
+        width: 60px !important;
+        height: 60px !important;
+        grid-template-columns: repeat(4, 15px) !important;
+        grid-template-rows: repeat(4, 15px) !important;
+    }
+
+    .preview-cell {
+        width: 14px !important;
+        height: 14px !important;
+    }
+
+    /* Schování zbytečného textu pro mobil */
+    .controls {
+        display: none; /* Instrukce klávesnice na mobilu nepotřebujeme */
     }
 }
 </style>
@@ -2703,6 +2762,7 @@ await loadCurrentUser()
 </script>
 </body>
 </html>
+
 
 
 
