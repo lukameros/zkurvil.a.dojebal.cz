@@ -5,11 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Tetris - Enhanced</title>
 <style>
- #tetris {
-    touch-action: none; /* Zastaví scrollování stránky při dotyku na hru */
-    user-select: none;
-    -webkit-tap-highlight-color: transparent; /* Odstraní modrý záblesk při ťuknutí */
-}
  .event-notification {
     position: fixed;
     top: 50%;
@@ -1136,56 +1131,6 @@ body {
         touch-action: none;
     }
 }
- #mobileControls {
-    position: fixed;
-    bottom: 20px;
-    left: 50%;
-    transform: translateX(-50%);
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    z-index: 1000;
-    width: 90%;
-}
-
-.control-row {
-    display: flex;
-    justify-content: center;
-    gap: 15px;
-}
-
-.touchBtn {
-    width: 65px;
-    height: 65px;
-    background: rgba(255, 255, 255, 0.2);
-    border: 2px solid #00ffff;
-    border-radius: 50%;
-    color: white;
-    font-size: 24px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    touch-action: manipulation; /* Důležité: zabrání zoomování při klikání */
-    user-select: none;
-}
-
-.touchBtn:active {
-    background: rgba(0, 255, 255, 0.5);
-    transform: scale(0.9);
-}
-
-.touchBtn.wide {
-    width: 140px;
-    border-radius: 30px;
-    font-size: 16px;
-}
-
-/* Zobrazit tlačítka pouze na mobilech */
-@media (pointer: coarse) {
-    #mobileControls {
-        display: flex !important;
-    }
-}
 </style>
 </head>
 <body>
@@ -1456,264 +1401,8 @@ body {
         <button class="menuBtn" onclick="backToMainMenu()">🏠 Zpět do menu</button>
     </div>
 </div>
-<div id="mobileControls" style="display: none;">
-    <div class="control-row">
-        <button class="touchBtn" id="btnRotate">🔄</button>
-    </div>
-    <div class="control-row">
-        <button class="touchBtn" id="btnLeft">⬅️</button>
-        <button class="touchBtn" id="btnDown">⬇️</button>
-        <button class="touchBtn" id="btnRight">➡️</button>
-    </div>
-    <div class="control-row">
-        <button class="touchBtn wide" id="btnDrop">SPACE (Drop)</button>
-        <button class="touchBtn" id="btnHold">📥 Hold</button>
-    </div>
-</div>
+
 <script>
- function playerReset() {
-    const pieces = 'ILJOTSZ';
-    player.matrix = createPiece(pieces[pieces.length * Math.random() | 0]);
-    player.pos.y = 0;
-    player.pos.x = (arena[0].length / 2 | 0) - (player.matrix[0].length / 2 | 0);
-    if (collide(arena, player)) {
-        arena.forEach(row => row.fill(0)); // Game Over -> Reset plochy
-    }
-}
-
-let dropCounter = 0;
-let lastTime = 0;
-function update(time = 0) {
-    const deltaTime = time - lastTime;
-    lastTime = time;
-    dropCounter += deltaTime;
-    if (dropCounter > 1000) { // Každou sekundu spadne dolů
-        dropPlayer();
-    }
-    draw(); // Tady musíš mít funkci, která to vykreslí na obrazovku
-    requestAnimationFrame(update);
-}
-
-playerReset();
-update();
- // POHYB DO STRAN
-function movePlayer(dir) {
-    player.pos.x += dir;
-    if (collide(arena, player)) {
-        player.pos.x -= dir;
-    }
-}
-
-// ROTACE (Poklep)
-function rotatePlayer() {
-    const pos = player.pos.x;
-    let offset = 1;
-    rotate(player.matrix);
-    while (collide(arena, player)) {
-        player.pos.x += offset;
-        offset = -(offset + (offset > 0 ? 1 : -1));
-        if (offset > player.matrix[0].length) {
-            rotate(player.matrix, -1);
-            player.pos.x = pos;
-            return;
-        }
-    }
-}
-
-function rotate(matrix, dir = 1) {
-    for (let y = 0; y < matrix.length; ++y) {
-        for (let x = 0; x < y; ++x) {
-            [matrix[x][y], matrix[y][x]] = [matrix[y][x], matrix[x][y]];
-        }
-    }
-    if (dir > 0) matrix.forEach(row => row.reverse());
-    else matrix.reverse();
-}
-
-// PÁD (Swipe dolů)
-function dropPlayer() {
-    player.pos.y++;
-    if (collide(arena, player)) {
-        player.pos.y--;
-        merge(arena, player);
-        playerReset();
-        arenaSweep();
-    }
-}
-
-// HOLD (Swipe nahoru)
-function holdPieceAction() {
-    if (!player.hold) {
-        player.hold = player.matrix;
-        playerReset();
-    } else {
-        const temp = player.matrix;
-        player.matrix = player.hold;
-        player.hold = temp;
-        player.pos.y = 0;
-        player.pos.x = 5;
-    }
-}
-
-// KOLIZE - aby kostka neprošla zdí
-function collide(arena, player) {
-    const [m, o] = [player.matrix, player.pos];
-    for (let y = 0; y < m.length; ++y) {
-        for (let x = 0; x < m[y].length; ++x) {
-            if (m[y][x] !== 0 &&
-               (arena[y + o.y] && arena[y + o.y][x + o.x]) !== 0) {
-                return true;
-            }
-        }
-    }
-    return false;
-}
-
-// SPOJENÍ KOSTKY S PLOCHOU
-function merge(arena, player) {
-    player.matrix.forEach((row, y) => {
-        row.forEach((value, x) => {
-            if (value !== 0) {
-                arena[y + player.pos.y][x + player.pos.x] = value;
-            }
-        });
-    });
-}
- const canvas = document.getElementById('tetris');
-const context = canvas.getContext('2d'); // Pokud používáš Canvas
-// Pokud používáš DIVy, logika se mírně liší, ale toto je standard:
-
-const arena = createMatrix(10, 20); // Mřížka 10x20
-
-const player = {
-    pos: {x: 0, y: 0},
-    matrix: null,
-    next: null,
-    hold: null
-};
-
-// Definice tvarů kostek
-function createPiece(type) {
-    if (type === 'T') {
-        return [
-            [0, 1, 0],
-            [1, 1, 1],
-            [0, 0, 0],
-        ];
-    } else if (type === 'L') {
-        return [
-            [0, 2, 0],
-            [0, 2, 0],
-            [0, 2, 2],
-        ];
-    } // ... další kostky J, S, Z, O, I
-}
-
-function createMatrix(w, h) {
-    const matrix = [];
-    while (h--) {
-        matrix.push(new Array(w).fill(0));
-    }
-    return matrix;
-}
- // Pohyb do stran (volá tvůj swipe doleva/doprava)
-function movePlayer(dir) {
-    player.pos.x += dir;
-    if (collide(arena, player)) {
-        player.pos.x -= dir; // Pokud narazí do zdi, vrátí se
-    }
-}
-
-// Rotace (volá tvůj poklep)
-function rotatePlayer() {
-    const pos = player.pos.x;
-    let offset = 1;
-    rotate(player.matrix); // Funkce, která otočí matici kostky
-    
-    // Kontrola, aby se kostka při otočení neprolnula se zdí
-    while (collide(arena, player)) {
-        player.pos.x += offset;
-        offset = -(offset + (offset > 0 ? 1 : -1));
-        if (offset > player.matrix[0].length) {
-            rotate(player.matrix); // Pokud se nevejde, otočíme zpět
-            player.pos.x = pos;
-            return;
-        }
-    }
-}
-
-// Pád dolů (volá tvůj swipe dolů)
-function dropPlayer() {
-    player.pos.y++;
-    if (collide(arena, player)) {
-        player.pos.y--;
-        merge(arena, player); // Kostka se "přilepí"
-        playerReset(); // Nová kostka shora
-        arenaSweep();  // Smazání plných řad
-    }
-    dropCounter = 0; // Vynulování času automatického pádu
-}
-
-// Držení kostky (volá tvůj swipe nahoru)
-function holdPieceAction() {
-    // Tady můžeš mít kód pro výměnu kostky
-    console.log("Výměna kostky (Hold)");
-}
-
-// Pomocná funkce pro samotné otočení matice
-function rotate(matrix) {
-    for (let y = 0; y < matrix.length; ++y) {
-        for (let x = 0; x < y; ++x) {
-            [
-                matrix[x][y],
-                matrix[y][x],
-            ] = [
-                matrix[y][x],
-                matrix[x][y],
-            ];
-        }
-    }
-    matrix.forEach(row => row.reverse());
-}
- let touchStartX = 0;
-let touchStartY = 0;
-const board = document.getElementById('tetris');
-
-board.addEventListener('touchstart', e => {
-    touchStartX = e.touches[0].clientX;
-    touchStartY = e.touches[0].clientY;
-}, {passive: false});
-
-board.addEventListener('touchend', e => {
-    const touchEndX = e.changedTouches[0].clientX;
-    const touchEndY = e.changedTouches[0].clientY;
-    
-    const dx = touchEndX - touchStartX;
-    const dy = touchEndY - touchStartY;
-    const absDx = Math.abs(dx);
-    const absDy = Math.abs(dy);
-
-    // Práh citlivosti (aby se klepnutí nepletlo s pohybem)
-    const threshold = 30;
-
-    if (absDx < 10 && absDy < 10) {
-        // POKLEP (Tap) -> Rotace
-        rotatePlayer(); 
-    } else if (absDy > absDx && dy < -threshold) {
-        // SWIPE NAHORU -> Hold (Držení kostky)
-        holdPieceAction();
-    } else if (absDx > absDy) {
-        // HORIZONTÁLNÍ POHYB
-        if (dx > threshold) movePlayer(1);  // Doprava
-        else if (dx < -threshold) movePlayer(-1); // Doleva
-    } else if (dy > threshold) {
-        // SWIPE DOLŮ -> Rychlý pád
-        dropPlayer();
-    }
-    
-    e.preventDefault();
-}, {passive: false});
- 
 let selectedDifficulty = 'medium';
 let mapRows = 20;
 let mapCols = 10;
@@ -1747,7 +1436,7 @@ let totalGamesPlayed = 0;
 let activeEvent = null;
 let eventTimeout = null;
 let canRotate = true;
- 
+
 function startPageLoading() {
     const loadingTime = 3000 + Math.random() * 3000;
     const loadingBar = document.getElementById('loadingBar');
@@ -3014,8 +2703,6 @@ await loadCurrentUser()
 </script>
 </body>
 </html>
-
-
 
 
 
