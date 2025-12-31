@@ -971,10 +971,24 @@ function applyTheme(colors) {
         }
         
         #coinDisplay, #dailyBonus, #shopBtn {
-            background: linear-gradient(135deg, ${colors.primary} 0%, ${colors.secondary} 100%) !important;
-            border-color: ${colors.primary} !important;
-            box-shadow: 0 0 25px ${colors.primary}dd !important;
-        }
+    background: linear-gradient(135deg, ${colors.primary} 0%, ${colors.secondary} 100%) !important;
+    border-color: ${colors.primary} !important;
+    box-shadow: 0 0 25px ${colors.primary}dd !important;
+}
+
+#paytableBtn {
+    background: linear-gradient(135deg, ${colors.primary} 0%, ${colors.secondary} 100%) !important;
+    border-color: ${colors.primary} !important;
+    box-shadow: 0 0 25px ${colors.primary}dd !important;
+}
+
+#paytableBtn:hover {
+    box-shadow: 0 0 35px ${colors.primary} !important;
+}
+
+#paytableBtn.active {
+    box-shadow: 0 0 40px ${colors.primary} !important;
+}
         
         .game-btn {
             background: linear-gradient(135deg, ${colors.primary} 0%, ${colors.secondary} 100%) !important;
@@ -1702,6 +1716,7 @@ window.addEventListener('load', async () => {
         }
     }, 3500);
 });
+
 
 
 
