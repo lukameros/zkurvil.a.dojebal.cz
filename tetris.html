@@ -1131,6 +1131,56 @@ body {
         touch-action: none;
     }
 }
+ #mobileControls {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    z-index: 1000;
+    width: 90%;
+}
+
+.control-row {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+}
+
+.touchBtn {
+    width: 65px;
+    height: 65px;
+    background: rgba(255, 255, 255, 0.2);
+    border: 2px solid #00ffff;
+    border-radius: 50%;
+    color: white;
+    font-size: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    touch-action: manipulation; /* Důležité: zabrání zoomování při klikání */
+    user-select: none;
+}
+
+.touchBtn:active {
+    background: rgba(0, 255, 255, 0.5);
+    transform: scale(0.9);
+}
+
+.touchBtn.wide {
+    width: 140px;
+    border-radius: 30px;
+    font-size: 16px;
+}
+
+/* Zobrazit tlačítka pouze na mobilech */
+@media (pointer: coarse) {
+    #mobileControls {
+        display: flex !important;
+    }
+}
 </style>
 </head>
 <body>
@@ -1401,7 +1451,20 @@ body {
         <button class="menuBtn" onclick="backToMainMenu()">🏠 Zpět do menu</button>
     </div>
 </div>
-
+<div id="mobileControls" style="display: none;">
+    <div class="control-row">
+        <button class="touchBtn" id="btnRotate">🔄</button>
+    </div>
+    <div class="control-row">
+        <button class="touchBtn" id="btnLeft">⬅️</button>
+        <button class="touchBtn" id="btnDown">⬇️</button>
+        <button class="touchBtn" id="btnRight">➡️</button>
+    </div>
+    <div class="control-row">
+        <button class="touchBtn wide" id="btnDrop">SPACE (Drop)</button>
+        <button class="touchBtn" id="btnHold">📥 Hold</button>
+    </div>
+</div>
 <script>
 let selectedDifficulty = 'medium';
 let mapRows = 20;
@@ -1436,6 +1499,30 @@ let totalGamesPlayed = 0;
 let activeEvent = null;
 let eventTimeout = null;
 let canRotate = true;
+
+ // Funkce pro detekci mobilního ovládání
+function initTouchControls() {
+    // Definice tlačítek
+    const controls = {
+        btnLeft: () => movePlayer(-1),
+        btnRight: () => movePlayer(1),
+        btnDown: () => dropPlayer(),
+        btnRotate: () => rotatePlayer(),
+        btnHold: () => holdPieceAction(),
+        btnDrop: () => hardDrop()
+    };
+
+    // Přidání event listenerů pro dotyk
+    Object.keys(controls).forEach(id => {
+        const el = document.getElementById(id);
+        if (el) {
+            el.addEventListener('touchstart', (e) => {
+                e.preventDefault(); // Zabrání scrollování
+                controls[id]();
+            });
+        }
+    });
+ }
 
 function startPageLoading() {
     const loadingTime = 3000 + Math.random() * 3000;
@@ -2703,6 +2790,7 @@ await loadCurrentUser()
 </script>
 </body>
 </html>
+
 
 
 
