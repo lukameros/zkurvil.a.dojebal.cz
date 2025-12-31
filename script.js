@@ -444,64 +444,61 @@ window.spinSlot = async function() {
         const reel = document.getElementById(`reel${i + 1}`);
         const reelElement = reel.parentElement;
         
-        // Najdi index cílového symbolu (musí být dost daleko od začátku)
+        // Najdi cílový symbol v bezpečné vzdálenosti od začátku i konce
         let targetIndex = -1;
-        for (let j = 20; j < reels[i].length - 20; j++) {
+        for (let j = 30; j < reels[i].length - 30; j++) {
             if (reels[i][j] === results[i]) {
                 targetIndex = j;
                 break;
             }
         }
         
-        // Pokud se nenašel, použij prostřední část pole
         if (targetIndex === -1) {
-            targetIndex = Math.floor(reels[i].length / 2);
+            targetIndex = 50;
         }
         
-        // Výpočet pozice - STŘEDNÍ symbol má být viditelný uprostřed (ve 2. slotu ze 3)
-        // Okno ukazuje 3 symboly, chceme aby targetIndex byl uprostřed
-        const targetPosition = -((targetIndex - 1) * symbolHeight);
+        // KLÍČOVÁ ZMĚNA: Cílová pozice musí být tak, aby středový symbol byl ve středu okna
+        // Okno ukazuje 3 symboly (indexy 0, 1, 2), chceme targetIndex na pozici 1 (uprostřed)
+        // Proto: posuneme reel tak, aby targetIndex byl na 2. pozici
+        const targetPosition = -(targetIndex * symbolHeight) + symbolHeight;
         
-        // Reset pozice
+        // Reset
         reel.style.transition = 'none';
         reel.style.transform = 'translateY(0px)';
         
-        // Přidej spinning class s malým zpožděním
         setTimeout(() => {
             reelElement.classList.add('spinning');
-        }, 10);
-        
-        // Animace rychlého točení
-        const spinSpeed = 25;
-        let currentPos = 0;
-        const spinInterval = setInterval(() => {
-            currentPos -= spinSpeed;
-            reel.style.transform = `translateY(${currentPos}px)`;
             
-            // Loop když přejdeš polovinu pole
-            if (Math.abs(currentPos) > (reels[i].length * symbolHeight) / 2) {
-                currentPos = 0;
-            }
-        }, 16);
-        
-        // Zastav točení po určité době
-        setTimeout(() => {
-            clearInterval(spinInterval);
-            reelElement.classList.remove('spinning');
-            reelElement.classList.add('stopping');
+            // Rychlé točení
+            let currentPos = 0;
+            const totalSpinDistance = reels[i].length * symbolHeight * 3; // 3 celé otočky
+            const finalPosition = (totalSpinDistance + Math.abs(targetPosition)) % (reels[i].length * symbolHeight);
             
-            // Plynule zastav na přesné cílové pozici
-            reel.style.transition = 'transform 800ms cubic-bezier(0.25, 0.46, 0.45, 0.94)';
-            reel.style.transform = `translateY(${targetPosition}px)`;
+            const spinInterval = setInterval(() => {
+                currentPos -= 30;
+                if (currentPos <= -(reels[i].length * symbolHeight)) {
+                    currentPos = 0;
+                }
+                reel.style.transform = `translateY(${currentPos}px)`;
+            }, 16);
             
-            // Odstran stopping class
+            // Zastav s plynulým přechodem
             setTimeout(() => {
-                reelElement.classList.remove('stopping');
-            }, 800);
-        }, spinDurations[i]);
+                clearInterval(spinInterval);
+                reelElement.classList.remove('spinning');
+                reelElement.classList.add('stopping');
+                
+                // Nastav přesnou cílovou pozici
+                reel.style.transition = 'transform 800ms cubic-bezier(0.17, 0.67, 0.35, 0.96)';
+                reel.style.transform = `translateY(${targetPosition}px)`;
+                
+                setTimeout(() => {
+                    reelElement.classList.remove('stopping');
+                }, 800);
+            }, spinDurations[i]);
+        }, 10);
     }
     
-    // Vyhodnoť výhru po dokončení všech animací
     setTimeout(() => {
         evaluateSlotWin(results);
     }, 5200);
@@ -1613,5 +1610,6 @@ window.addEventListener('load', async () => {
         }
     }, 3500);
 });
+
 
 
