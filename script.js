@@ -4,10 +4,11 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
 const SUPABASE_URL = 'https://bmmaijlbpwgzhrxzxphf.supabase.co'
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJtbWFpamxicHdnemhyeHp4cGhmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjY4NjQ5MDcsImV4cCI6MjA4MjQ0MDkwN30.s0YQVnAjMXFu1pSI1NXZ2naSab179N0vQPglsmy3Pgw'
 const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+// Session storage pro update modal (místo localStorage)
+let hasSeenUpdateModal = false;
+
 function showUpdateModal() {
-    const hasSeenUpdate = localStorage.getItem('casino_update_v2');
-    if (!hasSeenUpdate) {
-        // Počkej až loading skončí
+    if (!hasSeenUpdateModal) {
         setTimeout(() => {
             const modal = document.createElement('div');
             modal.className = 'modal';
@@ -34,12 +35,12 @@ function showUpdateModal() {
                 </div>
             `;
             document.body.appendChild(modal);
-        }, 3500); // Počká až loading screen zmizí
+        }, 3500);
     }
 }
 
 window.closeUpdateModal = function() {
-    localStorage.setItem('casino_update_v2', 'true');
+    hasSeenUpdateModal = true;
     const modal = document.getElementById('updateModalContainer');
     if (modal) modal.remove();
 }
@@ -1566,88 +1567,6 @@ function applyTheme(colors) {
     
     document.head.appendChild(style);
     
-    console.log('✨ Téma plně aplikováno na celou hru:', colors);
-}
-    
-    // Textové elementy
-    const userName = document.getElementById('userName');
-    if (userName) {
-        userName.style.color = colors.primary;
-        userName.style.textShadow = `0 0 15px ${colors.primary}, 0 0 30px ${colors.secondary}`;
-    }
-    
-    const slotTitle = document.getElementById('slotTitle');
-    if (slotTitle) {
-        slotTitle.style.color = colors.primary;
-        slotTitle.style.textShadow = `0 0 20px ${colors.primary}, 0 0 40px ${colors.secondary}`;
-    }
-    
-    const wheelTitle = document.getElementById('wheelTitle');
-    if (wheelTitle) {
-        wheelTitle.style.color = colors.secondary;
-        wheelTitle.style.textShadow = `0 0 15px ${colors.secondary}, 0 0 30px ${colors.primary}`;
-    }
-    
-    const betAmount = document.getElementById('betAmount');
-    if (betAmount) {
-        betAmount.style.color = colors.primary;
-        betAmount.style.textShadow = `0 0 10px ${colors.primary}`;
-    }
-    
-    const slotResult = document.getElementById('slotResult');
-    if (slotResult) {
-        slotResult.style.color = colors.primary;
-        slotResult.style.textShadow = `0 0 15px ${colors.primary}`;
-    }
-    
-    const wheelCost = document.getElementById('wheelCost');
-    if (wheelCost) {
-        wheelCost.style.color = colors.secondary;
-        wheelCost.style.textShadow = `0 0 10px ${colors.secondary}`;
-    }
-    
-    // Paytable nadpis
-    const paytableTitle = document.querySelector('.paytable h3');
-    if (paytableTitle) {
-        paytableTitle.style.color = colors.primary;
-        paytableTitle.style.textShadow = `0 0 15px ${colors.primary}`;
-    }
-    
-    // Leaderboard nadpis
-    const leaderboardTitle = document.querySelector('#leaderboardFull h2');
-    if (leaderboardTitle) {
-        leaderboardTitle.style.color = colors.primary;
-        leaderboardTitle.style.textShadow = `0 0 20px ${colors.primary}, 0 0 40px ${colors.secondary}`;
-    }
-    
-    // Shop nadpis
-    const shopTitle = document.querySelector('#shopGame h2');
-    if (shopTitle) {
-        shopTitle.style.color = colors.primary;
-        shopTitle.style.textShadow = `0 0 20px ${colors.primary}, 0 0 40px ${colors.secondary}`;
-    }
-    
-    // Všechny leaderboard položky
-    document.querySelectorAll('.leaderboard-rank').forEach(el => {
-        el.style.color = colors.secondary;
-    });
-    
-    document.querySelectorAll('.leaderboard-coins').forEach(el => {
-        el.style.color = colors.primary;
-    });
-    
-    // Shop názvy
-    document.querySelectorAll('.shop-name').forEach(el => {
-        el.style.color = colors.primary;
-        el.style.textShadow = `0 0 10px ${colors.primary}`;
-    });
-    
-    // Modal nadpisy
-    document.querySelectorAll('.modal h2').forEach(el => {
-        el.style.color = colors.primary;
-        el.style.textShadow = `0 0 20px ${colors.primary}, 0 0 40px ${colors.secondary}`;
-    });
-    
     console.log('✨ Téma aplikováno:', colors);
 }
 
@@ -1671,7 +1590,7 @@ window.switchGame = function(game) {
     } else if (game === 'missions') {
         document.getElementById('missionsGame').classList.add('active');
         document.getElementById('missionsBtn').classList.add('active');
-        loadMissions(); // DŮLEŽITÉ!
+        loadMissions();
     } else if (game === 'achievements') {
         document.getElementById('achievementsGame').classList.add('active');
         document.getElementById('achievementsBtn').classList.add('active');
@@ -1682,11 +1601,11 @@ window.switchGame = function(game) {
         loadLeaderboard();
     } else if (game === 'shop') {
         document.getElementById('shopGame').classList.add('active');
-        document.getElementById('shopBtn').classList.add('active'); // Přidej toto
+        document.getElementById('shopBtn').classList.add('active');
         loadShop();
     }
 };
-// USER MANAGEMENT
+
 window.login = async function() {
     const nickname = document.getElementById('nicknameInput').value.trim();
     if (!nickname || nickname.length < 2) {
@@ -1707,31 +1626,27 @@ window.login = async function() {
             .maybeSingle();
         
         if (existingUser) {
-            // Uživatel existuje - načti jeho data
+            // Načti existujícího uživatele
             currentUser.id = existingUser.id;
             currentUser.nickname = existingUser.nickname;
             currentUser.coins = existingUser.coins;
             currentUser.lastDailyBonus = existingUser.last_daily_bonus;
             currentUser.ownedThemes = existingUser.owned_themes || ['default'];
             currentUser.activeTheme = existingUser.active_theme || 'default';
-            currentUser.stats = existingUser.stats || currentUser.stats;
+            currentUser.stats = {
+                ...currentUser.stats,
+                ...(existingUser.stats || {})
+            };
             currentUser.unlockedAchievements = existingUser.unlocked_achievements || [];
             currentUser.dailyMissions = existingUser.daily_missions || {};
             currentUser.lastMissionReset = existingUser.last_mission_reset;
             
-            localStorage.setItem('currentUser', JSON.stringify({
-                id: currentUser.id,
-                username: currentUser.nickname
-            }));
-            
             console.log('✅ Uživatel přihlášen:', currentUser);
         } else {
-            // Nový uživatel - vytvoř účet
+            // Vytvoř nového uživatele
             currentUser.nickname = nickname;
             currentUser.coins = 100;
-            currentUser.lastDailyBonus = new Date().toISOString().split('T')[0];
-            currentUser.ownedThemes = ['default'];
-            currentUser.activeTheme = 'default';
+            currentUser.lastDailyBonus = new Date().toISOString();
             
             const { data: newUser, error: insertError } = await supabase
                 .from('casino_users')
@@ -1754,25 +1669,16 @@ window.login = async function() {
             }
             
             currentUser.id = newUser.id;
-            
-            localStorage.setItem('currentUser', JSON.stringify({
-                id: currentUser.id,
-                username: currentUser.nickname
-            }));
-            
             console.log('✅ Nový uživatel vytvořen:', currentUser);
         }
         
-        // ⭐ NOVÉ: Inicializuj mise
         initializeMissions();
         
-        // Aplikuj téma
         const activeItem = shopItems.find(i => i.id === currentUser.activeTheme);
         if (activeItem) {
             applyTheme(activeItem.colors);
         }
         
-        // Zavři modal a zobraz hru
         document.getElementById('loginModal').style.display = 'none';
         updateUI();
         checkDailyBonus();
@@ -2279,6 +2185,7 @@ window.addEventListener('load', async () => {
         }
     }, 3500);
 });
+
 
 
 
