@@ -2119,7 +2119,6 @@ document.getElementById('nicknameInput').addEventListener('keypress', function(e
 });
 
 // Inicializace
-// Inicializace
 window.addEventListener('load', async () => {
     console.log('🎰 Casino inicializace...');
     
@@ -2185,6 +2184,7 @@ window.addEventListener('load', async () => {
         }
     }, 3500);
 });
+
 
 
 
