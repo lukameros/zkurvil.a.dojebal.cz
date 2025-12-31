@@ -1484,6 +1484,17 @@ function showNotification(message) {
     }, 3000);
 }
 
+document.getElementById('tableToggleBtn').addEventListener('click', function() {
+    const tableContainer = document.getElementById('tableContainer');
+    
+    // Přepínání zobrazení tabulky
+    if (tableContainer.style.display === 'none' || tableContainer.style.display === '') {
+        tableContainer.style.display = 'block'; // Ukáže tabulku
+    } else {
+        tableContainer.style.display = 'none'; // Skryje tabulku
+    }
+});
+
 function updateLoginStreak() {
     const today = new Date().toISOString().split('T')[0];
     const lastLogin = currentUser.stats.lastLogin;
@@ -1609,6 +1620,7 @@ window.addEventListener('load', async () => {
         }
     }, 3500);
 });
+
 
 
 
