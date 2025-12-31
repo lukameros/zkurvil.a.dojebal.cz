@@ -720,6 +720,417 @@ button.menuBtn.locked::after {
         grid-template-columns: 1fr;
     }
 }
+
+ /* ========================================== */
+/* MOBILNÍ OPTIMALIZACE PRO TETRIS */
+/* ========================================== */
+
+/* Touch ovládání */
+body {
+    -webkit-tap-highlight-color: transparent;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    user-select: none;
+}
+
+/* Základní mobilní styly */
+@media (max-width: 768px) {
+    body {
+        overflow-x: hidden;
+        overflow-y: auto;
+    }
+    
+    h1 {
+        font-size: 36px;
+        margin-bottom: 20px;
+    }
+    
+    /* Zmenšení top statsů */
+    #playerStats {
+        top: 10px;
+        right: 10px;
+        gap: 8px;
+    }
+    
+    #coinsDisplay, #levelDisplay {
+        padding: 8px 15px;
+        font-size: 18px;
+    }
+    
+    .xp-bar-container {
+        height: 6px;
+    }
+    
+    .xp-text {
+        font-size: 12px;
+    }
+    
+    /* Back button */
+    #backBtn {
+        top: 10px;
+        left: 10px;
+        padding: 8px 16px;
+        font-size: 14px;
+    }
+    
+    /* Menu tlačítka */
+    button.menuBtn {
+        padding: 12px 30px;
+        font-size: 18px;
+        min-width: 240px;
+        margin: 8px 0;
+    }
+    
+    .price-tag, .level-req {
+        font-size: 13px;
+        padding: 3px 8px;
+    }
+    
+    /* Menu sekce */
+    .menu-section {
+        grid-template-columns: 1fr;
+        max-height: 50vh;
+        padding: 15px;
+        gap: 10px;
+    }
+    
+    /* Herní plocha */
+    #tetris {
+        transform: scale(0.8);
+        transform-origin: top center;
+    }
+    
+    .cell {
+        width: 25px;
+        height: 25px;
+    }
+    
+    .game-container {
+        flex-direction: column;
+        gap: 15px;
+        align-items: center;
+    }
+    
+    .side-panel {
+        flex-direction: row;
+        gap: 15px;
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .info-box {
+        padding: 15px;
+        min-width: 140px;
+    }
+    
+    .info-box h3 {
+        font-size: 16px;
+        margin-bottom: 10px;
+    }
+    
+    #score, #level, #lines, #combo, #gameCoins {
+        font-size: 24px;
+    }
+    
+    #nextPiece, #holdPiece {
+        width: 100px;
+        height: 100px;
+        grid-template-columns: repeat(4, 25px);
+        grid-template-rows: repeat(4, 25px);
+    }
+    
+    .preview-cell {
+        width: 23px;
+        height: 23px;
+    }
+    
+    /* Ovládání */
+    .controls {
+        position: static;
+        margin-top: 20px;
+        width: 90%;
+        font-size: 12px;
+        padding: 12px;
+    }
+    
+    .controls h4 {
+        font-size: 14px;
+        margin-bottom: 6px;
+    }
+    
+    /* Leaderboard */
+    #leaderboard {
+        max-width: 95%;
+    }
+    
+    #leaderboard table {
+        width: 100%;
+        font-size: 14px;
+    }
+    
+    #leaderboard th, #leaderboard td {
+        padding: 8px 4px;
+        font-size: 12px;
+    }
+    
+    /* Modály */
+    .modal-content {
+        padding: 25px;
+        max-width: 90%;
+    }
+    
+    .modal-content h2 {
+        font-size: 32px;
+        margin-bottom: 15px;
+    }
+    
+    .modal-content .coin-reward {
+        font-size: 36px;
+        margin: 15px 0;
+    }
+    
+    .modal-content .xp-reward {
+        font-size: 28px;
+        margin: 8px 0;
+    }
+    
+    .modal-content input {
+        width: 90%;
+        padding: 10px 15px;
+        font-size: 16px;
+    }
+    
+    /* Notifikace */
+    .event-notification, .level-up-notification {
+        padding: 25px 35px;
+        max-width: 85%;
+    }
+    
+    .event-notification h2, .level-up-notification h2 {
+        font-size: 32px;
+        margin-bottom: 10px;
+    }
+    
+    .event-notification p, .level-up-notification p {
+        font-size: 18px;
+    }
+    
+    .event-timer {
+        top: 60px;
+        font-size: 16px;
+        padding: 10px 20px;
+    }
+    
+    /* Pauza */
+    .pause-text {
+        font-size: 48px;
+    }
+    
+    /* Loading */
+    .loading-bar-container {
+        width: 90%;
+        max-width: 350px;
+    }
+    
+    .loading-content h2 {
+        font-size: 36px;
+    }
+    
+    .loading-text {
+        font-size: 16px;
+    }
+}
+
+/* Extra malé mobily */
+@media (max-width: 480px) {
+    h1 {
+        font-size: 28px;
+    }
+    
+    button.menuBtn {
+        padding: 10px 20px;
+        font-size: 16px;
+        min-width: 200px;
+    }
+    
+    #tetris {
+        transform: scale(0.65);
+    }
+    
+    .cell {
+        width: 20px;
+        height: 20px;
+    }
+    
+    #nextPiece, #holdPiece {
+        width: 80px;
+        height: 80px;
+        grid-template-columns: repeat(4, 20px);
+        grid-template-rows: repeat(4, 20px);
+    }
+    
+    .preview-cell {
+        width: 18px;
+        height: 18px;
+    }
+    
+    .info-box {
+        padding: 10px;
+        min-width: 110px;
+    }
+    
+    .info-box h3 {
+        font-size: 14px;
+    }
+    
+    #score, #level, #lines, #combo, #gameCoins {
+        font-size: 20px;
+    }
+    
+    .modal-content {
+        padding: 20px;
+    }
+    
+    .modal-content h2 {
+        font-size: 26px;
+    }
+    
+    .event-notification, .level-up-notification {
+        padding: 20px 25px;
+    }
+    
+    #leaderboard th, #leaderboard td {
+        padding: 6px 2px;
+        font-size: 11px;
+    }
+}
+
+/* Landscape režim pro mobily */
+@media (max-width: 950px) and (max-height: 550px) and (orientation: landscape) {
+    #playerStats {
+        top: 5px;
+        right: 5px;
+        flex-direction: row;
+        gap: 10px;
+    }
+    
+    #coinsDisplay, #levelDisplay {
+        padding: 5px 10px;
+        font-size: 14px;
+    }
+    
+    .xp-bar-container {
+        display: none;
+    }
+    
+    .xp-text {
+        display: none;
+    }
+    
+    #backBtn {
+        top: 5px;
+        left: 5px;
+        padding: 6px 12px;
+        font-size: 12px;
+    }
+    
+    h1 {
+        font-size: 24px;
+        margin-bottom: 10px;
+    }
+    
+    button.menuBtn {
+        padding: 8px 20px;
+        font-size: 14px;
+        margin: 5px 0;
+        min-width: 180px;
+    }
+    
+    .menu-section {
+        max-height: 40vh;
+        padding: 10px;
+        gap: 8px;
+    }
+    
+    #tetris {
+        transform: scale(0.6);
+    }
+    
+    .cell {
+        width: 18px;
+        height: 18px;
+    }
+    
+    .game-container {
+        flex-direction: row;
+        gap: 10px;
+    }
+    
+    .side-panel {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .info-box {
+        padding: 8px;
+        min-width: 100px;
+    }
+    
+    .info-box h3 {
+        font-size: 12px;
+        margin-bottom: 5px;
+    }
+    
+    #score, #level, #lines, #combo, #gameCoins {
+        font-size: 18px;
+    }
+    
+    #nextPiece, #holdPiece {
+        width: 70px;
+        height: 70px;
+        grid-template-columns: repeat(4, 17px);
+        grid-template-rows: repeat(4, 17px);
+    }
+    
+    .preview-cell {
+        width: 15px;
+        height: 15px;
+    }
+    
+    .controls {
+        font-size: 10px;
+        padding: 8px;
+        bottom: 5px;
+        right: 5px;
+    }
+    
+    .controls h4 {
+        font-size: 11px;
+    }
+    
+    .event-timer {
+        top: 40px;
+        font-size: 12px;
+        padding: 5px 10px;
+    }
+}
+
+/* Touch ovládání pro hru */
+@media (hover: none) and (pointer: coarse) {
+    .centered {
+        padding: 20px 10px;
+    }
+    
+    /* Větší plochy pro klikání */
+    button.menuBtn {
+        min-height: 50px;
+        touch-action: manipulation;
+    }
+    
+    .cell {
+        touch-action: none;
+    }
+}
 </style>
 </head>
 <body>
@@ -2292,6 +2703,7 @@ await loadCurrentUser()
 </script>
 </body>
 </html>
+
 
 
 
