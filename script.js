@@ -1387,6 +1387,7 @@ function initializeMissions() {
         currentUser.lastMissionReset = today;
         currentUser.dailyMissions = {};
         
+        // Inicializuj VŠECHNY mise
         dailyMissions.forEach(mission => {
             currentUser.dailyMissions[mission.id] = {
                 progress: 0,
@@ -1402,9 +1403,21 @@ function initializeMissions() {
         currentUser.stats.totalSpins = 0;
         
         saveUser();
+    } else {
+        // DŮLEŽITÉ: Pokud chybí nějaké mise, přidej je
+        dailyMissions.forEach(mission => {
+            if (!currentUser.dailyMissions[mission.id]) {
+                currentUser.dailyMissions[mission.id] = {
+                    progress: 0,
+                    completed: false,
+                    claimed: false
+                };
+            }
+        });
     }
+    
+    console.log('✅ Inicializováno misí:', Object.keys(currentUser.dailyMissions).length);
 }
-
 function updateMissionProgress(type, amount = 1) {
     if (!currentUser.dailyMissions) initializeMissions();
     if (!currentUser.stats.gamesPlayed) currentUser.stats.gamesPlayed = [];
@@ -1676,6 +1689,7 @@ window.addEventListener('load', async () => {
         }
     }, 3500);
 });
+
 
 
 
