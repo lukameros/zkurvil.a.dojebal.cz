@@ -437,10 +437,6 @@ window.spinSlot = async function() {
         }
     }
     
-    document.querySelectorAll('.reel').forEach(reel => {
-        reel.classList.add('spinning');
-    });
-    
     const spinDurations = [2500, 3200, 3900];
     const symbolHeight = 100;
     
@@ -448,34 +444,59 @@ window.spinSlot = async function() {
         const reel = document.getElementById(`reel${i + 1}`);
         const reelElement = reel.parentElement;
         
-        let targetIndex = reels[i].indexOf(results[i]);
-        if (targetIndex === -1) targetIndex = 10;
-        
-        const targetPosition = -(targetIndex * symbolHeight - symbolHeight);
-        
-        const spinSpeed = 15;
-        let currentPos = 0;
-        const spinInterval = setInterval(() => {
-            currentPos -= spinSpeed;
-            reel.style.transform = `translateY(${currentPos}px)`;
-            
-            if (Math.abs(currentPos) > reels[i].length * symbolHeight / 2) {
-                currentPos = 0;
+        // Najdi cílový symbol v bezpečné vzdálenosti od začátku i konce
+        let targetIndex = -1;
+        for (let j = 30; j < reels[i].length - 30; j++) {
+            if (reels[i][j] === results[i]) {
+                targetIndex = j;
+                break;
             }
-        }, 16);
+        }
+        
+        if (targetIndex === -1) {
+            targetIndex = 50;
+        }
+        
+        // KLÍČOVÁ ZMĚNA: Cílová pozice musí být tak, aby středový symbol byl ve středu okna
+        // Okno ukazuje 3 symboly (indexy 0, 1, 2), chceme targetIndex na pozici 1 (uprostřed)
+        // Proto: posuneme reel tak, aby targetIndex byl na 2. pozici
+        const targetPosition = -(targetIndex * symbolHeight) + symbolHeight;
+        
+        // Reset
+        reel.style.transition = 'none';
+        reel.style.transform = 'translateY(0px)';
         
         setTimeout(() => {
-            clearInterval(spinInterval);
-            reelElement.classList.remove('spinning');
-            reelElement.classList.add('stopping');
+            reelElement.classList.add('spinning');
             
-            reel.style.transition = 'transform 800ms cubic-bezier(0.25, 0.46, 0.45, 0.94)';
-            reel.style.transform = `translateY(${targetPosition}px)`;
+            // Rychlé točení
+            let currentPos = 0;
+            const totalSpinDistance = reels[i].length * symbolHeight * 3; // 3 celé otočky
+            const finalPosition = (totalSpinDistance + Math.abs(targetPosition)) % (reels[i].length * symbolHeight);
             
+            const spinInterval = setInterval(() => {
+                currentPos -= 30;
+                if (currentPos <= -(reels[i].length * symbolHeight)) {
+                    currentPos = 0;
+                }
+                reel.style.transform = `translateY(${currentPos}px)`;
+            }, 16);
+            
+            // Zastav s plynulým přechodem
             setTimeout(() => {
-                reelElement.classList.remove('stopping');
-            }, 800);
-        }, spinDurations[i]);
+                clearInterval(spinInterval);
+                reelElement.classList.remove('spinning');
+                reelElement.classList.add('stopping');
+                
+                // Nastav přesnou cílovou pozici
+                reel.style.transition = 'transform 800ms cubic-bezier(0.17, 0.67, 0.35, 0.96)';
+                reel.style.transform = `translateY(${targetPosition}px)`;
+                
+                setTimeout(() => {
+                    reelElement.classList.remove('stopping');
+                }, 800);
+            }, spinDurations[i]);
+        }, 10);
     }
     
     setTimeout(() => {
@@ -1589,6 +1610,7 @@ window.addEventListener('load', async () => {
         }
     }, 3500);
 });
+
 
 
 
