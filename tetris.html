@@ -1142,6 +1142,39 @@ function showLevelUpNotification() {
         setTimeout(() => notification.remove(), 300);
     }, 4000);
 }
+
+function showUpdateModal() {
+    if (!hasSeenUpdateModal) {
+        setTimeout(() => {
+            const modal = document.createElement('div');
+            modal.className = 'modal';
+            modal.id = 'updateModalContainer';
+            modal.style.display = 'flex';
+            modal.innerHTML = `
+                <div class="modal-content">
+                    <h2>🎉 NOVÁ AKTUALIZACE! 🎉</h2>
+                    <div style="color: #fff; font-size: 18px; text-align: left; margin: 20px 0;">
+                        <p style="margin: 10px 0;">✨ <strong>Nové funkce:</strong></p>
+                        <ul style="margin-left: 20px; line-height: 1.8;">
+                            <li>🎰 Výhry i se 2 stejnými symboly!</li>
+                            <li>🏆 20+ nových úspěchů</li>
+                            <li>📋 15 denních úkolů</li>
+                            <li>🎨 Vylepšené téma mění celou hru</li>
+                            <li>💰 Denní bonus 300 mincí každých 12h</li>
+                        </ul>
+                        <p style="margin: 15px 0; font-size: 16px; color: #00ffaa; text-align: center; padding: 10px; background: rgba(0,255,170,0.1); border-radius: 10px;">
+                            🎮 Hra je 100% ZDARMA, bez mikrotransakcí<br>
+                            👶 Vhodné pro hráče od 10 let
+                        </p>
+                    </div>
+                    <button class="modal-close" onclick="closeUpdateModal()">SUPER! ZAČNĚME HRÁT! 🎰</button>
+                </div>
+            `;
+            document.body.appendChild(modal);
+        }, 3500);
+    }
+} 
+ 
 </script>
 
 <script type="module">
@@ -2259,6 +2292,7 @@ await loadCurrentUser()
 </script>
 </body>
 </html>
+
 
 
 
