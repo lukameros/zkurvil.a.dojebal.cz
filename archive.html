@@ -201,7 +201,7 @@ h1 {
     position: relative;
     background: linear-gradient(135deg, rgba(30,30,30,0.95) 0%, rgba(15,15,15,0.98) 100%);
     border: 2px solid rgba(200,0,0,0.4);
-    .clip-path: polygon(0 0, 95% 0, 100% 5%, 100% 100%, 5% 100%, 0 95%);
+    clip-path: polygon(0 0, 95% 0, 100% 5%, 100% 100%, 5% 100%, 0 95%);
     overflow: hidden;
     box-shadow: 0 5px 20px rgba(0,0,0,0.8), 0 0 20px rgba(200,0,0,0.2);
     transition: all 0.4s ease;
@@ -476,6 +476,49 @@ h1 {
 
 .modal-buttons button:hover {
     background: linear-gradient(135deg, rgba(255,20,20,1) 0%, rgba(150,0,0,1) 100%);
+}
+
+/* Media Queries */
+@media (max-width: 768px) {
+    h1 {
+        font-size: 32px;
+        margin: 80px 0 30px;
+    }
+    .category-buttons {
+        flex-direction: column;
+    }
+    .category-buttons button {
+        font-size: 16px;
+        padding: 12px 30px;
+    }
+    #archiveContent {
+        padding: 0 20px 40px;
+    }
+    .image-card {
+        width: 100%;
+    }
+    .image-card img {
+        height: 200px;
+    }
+}
+
+@media (max-width: 480px) {
+    #backBtn {
+        padding: 10px 20px;
+        font-size: 14px;
+    }
+    #authButtons button {
+        font-size: 12px;
+        padding: 10px 20px;
+    }
+    .category-buttons button {
+        font-size: 14px;
+        padding: 10px 25px;
+    }
+    #uploadContent {
+        padding: 30px;
+        width: 90%;
+    }
 }
 </style>
 </head>
@@ -986,6 +1029,7 @@ window.addEventListener('DOMContentLoaded', async function() {
 
 </body>
 </html>
+
 
 
 
