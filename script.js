@@ -196,6 +196,44 @@ const achievements = [
         condition: (stats) => stats.missionsCompleted >= 50 },
     { id: 'legend', name: 'Legenda 🏆', desc: 'Dosáhnout všech ostatních úspěchů', icon: '🏆', reward: 2000,
         condition: (stats) => stats.achievementsUnlocked >= 20 }
+        { id: 'lucky_winner', name: 'Šťastný vítěz 🍀', desc: 'Vyhrát poprvé s 3 stejné symboly', icon: '🍀', reward: 100,
+        condition: (stats) => stats.sameSymbolsWins >= 1 },
+    { id: 'big_earning', name: 'Velký výdělek 💸', desc: 'Vyhrát celkem 5000 mincí', icon: '💸', reward: 400,
+        condition: (stats) => stats.coinsWon >= 5000 },
+    { id: 'gambler', name: 'Hráč hazardu 🎲', desc: 'Vsadit celkem 10000 mincí', icon: '🎲', reward: 500,
+        condition: (stats) => stats.totalBet >= 10000 },
+    { id: 'speed_spin', name: 'Rychlý točitel ⚡', desc: 'Zatočit 100x za den', icon: '⚡', reward: 350,
+        condition: (stats) => stats.totalSpinsToday >= 100 },
+    { id: 'jackpot_win_2', name: 'Mega jackpot 🎰', desc: 'Vyhrát 2x jackpot', icon: '🎰', reward: 1000,
+        condition: (stats) => stats.jackpotWins >= 2 },
+    { id: 'long_streak', name: 'Dlouhá série 🔥', desc: '5 výher za sebou bez prohry', icon: '🔥', reward: 400,
+        condition: (stats) => stats.winStreak >= 5 && stats.noLossStreak >= 5 },
+    { id: 'bet_10000', name: 'High Roller 10K 💰', desc: 'Vsadit celkem 10000 mincí najednou', icon: '💰', reward: 600,
+        condition: (stats) => stats.maxBets >= 10000 },
+    { id: 'multi_game_player', name: 'Mnohostranný hráč 🎮', desc: 'Zahrát 3 různé hry', icon: '🎮', reward: 250,
+        condition: (stats) => stats.gamesPlayed >= 3 },
+    { id: 'diamond_luxury', name: 'Diamantový luxus 💎', desc: 'Vyhrát 5x s diamanty 💎💎💎', icon: '💎', reward: 800,
+        condition: (stats) => stats.diamondWins >= 5 },
+    { id: 'ultimate_bet', name: 'Ultimate sázka 🎯', desc: 'Vsadit maximální sázku 100x', icon: '🎯', reward: 700,
+        condition: (stats) => stats.maxBets >= 100 },
+    { id: 'fast_spin_5', name: 'Super rychlé točení ⚡', desc: 'Zatočit 5x za 1 minutu', icon: '⚡', reward: 300,
+        condition: (stats) => stats.fastSpins >= 5 },
+    { id: 'collector_gold', name: 'Zlatý sběratel 🪙', desc: 'Mít alespoň 5000 mincí', icon: '🪙', reward: 450,
+        condition: (stats) => stats.totalCoins >= 5000 },
+    { id: 'spinner_pro', name: 'Profík na točení 🎰', desc: 'Zatočit 200x na automatu', icon: '🎰', reward: 600,
+        condition: (stats) => stats.slotSpins >= 200 },
+    { id: 'poker_face', name: 'Poker Face 🃏', desc: 'Vyhrát bez prohry 20x', icon: '🃏', reward: 700,
+        condition: (stats) => stats.noLossStreak >= 20 },
+    { id: 'big_bet_500', name: 'Velká sázka 500 🤑', desc: 'Vsadit 500 mincí najednou 5x', icon: '🤑', reward: 500,
+        condition: (stats) => stats.highBets >= 5 },
+    { id: 'lucky_day', name: 'Šťastný den 🌞', desc: 'Vyhrát 10x během dne', icon: '🌞', reward: 450,
+        condition: (stats) => stats.dailyWins >= 10 },
+    { id: 'extreme_bet', name: 'Extrémní sázející 🎯', desc: 'Vsadit maximální sázku 200x', icon: '🎯', reward: 1000,
+        condition: (stats) => stats.maxBets >= 200 },
+    { id: 'slot_master_2', name: 'Mistr automatů II 🎰', desc: 'Zatočit 500x na automatu', icon: '🎰', reward: 1000,
+        condition: (stats) => stats.slotSpins >= 500 },
+    { id: 'ultimate_collector', name: 'Nejlepší sběratel 🎨', desc: 'Vlastnit všechny vzhledy', icon: '🎨', reward: 1500,
+        condition: (stats) => stats.themesOwned >= 20 }
 ];
 
 // ============================================
@@ -1645,6 +1683,7 @@ window.addEventListener('load', async () => {
         }
     }, 3500);
 });
+
 
 
 
