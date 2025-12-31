@@ -280,7 +280,7 @@ const dailyMissions = [
         reward: 150, target: 50, type: 'totalSpins' },
     { id: 'bet_1000', name: '💸 Velký sázkař', desc: 'Vsadit celkem 1000 mincí', icon: '💸',
         reward: 120, target: 1000, type: 'totalBet' },
-    { id: 'jackpot_spin', name: '🎰 Sázka na jackpot', desc: 'Zatočit s max. sázkou', icon: '🎰',
+    { id: 'jackpot_spin', name: '🎰 Sázka na jackpot', desc: 'Zatočit s max sázkou', icon: '🎰',
         reward: 200, target: 1, type: 'maxBets' },
     { id: 'win_2x_in_row', name: '🍀 Šťastná dvojka', desc: 'Vyhrát 2x po sobě', icon: '🍀',
         reward: 70, target: 2, type: 'dailyWins' },
@@ -301,7 +301,6 @@ const dailyMissions = [
     { id: 'jackpot_win', name: '🎰 Jackpotová výhra', desc: 'Vyhrát jackpot', icon: '🎰',
         reward: 500, target: 1, type: 'jackpotWins' }
 ];
-
 // ============================================
 // SLOT MACHINE KONFIGURACE
 // ============================================
@@ -1677,6 +1676,7 @@ window.addEventListener('load', async () => {
         }
     }, 3500);
 });
+
 
 
 
