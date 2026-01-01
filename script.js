@@ -1960,12 +1960,6 @@ if (nicknameInput) {
 // ============================================
 window.addEventListener('load', async () => {
     console.log('🎰 Casino inicializace...');
-    
-    // KRITICKÉ: Inicializace Lucky Hour a Jackpot
-    updateLuckyHourDisplay();
-    setInterval(updateLuckyHourDisplay, 60000); // Update každou minutu
-    updateJackpotDisplay();
-    
     createStars();
     showUpdateModal();
     startLoading();
@@ -2002,7 +1996,8 @@ window.addEventListener('load', async () => {
                         progressiveJackpot = existingUser.stats.progressiveJackpot;
                     }
                     updateJackpotDisplay();
-                    
+                    updateLuckyHourDisplay();
+                    setInterval(updateLuckyHourDisplay, 60000);
                     updateLoginStreak();
                     initializeMissions();
                     
@@ -2027,6 +2022,7 @@ window.addEventListener('load', async () => {
         }
     }, 3500);
 });
+
 
 
 
