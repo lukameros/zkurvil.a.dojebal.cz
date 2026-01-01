@@ -742,7 +742,27 @@
         async function translateAPI(text, from, to) {
             if (from === 'auto') from = 'en';
             
-            // Používáme MyMemory API s lepším error handlingem
+            // Pokud je text delší než 450 znaků, rozdělíme ho
+            const MAX_LENGTH = 450;
+            
+            if (text.length > MAX_LENGTH) {
+                const chunks = splitText(text, MAX_LENGTH);
+                const translations = [];
+                
+                for (const chunk of chunks) {
+                    const translated = await translateChunk(chunk, from, to);
+                    translations.push(translated);
+                    // Malá pauza mezi požadavky
+                    await new Promise(resolve => setTimeout(resolve, 100));
+                }
+                
+                return translations.join(' ');
+            } else {
+                return await translateChunk(text, from, to);
+            }
+        }
+
+        async function translateChunk(text, from, to) {
             const url = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=${from}|${to}`;
             
             const response = await fetch(url);
@@ -753,6 +773,44 @@
             }
             
             throw new Error('Translation failed');
+        }
+
+        function splitText(text, maxLength) {
+            const sentences = text.match(/[^.!?]+[.!?]+/g) || [text];
+            const chunks = [];
+            let currentChunk = '';
+
+            for (const sentence of sentences) {
+                if ((currentChunk + sentence).length > maxLength) {
+                    if (currentChunk) {
+                        chunks.push(currentChunk.trim());
+                        currentChunk = sentence;
+                    } else {
+                        // Věta je moc dlouhá, rozdělit podle slov
+                        const words = sentence.split(' ');
+                        let wordChunk = '';
+                        
+                        for (const word of words) {
+                            if ((wordChunk + word).length > maxLength) {
+                                chunks.push(wordChunk.trim());
+                                wordChunk = word + ' ';
+                            } else {
+                                wordChunk += word + ' ';
+                            }
+                        }
+                        
+                        if (wordChunk) currentChunk = wordChunk;
+                    }
+                } else {
+                    currentChunk += sentence;
+                }
+            }
+
+            if (currentChunk) {
+                chunks.push(currentChunk.trim());
+            }
+
+            return chunks;
         }
 
         // Copy text
