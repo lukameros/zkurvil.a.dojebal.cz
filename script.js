@@ -774,9 +774,20 @@ function drawWheel() {
     if (!canvas) return;
     
     const ctx = canvas.getContext("2d");
+    if (!ctx) return; // ← NOVÝ řádek
+    
     const center = 200;
     
-    ctx.clearRect(0, 0, 400, 400);
+    // ← NOVÉ řádky (PŘED clearRect)
+    ctx.save();
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.restore();
+    // ← KONEC nových řádků
+    
+    // Tento clearRect SMAŽ (už ho máme nahoře)
+    // ctx.clearRect(0, 0, 400, 400);  ← SMAŽ tento řádek
+    
     const slice = 2 * Math.PI / wheelPrizes.length;
     
     wheelPrizes.forEach((prize, i) => {
@@ -805,10 +816,26 @@ function drawWheel() {
     });
 }
 
-function autoRotate() {
-    if (autoRotating && !wheelSpinning) rotation += 0.001;
+let animationFrameId = null;
+let lastFrameTime = 0;
+
+function autoRotate(currentTime = 0) {
+    // Vypočítej delta time pro konzistentní rychlost
+    if (!lastFrameTime) lastFrameTime = currentTime;
+    const deltaTime = currentTime - lastFrameTime;
+    lastFrameTime = currentTime;
+    
+    // Rotuj pouze když není spinning
+    if (autoRotating && !wheelSpinning) {
+        // Konzistentní rychlost: 0.001 radiánů za frame při 60 FPS
+        // Upraveno pro delta time
+        rotation += (deltaTime / 16.67) * 0.001;
+    }
+    
     drawWheel();
-    requestAnimationFrame(autoRotate);
+    
+    // Zajisti že animace běží kontinuálně
+    animationFrameId = requestAnimationFrame(autoRotate);
 }
 
 // ============================================
@@ -826,6 +853,12 @@ window.spinWheel = async function() {
     wheelSpinning = true;
     autoRotating = false;
     document.getElementById('spinWheelBtn').disabled = true;
+    
+    // PŘIDÁNO: Zastav auto-rotaci
+    if (animationFrameId) {
+        cancelAnimationFrame(animationFrameId);
+        animationFrameId = null;
+    }
     
     currentUser.coins -= wheelCost;
     currentUser.stats.wheelSpins++;
@@ -871,6 +904,10 @@ window.spinWheel = async function() {
         if (t < 1) {
             requestAnimationFrame(anim);
         } else {
+            // PŘIDÁNO: Restart auto-rotace po spinu
+            autoRotating = true;
+            lastFrameTime = 0;
+            autoRotate();
             setTimeout(() => finishWheelSpin(selectedPrize.coins), 500);
         }
     }
@@ -1989,8 +2026,13 @@ window.addEventListener('load', async () => {
     showUpdateModal();
     startLoading();
     initReels();
-    autoRotate();
-    
+    // Restart animace s čistým stavem
+    lastFrameTime = 0;
+    autoRotating = true;
+    if (animationFrameId) {
+    cancelAnimationFrame(animationFrameId);
+}
+autoRotate();
     setTimeout(async () => {
         const savedUser = localStorage.getItem('currentUser');
         
@@ -2047,6 +2089,7 @@ window.addEventListener('load', async () => {
         }
     }, 3500);
 });
+
 
 
 
