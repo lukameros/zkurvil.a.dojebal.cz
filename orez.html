@@ -3,13 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ořez obrázku | Odstranění pozadí</title>
+    <title>Pokročilý editor obrázků</title>
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
     <style>
         :root {
             --bg-dark: #0a0e27;
-            --bg-medium: #151932;
-            --bg-light: #1e2444;
             --accent-purple: #8b5cf6;
             --accent-pink: #ec4899;
             --accent-cyan: #06b6d4;
@@ -19,11 +17,7 @@
             --error: #ef4444;
         }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
             font-family: 'JetBrains Mono', monospace;
@@ -31,7 +25,6 @@
             color: var(--text-primary);
             min-height: 100vh;
             overflow-x: hidden;
-            position: relative;
         }
 
         body::before {
@@ -43,21 +36,18 @@
             height: 200%;
             background: 
                 radial-gradient(circle at 20% 50%, rgba(139, 92, 246, 0.1) 0%, transparent 50%),
-                radial-gradient(circle at 80% 80%, rgba(236, 72, 153, 0.1) 0%, transparent 50%),
-                radial-gradient(circle at 40% 90%, rgba(6, 182, 212, 0.1) 0%, transparent 50%);
-            animation: backgroundMove 20s ease-in-out infinite;
+                radial-gradient(circle at 80% 80%, rgba(236, 72, 153, 0.1) 0%, transparent 50%);
+            animation: bgMove 20s ease-in-out infinite;
             pointer-events: none;
         }
 
-        @keyframes backgroundMove {
+        @keyframes bgMove {
             0%, 100% { transform: translate(0, 0); }
-            25% { transform: translate(-5%, -5%); }
             50% { transform: translate(-10%, 5%); }
-            75% { transform: translate(-5%, -10%); }
         }
 
         .container {
-            max-width: 1200px;
+            max-width: 1400px;
             margin: 0 auto;
             padding: 40px 20px;
             position: relative;
@@ -66,26 +56,19 @@
 
         header {
             text-align: center;
-            margin-bottom: 50px;
-            animation: fadeInDown 0.8s ease-out;
+            margin-bottom: 40px;
+            animation: fadeIn 0.8s ease-out;
         }
 
         h1 {
             font-family: 'Playfair Display', serif;
-            font-size: clamp(2.5rem, 5vw, 4.5rem);
+            font-size: clamp(2.5rem, 5vw, 4rem);
             margin-bottom: 15px;
             background: linear-gradient(135deg, var(--accent-purple), var(--accent-pink), var(--accent-cyan));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
             letter-spacing: -2px;
-            animation: gradientShift 5s ease infinite;
-            background-size: 200% 200%;
-        }
-
-        @keyframes gradientShift {
-            0%, 100% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
         }
 
         .subtitle {
@@ -100,11 +83,8 @@
             backdrop-filter: blur(20px);
             border: 1px solid rgba(139, 92, 246, 0.2);
             border-radius: 24px;
-            padding: 50px;
-            box-shadow: 
-                0 20px 60px rgba(0, 0, 0, 0.5),
-                inset 0 1px 0 rgba(255, 255, 255, 0.1);
-            animation: fadeInUp 0.8s ease-out 0.2s both;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
         }
 
         .upload-zone {
@@ -113,39 +93,19 @@
             padding: 60px 30px;
             text-align: center;
             cursor: pointer;
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: all 0.4s ease;
             background: rgba(139, 92, 246, 0.05);
-            position: relative;
-            overflow: hidden;
-            margin-bottom: 40px;
-        }
-
-        .upload-zone::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(139, 92, 246, 0.1), transparent);
-            transition: left 0.5s;
-        }
-
-        .upload-zone:hover::before {
-            left: 100%;
         }
 
         .upload-zone:hover {
             border-color: var(--accent-purple);
             background: rgba(139, 92, 246, 0.1);
             transform: translateY(-5px);
-            box-shadow: 0 15px 40px rgba(139, 92, 246, 0.3);
         }
 
         .upload-zone.dragover {
             border-color: var(--accent-cyan);
             background: rgba(6, 182, 212, 0.15);
-            transform: scale(1.02);
         }
 
         .upload-icon {
@@ -162,7 +122,6 @@
         .upload-text {
             font-size: 1.2rem;
             margin-bottom: 10px;
-            color: var(--text-primary);
             font-weight: 700;
         }
 
@@ -171,167 +130,174 @@
             color: var(--text-secondary);
         }
 
-        input[type="file"] {
+        input[type="file"] { display: none; }
+
+        .editor-section {
             display: none;
         }
 
-        .preview-section {
-            display: none;
-            margin-bottom: 40px;
-        }
-
-        .preview-section.active {
+        .editor-section.active {
             display: block;
             animation: fadeIn 0.5s ease-out;
         }
 
-        .preview-grid {
+        .editor-layout {
             display: grid;
-            grid-template-columns: 1fr 1fr;
+            grid-template-columns: 280px 1fr;
             gap: 30px;
             margin-bottom: 30px;
         }
 
-        .preview-box {
+        .tools-panel {
             background: rgba(15, 20, 40, 0.8);
             border-radius: 16px;
             padding: 20px;
             border: 1px solid rgba(139, 92, 246, 0.2);
-            position: relative;
-            overflow: hidden;
+            height: fit-content;
         }
 
-        .preview-label {
+        .tool-group {
+            margin-bottom: 25px;
+        }
+
+        .tool-group:last-child {
+            margin-bottom: 0;
+        }
+
+        .tool-title {
             font-size: 0.85rem;
             text-transform: uppercase;
             letter-spacing: 2px;
-            color: var(--text-secondary);
-            margin-bottom: 15px;
+            color: var(--accent-purple);
+            margin-bottom: 12px;
             display: flex;
             align-items: center;
             gap: 8px;
         }
 
-        .preview-label::before {
-            content: '';
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            background: var(--accent-purple);
-            animation: pulse 2s ease-in-out infinite;
+        .slider-control {
+            margin-bottom: 15px;
         }
 
-        @keyframes pulse {
-            0%, 100% { opacity: 1; transform: scale(1); }
-            50% { opacity: 0.5; transform: scale(0.8); }
-        }
-
-        .image-container {
-            width: 100%;
-            min-height: 300px;
+        .slider-label {
             display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 12px;
-            background-image: 
-                repeating-conic-gradient(rgba(255, 255, 255, 0.05) 0% 25%, transparent 0% 50%) 
-                50% / 20px 20px;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .image-container img {
-            max-width: 100%;
-            max-height: 400px;
-            object-fit: contain;
-            border-radius: 8px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-        }
-
-        .loading-overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(10, 14, 39, 0.9);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            gap: 20px;
-            z-index: 10;
-        }
-
-        .spinner {
-            width: 60px;
-            height: 60px;
-            border: 4px solid rgba(139, 92, 246, 0.2);
-            border-top-color: var(--accent-purple);
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
-        .loading-text {
-            font-size: 1rem;
+            justify-content: space-between;
+            margin-bottom: 6px;
+            font-size: 0.8rem;
             color: var(--text-secondary);
         }
 
-        .controls {
+        .slider-value {
+            color: var(--accent-cyan);
+            font-weight: 700;
+        }
+
+        input[type="range"] {
+            width: 100%;
+            height: 6px;
+            border-radius: 3px;
+            background: rgba(139, 92, 246, 0.2);
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--accent-purple), var(--accent-pink));
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(139, 92, 246, 0.5);
+        }
+
+        input[type="range"]::-moz-range-thumb {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--accent-purple), var(--accent-pink));
+            cursor: pointer;
+            border: none;
+        }
+
+        .filter-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+        }
+
+        .filter-btn {
+            padding: 8px;
+            border: 1px solid rgba(139, 92, 246, 0.3);
+            border-radius: 8px;
+            background: rgba(139, 92, 246, 0.1);
+            color: var(--text-primary);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+        }
+
+        .filter-btn:hover {
+            background: rgba(139, 92, 246, 0.2);
+            border-color: var(--accent-purple);
+        }
+
+        .filter-btn.active {
+            background: linear-gradient(135deg, var(--accent-purple), var(--accent-pink));
+            border-color: transparent;
+        }
+
+        .canvas-container {
+            background: rgba(15, 20, 40, 0.8);
+            border-radius: 16px;
+            padding: 30px;
+            border: 1px solid rgba(139, 92, 246, 0.2);
             display: flex;
-            gap: 15px;
+            align-items: center;
+            justify-content: center;
+            min-height: 500px;
+            background-image: 
+                repeating-conic-gradient(rgba(255, 255, 255, 0.05) 0% 25%, transparent 0% 50%) 
+                50% / 20px 20px;
+        }
+
+        #canvas {
+            max-width: 100%;
+            max-height: 600px;
+            border-radius: 8px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 12px;
             flex-wrap: wrap;
             justify-content: center;
         }
 
         .btn {
-            padding: 14px 32px;
+            padding: 12px 24px;
             border: none;
             border-radius: 12px;
             font-family: 'JetBrains Mono', monospace;
-            font-size: 0.95rem;
+            font-size: 0.85rem;
             font-weight: 700;
             cursor: pointer;
             transition: all 0.3s ease;
             text-transform: uppercase;
             letter-spacing: 1px;
-            position: relative;
-            overflow: hidden;
-            z-index: 1;
-        }
-
-        .btn::before {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 0;
-            height: 0;
-            border-radius: 50%;
-            background: rgba(255, 255, 255, 0.2);
-            transform: translate(-50%, -50%);
-            transition: width 0.6s, height 0.6s;
-            z-index: -1;
-        }
-
-        .btn:hover::before {
-            width: 300px;
-            height: 300px;
         }
 
         .btn-primary {
             background: linear-gradient(135deg, var(--accent-purple), var(--accent-pink));
             color: white;
-            box-shadow: 0 4px 15px rgba(139, 92, 246, 0.4);
         }
 
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(139, 92, 246, 0.6);
+        .btn-success {
+            background: linear-gradient(135deg, var(--success), #059669);
+            color: white;
         }
 
         .btn-secondary {
@@ -340,115 +306,9 @@
             border: 1px solid var(--accent-purple);
         }
 
-        .btn-secondary:hover {
-            background: rgba(139, 92, 246, 0.3);
+        .btn:hover {
             transform: translateY(-2px);
-        }
-
-        .btn-download {
-            background: linear-gradient(135deg, var(--success), #059669);
-            color: white;
-            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4);
-        }
-
-        .btn-download:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(16, 185, 129, 0.6);
-        }
-
-        .btn-reset {
-            background: linear-gradient(135deg, var(--error), #dc2626);
-            color: white;
-            box-shadow: 0 4px 15px rgba(239, 68, 68, 0.4);
-        }
-
-        .btn-reset:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(239, 68, 68, 0.6);
-        }
-
-        .btn:active {
-            transform: translateY(0);
-        }
-
-        .btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-            transform: none;
-        }
-
-        .info-banner {
-            background: rgba(6, 182, 212, 0.1);
-            border: 1px solid rgba(6, 182, 212, 0.3);
-            border-radius: 12px;
-            padding: 20px;
-            margin-top: 30px;
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-
-        .info-icon {
-            font-size: 1.5rem;
-        }
-
-        .info-text {
-            font-size: 0.9rem;
-            color: var(--text-secondary);
-            line-height: 1.6;
-        }
-
-        @media (max-width: 768px) {
-            .main-card {
-                padding: 30px 20px;
-            }
-
-            .preview-grid {
-                grid-template-columns: 1fr;
-            }
-
-            h1 {
-                font-size: 2rem;
-            }
-
-            .upload-zone {
-                padding: 40px 20px;
-            }
-
-            .controls {
-                flex-direction: column;
-            }
-
-            .btn {
-                width: 100%;
-            }
-        }
-
-        @keyframes fadeInDown {
-            from {
-                opacity: 0;
-                transform: translateY(-30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
+            box-shadow: 0 8px 25px rgba(139, 92, 246, 0.4);
         }
 
         .toast {
@@ -461,7 +321,7 @@
             border-radius: 12px;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
             transform: translateX(400px);
-            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: transform 0.4s ease;
             z-index: 1000;
             font-weight: 700;
             display: flex;
@@ -469,77 +329,108 @@
             gap: 12px;
         }
 
-        .toast.show {
-            transform: translateX(0);
+        .toast.show { transform: translateX(0); }
+        .toast.error { background: linear-gradient(135deg, var(--error), #dc2626); }
+
+        @media (max-width: 968px) {
+            .editor-layout { grid-template-columns: 1fr; }
+            .tools-panel { order: 2; }
+            .canvas-container { order: 1; }
         }
 
-        .toast.error {
-            background: linear-gradient(135deg, var(--error), #dc2626);
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
         }
     </style>
 </head>
 <body>
     <div class="container">
         <header>
-            <h1>Ořez obrázku</h1>
-            <p class="subtitle">Automatické odstranění pozadí</p>
+            <h1>Editor obrázků</h1>
+            <p class="subtitle">Pokročilé úpravy v reálném čase</p>
         </header>
 
         <div class="main-card">
-            <div class="upload-zone" id="uploadZone" onclick="document.getElementById('fileInput').click()">
-                <div class="upload-icon">🖼️</div>
+            <div class="upload-zone" id="uploadZone">
+                <div class="upload-icon">🎨</div>
                 <div class="upload-text">Klikněte nebo přetáhněte obrázek</div>
-                <div class="upload-hint">Podporované formáty: JPG, PNG, WEBP (max 10MB)</div>
-                <input type="file" id="fileInput" accept="image/jpeg,image/png,image/webp">
+                <div class="upload-hint">JPG, PNG, WEBP</div>
+                <input type="file" id="fileInput" accept="image/*">
             </div>
 
-            <div class="preview-section" id="previewSection">
-                <div class="preview-grid">
-                    <div class="preview-box">
-                        <div class="preview-label">
-                            Původní obrázek
+            <div class="editor-section" id="editorSection">
+                <div class="editor-layout">
+                    <div class="tools-panel">
+                        <div class="tool-group">
+                            <div class="tool-title">🎨 Filtry</div>
+                            <div class="filter-buttons">
+                                <button class="filter-btn active" data-filter="none">Původní</button>
+                                <button class="filter-btn" data-filter="grayscale">Černobílý</button>
+                                <button class="filter-btn" data-filter="sepia">Sepia</button>
+                                <button class="filter-btn" data-filter="vintage">Vintage</button>
+                                <button class="filter-btn" data-filter="cold">Studený</button>
+                                <button class="filter-btn" data-filter="warm">Teplý</button>
+                            </div>
                         </div>
-                        <div class="image-container">
-                            <img id="originalImage" alt="Původní obrázek">
-                        </div>
-                    </div>
 
-                    <div class="preview-box">
-                        <div class="preview-label">
-                            Bez pozadí
+                        <div class="tool-group">
+                            <div class="tool-title">⚙️ Úpravy</div>
+                            
+                            <div class="slider-control">
+                                <div class="slider-label">
+                                    <span>Jas</span>
+                                    <span class="slider-value" id="brightnessValue">100%</span>
+                                </div>
+                                <input type="range" id="brightness" min="0" max="200" value="100">
+                            </div>
+
+                            <div class="slider-control">
+                                <div class="slider-label">
+                                    <span>Kontrast</span>
+                                    <span class="slider-value" id="contrastValue">100%</span>
+                                </div>
+                                <input type="range" id="contrast" min="0" max="200" value="100">
+                            </div>
+
+                            <div class="slider-control">
+                                <div class="slider-label">
+                                    <span>Sytost</span>
+                                    <span class="slider-value" id="saturationValue">100%</span>
+                                </div>
+                                <input type="range" id="saturation" min="0" max="200" value="100">
+                            </div>
+
+                            <div class="slider-control">
+                                <div class="slider-label">
+                                    <span>Rozostření</span>
+                                    <span class="slider-value" id="blurValue">0px</span>
+                                </div>
+                                <input type="range" id="blur" min="0" max="20" value="0">
+                            </div>
                         </div>
-                        <div class="image-container" id="processedContainer">
-                            <img id="processedImage" alt="Zpracovaný obrázek" style="display: none;">
-                            <div class="loading-overlay" id="loadingOverlay">
-                                <div class="spinner"></div>
-                                <div class="loading-text">Odstraňuji pozadí...</div>
+
+                        <div class="tool-group">
+                            <div class="tool-title">🔄 Transformace</div>
+                            <div class="filter-buttons">
+                                <button class="filter-btn" id="rotateRight">↻ 90°</button>
+                                <button class="filter-btn" id="rotateLeft">↺ 90°</button>
+                                <button class="filter-btn" id="flipH">↔ Překlopit</button>
+                                <button class="filter-btn" id="flipV">↕ Překlopit</button>
                             </div>
                         </div>
                     </div>
+
+                    <div class="canvas-container">
+                        <canvas id="canvas"></canvas>
+                    </div>
                 </div>
 
-                <div class="controls">
-                    <button class="btn btn-primary" id="processBtn" onclick="removeBackground()">
-                        ✨ Odstranit pozadí
-                    </button>
-                    <button class="btn btn-download" id="downloadBtn" onclick="downloadImage()" disabled>
-                        ⬇️ Stáhnout PNG
-                    </button>
-                    <button class="btn btn-secondary" onclick="newImage()">
-                        🔄 Nový obrázek
-                    </button>
-                    <button class="btn btn-reset" onclick="resetAll()">
-                        🗑️ Resetovat
-                    </button>
-                </div>
-            </div>
-
-            <div class="info-banner">
-                <div class="info-icon">💡</div>
-                <div class="info-text">
-                    <strong>Tip:</strong> Tento nástroj používá AI pro automatické odstranění pozadí. 
-                    Funguje nejlépe s obrázky, kde je objekt v popředí jasně odlišený od pozadí. 
-                    Výsledný obrázek bude ve formátu PNG s průhledným pozadím.
+                <div class="action-buttons">
+                    <button class="btn btn-primary" id="resetBtn">🔄 Resetovat</button>
+                    <button class="btn btn-success" id="downloadPng">⬇️ Stáhnout PNG</button>
+                    <button class="btn btn-success" id="downloadJpg">⬇️ Stáhnout JPG</button>
+                    <button class="btn btn-secondary" id="newImageBtn">📁 Nový obrázek</button>
                 </div>
             </div>
         </div>
@@ -547,15 +438,29 @@
 
     <div class="toast" id="toast">
         <span id="toastIcon">✓</span>
-        <span id="toastMessage">Akce provedena úspěšně</span>
+        <span id="toastMessage"></span>
     </div>
 
     <script>
-        let originalImageData = null;
-        let processedImageData = null;
+        let originalImage = null;
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        let currentFilter = 'none';
+        let rotation = 0;
+        let flipH = false;
+        let flipV = false;
 
-        // Drag & Drop
+        const filters = {
+            brightness: 100,
+            contrast: 100,
+            saturation: 100,
+            blur: 0
+        };
+
         const uploadZone = document.getElementById('uploadZone');
+        const fileInput = document.getElementById('fileInput');
+
+        uploadZone.onclick = () => fileInput.click();
 
         uploadZone.addEventListener('dragover', (e) => {
             e.preventDefault();
@@ -569,155 +474,186 @@
         uploadZone.addEventListener('drop', (e) => {
             e.preventDefault();
             uploadZone.classList.remove('dragover');
-            
-            const files = e.dataTransfer.files;
-            if (files.length > 0) {
-                handleFile(files[0]);
+            if (e.dataTransfer.files.length > 0) {
+                handleFile(e.dataTransfer.files[0]);
             }
         });
 
-        // File input
-        document.getElementById('fileInput').addEventListener('change', (e) => {
+        fileInput.addEventListener('change', (e) => {
             if (e.target.files.length > 0) {
                 handleFile(e.target.files[0]);
             }
         });
 
         function handleFile(file) {
-            // Validace
-            if (!file.type.match('image/(jpeg|png|webp)')) {
-                showToast('Nepodporovaný formát souboru', 'error');
+            if (!file.type.match('image.*')) {
+                showToast('Vyberte prosím obrázek', 'error');
                 return;
             }
 
-            if (file.size > 10 * 1024 * 1024) {
-                showToast('Soubor je příliš velký (max 10MB)', 'error');
-                return;
-            }
-
-            // Načtení obrázku
             const reader = new FileReader();
             reader.onload = (e) => {
-                originalImageData = e.target.result;
-                document.getElementById('originalImage').src = originalImageData;
-                document.getElementById('previewSection').classList.add('active');
-                document.getElementById('processedImage').style.display = 'none';
-                document.getElementById('loadingOverlay').style.display = 'none';
-                document.getElementById('downloadBtn').disabled = true;
-                processedImageData = null;
+                const img = new Image();
+                img.onload = () => {
+                    originalImage = img;
+                    initCanvas();
+                    document.getElementById('editorSection').classList.add('active');
+                    showToast('Obrázek načten!');
+                };
+                img.src = e.target.result;
             };
             reader.readAsDataURL(file);
         }
 
-        async function removeBackground() {
-            if (!originalImageData) {
-                showToast('Nejdříve nahrajte obrázek', 'error');
-                return;
-            }
+        function initCanvas() {
+            rotation = 0;
+            flipH = false;
+            flipV = false;
+            canvas.width = originalImage.width;
+            canvas.height = originalImage.height;
+            applyAllFilters();
+        }
 
-            const processBtn = document.getElementById('processBtn');
-            const loadingOverlay = document.getElementById('loadingOverlay');
-            const processedImage = document.getElementById('processedImage');
+        function applyAllFilters() {
+            ctx.save();
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            ctx.translate(canvas.width / 2, canvas.height / 2);
+            ctx.rotate(rotation * Math.PI / 180);
+            ctx.scale(flipH ? -1 : 1, flipV ? -1 : 1);
+            ctx.translate(-canvas.width / 2, -canvas.height / 2);
+            
+            let filterStr = `brightness(${filters.brightness}%) contrast(${filters.contrast}%) saturate(${filters.saturation}%) blur(${filters.blur}px)`;
+            ctx.filter = filterStr;
+            
+            ctx.drawImage(originalImage, 0, 0, canvas.width, canvas.height);
+            applyColorFilter();
+            ctx.restore();
+        }
 
-            processBtn.disabled = true;
-            loadingOverlay.style.display = 'flex';
-            processedImage.style.display = 'none';
-
-            try {
-                // Vytvoření canvasu pro zpracování
-                const img = new Image();
-                img.src = originalImageData;
+        function applyColorFilter() {
+            if (currentFilter === 'none') return;
+            
+            const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+            const data = imageData.data;
+            
+            for (let i = 0; i < data.length; i += 4) {
+                let r = data[i], g = data[i + 1], b = data[i + 2];
                 
-                await new Promise((resolve) => {
-                    img.onload = resolve;
-                });
-
-                const canvas = document.createElement('canvas');
-                canvas.width = img.width;
-                canvas.height = img.height;
-                const ctx = canvas.getContext('2d');
-                
-                // Nakreslení obrázku
-                ctx.drawImage(img, 0, 0);
-                
-                // Získání pixel dat
-                const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-                const data = imageData.data;
-
-                // Jednoduchý algoritmus na odstranění pozadí
-                // (v produkci byste použili pokročilejší AI model)
-                const tolerance = 40;
-                const bgColor = {
-                    r: data[0],
-                    g: data[1],
-                    b: data[2]
-                };
-
-                for (let i = 0; i < data.length; i += 4) {
-                    const r = data[i];
-                    const g = data[i + 1];
-                    const b = data[i + 2];
-
-                    // Pokud je barva podobná pozadí, nastavit průhlednost
-                    const diff = Math.abs(r - bgColor.r) + 
-                                Math.abs(g - bgColor.g) + 
-                                Math.abs(b - bgColor.b);
-
-                    if (diff < tolerance) {
-                        data[i + 3] = 0; // Alpha = 0 (průhledné)
-                    }
+                switch(currentFilter) {
+                    case 'grayscale':
+                        const gray = 0.299 * r + 0.587 * g + 0.114 * b;
+                        data[i] = data[i + 1] = data[i + 2] = gray;
+                        break;
+                    case 'sepia':
+                        data[i] = Math.min(255, r * 0.393 + g * 0.769 + b * 0.189);
+                        data[i + 1] = Math.min(255, r * 0.349 + g * 0.686 + b * 0.168);
+                        data[i + 2] = Math.min(255, r * 0.272 + g * 0.534 + b * 0.131);
+                        break;
+                    case 'vintage':
+                        data[i] = Math.min(255, r * 1.2);
+                        data[i + 1] = Math.min(255, g * 1.1);
+                        data[i + 2] = Math.min(255, b * 0.8);
+                        break;
+                    case 'cold':
+                        data[i] = Math.min(255, r * 0.9);
+                        data[i + 2] = Math.min(255, b * 1.2);
+                        break;
+                    case 'warm':
+                        data[i] = Math.min(255, r * 1.2);
+                        data[i + 1] = Math.min(255, g * 1.1);
+                        data[i + 2] = Math.min(255, b * 0.8);
+                        break;
                 }
-
-                // Aplikace zpracovaných dat
-                ctx.putImageData(imageData, 0, 0);
-
-                // Simulace delšího zpracování pro realističtější efekt
-                await new Promise(resolve => setTimeout(resolve, 1500));
-
-                // Převod na PNG
-                processedImageData = canvas.toDataURL('image/png');
-                processedImage.src = processedImageData;
-                processedImage.style.display = 'block';
-                
-                document.getElementById('downloadBtn').disabled = false;
-                showToast('Pozadí úspěšně odstraněno!', 'success');
-
-            } catch (error) {
-                console.error('Chyba při zpracování:', error);
-                showToast('Nepodařilo se zpracovat obrázek', 'error');
-            } finally {
-                loadingOverlay.style.display = 'none';
-                processBtn.disabled = false;
             }
+            ctx.putImageData(imageData, 0, 0);
         }
 
-        function downloadImage() {
-            if (!processedImageData) {
-                showToast('Nejdříve zpracujte obrázek', 'error');
-                return;
-            }
+        document.querySelectorAll('.filter-btn[data-filter]').forEach(btn => {
+            btn.addEventListener('click', () => {
+                currentFilter = btn.dataset.filter;
+                document.querySelectorAll('.filter-btn[data-filter]').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                applyAllFilters();
+            });
+        });
 
+        ['brightness', 'contrast', 'saturation', 'blur'].forEach(filter => {
+            const slider = document.getElementById(filter);
+            const valueDisplay = document.getElementById(filter + 'Value');
+            
+            slider.addEventListener('input', (e) => {
+                filters[filter] = parseInt(e.target.value);
+                valueDisplay.textContent = filter === 'blur' ? filters[filter] + 'px' : filters[filter] + '%';
+                applyAllFilters();
+            });
+        });
+
+        document.getElementById('rotateRight').onclick = () => {
+            rotation = (rotation + 90) % 360;
+            applyAllFilters();
+            showToast('Otočeno o 90°');
+        };
+
+        document.getElementById('rotateLeft').onclick = () => {
+            rotation = (rotation - 90) % 360;
+            applyAllFilters();
+            showToast('Otočeno o -90°');
+        };
+
+        document.getElementById('flipH').onclick = () => {
+            flipH = !flipH;
+            applyAllFilters();
+            showToast('Překlopeno horizontálně');
+        };
+
+        document.getElementById('flipV').onclick = () => {
+            flipV = !flipV;
+            applyAllFilters();
+            showToast('Překlopeno vertikálně');
+        };
+
+        document.getElementById('resetBtn').onclick = () => {
+            filters.brightness = filters.contrast = filters.saturation = 100;
+            filters.blur = 0;
+            rotation = 0;
+            flipH = flipV = false;
+            currentFilter = 'none';
+            
+            document.getElementById('brightness').value = 100;
+            document.getElementById('contrast').value = 100;
+            document.getElementById('saturation').value = 100;
+            document.getElementById('blur').value = 0;
+            
+            document.getElementById('brightnessValue').textContent = '100%';
+            document.getElementById('contrastValue').textContent = '100%';
+            document.getElementById('saturationValue').textContent = '100%';
+            document.getElementById('blurValue').textContent = '0px';
+            
+            document.querySelectorAll('.filter-btn[data-filter]').forEach(b => b.classList.remove('active'));
+            document.querySelector('.filter-btn[data-filter="none"]').classList.add('active');
+            
+            applyAllFilters();
+            showToast('Resetováno');
+        };
+
+        document.getElementById('downloadPng').onclick = () => {
             const link = document.createElement('a');
-            link.download = `bez-pozadi-${Date.now()}.png`;
-            link.href = processedImageData;
+            link.download = `obrazek-${Date.now()}.png`;
+            link.href = canvas.toDataURL('image/png');
             link.click();
+            showToast('Staženo jako PNG');
+        };
 
-            showToast('Obrázek stažen!', 'success');
-        }
+        document.getElementById('downloadJpg').onclick = () => {
+            const link = document.createElement('a');
+            link.download = `obrazek-${Date.now()}.jpg`;
+            link.href = canvas.toDataURL('image/jpeg', 0.95);
+            link.click();
+            showToast('Staženo jako JPG');
+        };
 
-        function newImage() {
-            document.getElementById('fileInput').click();
-        }
-
-        function resetAll() {
-            if (confirm('Opravdu chcete resetovat vše?')) {
-                originalImageData = null;
-                processedImageData = null;
-                document.getElementById('previewSection').classList.remove('active');
-                document.getElementById('fileInput').value = '';
-                showToast('Vše resetováno', 'success');
-            }
-        }
+        document.getElementById('newImageBtn').onclick = () => fileInput.click();
 
         function showToast(message, type = 'success') {
             const toast = document.getElementById('toast');
@@ -735,21 +671,8 @@
             }
 
             toast.classList.add('show');
-
-            setTimeout(() => {
-                toast.classList.remove('show');
-            }, 3000);
+            setTimeout(() => toast.classList.remove('show'), 3000);
         }
-
-        // Klávesové zkratky
-        document.addEventListener('keydown', (e) => {
-            if (e.ctrlKey && e.key === 's') {
-                e.preventDefault();
-                if (!document.getElementById('downloadBtn').disabled) {
-                    downloadImage();
-                }
-            }
-        });
     </script>
 </body>
 </html>
