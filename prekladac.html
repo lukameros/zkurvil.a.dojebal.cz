@@ -162,10 +162,6 @@
             transform: rotate(180deg) scale(1.1);
         }
 
-        .swap-button:active {
-            transform: rotate(180deg) scale(0.95);
-        }
-
         .text-areas {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -273,14 +269,9 @@
             box-shadow: 0 8px 25px var(--shadow);
         }
 
-        button:active {
-            transform: translateY(0);
-        }
-
         button:disabled {
             opacity: 0.5;
             cursor: not-allowed;
-            transform: none;
         }
 
         button span {
@@ -328,19 +319,6 @@
             background: #e74c3c;
         }
 
-        .api-info {
-            background: rgba(50, 130, 184, 0.1);
-            border: 1px solid rgba(50, 130, 184, 0.3);
-            border-radius: 12px;
-            padding: 15px;
-            margin-top: 20px;
-            font-size: 0.85rem;
-            color: var(--text-secondary);
-            text-align: center;
-            position: relative;
-            z-index: 2;
-        }
-
         @media (max-width: 768px) {
             .text-areas {
                 grid-template-columns: 1fr;
@@ -361,36 +339,18 @@
         }
 
         @keyframes fadeInDown {
-            from {
-                opacity: 0;
-                transform: translateY(-30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+            from { opacity: 0; transform: translateY(-30px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         @keyframes pulse {
-            0%, 100% {
-                opacity: 1;
-                transform: scale(1);
-            }
-            50% {
-                opacity: 0.8;
-                transform: scale(1.05);
-            }
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.8; transform: scale(1.05); }
         }
     </style>
 </head>
@@ -398,7 +358,7 @@
     <div class="container">
         <header>
             <h1>Překladač</h1>
-            <p class="subtitle">Inteligentní AI překladač</p>
+            <p class="subtitle">Automatický překladač textu</p>
         </header>
 
         <div class="translator-wrapper">
@@ -413,16 +373,9 @@
                     <option value="ru">Ruština</option>
                     <option value="pl">Polština</option>
                     <option value="sk">Slovenština</option>
-                    <option value="uk">Ukrajinština</option>
-                    <option value="ja">Japonština</option>
-                    <option value="zh">Čínština</option>
-                    <option value="ko">Korejština</option>
-                    <option value="ar">Arabština</option>
                 </select>
 
-                <button class="swap-button" id="swapBtn" title="Prohodit jazyky">
-                    ⇄
-                </button>
+                <button class="swap-button" id="swapBtn" title="Prohodit jazyky">⇄</button>
 
                 <select id="targetLang">
                     <option value="en">Angličtina</option>
@@ -434,29 +387,19 @@
                     <option value="ru">Ruština</option>
                     <option value="pl">Polština</option>
                     <option value="sk">Slovenština</option>
-                    <option value="uk">Ukrajinština</option>
-                    <option value="ja">Japonština</option>
-                    <option value="zh">Čínština</option>
-                    <option value="ko">Korejština</option>
-                    <option value="ar">Arabština</option>
                 </select>
             </div>
 
             <div class="text-areas">
                 <div class="text-box">
                     <label for="sourceText">Zdrojový text</label>
-                    <textarea 
-                        id="sourceText" 
-                        placeholder="Zadejte text k překladu..."></textarea>
+                    <textarea id="sourceText" placeholder="Zadejte text k překladu..."></textarea>
                     <span class="char-count" id="sourceCount">0 znaků</span>
                 </div>
 
                 <div class="text-box">
                     <label for="targetText">Překlad</label>
-                    <textarea 
-                        id="targetText" 
-                        placeholder="Zde se zobrazí překlad..."
-                        readonly></textarea>
+                    <textarea id="targetText" placeholder="Zde se zobrazí překlad..." readonly></textarea>
                     <span class="char-count" id="targetCount">0 znaků</span>
                 </div>
             </div>
@@ -473,13 +416,7 @@
                 </button>
             </div>
 
-            <div class="loading" id="loading">
-                ⏳ Překládám...
-            </div>
-
-            <div class="api-info">
-                💡 Tento překladač využívá AI technologii Claude pro přesné překlady
-            </div>
+            <div class="loading" id="loading">⏳ Překládám...</div>
         </div>
     </div>
 
@@ -503,7 +440,6 @@
         }
 
         sourceText.addEventListener('input', updateCharCount);
-        targetText.addEventListener('input', updateCharCount);
 
         swapBtn.addEventListener('click', () => {
             const tempLang = sourceLang.value;
@@ -537,62 +473,30 @@
             translateBtn.disabled = true;
 
             try {
-                const response = await fetch('https://api.anthropic.com/v1/messages', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        model: 'claude-sonnet-4-20250514',
-                        max_tokens: 2000,
-                        messages: [{
-                            role: 'user',
-                            content: `Přelož následující text z jazyka ${getLanguageName(source)} do jazyka ${getLanguageName(target)}. Vrať pouze přeložený text bez jakýchkoli vysvětlení, úvodních frází nebo dodatečných komentářů. Zachovej formátování a strukturu původního textu:\n\n${text}`
-                        }]
-                    })
-                });
-
+                const url = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=${source}|${target}`;
+                
+                const response = await fetch(url);
+                
                 if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
+                    throw new Error('Chyba sítě');
                 }
 
                 const data = await response.json();
                 
-                if (data.content && data.content[0] && data.content[0].text) {
-                    targetText.value = data.content[0].text.trim();
+                if (data.responseStatus === 200 && data.responseData) {
+                    targetText.value = data.responseData.translatedText;
                     updateCharCount();
                     showNotification('Překlad dokončen!');
                 } else {
-                    throw new Error('Neplatná odpověď z API');
+                    throw new Error('Chyba překladu');
                 }
             } catch (error) {
                 console.error('Chyba při překladu:', error);
-                showNotification('Nepodařilo se přeložit text. Tento překladač funguje pouze v prostředí Claude.ai', true);
-                targetText.value = '';
+                showNotification('Nepodařilo se přeložit text. Zkuste to prosím znovu.', true);
             } finally {
                 loading.style.display = 'none';
                 translateBtn.disabled = false;
             }
-        }
-
-        function getLanguageName(code) {
-            const languages = {
-                'cs': 'čeština',
-                'en': 'angličtina',
-                'de': 'němčina',
-                'es': 'španělština',
-                'fr': 'francouzština',
-                'it': 'italština',
-                'ru': 'ruština',
-                'pl': 'polština',
-                'sk': 'slovenština',
-                'uk': 'ukrajinština',
-                'ja': 'japonština',
-                'zh': 'čínština',
-                'ko': 'korejština',
-                'ar': 'arabština'
-            };
-            return languages[code] || code;
         }
 
         function copyTranslation() {
@@ -603,8 +507,7 @@
 
             navigator.clipboard.writeText(targetText.value).then(() => {
                 showNotification('Překlad zkopírován do schránky!');
-            }).catch(err => {
-                console.error('Chyba při kopírování:', err);
+            }).catch(() => {
                 showNotification('Nepodařilo se zkopírovat text.', true);
             });
         }
