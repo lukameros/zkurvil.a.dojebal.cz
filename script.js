@@ -1589,6 +1589,73 @@ function showNotification(message) {
     }, 3000);
 }
 
+function getLuckyHours() {
+    // Náhodně vygeneruj 2 hodiny pro dnešek
+    const today = new Date().toISOString().split('T')[0];
+    
+    if (!currentUser.luckyHours || currentUser.luckyHours.date !== today) {
+        const hour1 = Math.floor(Math.random() * 24);
+        let hour2 = Math.floor(Math.random() * 24);
+        while (hour2 === hour1) {
+            hour2 = Math.floor(Math.random() * 24);
+        }
+        
+        currentUser.luckyHours = {
+            date: today,
+            hours: [hour1, hour2].sort((a, b) => a - b)
+        };
+        saveUser();
+    }
+    
+    return currentUser.luckyHours.hours;
+}
+
+function isLuckyHour() {
+    const currentHour = new Date().getHours();
+    const luckyHours = getLuckyHours();
+    return luckyHours.includes(currentHour);
+}
+
+function getLuckyHourMultiplier() {
+    return isLuckyHour() ? 2.0 : 1.0;
+}
+
+// Zobraz lucky hours v UI
+function updateLuckyHourDisplay() {
+    const luckyHours = getLuckyHours();
+    const currentHour = new Date().getHours();
+    const isLucky = isLuckyHour();
+    
+    let display = document.getElementById('luckyHourDisplay');
+    if (!display) {
+        display = document.createElement('div');
+        display.id = 'luckyHourDisplay';
+        display.style.cssText = `
+            position: fixed;
+            top: 70px;
+            right: 15px;
+            background: linear-gradient(135deg, ${isLucky ? '#ffd700' : '#666'}, ${isLucky ? '#ff8c00' : '#444'});
+            color: ${isLucky ? '#000' : '#fff'};
+            padding: 8px 15px;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: bold;
+            border: 2px solid ${isLucky ? '#ffff00' : '#888'};
+            box-shadow: 0 0 ${isLucky ? '20px' : '10px'} ${isLucky ? 'rgba(255,215,0,0.8)' : 'rgba(0,0,0,0.5)'};
+            z-index: 99;
+            animation: ${isLucky ? 'luckyPulse 2s ease-in-out infinite' : 'none'};
+        `;
+        document.body.appendChild(display);
+    }
+    
+    if (isLucky) {
+        display.innerHTML = `⭐ LUCKY HOUR! 2x VÝHRY! ⭐`;
+    } else {
+        const nextLucky = luckyHours.find(h => h > currentHour) || luckyHours[0];
+        display.innerHTML = `🍀 Další Lucky Hour: ${nextLucky}:00`;
+    }
+}
+
 function updateLoginStreak() {
     const today = new Date().toISOString().split('T')[0];
     const lastLogin = currentUser.stats.lastLogin;
@@ -1717,6 +1784,7 @@ window.addEventListener('load', async () => {
         }
     }, 3500);
 });
+
 
 
 
