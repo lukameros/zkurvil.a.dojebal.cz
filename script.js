@@ -1402,6 +1402,67 @@ function loadAchievements() {
     });
 }
 
+let progressiveJackpot = 1000; // Startovní jackpot
+
+function updateProgressiveJackpot(bet) {
+    // 5% z každé sázky jde do progressive jackpotu
+    progressiveJackpot += Math.floor(bet * 0.05);
+    updateJackpotDisplay();
+}
+
+function checkProgressiveJackpot(results) {
+    // Super rare - 0.1% šance na progressive jackpot
+    if (results[0] === '🎰' && results[1] === '🎰' && results[2] === '🎰') {
+        if (Math.random() < 0.1) { // 10% šance když padne 🎰🎰🎰
+            const jackpotWin = progressiveJackpot;
+            progressiveJackpot = 1000; // Reset
+            
+            currentUser.coins += jackpotWin;
+            
+            showSpecialModal(
+                '🎰💎 PROGRESSIVE JACKPOT! 💎🎰',
+                `GRATULUJEME!\nVyhráli jste PROGRESSIVE JACKPOT!\n\n+${jackpotWin} 🪙`,
+                'jackpot-win'
+            );
+            
+            // Mega konfety
+            for (let i = 0; i < 200; i++) {
+                setTimeout(() => createConfetti(), i * 10);
+            }
+            
+            return jackpotWin;
+        }
+    }
+    return 0;
+}
+
+function updateJackpotDisplay() {
+    let display = document.getElementById('jackpotDisplay');
+    if (!display) {
+        display = document.createElement('div');
+        display.id = 'jackpotDisplay';
+        display.style.cssText = `
+            position: fixed;
+            top: 140px;
+            right: 15px;
+            background: linear-gradient(135deg, #ff00ff 0%, #ffd700 100%);
+            color: #000;
+            padding: 10px 18px;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: bold;
+            border: 3px solid #ffd700;
+            box-shadow: 0 0 30px rgba(255,215,0,0.9);
+            z-index: 99;
+            animation: jackpotGlowAnim 2s ease-in-out infinite;
+        `;
+        document.body.appendChild(display);
+    }
+    
+    display.innerHTML = `💎 JACKPOT<br>${progressiveJackpot} 🪙`;
+}
+
+
 // ============================================
 // MISSIONS
 // ============================================
@@ -1784,6 +1845,7 @@ window.addEventListener('load', async () => {
         }
     }, 3500);
 });
+
 
 
 
