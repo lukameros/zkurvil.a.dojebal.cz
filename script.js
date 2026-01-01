@@ -604,6 +604,7 @@ if (progressiveWin > 0) {
 // SLOT MACHINE - VYHODNOCENÍ VÝHRY
 // ============================================
 async function evaluateSlotWin(results) {
+    const progressiveWin = checkProgressiveJackpot(results);
     let winAmount = 0;
     let message = '';
     let isWin = false;
@@ -649,6 +650,12 @@ if (luckyMultiplier > 1) {
             message = `🎉 VÝHRA! 🎉 +${winAmount} 🪙`;
         }
         
+        if (luckyMultiplier > 1) {
+            const originalWin = winAmount;
+            winAmount = Math.floor(winAmount * luckyMultiplier);
+            message += ` 🍀 LUCKY HOUR! ${originalWin} → ${winAmount}!`;
+        }
+        
         if (multiplier >= 10) {
             updateMissionProgress('bigWins', 1);
         }
@@ -672,7 +679,14 @@ if (luckyMultiplier > 1) {
         currentUser.stats.dailyWins++;
         currentUser.stats.coinsWon += winAmount;
         
-        message = `💫 Malá výhra! 💫 +${winAmount} 🪙`;
+        message = `💫 Malá výhra! 💫 +${winAmount} 🪙`;message = `💫 Malá výhra! 💫 +${winAmount} 🪙`;
+        
+        // Aplikuj Lucky Hour bonus
+        if (luckyMultiplier > 1) {
+            const originalWin = winAmount;
+            winAmount = Math.floor(winAmount * luckyMultiplier);
+            message += ` 🍀 LUCKY HOUR! ${originalWin} → ${winAmount}!`;
+        }
         updateMissionProgress('coinsWon', winAmount);
         updateMissionProgress('dailyWins', 1);
     }
@@ -1300,8 +1314,14 @@ function checkDailyBonus() {
 // ============================================
 // ULOŽENÍ UŽIVATELE
 // ============================================
+// ============================================
+// ULOŽENÍ UŽIVATELE
+// ============================================
 async function saveUser() {
     if (!currentUser.id) return;
+    
+    // Ulož progressive jackpot do stats
+    currentUser.stats.progressiveJackpot = progressiveJackpot;
     
     if (currentUser.dailyMissions && currentUser.dailyMissions.coin_collector) {
         const mission = currentUser.dailyMissions.coin_collector;
@@ -1320,7 +1340,7 @@ async function saveUser() {
                 last_daily_bonus: currentUser.lastDailyBonus,
                 owned_themes: currentUser.ownedThemes,
                 active_theme: currentUser.activeTheme,
-                stats: currentUser.stats,
+                stats: currentUser.stats, // Obsahuje i progressiveJackpot
                 unlocked_achievements: currentUser.unlockedAchievements,
                 daily_missions: currentUser.dailyMissions,
                 last_mission_reset: currentUser.lastMissionReset
@@ -1440,12 +1460,6 @@ function loadAchievements() {
 }
 
 let progressiveJackpot = 1000; // Startovní jackpot
-
-function updateProgressiveJackpot(bet) {
-    // 5% z každé sázky jde do progressive jackpotu
-    progressiveJackpot += Math.floor(bet * 0.05);
-    updateJackpotDisplay();
-}
 
 function checkProgressiveJackpot(results) {
     // Super rare - 0.1% šance na progressive jackpot
@@ -1934,17 +1948,19 @@ if (nicknameInput) {
 // ============================================
 window.addEventListener('load', async () => {
     console.log('🎰 Casino inicializace...');
+    
+    // KRITICKÉ: Inicializace Lucky Hour a Jackpot
     updateLuckyHourDisplay();
-setInterval(updateLuckyHourDisplay, 60000); // Update každou minutu
-updateJackpotDisplay();
-createTurboToggle();
+    setInterval(updateLuckyHourDisplay, 60000); // Update každou minutu
+    updateJackpotDisplay();
+    
     createStars();
     showUpdateModal();
     startLoading();
     initReels();
     autoRotate();
     
-   setTimeout(async () => {
+    setTimeout(async () => {
         const savedUser = localStorage.getItem('currentUser');
         
         if (savedUser) {
@@ -1969,13 +1985,18 @@ createTurboToggle();
                     currentUser.dailyMissions = existingUser.daily_missions || {};
                     currentUser.lastMissionReset = existingUser.last_mission_reset;
                     
+                    // Načti progressive jackpot ze stats
+                    if (existingUser.stats && existingUser.stats.progressiveJackpot) {
+                        progressiveJackpot = existingUser.stats.progressiveJackpot;
+                    }
+                    updateJackpotDisplay();
+                    
                     updateLoginStreak();
                     initializeMissions();
                     
                     const activeItem = shopItems.find(i => i.id === currentUser.activeTheme);
                     if (activeItem) applyTheme(activeItem.colors);
                     
-                    // SKRYTÍ MODALU - KRITICKÉ!
                     document.getElementById('loginModal').style.display = 'none';
                     
                     updateUI();
