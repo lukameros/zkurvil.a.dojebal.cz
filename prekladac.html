@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Překladač | Nástroje</title>
+    <title>Pokročilý překladač | AI Nástroje</title>
     <link href="https://fonts.googleapis.com/css2?family=Courier+Prime:wght@400;700&family=DM+Serif+Display&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -82,6 +82,22 @@
             text-transform: uppercase;
         }
 
+        .features-bar {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .feature-chip {
+            background: rgba(50, 130, 184, 0.2);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            border: 1px solid rgba(50, 130, 184, 0.3);
+        }
+
         .translator-wrapper {
             background: rgba(26, 26, 46, 0.6);
             backdrop-filter: blur(10px);
@@ -103,6 +119,38 @@
             height: 200%;
             background: radial-gradient(circle, rgba(50, 130, 184, 0.1) 0%, transparent 70%);
             animation: pulse 4s ease-in-out infinite;
+        }
+
+        .mode-selector {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-bottom: 30px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .mode-btn {
+            padding: 12px 30px;
+            background: rgba(50, 130, 184, 0.1);
+            border: 2px solid rgba(50, 130, 184, 0.3);
+            border-radius: 12px;
+            color: var(--text);
+            font-family: 'Courier Prime', monospace;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+            font-weight: bold;
+        }
+
+        .mode-btn:hover {
+            background: rgba(50, 130, 184, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .mode-btn.active {
+            background: linear-gradient(135deg, var(--accent), var(--highlight));
+            border-color: var(--highlight);
         }
 
         .language-selector {
@@ -162,6 +210,57 @@
             transform: rotate(180deg) scale(1.1);
         }
 
+        .image-upload-zone {
+            display: none;
+            border: 3px dashed rgba(50, 130, 184, 0.4);
+            border-radius: 16px;
+            padding: 40px;
+            text-align: center;
+            cursor: pointer;
+            margin-bottom: 30px;
+            transition: all 0.3s ease;
+            position: relative;
+            z-index: 2;
+        }
+
+        .image-upload-zone.active {
+            display: block;
+        }
+
+        .image-upload-zone:hover {
+            border-color: var(--highlight);
+            background: rgba(50, 130, 184, 0.1);
+        }
+
+        .upload-icon {
+            font-size: 3rem;
+            margin-bottom: 15px;
+        }
+
+        .upload-text {
+            font-size: 1.1rem;
+            margin-bottom: 8px;
+        }
+
+        .upload-hint {
+            font-size: 0.85rem;
+            color: var(--text);
+            opacity: 0.6;
+        }
+
+        .image-preview {
+            display: none;
+            max-width: 100%;
+            max-height: 400px;
+            border-radius: 12px;
+            margin: 20px auto;
+            box-shadow: 0 10px 30px var(--shadow);
+        }
+
+        .image-preview.active {
+            display: block;
+        }
+
         .text-areas {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -169,6 +268,10 @@
             margin-bottom: 30px;
             position: relative;
             z-index: 2;
+        }
+
+        .text-areas.hidden {
+            display: none;
         }
 
         .text-box {
@@ -319,6 +422,56 @@
             background: #e74c3c;
         }
 
+        .history-section {
+            margin-top: 40px;
+            background: rgba(22, 33, 62, 0.6);
+            border-radius: 16px;
+            padding: 25px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .history-title {
+            font-size: 1.1rem;
+            margin-bottom: 15px;
+            color: var(--highlight);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .history-item {
+            background: rgba(15, 20, 40, 0.8);
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            border-left: 3px solid var(--highlight);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .history-item:hover {
+            background: rgba(15, 20, 40, 1);
+            transform: translateX(5px);
+        }
+
+        .history-meta {
+            font-size: 0.75rem;
+            color: var(--text);
+            opacity: 0.6;
+            margin-bottom: 5px;
+        }
+
+        .history-text {
+            font-size: 0.9rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        input[type="file"] {
+            display: none;
+        }
+
         @media (max-width: 768px) {
             .text-areas {
                 grid-template-columns: 1fr;
@@ -335,6 +488,10 @@
 
             h1 {
                 font-size: 2rem;
+            }
+
+            .mode-selector {
+                flex-direction: column;
             }
         }
 
@@ -357,40 +514,111 @@
 <body>
     <div class="container">
         <header>
-            <h1>Překladač</h1>
-            <p class="subtitle">Automatický překladač textu</p>
+            <h1>Pokročilý překladač</h1>
+            <p class="subtitle">AI překladač s OCR technologií</p>
+            <div class="features-bar">
+                <div class="feature-chip">📝 25+ jazyků</div>
+                <div class="feature-chip">📸 Překlad z obrázků</div>
+                <div class="feature-chip">🔄 Historie překladů</div>
+                <div class="feature-chip">⚡ Okamžitý překlad</div>
+            </div>
         </header>
 
         <div class="translator-wrapper">
+            <div class="mode-selector">
+                <button class="mode-btn active" data-mode="text">📝 Textový překlad</button>
+                <button class="mode-btn" data-mode="image">📸 Překlad z obrázku</button>
+            </div>
+
             <div class="language-selector">
                 <select id="sourceLang">
-                    <option value="cs">Čeština</option>
-                    <option value="en">Angličtina</option>
-                    <option value="de">Němčina</option>
-                    <option value="es">Španělština</option>
-                    <option value="fr">Francouzština</option>
-                    <option value="it">Italština</option>
-                    <option value="ru">Ruština</option>
-                    <option value="pl">Polština</option>
-                    <option value="sk">Slovenština</option>
+                    <option value="auto">🔍 Detekovat automaticky</option>
+                    <optgroup label="Evropské jazyky">
+                        <option value="cs">🇨🇿 Čeština</option>
+                        <option value="en">🇬🇧 Angličtina</option>
+                        <option value="de">🇩🇪 Němčina</option>
+                        <option value="es">🇪🇸 Španělština</option>
+                        <option value="fr">🇫🇷 Francouzština</option>
+                        <option value="it">🇮🇹 Italština</option>
+                        <option value="pl">🇵🇱 Polština</option>
+                        <option value="sk">🇸🇰 Slovenština</option>
+                        <option value="ru">🇷🇺 Ruština</option>
+                        <option value="uk">🇺🇦 Ukrajinština</option>
+                        <option value="pt">🇵🇹 Portugalština</option>
+                        <option value="nl">🇳🇱 Nizozemština</option>
+                        <option value="sv">🇸🇪 Švédština</option>
+                        <option value="no">🇳🇴 Norština</option>
+                        <option value="da">🇩🇰 Dánština</option>
+                        <option value="fi">🇫🇮 Finština</option>
+                        <option value="ro">🇷🇴 Rumunština</option>
+                        <option value="hu">🇭🇺 Maďarština</option>
+                        <option value="el">🇬🇷 Řečtina</option>
+                    </optgroup>
+                    <optgroup label="Asijské jazyky">
+                        <option value="ja">🇯🇵 Japonština</option>
+                        <option value="zh">🇨🇳 Čínština</option>
+                        <option value="ko">🇰🇷 Korejština</option>
+                        <option value="hi">🇮🇳 Hindština</option>
+                        <option value="th">🇹🇭 Thajština</option>
+                        <option value="vi">🇻🇳 Vietnamština</option>
+                    </optgroup>
+                    <optgroup label="Ostatní">
+                        <option value="ar">🇸🇦 Arabština</option>
+                        <option value="tr">🇹🇷 Turečtina</option>
+                        <option value="he">🇮🇱 Hebrejština</option>
+                    </optgroup>
                 </select>
 
                 <button class="swap-button" id="swapBtn" title="Prohodit jazyky">⇄</button>
 
                 <select id="targetLang">
-                    <option value="en">Angličtina</option>
-                    <option value="cs">Čeština</option>
-                    <option value="de">Němčina</option>
-                    <option value="es">Španělština</option>
-                    <option value="fr">Francouzština</option>
-                    <option value="it">Italština</option>
-                    <option value="ru">Ruština</option>
-                    <option value="pl">Polština</option>
-                    <option value="sk">Slovenština</option>
+                    <optgroup label="Evropské jazyky">
+                        <option value="en">🇬🇧 Angličtina</option>
+                        <option value="cs">🇨🇿 Čeština</option>
+                        <option value="de">🇩🇪 Němčina</option>
+                        <option value="es">🇪🇸 Španělština</option>
+                        <option value="fr">🇫🇷 Francouzština</option>
+                        <option value="it">🇮🇹 Italština</option>
+                        <option value="pl">🇵🇱 Polština</option>
+                        <option value="sk">🇸🇰 Slovenština</option>
+                        <option value="ru">🇷🇺 Ruština</option>
+                        <option value="uk">🇺🇦 Ukrajinština</option>
+                        <option value="pt">🇵🇹 Portugalština</option>
+                        <option value="nl">🇳🇱 Nizozemština</option>
+                        <option value="sv">🇸🇪 Švédština</option>
+                        <option value="no">🇳🇴 Norština</option>
+                        <option value="da">🇩🇰 Dánština</option>
+                        <option value="fi">🇫🇮 Finština</option>
+                        <option value="ro">🇷🇴 Rumunština</option>
+                        <option value="hu">🇭🇺 Maďarština</option>
+                        <option value="el">🇬🇷 Řečtina</option>
+                    </optgroup>
+                    <optgroup label="Asijské jazyky">
+                        <option value="ja">🇯🇵 Japonština</option>
+                        <option value="zh">🇨🇳 Čínština</option>
+                        <option value="ko">🇰🇷 Korejština</option>
+                        <option value="hi">🇮🇳 Hindština</option>
+                        <option value="th">🇹🇭 Thajština</option>
+                        <option value="vi">🇻🇳 Vietnamština</option>
+                    </optgroup>
+                    <optgroup label="Ostatní">
+                        <option value="ar">🇸🇦 Arabština</option>
+                        <option value="tr">🇹🇷 Turečtina</option>
+                        <option value="he">🇮🇱 Hebrejština</option>
+                    </optgroup>
                 </select>
             </div>
 
-            <div class="text-areas">
+            <div class="image-upload-zone" id="imageUploadZone">
+                <div class="upload-icon">📸</div>
+                <div class="upload-text">Klikněte nebo přetáhněte obrázek s textem</div>
+                <div class="upload-hint">Podporované formáty: JPG, PNG, WEBP</div>
+                <input type="file" id="imageInput" accept="image/*">
+            </div>
+
+            <img id="imagePreview" class="image-preview" alt="Náhled obrázku">
+
+            <div class="text-areas" id="textAreas">
                 <div class="text-box">
                     <label for="sourceText">Zdrojový text</label>
                     <textarea id="sourceText" placeholder="Zadejte text k překladu..."></textarea>
@@ -409,19 +637,29 @@
                     <span>🌐 Přeložit</span>
                 </button>
                 <button class="copy-button" id="copyBtn">
-                    <span>📋 Kopírovat překlad</span>
+                    <span>📋 Kopírovat</span>
                 </button>
                 <button class="clear-button" id="clearBtn">
-                    <span>🗑️ Vymazat vše</span>
+                    <span>🗑️ Vymazat</span>
                 </button>
             </div>
 
             <div class="loading" id="loading">⏳ Překládám...</div>
+
+            <div class="history-section">
+                <div class="history-title">📜 Historie překladů</div>
+                <div id="historyContainer">
+                    <div style="text-align: center; opacity: 0.5; padding: 20px;">
+                        Zatím žádné překlady
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
     <div class="notification" id="notification"></div>
 
+    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@4/dist/tesseract.min.js"></script>
     <script>
         const sourceText = document.getElementById('sourceText');
         const targetText = document.getElementById('targetText');
@@ -433,6 +671,96 @@
         const swapBtn = document.getElementById('swapBtn');
         const loading = document.getElementById('loading');
         const notification = document.getElementById('notification');
+        const imageUploadZone = document.getElementById('imageUploadZone');
+        const imageInput = document.getElementById('imageInput');
+        const imagePreview = document.getElementById('imagePreview');
+        const textAreas = document.getElementById('textAreas');
+        const historyContainer = document.getElementById('historyContainer');
+
+        let currentMode = 'text';
+        let translationHistory = JSON.parse(localStorage.getItem('translationHistory') || '[]');
+
+        // Mode switching
+        document.querySelectorAll('.mode-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                currentMode = btn.dataset.mode;
+                
+                if (currentMode === 'image') {
+                    imageUploadZone.classList.add('active');
+                    textAreas.classList.add('hidden');
+                } else {
+                    imageUploadZone.classList.remove('active');
+                    textAreas.classList.remove('hidden');
+                    imagePreview.classList.remove('active');
+                }
+            });
+        });
+
+        // Image upload
+        imageUploadZone.onclick = () => imageInput.click();
+
+        imageUploadZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            imageUploadZone.style.borderColor = 'var(--highlight)';
+        });
+
+        imageUploadZone.addEventListener('dragleave', () => {
+            imageUploadZone.style.borderColor = '';
+        });
+
+        imageUploadZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            imageUploadZone.style.borderColor = '';
+            if (e.dataTransfer.files.length > 0) {
+                handleImageFile(e.dataTransfer.files[0]);
+            }
+        });
+
+        imageInput.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) {
+                handleImageFile(e.target.files[0]);
+            }
+        });
+
+        async function handleImageFile(file) {
+            if (!file.type.match('image.*')) {
+                showNotification('Vyberte prosím obrázek', true);
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = async (e) => {
+                imagePreview.src = e.target.result;
+                imagePreview.classList.add('active');
+                textAreas.classList.remove('hidden');
+                
+                loading.style.display = 'block';
+                sourceText.value = 'Rozpoznávám text z obrázku...';
+
+                try {
+                    const result = await Tesseract.recognize(
+                        e.target.result,
+                        'eng+ces+deu+fra+spa+ita+pol+rus',
+                        {
+                            logger: m => console.log(m)
+                        }
+                    );
+                    
+                    sourceText.value = result.data.text;
+                    updateCharCount();
+                    showNotification('Text rozpoznán! Nyní můžete přeložit.');
+                } catch (error) {
+                    console.error('OCR error:', error);
+                    showNotification('Nepodařilo se rozpoznat text z obrázku', true);
+                    sourceText.value = '';
+                } finally {
+                    loading.style.display = 'none';
+                }
+            };
+            reader.readAsDataURL(file);
+        }
 
         function updateCharCount() {
             document.getElementById('sourceCount').textContent = `${sourceText.value.length} znaků`;
@@ -442,6 +770,11 @@
         sourceText.addEventListener('input', updateCharCount);
 
         swapBtn.addEventListener('click', () => {
+            if (sourceLang.value === 'auto') {
+                showNotification('Nelze prohodit s automatickou detekcí', true);
+                return;
+            }
+
             const tempLang = sourceLang.value;
             sourceLang.value = targetLang.value;
             targetLang.value = tempLang;
@@ -455,16 +788,21 @@
 
         async function translateText() {
             const text = sourceText.value.trim();
-            const source = sourceLang.value;
+            let source = sourceLang.value;
             const target = targetLang.value;
 
             if (!text) {
-                showNotification('Zadejte prosím text k překladu.', true);
+                showNotification('Zadejte prosím text k překladu', true);
                 return;
             }
 
+            if (source === 'auto') {
+                source = 'en';
+                showNotification('Detekována angličtina jako zdrojový jazyk');
+            }
+
             if (source === target) {
-                showNotification('Zdrojový a cílový jazyk musí být různé.', true);
+                showNotification('Zdrojový a cílový jazyk musí být různé', true);
                 return;
             }
 
@@ -483,58 +821,114 @@
 
                 const data = await response.json();
                 
-                if (data.responseStatus === 200 && data.responseData) {
+               if (data.responseStatus === 200 && data.responseData) {
                     targetText.value = data.responseData.translatedText;
                     updateCharCount();
+                    
+                    addToHistory({
+                        source: text,
+                        target: data.responseData.translatedText,
+                        sourceLang: source,
+                        targetLang: target,
+                        timestamp: new Date().toISOString()
+                    });
+                    
                     showNotification('Překlad dokončen!');
                 } else {
-                    throw new Error('Chyba překladu');
+                    throw new Error('Chyba při překladu');
                 }
             } catch (error) {
-                console.error('Chyba při překladu:', error);
-                showNotification('Nepodařilo se přeložit text. Zkuste to prosím znovu.', true);
+                console.error('Translation error:', error);
+                showNotification('Překlad se nezdařil. Zkuste to prosím znovu.', true);
             } finally {
                 loading.style.display = 'none';
                 translateBtn.disabled = false;
             }
         }
 
-        function copyTranslation() {
-            if (!targetText.value.trim()) {
-                showNotification('Není co kopírovat. Nejdříve přeložte text.', true);
+        translateBtn.addEventListener('click', translateText);
+
+        copyBtn.addEventListener('click', () => {
+            if (!targetText.value) {
+                showNotification('Není co kopírovat', true);
                 return;
             }
 
             navigator.clipboard.writeText(targetText.value).then(() => {
-                showNotification('Překlad zkopírován do schránky!');
+                showNotification('Text zkopírován do schránky!');
             }).catch(() => {
-                showNotification('Nepodařilo se zkopírovat text.', true);
+                showNotification('Kopírování se nezdařilo', true);
             });
-        }
+        });
+
+        clearBtn.addEventListener('click', () => {
+            sourceText.value = '';
+            targetText.value = '';
+            imagePreview.classList.remove('active');
+            imagePreview.src = '';
+            imageInput.value = '';
+            updateCharCount();
+            showNotification('Vše vymazáno');
+        });
 
         function showNotification(message, isError = false) {
             notification.textContent = message;
-            notification.classList.toggle('error', isError);
-            notification.classList.add('show');
-            
+            notification.className = 'notification show';
+            if (isError) {
+                notification.classList.add('error');
+            }
+
             setTimeout(() => {
                 notification.classList.remove('show');
             }, 3000);
         }
 
-        function clearAll() {
-            if (confirm('Opravdu chcete vymazat veškerý text?')) {
-                sourceText.value = '';
-                targetText.value = '';
-                updateCharCount();
+        function addToHistory(entry) {
+            translationHistory.unshift(entry);
+            if (translationHistory.length > 10) {
+                translationHistory = translationHistory.slice(0, 10);
             }
+            localStorage.setItem('translationHistory', JSON.stringify(translationHistory));
+            renderHistory();
         }
 
-        translateBtn.addEventListener('click', translateText);
-        copyBtn.addEventListener('click', copyTranslation);
-        clearBtn.addEventListener('click', clearAll);
+        function renderHistory() {
+            if (translationHistory.length === 0) {
+                historyContainer.innerHTML = '<div style="text-align: center; opacity: 0.5; padding: 20px;">Zatím žádné překlady</div>';
+                return;
+            }
 
-        document.addEventListener('keydown', (e) => {
+            historyContainer.innerHTML = translationHistory.map((entry, index) => {
+                const date = new Date(entry.timestamp);
+                const timeStr = date.toLocaleString('cs-CZ', { 
+                    day: '2-digit', 
+                    month: '2-digit', 
+                    hour: '2-digit', 
+                    minute: '2-digit' 
+                });
+
+                return `
+                    <div class="history-item" onclick="loadFromHistory(${index})">
+                        <div class="history-meta">${timeStr} • ${entry.sourceLang.toUpperCase()} → ${entry.targetLang.toUpperCase()}</div>
+                        <div class="history-text">${entry.source.substring(0, 80)}${entry.source.length > 80 ? '...' : ''}</div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function loadFromHistory(index) {
+            const entry = translationHistory[index];
+            sourceText.value = entry.source;
+            targetText.value = entry.target;
+            sourceLang.value = entry.sourceLang;
+            targetLang.value = entry.targetLang;
+            updateCharCount();
+            showNotification('Načteno z historie');
+        }
+
+        renderHistory();
+
+        sourceText.addEventListener('keydown', (e) => {
             if (e.ctrlKey && e.key === 'Enter') {
                 translateText();
             }
