@@ -615,117 +615,144 @@ async function evaluateSlotWin(results) {
     let winAmount = 0;
     let message = '';
     let isWin = false;
+
     const luckyMultiplier = getLuckyHourMultiplier();
-    
-    // KONTROLA 3 STEJNÝCH
+
+    // ===== 3 STEJNÉ SYMBOLY =====
     if (results[0] === results[1] && results[1] === results[2]) {
-        const multiplier = winMultipliers[results[0]];
+        const multiplier = winMultipliers[results[0]] ?? 1;
         winAmount = currentBet * multiplier;
         isWin = true;
-        
+
         currentUser.stats.totalWins++;
         currentUser.stats.currentStreak++;
         currentUser.stats.dailyWins++;
-        currentUser.stats.coinsWon += winAmount;
-        
+
         if (currentUser.stats.currentStreak > currentUser.stats.winStreak) {
             currentUser.stats.winStreak = currentUser.stats.currentStreak;
         }
-        
-        if (results[0] === '🎰') {
-            message = `🎰 MEGA JACKPOT! 🎰`;
-            currentUser.stats.jackpots++;
-        } else if (results[0] === '💎') {
-            message = `💎 DIAMANTOVÁ VÝHRA! 💎`;
-            currentUser.stats.diamondWins++;
-            updateMissionProgress('diamondWins', 1);
-        } else if (results[0] === '🍒') {
-            message = `🍒 TŘEŠŇOVÁ VÝHRA! 🍒`;
-            currentUser.stats.cherryWins++;
-        } else if (results[0] === '🔔') {
-            message = `🔔 ZVONKOVÁ VÝHRA! 🔔`;
-            currentUser.stats.bellWins++;
-        } else if (results[0] === '⭐') {
-            message = `⭐ HVĚZDNÁ VÝHRA! ⭐`;
-            currentUser.stats.starWins++;
-        } else {
-            message = `🎉 VÝHRA! 🎉`;
+
+        switch (results[0]) {
+            case '🎰':
+                message = '🎰 MEGA JACKPOT! 🎰';
+                currentUser.stats.jackpots++;
+                break;
+            case '💎':
+                message = '💎 DIAMANTOVÁ VÝHRA! 💎';
+                currentUser.stats.diamondWins++;
+                updateMissionProgress('diamondWins', 1);
+                break;
+            case '🍒':
+                message = '🍒 TŘEŠŇOVÁ VÝHRA! 🍒';
+                currentUser.stats.cherryWins++;
+                break;
+            case '🔔':
+                message = '🔔 ZVONKOVÁ VÝHRA! 🔔';
+                currentUser.stats.bellWins++;
+                break;
+            case '⭐':
+                message = '⭐ HVĚZDNÁ VÝHRA! ⭐';
+                currentUser.stats.starWins++;
+                break;
+            default:
+                message = '🎉 VÝHRA! 🎉';
         }
-        
+
         if (multiplier >= 10) {
             updateMissionProgress('bigWins', 1);
         }
-        
-        updateMissionProgress('coinsWon', winAmount);
-        updateMissionProgress('dailyWins', 1);
-        updateMissionProgress('winStreak', currentUser.stats.currentStreak);
     }
-    // KONTROLA 2 STEJNÝCH
-    else if (results[0] === results[1] || results[1] === results[2] || results[0] === results[2]) {
-        let symbol;
-        if (results[0] === results[1]) symbol = results[0];
-        else if (results[1] === results[2]) symbol = results[1];
-        else symbol = results[0];
-        
-        const smallMultiplier = Math.floor(winMultipliers[symbol] * 0.3);
-        winAmount = Math.max(currentBet * smallMultiplier, Math.floor(currentBet * 0.5));
+
+    // ===== 2 STEJNÉ SYMBOLY =====
+    else if (
+        results[0] === results[1] ||
+        results[1] === results[2] ||
+        results[0] === results[2]
+    ) {
+        const counts = {};
+        results.forEach(r => counts[r] = (counts[r] || 0) + 1);
+        const symbol = Object.keys(counts).find(k => counts[k] === 2);
+
+        const baseMultiplier = winMultipliers[symbol] ?? 1;
+        const smallMultiplier = Math.max(1, Math.floor(baseMultiplier * 0.3));
+
+        winAmount = Math.max(
+            currentBet * smallMultiplier,
+            Math.floor(currentBet * 0.5)
+        );
+
         isWin = true;
-        
+        message = '💫 Malá výhra! 💫';
+
         currentUser.stats.totalWins++;
         currentUser.stats.dailyWins++;
-        currentUser.stats.coinsWon += winAmount;
-        
-        message = `💫 Malá výhra! 💫`;
-        
-        updateMissionProgress('coinsWon', winAmount);
-        updateMissionProgress('dailyWins', 1);
+        currentUser.stats.currentStreak++;
     }
+
+    // ===== PROHRA =====
     else {
         message = '😢 Zkuste to znovu!';
         currentUser.stats.currentStreak = 0;
     }
-    
-    // Aplikuj Lucky Hour bonus
+
+    // ===== LUCKY HOUR BONUS =====
+    let finalWin = winAmount;
     if (isWin && luckyMultiplier > 1) {
-        const originalWin = winAmount;
-        winAmount = Math.floor(winAmount * luckyMultiplier);
-        message += ` 🍀 LUCKY HOUR! ${originalWin} → ${winAmount}!`;
+        finalWin = Math.floor(winAmount * luckyMultiplier);
+        message += ` 🍀 LUCKY HOUR! ${winAmount} → ${finalWin}!`;
     }
-    
-    // Přidej mince k celkové částce
+
+    // ===== STATISTIKY A MINCE =====
     if (isWin) {
-        message += ` +${winAmount} 🪙`;
-    }
-    
-    document.getElementById('slotResult').textContent = message;
-    document.getElementById('slotResult').style.color = isWin ? '#00ffaa' : '#ff4444';
-    
-    if (isWin) {
-        currentUser.coins += winAmount;
-        
+        message += ` +${finalWin} 🪙`;
+
+        currentUser.coins += finalWin;
+        currentUser.stats.coinsWon += finalWin;
+
+        updateMissionProgress('coinsWon', finalWin);
+        updateMissionProgress('dailyWins', 1);
+        updateMissionProgress('winStreak', currentUser.stats.currentStreak);
+
         if (currentUser.coins > currentUser.stats.maxCoins) {
             currentUser.stats.maxCoins = currentUser.coins;
         }
-        
+
         checkAchievements();
-        await saveUser();
-        updateUI();
-        
-        document.getElementById('winAmount').textContent = `+${winAmount} 🪙`;
-        document.getElementById('winModal').style.display = 'flex';
-        
-        const confettiCount = winAmount >= currentBet * 10 ? 100 : 30;
-        for (let i = 0; i < confettiCount; i++) {
-            setTimeout(() => createConfetti(), i * (winAmount >= currentBet * 10 ? 10 : 15));
+    }
+
+    // ===== UI =====
+    const resultEl = document.getElementById('slotResult');
+    if (resultEl) {
+        resultEl.textContent = message;
+        resultEl.style.color = isWin ? '#00ffaa' : '#ff4444';
+    }
+
+    if (isWin) {
+        const winAmountEl = document.getElementById('winAmount');
+        if (winAmountEl) {
+            winAmountEl.textContent = `+${finalWin} 🪙`;
         }
-    } else {
-        await saveUser();
+
+        const winModal = document.getElementById('winModal');
+        if (winModal) {
+            winModal.style.display = 'flex';
+        }
+
+        const confettiCount = finalWin >= currentBet * 10 ? 100 : 30;
+        for (let i = 0; i < confettiCount; i++) {
+            setTimeout(() => createConfetti(), i * 15);
+        }
+    }
+
+    await saveUser();
+    updateUI();
+
+    spinning = false;
+    const spinBtn = document.getElementById('spinSlotBtn');
+    if (spinBtn) {
+        spinBtn.disabled = false;
     }
     
-    spinning = false;
-    document.getElementById('spinSlotBtn').disabled = false;
-}
-
 // ============================================
 // SLOT MACHINE - NASTAVENÍ SÁZKY
 // ============================================
@@ -2020,6 +2047,7 @@ window.addEventListener('load', async () => {
         }
     }, 3500);
 });
+
 
 
 
