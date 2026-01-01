@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html lang="cs">
 <head>
-<link rel="stylesheet" href="firebase-chat-styles.css">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Nástroje</title>
@@ -602,7 +601,7 @@ body {
 
 <script>
 function goToTranslator() {
-    window.location.href = "nastroje.html";
+    window.location.href = "prekladac.html";
 }
 
 function goToCrop() {
@@ -723,7 +722,7 @@ window.login = async function() {
     document.getElementById('logoutBtn').style.display = 'inline-block';
     
     closeLogin();
-    alert(\`Vítejte, \${user.username}!\${isAdmin ? ' (Admin)' : ''}\`);
+    alert('Vítejte, ' + user.username + '!' + (isAdmin ? ' (Admin)' : ''));
     
     userPresenceId = await initPresence(supabase, db);
 }
@@ -794,11 +793,9 @@ function displayMessages(messages) {
             
             const time = msg.timestamp ? new Date(msg.timestamp).toLocaleTimeString('cs-CZ') : '';
             
-            div.innerHTML = \`
-                <span class="chat-user">\${msg.username}:</span>
-                <span class="chat-text">\${msg.text}</span>
-                <span class="chat-time" style="font-size: 11px; color: rgba(255,255,255,0.5); margin-left: 8px;">\${time}</span>
-            \`;
+            div.innerHTML = '<span class="chat-user">' + msg.username + ':</span>' +
+                           '<span class="chat-text">' + msg.text + '</span>' +
+                           '<span class="chat-time" style="font-size: 11px; color: rgba(255,255,255,0.5); margin-left: 8px;">' + time + '</span>';
             
             messagesDiv.appendChild(div);
         });
