@@ -854,7 +854,7 @@ window.spinWheel = async function() {
     autoRotating = false;
     document.getElementById('spinWheelBtn').disabled = true;
     
-    // PŘIDÁNO: Zastav auto-rotaci
+    // Zastav auto-rotaci
     if (animationFrameId) {
         cancelAnimationFrame(animationFrameId);
         animationFrameId = null;
@@ -888,34 +888,56 @@ window.spinWheel = async function() {
     if (!selectedPrize) selectedPrize = wheelPrizes[0];
     
     const prizeIndex = wheelPrizes.indexOf(selectedPrize);
-const slice = 2 * Math.PI / wheelPrizes.length;
-
-// ✅ OPRAVA: Normalizuj aktuální rotaci před výpočtem
-const normalizedRotation = rotation % (2 * Math.PI);
-
-// Výpočet cílové rotace: 8 celých otáček + cílová pozice
-const targetRotation = 2 * Math.PI * 8 + (3 / 2 * Math.PI - prizeIndex * slice - slice / 2);
-
-const startRotation = normalizedRotation; // ← Použij normalizovanou
-const duration = 7000;
-let startTime = null;
-
-function anim(timestamp) {
-    if (!startTime) startTime = timestamp;
-    let elapsed = timestamp - startTime;
-    let t = Math.min(elapsed / duration, 1);
+    const slice = 2 * Math.PI / wheelPrizes.length;
     
-    // ✅ Rotace od normalizované pozice k cíli
-    rotation = startRotation + (targetRotation - startRotation) * easeOutCubic(t);
+    // ✅ KLÍČOVÁ OPRAVA: Vezmi aktuální rotaci jako start
+    const startRotation = rotation;
     
-    drawWheel();
-    if (t < 1) {
-        requestAnimationFrame(anim);
-    } else {
-        setTimeout(() => finishWheelSpin(selectedPrize.coins), 500);
+    // ✅ Výpočet: přidej 8 otáček + dojeď na cílový segment
+    const spins = 8; // Počet celých otáček
+    const targetAngle = (3 / 2 * Math.PI - prizeIndex * slice - slice / 2);
+    const fullRotation = spins * 2 * Math.PI;
+    
+    // ✅ Cílová pozice = start + otáčky + cílový úhel
+    const finalRotation = startRotation + fullRotation + targetAngle;
+    
+    const duration = 7000;
+    let startTime = null;
+    let spinAnimationId = null;
+    
+    function anim(timestamp) {
+        if (!startTime) startTime = timestamp;
+        let elapsed = timestamp - startTime;
+        let t = Math.min(elapsed / duration, 1);
+        
+        // Interpolace od startu k cíli
+        rotation = startRotation + (finalRotation - startRotation) * easeOutCubic(t);
+        
+        drawWheel();
+        
+        if (t < 1) {
+            spinAnimationId = requestAnimationFrame(anim);
+        } else {
+            // ✅ Normalizuj rotaci po dokončení
+            rotation = rotation % (2 * Math.PI);
+            if (rotation < 0) rotation += 2 * Math.PI;
+            
+            // ✅ Restart auto-rotace
+            wheelSpinning = false;
+            autoRotating = true;
+            lastFrameTime = 0;
+            
+            // Spusť auto-rotaci znovu
+            if (animationFrameId) {
+                cancelAnimationFrame(animationFrameId);
+            }
+            autoRotate();
+            
+            setTimeout(() => finishWheelSpin(selectedPrize.coins), 500);
+        }
     }
-}
-requestAnimationFrame(anim);
+    
+    spinAnimationId = requestAnimationFrame(anim);
 };
 
 function easeOutCubic(t) {
@@ -926,15 +948,8 @@ function easeOutCubic(t) {
 // WHEEL OF FORTUNE - VYHODNOCENÍ
 // ============================================
 async function finishWheelSpin(coinWin) {
-    wheelSpinning = false;
+    // wheelSpinning už je false (nastaveno v animaci)
     document.getElementById('spinWheelBtn').disabled = false;
-    
-    // ✅ KLÍČOVÁ OPRAVA: Normalizuj rotaci zpět do rozsahu 0-2π
-    rotation = rotation % (2 * Math.PI);
-    
-    autoRotating = true;
-    lastFrameTime = 0;
-    autoRotate(); // ← Restart auto-rotace
     
     currentUser.coins += coinWin;
     
@@ -2099,6 +2114,7 @@ autoRotate();
         }
     }, 3500);
 });
+
 
 
 
