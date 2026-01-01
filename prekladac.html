@@ -277,6 +277,12 @@
             transform: translateY(0);
         }
 
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
         button span {
             position: relative;
             z-index: 1;
@@ -316,6 +322,10 @@
 
         .notification.show {
             transform: translateX(0);
+        }
+
+        .notification.error {
+            background: #e74c3c;
         }
 
         @media (max-width: 768px) {
@@ -375,7 +385,7 @@
     <div class="container">
         <header>
             <h1>Překladač</h1>
-            <p class="subtitle">Nástroj pro překlad textu</p>
+            <p class="subtitle">AI překladač s podporou Claude</p>
         </header>
 
         <div class="translator-wrapper">
@@ -390,9 +400,14 @@
                     <option value="ru">Ruština</option>
                     <option value="pl">Polština</option>
                     <option value="sk">Slovenština</option>
+                    <option value="uk">Ukrajinština</option>
+                    <option value="ja">Japonština</option>
+                    <option value="zh">Čínština</option>
+                    <option value="ko">Korejština</option>
+                    <option value="ar">Arabština</option>
                 </select>
 
-                <button class="swap-button" onclick="swapLanguages()" title="Prohodit jazyky">
+                <button class="swap-button" id="swapBtn" title="Prohodit jazyky">
                     ⇄
                 </button>
 
@@ -406,6 +421,11 @@
                     <option value="ru">Ruština</option>
                     <option value="pl">Polština</option>
                     <option value="sk">Slovenština</option>
+                    <option value="uk">Ukrajinština</option>
+                    <option value="ja">Japonština</option>
+                    <option value="zh">Čínština</option>
+                    <option value="ko">Korejština</option>
+                    <option value="ar">Arabština</option>
                 </select>
             </div>
 
@@ -414,8 +434,7 @@
                     <label for="sourceText">Zdrojový text</label>
                     <textarea 
                         id="sourceText" 
-                        placeholder="Zadejte text k překladu..."
-                        oninput="updateCharCount('source')"></textarea>
+                        placeholder="Zadejte text k překladu..."></textarea>
                     <span class="char-count" id="sourceCount">0 znaků</span>
                 </div>
 
@@ -430,13 +449,13 @@
             </div>
 
             <div class="button-group">
-                <button onclick="translateText()">
+                <button id="translateBtn">
                     <span>🌐 Přeložit</span>
                 </button>
-                <button class="copy-button" onclick="copyTranslation()">
+                <button class="copy-button" id="copyBtn">
                     <span>📋 Kopírovat překlad</span>
                 </button>
-                <button class="clear-button" onclick="clearAll()">
+                <button class="clear-button" id="clearBtn">
                     <span>🗑️ Vymazat vše</span>
                 </button>
             </div>
@@ -447,60 +466,60 @@
         </div>
     </div>
 
-    <div class="notification" id="notification">
-        Překlad zkopírován!
-    </div>
+    <div class="notification" id="notification"></div>
 
     <script>
-        function updateCharCount(type) {
-            const textarea = document.getElementById(type === 'source' ? 'sourceText' : 'targetText');
-            const countElement = document.getElementById(type === 'source' ? 'sourceCount' : 'targetCount');
-            const count = textarea.value.length;
-            countElement.textContent = `${count} znaků`;
+        const sourceText = document.getElementById('sourceText');
+        const targetText = document.getElementById('targetText');
+        const sourceLang = document.getElementById('sourceLang');
+        const targetLang = document.getElementById('targetLang');
+        const translateBtn = document.getElementById('translateBtn');
+        const copyBtn = document.getElementById('copyBtn');
+        const clearBtn = document.getElementById('clearBtn');
+        const swapBtn = document.getElementById('swapBtn');
+        const loading = document.getElementById('loading');
+        const notification = document.getElementById('notification');
+
+        function updateCharCount() {
+            document.getElementById('sourceCount').textContent = `${sourceText.value.length} znaků`;
+            document.getElementById('targetCount').textContent = `${targetText.value.length} znaků`;
         }
 
-        function swapLanguages() {
-            const sourceLang = document.getElementById('sourceLang');
-            const targetLang = document.getElementById('targetLang');
-            const sourceText = document.getElementById('sourceText');
-            const targetText = document.getElementById('targetText');
+        sourceText.addEventListener('input', updateCharCount);
+        targetText.addEventListener('input', updateCharCount);
 
-            // Prohodit jazyky
+        swapBtn.addEventListener('click', () => {
             const tempLang = sourceLang.value;
             sourceLang.value = targetLang.value;
             targetLang.value = tempLang;
 
-            // Prohodit texty
             const tempText = sourceText.value;
             sourceText.value = targetText.value;
             targetText.value = tempText;
 
-            updateCharCount('source');
-            updateCharCount('target');
-        }
+            updateCharCount();
+        });
 
         async function translateText() {
-            const sourceText = document.getElementById('sourceText').value.trim();
-            const sourceLang = document.getElementById('sourceLang').value;
-            const targetLang = document.getElementById('targetLang').value;
-            const targetTextArea = document.getElementById('targetText');
-            const loading = document.getElementById('loading');
+            const text = sourceText.value.trim();
+            const source = sourceLang.value;
+            const target = targetLang.value;
 
-            if (!sourceText) {
-                alert('Zadejte prosím text k překladu.');
+            if (!text) {
+                showNotification('Zadejte prosím text k překladu.', true);
                 return;
             }
 
-            if (sourceLang === targetLang) {
-                alert('Zdrojový a cílový jazyk musí být různé.');
+            if (source === target) {
+                showNotification('Zdrojový a cílový jazyk musí být různé.', true);
                 return;
             }
 
             loading.style.display = 'block';
-            targetTextArea.value = '';
+            targetText.value = '';
+            translateBtn.disabled = true;
 
             try {
-                // Simulace překladu pomocí Claude API
                 const response = await fetch('https://api.anthropic.com/v1/messages', {
                     method: 'POST',
                     headers: {
@@ -508,27 +527,34 @@
                     },
                     body: JSON.stringify({
                         model: 'claude-sonnet-4-20250514',
-                        max_tokens: 1000,
+                        max_tokens: 2000,
                         messages: [{
                             role: 'user',
-                            content: `Přelož následující text z jazyka ${getLanguageName(sourceLang)} do jazyka ${getLanguageName(targetLang)}. Vrať pouze přeložený text bez jakýchkoli vysvětlení nebo dodatečných komentářů:\n\n${sourceText}`
+                            content: `Přelož následující text z jazyka ${getLanguageName(source)} do jazyka ${getLanguageName(target)}. Vrať pouze přeložený text bez jakýchkoli vysvětlení, úvodních frází nebo dodatečných komentářů. Zachovej formátování a strukturu původního textu:\n\n${text}`
                         }]
                     })
                 });
 
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
                 const data = await response.json();
                 
                 if (data.content && data.content[0] && data.content[0].text) {
-                    targetTextArea.value = data.content[0].text;
-                    updateCharCount('target');
+                    targetText.value = data.content[0].text.trim();
+                    updateCharCount();
+                    showNotification('Překlad dokončen!');
                 } else {
                     throw new Error('Neplatná odpověď z API');
                 }
             } catch (error) {
                 console.error('Chyba při překladu:', error);
-                targetTextArea.value = 'Nepodařilo se přeložit text. Zkuste to prosím znovu.';
+                showNotification('Nepodařilo se přeložit text. Zkuste to prosím znovu.', true);
+                targetText.value = '';
             } finally {
                 loading.style.display = 'none';
+                translateBtn.disabled = false;
             }
         }
 
@@ -542,46 +568,52 @@
                 'it': 'italština',
                 'ru': 'ruština',
                 'pl': 'polština',
-                'sk': 'slovenština'
+                'sk': 'slovenština',
+                'uk': 'ukrajinština',
+                'ja': 'japonština',
+                'zh': 'čínština',
+                'ko': 'korejština',
+                'ar': 'arabština'
             };
             return languages[code] || code;
         }
 
         function copyTranslation() {
-            const targetText = document.getElementById('targetText');
-            
             if (!targetText.value.trim()) {
-                alert('Není co kopírovat. Nejdříve přeložte text.');
+                showNotification('Není co kopírovat. Nejdříve přeložte text.', true);
                 return;
             }
 
             navigator.clipboard.writeText(targetText.value).then(() => {
-                showNotification();
+                showNotification('Překlad zkopírován do schránky!');
             }).catch(err => {
                 console.error('Chyba při kopírování:', err);
-                alert('Nepodařilo se zkopírovat text.');
+                showNotification('Nepodařilo se zkopírovat text.', true);
             });
         }
 
-        function showNotification() {
-            const notification = document.getElementById('notification');
+        function showNotification(message, isError = false) {
+            notification.textContent = message;
+            notification.classList.toggle('error', isError);
             notification.classList.add('show');
             
             setTimeout(() => {
                 notification.classList.remove('show');
-            }, 2000);
+            }, 3000);
         }
 
         function clearAll() {
             if (confirm('Opravdu chcete vymazat veškerý text?')) {
-                document.getElementById('sourceText').value = '';
-                document.getElementById('targetText').value = '';
-                updateCharCount('source');
-                updateCharCount('target');
+                sourceText.value = '';
+                targetText.value = '';
+                updateCharCount();
             }
         }
 
-        // Podpora klávesových zkratek
+        translateBtn.addEventListener('click', translateText);
+        copyBtn.addEventListener('click', copyTranslation);
+        clearBtn.addEventListener('click', clearAll);
+
         document.addEventListener('keydown', (e) => {
             if (e.ctrlKey && e.key === 'Enter') {
                 translateText();
