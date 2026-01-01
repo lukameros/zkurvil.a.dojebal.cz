@@ -890,21 +890,42 @@ window.spinWheel = async function() {
     const prizeIndex = wheelPrizes.indexOf(selectedPrize);
 const slice = 2 * Math.PI / wheelPrizes.length;
 
+console.log('🎯 Vybraná výhra:', selectedPrize.coins, '🪙');
+console.log('📍 Prize index:', prizeIndex, 'z', wheelPrizes.length);
+
 const startRotation = rotation;
-
-// ✅ Počítej od aktuální pozice
 const spins = 8;
-const currentNormalized = startRotation % (2 * Math.PI);
 
-// Cílový úhel pro vybraný prize (šipka ukazuje nahoru = 0°)
-// Segments jsou kresleny po směru hodin, takže:
-const targetAngle = -prizeIndex * slice;
+// ✅ OPRAVA: Šipka ukazuje DOLŮ (na spodek, 270° = 3/2 * PI)
+// Chceme aby STŘED vybraného segmentu skončil na pozici šipky
 
-// Kolik ještě musíme dorotovat od aktuální pozice
-let rotationNeeded = targetAngle - currentNormalized;
+// Pozice středu segmentu (segmenty začínají od 0° a jdou po směru hodin)
+const segmentMiddle = prizeIndex * slice + slice / 2;
+
+// Šipka je na pozici 3π/2 (dolů)
+const pointerPosition = 3 * Math.PI / 2;
+
+// Cílová rotace = kam musíme otočit kolo, aby segment byl pod šipkou
+// (Otáčíme kolo, ne šipku, takže odečítáme)
+const targetRotation = pointerPosition - segmentMiddle;
+
+// Normalizuj do 0-2π
+let normalizedTarget = targetRotation % (2 * Math.PI);
+if (normalizedTarget < 0) normalizedTarget += 2 * Math.PI;
+
+// Aktuální pozice normalizovaná
+let currentNormalized = startRotation % (2 * Math.PI);
+if (currentNormalized < 0) currentNormalized += 2 * Math.PI;
+
+// Kolik musíme dorotovat
+let rotationNeeded = normalizedTarget - currentNormalized;
 if (rotationNeeded < 0) rotationNeeded += 2 * Math.PI;
 
+// Finální rotace = start + otáčky + potřebná rotace
 const finalRotation = startRotation + (spins * 2 * Math.PI) + rotationNeeded;
+
+console.log('🎲 Cílová rotace:', (normalizedTarget * 180 / Math.PI).toFixed(1), '°');
+console.log('🔄 Dorotovat o:', (rotationNeeded * 180 / Math.PI).toFixed(1), '°');
     
     const duration = 7000;
     let startTime = null;
@@ -2122,6 +2143,7 @@ autoRotate();
         }
     }, 3500);
 });
+
 
 
 
