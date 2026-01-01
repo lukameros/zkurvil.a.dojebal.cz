@@ -888,30 +888,34 @@ window.spinWheel = async function() {
     if (!selectedPrize) selectedPrize = wheelPrizes[0];
     
     const prizeIndex = wheelPrizes.indexOf(selectedPrize);
-    const slice = 2 * Math.PI / wheelPrizes.length;
-    const targetRotation = 2 * Math.PI * 8 + (3 / 2 * Math.PI - prizeIndex * slice - slice / 2);
+const slice = 2 * Math.PI / wheelPrizes.length;
+
+// ✅ OPRAVA: Normalizuj aktuální rotaci před výpočtem
+const normalizedRotation = rotation % (2 * Math.PI);
+
+// Výpočet cílové rotace: 8 celých otáček + cílová pozice
+const targetRotation = 2 * Math.PI * 8 + (3 / 2 * Math.PI - prizeIndex * slice - slice / 2);
+
+const startRotation = normalizedRotation; // ← Použij normalizovanou
+const duration = 7000;
+let startTime = null;
+
+function anim(timestamp) {
+    if (!startTime) startTime = timestamp;
+    let elapsed = timestamp - startTime;
+    let t = Math.min(elapsed / duration, 1);
     
-    const startRotation = rotation;
-    const duration = 7000;
-    let startTime = null;
+    // ✅ Rotace od normalizované pozice k cíli
+    rotation = startRotation + (targetRotation - startRotation) * easeOutCubic(t);
     
-    function anim(timestamp) {
-        if (!startTime) startTime = timestamp;
-        let elapsed = timestamp - startTime;
-        let t = Math.min(elapsed / duration, 1);
-        rotation = startRotation + (targetRotation - startRotation) * easeOutCubic(t);
-        drawWheel();
-        if (t < 1) {
-            requestAnimationFrame(anim);
-        } else {
-            // PŘIDÁNO: Restart auto-rotace po spinu
-            autoRotating = true;
-            lastFrameTime = 0;
-            autoRotate();
-            setTimeout(() => finishWheelSpin(selectedPrize.coins), 500);
-        }
+    drawWheel();
+    if (t < 1) {
+        requestAnimationFrame(anim);
+    } else {
+        setTimeout(() => finishWheelSpin(selectedPrize.coins), 500);
     }
-    requestAnimationFrame(anim);
+}
+requestAnimationFrame(anim);
 };
 
 function easeOutCubic(t) {
@@ -924,7 +928,13 @@ function easeOutCubic(t) {
 async function finishWheelSpin(coinWin) {
     wheelSpinning = false;
     document.getElementById('spinWheelBtn').disabled = false;
+    
+    // ✅ KLÍČOVÁ OPRAVA: Normalizuj rotaci zpět do rozsahu 0-2π
+    rotation = rotation % (2 * Math.PI);
+    
     autoRotating = true;
+    lastFrameTime = 0;
+    autoRotate(); // ← Restart auto-rotace
     
     currentUser.coins += coinWin;
     
@@ -2089,6 +2099,7 @@ autoRotate();
         }
     }, 3500);
 });
+
 
 
 
