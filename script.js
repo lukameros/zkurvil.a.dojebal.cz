@@ -1559,6 +1559,80 @@ function updateMissionProgress(type, amount = 1) {
     if (currentGame === 'missions') loadMissions();
 }
 
+function checkBonusGame() {
+    // 5% šance na bonus hru po každé výhře
+    if (Math.random() < 0.05) {
+        showBonusGame();
+    }
+}
+
+async function showBonusGame() {
+    const modal = document.createElement('div');
+    modal.className = 'modal';
+    modal.style.display = 'flex';
+    modal.innerHTML = `
+        <div class="modal-content" style="text-align: center;">
+            <h2>🎁 BONUS HRA! 🎁</h2>
+            <p style="color: #fff; font-size: 20px; margin: 20px 0;">
+                Vyber si jednu ze 3 krabic!<br>
+                Každá obsahuje tajemnou výhru!
+            </p>
+            <div style="display: flex; gap: 20px; justify-content: center; margin: 30px 0;">
+                <button class="bonus-box" onclick="openBonusBox(0)" style="font-size: 80px; padding: 20px; border: 4px solid #ffd700; border-radius: 15px; background: linear-gradient(135deg, #ff00ff, #00ffff); cursor: pointer;">
+                    📦
+                </button>
+                <button class="bonus-box" onclick="openBonusBox(1)" style="font-size: 80px; padding: 20px; border: 4px solid #ffd700; border-radius: 15px; background: linear-gradient(135deg, #ff00ff, #00ffff); cursor: pointer;">
+                    📦
+                </button>
+                <button class="bonus-box" onclick="openBonusBox(2)" style="font-size: 80px; padding: 20px; border: 4px solid #ffd700; border-radius: 15px; background: linear-gradient(135deg, #ff00ff, #00ffff); cursor: pointer;">
+                    📦
+                </button>
+            </div>
+        </div>
+    `;
+    modal.id = 'bonusGameModal';
+    document.body.appendChild(modal);
+}
+
+window.openBonusBox = async function(boxIndex) {
+    const rewards = [
+        { coins: 50, text: '50 mincí!' },
+        { coins: 100, text: '100 mincí!' },
+        { coins: 200, text: '200 mincí!' },
+        { coins: 500, text: 'MEGA VÝHRA 500!' },
+        { coins: 1000, text: 'JACKPOT 1000!' }
+    ];
+    
+    const reward = rewards[Math.floor(Math.random() * rewards.length)];
+    currentUser.coins += reward.coins;
+    
+    await saveUser();
+    updateUI();
+    
+    const modal = document.getElementById('bonusGameModal');
+    modal.innerHTML = `
+        <div class="modal-content" style="text-align: center;">
+            <h2>🎉 GRATULUJEME! 🎉</h2>
+            <p style="color: #ffd700; font-size: 48px; margin: 30px 0;">
+                +${reward.coins} 🪙
+            </p>
+            <p style="color: #fff; font-size: 22px;">
+                ${reward.text}
+            </p>
+            <button class="modal-close" onclick="closeBonusGame()">SUPER! 🎰</button>
+        </div>
+    `;
+    
+    for (let i = 0; i < 60; i++) {
+        setTimeout(() => createConfetti(), i * 15);
+    }
+};
+
+window.closeBonusGame = function() {
+    const modal = document.getElementById('bonusGameModal');
+    if (modal) modal.remove();
+};
+
 function loadMissions() {
     const list = document.getElementById('missionsList');
     if (!list) return;
@@ -1845,6 +1919,7 @@ window.addEventListener('load', async () => {
         }
     }, 3500);
 });
+
 
 
 
