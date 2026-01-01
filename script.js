@@ -1465,6 +1465,18 @@ function loadAchievements() {
 
 let progressiveJackpot = 1000; // Startovní jackpot
 
+// ⬇️⬇️⬇️ VLOŽ TADY ⬇️⬇️⬇️
+function updateProgressiveJackpot(betAmount) {
+    // Přidej 1% ze sázky do progressive jackpotu
+    const contribution = Math.floor(betAmount * 0.01);
+    progressiveJackpot += contribution;
+    updateJackpotDisplay();
+    
+    // Ulož do stats
+    currentUser.stats.progressiveJackpot = progressiveJackpot;
+}
+// ⬆️⬆️⬆️ KONEC ⬆️⬆️⬆️
+
 function checkProgressiveJackpot(results) {
     // Super rare - 0.1% šance na progressive jackpot
     if (results[0] === '🎰' && results[1] === '🎰' && results[2] === '🎰') {
@@ -2022,6 +2034,7 @@ window.addEventListener('load', async () => {
         }
     }, 3500);
 });
+
 
 
 
