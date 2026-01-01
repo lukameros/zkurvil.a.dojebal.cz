@@ -6,6 +6,30 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
 const SUPABASE_URL = 'https://bmmaijlbpwgzhrxzxphf.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJtbWFpamxicHdnemhyeHp4cGhmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjY4NjQ5MDcsImV4cCI6MjA4MjQ0MDkwN30.s0YQVnAjMXFu1pSI1NXZ2naSab179N0vQPglsmy3Pgw';
 const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+// ============================================
+// LANDSCAPE WARNING PRO MOBILY
+// ============================================
+function checkOrientation() {
+    const isLandscape = window.matchMedia("(orientation: landscape)").matches;
+    const isMobile = window.innerWidth <= 950 && window.innerHeight <= 500;
+    const warning = document.getElementById('landscapeWarning');
+    const wrapper = document.getElementById('wrapper');
+    const loading = document.getElementById('loadingScreen');
+    
+    if (isMobile && isLandscape) {
+        if (warning) warning.style.display = 'flex';
+        if (wrapper) wrapper.style.display = 'none';
+        if (loading) loading.style.display = 'none';
+    } else {
+        if (warning) warning.style.display = 'none';
+        if (wrapper) wrapper.style.display = 'flex';
+    }
+}
+
+// Kontrola při načtení a při otočení
+window.addEventListener('load', checkOrientation);
+window.addEventListener('resize', checkOrientation);
+window.addEventListener('orientationchange', checkOrientation);
 
 // ============================================
 // GLOBÁLNÍ PROMĚNNÉ
@@ -1970,6 +1994,7 @@ createTurboToggle();
         }
     }, 3500);
 });
+
 
 
 
