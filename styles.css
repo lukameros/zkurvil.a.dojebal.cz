@@ -2631,6 +2631,17 @@ button, .game-btn, .bet-btn {
     }
 }
 
+@keyframes jackpotGlowAnim {
+    0%, 100% { 
+        box-shadow: 0 0 30px rgba(255,215,0,0.9);
+        transform: scale(1);
+    }
+    50% { 
+        box-shadow: 0 0 50px rgba(255,0,255,1);
+        transform: scale(1.03);
+    }
+}
+
 
 
 
