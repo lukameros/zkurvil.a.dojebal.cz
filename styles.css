@@ -2324,6 +2324,302 @@ button, .game-btn, .bet-btn {
     }
 }
 
+/* ========================================== */
+/* BLOKACE LANDSCAPE MÓDU - PŘIDEJ DO styles.css */
+/* ========================================== */
+
+/* Overlay pro landscape mód */
+#landscapeWarning {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: linear-gradient(135deg, #0a0015 0%, #1a0033 100%);
+    z-index: 99999;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 20px;
+}
+
+#landscapeWarning .warning-content {
+    max-width: 90%;
+}
+
+#landscapeWarning h2 {
+    color: #ff00ff;
+    font-size: 32px;
+    margin-bottom: 20px;
+    text-shadow: 0 0 20px #ff00ff, 0 0 40px #00ffff;
+    animation: warningPulse 2s ease-in-out infinite;
+}
+
+#landscapeWarning .rotate-icon {
+    font-size: 80px;
+    margin: 20px 0;
+    animation: rotatePhone 2s ease-in-out infinite;
+}
+
+#landscapeWarning p {
+    color: #00ffff;
+    font-size: 20px;
+    margin-top: 20px;
+    text-shadow: 0 0 10px #00ffff;
+}
+
+@keyframes warningPulse {
+    0%, 100% { 
+        opacity: 1;
+        transform: scale(1);
+    }
+    50% { 
+        opacity: 0.7;
+        transform: scale(1.05);
+    }
+}
+
+@keyframes rotatePhone {
+    0%, 100% { 
+        transform: rotate(0deg);
+    }
+    25% { 
+        transform: rotate(-15deg);
+    }
+    75% { 
+        transform: rotate(15deg);
+    }
+}
+
+/* Zobrazení overlay při landscape módu na mobilech */
+@media (max-width: 950px) and (orientation: landscape) {
+    #landscapeWarning {
+        display: flex !important;
+    }
+    
+    #wrapper, #loadingScreen {
+        display: none !important;
+    }
+}
+
+/* ========================================== */
+/* MOBILNÍ OPTIMALIZACE - PORTRAIT */
+/* ========================================== */
+
+@media (max-width: 768px) and (orientation: portrait) {
+    /* Optimalizace pro portrait mód */
+    body {
+        font-size: 14px;
+    }
+    
+    #wrapper {
+        padding-top: 95px;
+    }
+    
+    #topBar {
+        flex-wrap: wrap;
+        padding: 6px 10px;
+        min-height: 85px;
+    }
+    
+    #userInfo {
+        width: 100%;
+        justify-content: space-between;
+        padding: 5px 0;
+    }
+    
+    #userName {
+        font-size: 20px;
+    }
+    
+    #coinDisplay {
+        padding: 6px 14px;
+    }
+    
+    #coinAmount {
+        font-size: 20px;
+    }
+    
+    #topButtons {
+        width: 100%;
+        justify-content: space-evenly;
+        padding: 5px 0;
+        gap: 6px;
+    }
+    
+    #topButtons button {
+        flex: 1;
+        min-width: 0;
+        padding: 7px 10px;
+        font-size: 13px;
+        white-space: nowrap;
+    }
+    
+    #gameSelector {
+        padding: 8px;
+        gap: 6px;
+        flex-wrap: wrap;
+    }
+    
+    .game-btn {
+        flex: 1 1 calc(50% - 6px);
+        min-width: 0;
+        padding: 10px 8px;
+        font-size: 15px;
+    }
+    
+    /* Slot machine optimalizace */
+    #slotContainer {
+        flex-direction: column;
+        padding: 12px;
+        gap: 12px;
+    }
+    
+    #slotMachine {
+        width: 100%;
+        max-width: 100%;
+        padding: 15px;
+    }
+    
+    #slotTitle {
+        font-size: 24px !important;
+        margin-bottom: 12px;
+    }
+    
+    #reels {
+        padding: 12px 8px;
+        gap: 6px;
+    }
+    
+    .reel {
+        width: 85px !important;
+        height: 255px !important;
+    }
+    
+    .symbol {
+        height: 85px !important;
+        font-size: 55px !important;
+    }
+    
+    .reel-window {
+        top: 85px !important;
+        height: 85px !important;
+    }
+    
+    #slotControls {
+        margin-top: 12px;
+    }
+    
+    #betAmount {
+        font-size: 22px !important;
+        margin-bottom: 10px;
+    }
+    
+    .bet-controls {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 8px;
+        margin-bottom: 10px;
+    }
+    
+    .bet-btn {
+        width: 100%;
+        padding: 10px 8px !important;
+        font-size: 16px !important;
+        margin: 0;
+    }
+    
+    #spinSlotBtn {
+        width: 100%;
+        margin-top: 12px;
+        padding: 15px 20px !important;
+        font-size: 22px !important;
+    }
+    
+    #slotResult {
+        margin-top: 10px;
+        font-size: 18px !important;
+        min-height: 30px;
+    }
+    
+    /* Wheel optimalizace */
+    #wheelTitle {
+        font-size: 26px !important;
+        margin: 12px 0;
+    }
+    
+    canvas {
+        width: 340px !important;
+        height: 340px !important;
+        max-width: 90vw !important;
+        max-height: 90vw !important;
+    }
+    
+    .wheelCenter {
+        width: 55px !important;
+        height: 55px !important;
+        font-size: 22px !important;
+    }
+    
+    .pointer {
+        transform: translate(-50%, -170px) !important;
+    }
+    
+    #spinWheelBtn {
+        width: calc(100% - 40px);
+        max-width: 400px;
+        margin: 15px auto 0;
+        padding: 14px 30px !important;
+        font-size: 22px !important;
+    }
+    
+    #wheelCost {
+        font-size: 18px !important;
+        margin-top: 8px;
+    }
+    
+    /* Touch-friendly větší tlačítka */
+    button, .bet-btn, .game-btn, .shop-buy-btn, .claim-btn {
+        min-height: 44px; /* iOS doporučená velikost pro touch */
+    }
+    
+    /* Lepší scrollování */
+    .game-container {
+        -webkit-overflow-scrolling: touch;
+    }
+    
+    /* Zakázání zoom při dvojkliku */
+    * {
+        touch-action: manipulation;
+    }
+}
+
+/* Pro menší mobily (iPhone SE apod.) */
+@media (max-width: 375px) and (orientation: portrait) {
+    .reel {
+        width: 75px !important;
+        height: 225px !important;
+    }
+    
+    .symbol {
+        height: 75px !important;
+        font-size: 48px !important;
+    }
+    
+    .reel-window {
+        top: 75px !important;
+        height: 75px !important;
+    }
+    
+    canvas {
+        width: 300px !important;
+        height: 300px !important;
+    }
+    
+    #spinSlotBtn, #spinWheelBtn {
+        font-size: 20px !important;
+    }
+}
+
 
 
 
