@@ -2004,8 +2004,8 @@ window.addEventListener('load', async () => {
                     updateUI();
                     checkDailyBonus();
                     updateJackpotDisplay();
-updateLuckyHourDisplay();
-setInterval(updateLuckyHourDisplay, 60000); // Aktualizuj každou minutu
+                    updateLuckyHourDisplay();
+                    setInterval(updateLuckyHourDisplay, 60000); // Aktualizuj každou minutu
                 } else {
                     localStorage.removeItem('currentUser');
                     document.getElementById('loginModal').style.display = 'flex';
@@ -2020,6 +2020,7 @@ setInterval(updateLuckyHourDisplay, 60000); // Aktualizuj každou minutu
         }
     }, 3500);
 });
+
 
 
 
