@@ -865,8 +865,10 @@
             sourceText.value = '';
             targetText.value = '';
             imagePreview.classList.remove('active');
+            translatedCanvas.classList.remove('active');
             imagePreview.src = '';
             imageInput.value = '';
+            currentImageFile = null;
             updateCharCount();
             showNotification('Vše vymazáno');
         });
@@ -936,3 +938,4 @@
     </script>
 </body>
 </html>
+
