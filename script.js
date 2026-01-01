@@ -488,7 +488,14 @@ window.spinSlot = async function() {
     if (currentBet >= 100) {
         updateMissionProgress('maxBets', 1);
     }
-    
+    updateProgressiveJackpot(currentBet);
+const progressiveWin = checkProgressiveJackpot(results);
+if (progressiveWin > 0) {
+    winAmount += progressiveWin;
+}
+    if (isWin) {
+    checkBonusGame();
+}
     await saveUser();
     updateUI();
     
@@ -504,7 +511,7 @@ window.spinSlot = async function() {
         }
     }
     
-    const spinDurations = [2500, 3200, 3900];
+    const spinDurations = turboMode ? [800, 1200, 1600] : [2500, 3200, 3900];
     
     for (let i = 0; i < 3; i++) {
         const reel = document.getElementById(`reel${i + 1}`);
@@ -576,6 +583,12 @@ async function evaluateSlotWin(results) {
     let winAmount = 0;
     let message = '';
     let isWin = false;
+    const luckyMultiplier = getLuckyHourMultiplier();
+winAmount = Math.floor(winAmount * luckyMultiplier);
+
+if (luckyMultiplier > 1) {
+    message += ' 🍀 LUCKY HOUR BONUS!';
+}
     
     // KONTROLA 3 STEJNÝCH
     if (results[0] === results[1] && results[1] === results[2]) {
@@ -1436,6 +1449,41 @@ function checkProgressiveJackpot(results) {
     return 0;
 }
 
+let turboMode = false;
+
+function createTurboToggle() {
+    const toggle = document.createElement('button');
+    toggle.id = 'turboToggle';
+    toggle.innerHTML = turboMode ? '⚡ TURBO: ZAP' : '🐢 TURBO: VYP';
+    toggle.style.cssText = `
+        margin-top: 10px;
+        padding: 8px 20px;
+        background: linear-gradient(135deg, ${turboMode ? '#00ff00' : '#666'}, ${turboMode ? '#00aa00' : '#444'});
+        border: 3px solid ${turboMode ? '#00ff00' : '#888'};
+        border-radius: 12px;
+        color: ${turboMode ? '#000' : '#fff'};
+        font-size: 16px;
+        font-weight: bold;
+        cursor: pointer;
+        font-family: 'Bangers', cursive;
+    `;
+    
+    toggle.onclick = function() {
+        turboMode = !turboMode;
+        toggle.innerHTML = turboMode ? '⚡ TURBO: ZAP' : '🐢 TURBO: VYP';
+        toggle.style.background = turboMode ? 
+            'linear-gradient(135deg, #00ff00, #00aa00)' : 
+            'linear-gradient(135deg, #666, #444)';
+        toggle.style.borderColor = turboMode ? '#00ff00' : '#888';
+        toggle.style.color = turboMode ? '#000' : '#fff';
+    };
+    
+    // Přidej za bet controls
+    const slotControls = document.getElementById('slotControls');
+    const betAmount = document.getElementById('betAmount');
+    betAmount.parentNode.insertBefore(toggle, betAmount.nextSibling);
+}
+
 function updateJackpotDisplay() {
     let display = document.getElementById('jackpotDisplay');
     if (!display) {
@@ -1862,7 +1910,10 @@ if (nicknameInput) {
 // ============================================
 window.addEventListener('load', async () => {
     console.log('🎰 Casino inicializace...');
-    
+    updateLuckyHourDisplay();
+setInterval(updateLuckyHourDisplay, 60000); // Update každou minutu
+updateJackpotDisplay();
+createTurboToggle();
     createStars();
     showUpdateModal();
     startLoading();
@@ -1919,6 +1970,7 @@ window.addEventListener('load', async () => {
         }
     }, 3500);
 });
+
 
 
 
