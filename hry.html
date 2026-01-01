@@ -36,12 +36,57 @@ body {
     overflow-y: auto;
 }
 
-#backBtn {
-    font-size: 12px;
-    padding: 8px 18px;
+.back-button-wrapper {
+    animation: cardEntrance 0.8s ease-out 0.4s backwards;
 }
 
+.backBtn {
+    position: relative;
+    padding: 18px 50px;
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(10px);
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    border-radius: 16px;
+    color: #fff;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1.1rem;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+    overflow: hidden;
+}
 
+.backBtn::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), transparent);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.backBtn:hover::before {
+    opacity: 1;
+}
+
+.backBtn:hover {
+    transform: translateY(-5px);
+    border-color: rgba(255, 255, 255, 0.4);
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.5);
+}
+
+.backBtn span::before {
+    content: "◀ ";
+    margin-right: 10px;
+    transition: margin-right 0.3s ease;
+}
+
+.backBtn:hover span::before {
+    margin-right: 15px;
+}
+    
 #menuVideo {
     position: fixed;
     inset: 0;
@@ -1508,6 +1553,7 @@ window.addEventListener('DOMContentLoaded', async function() {
 
 </body>
 </html>
+
 
 
 
