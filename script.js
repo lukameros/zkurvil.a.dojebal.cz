@@ -491,7 +491,7 @@ window.spinSlot = async function() {
     }
     
     spinning = true;
-    document.getElementById('spinSlotBtn').disabled = true;
+   document.getElementById('spinSlotBtn').disabled = true;
     document.getElementById('slotResult').textContent = '';
     
     currentUser.coins -= currentBet;
@@ -512,17 +512,14 @@ window.spinSlot = async function() {
     if (currentBet >= 100) {
         updateMissionProgress('maxBets', 1);
     }
+    
+    // ✅ OPRAVA: Progressive jackpot update
     updateProgressiveJackpot(currentBet);
-const progressiveWin = checkProgressiveJackpot(results);
-if (progressiveWin > 0) {
-    winAmount += progressiveWin;
-}
-    if (isWin) {
-    checkBonusGame();
-}
+    
     await saveUser();
     updateUI();
     
+    // ✅ OPRAVA: Results definuj PŘED použitím
     const results = [];
     const isJackpot = Math.random() < 0.005;
     
@@ -595,7 +592,6 @@ if (progressiveWin > 0) {
             }, spinDurations[i]);
         }, 10);
     }
-    
     setTimeout(() => {
         evaluateSlotWin(results);
     }, 5200);
@@ -2034,6 +2030,7 @@ window.addEventListener('load', async () => {
         }
     }, 3500);
 });
+
 
 
 
