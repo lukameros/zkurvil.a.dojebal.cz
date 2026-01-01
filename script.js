@@ -1850,17 +1850,6 @@ function getLuckyHours() {
     return currentUser.luckyHours.hours;
 }
 
-function isLuckyHour() {
-    const currentHour = new Date().getHours();
-    const luckyHours = getLuckyHours();
-    return luckyHours.includes(currentHour);
-}
-
-// Tvoje funkce, která se ptá té horní a vrací násobitel 2.0
-function getLuckyHourMultiplier() {
-    return isLuckyHour() ? 2.0 : 1.0;
-}
-
 // Zobraz lucky hours v UI
 function updateLuckyHourDisplay() {
     const luckyHours = getLuckyHours();
@@ -2004,9 +1993,6 @@ window.addEventListener('load', async () => {
                     if (existingUser.stats && existingUser.stats.progressiveJackpot) {
                         progressiveJackpot = existingUser.stats.progressiveJackpot;
                     }
-                    updateJackpotDisplay();
-                    updateLuckyHourDisplay();
-                    setInterval(updateLuckyHourDisplay, 60000);
                     updateLoginStreak();
                     initializeMissions();
                     
@@ -2034,6 +2020,7 @@ setInterval(updateLuckyHourDisplay, 60000); // Aktualizuj každou minutu
         }
     }, 3500);
 });
+
 
 
 
