@@ -918,26 +918,29 @@ window.spinWheel = async function() {
         if (t < 1) {
             spinAnimationId = requestAnimationFrame(anim);
         } else {
-            // ✅ Normalizuj rotaci po dokončení
+            // Normalizuj rotaci po dokončení
             rotation = rotation % (2 * Math.PI);
             if (rotation < 0) rotation += 2 * Math.PI;
             
-            // ✅ Restart auto-rotace
+            // Restart auto-rotace
             wheelSpinning = false;
             autoRotating = true;
             lastFrameTime = 0;
             
-            // Spusť auto-rotaci znovu
             if (animationFrameId) {
                 cancelAnimationFrame(animationFrameId);
             }
             autoRotate();
             
-            setTimeout(() => finishWheelSpin(selectedPrize.coins), 500);
+            // Zavolej finish po 500ms aby byla vidět finální pozice
+            setTimeout(() => {
+                finishWheelSpin(selectedPrize.coins);
+            }, 500);
         }
     }
     
-    spinAnimationId = requestAnimationFrame(anim);
+    // ✅ Spusť animaci JEDNOU
+    requestAnimationFrame(anim);
 };
 
 function easeOutCubic(t) {
@@ -2114,6 +2117,7 @@ autoRotate();
         }
     }, 3500);
 });
+
 
 
 
