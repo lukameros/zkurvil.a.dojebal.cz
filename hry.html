@@ -6,6 +6,118 @@
     <title>Hry</title>
     
     <style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    body {
+        font-family: 'Arial Black', 'Impact', sans-serif;
+        min-height: 100vh;
+        background:
+            linear-gradient(135deg, rgba(0,0,0,0.95) 0%, rgba(20,0,0,0.98) 100%),
+            repeating-linear-gradient(45deg, transparent, transparent 50px, rgba(100,0,0,0.03) 50px, rgba(100,0,0,0.03) 100px);
+        overflow-x: hidden;
+        position: relative;
+    }
+
+    body::before {
+        content: "";
+        position: fixed;
+        inset: 0;
+        background: 
+            radial-gradient(ellipse at 20% 30%, rgba(200,0,0,0.1) 0%, transparent 50%),
+            radial-gradient(ellipse at 80% 70%, rgba(100,0,0,0.15) 0%, transparent 50%);
+        animation: bgPulse 8s ease-in-out infinite;
+        pointer-events: none;
+    }
+
+    @keyframes bgPulse {
+        0%, 100% { opacity: 0.5; }
+        50% { opacity: 0.8; }
+    }
+
+    #backBtn {
+        position: fixed;
+        top: 30px;
+        left: 30px;
+        padding: 14px 28px;
+        border: 2px solid rgba(200,0,0,0.7);
+        background: linear-gradient(135deg, rgba(40,40,40,0.9) 0%, rgba(20,20,20,0.95) 100%);
+        color: #fff;
+        font-weight: 900;
+        font-size: 16px;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        cursor: pointer;
+        box-shadow: 0 0 20px rgba(200,0,0,0.5);
+        transition: all 0.3s ease;
+        text-shadow: 0 0 10px rgba(255,0,0,0.7);
+        clip-path: polygon(8% 0, 100% 0, 92% 100%, 0 100%);
+        z-index: 100;
+    }
+
+    #backBtn:hover {
+        background: linear-gradient(135deg, rgba(200,0,0,0.9) 0%, rgba(120,0,0,0.95) 100%);
+        transform: translateY(-2px);
+    }
+
+    #authButtons {
+        position: fixed;
+        top: 30px;
+        right: 30px;
+        display: flex;
+        gap: 12px;
+        align-items: center;
+        z-index: 100;
+    }
+
+    #onlineCounter {
+        padding: 8px 16px;
+        background: rgba(0,0,0,0.8);
+        color: #0f0;
+        font-weight: 900;
+        font-size: 14px;
+        border: 2px solid rgba(0,255,0,0.5);
+        box-shadow: 0 0 20px rgba(0,255,0,0.4);
+        text-shadow: 0 0 10px rgba(0,255,0,0.9);
+        clip-path: polygon(8% 0, 100% 0, 92% 100%, 0 100%);
+    }
+
+    #authButtons button {
+        padding: 12px 28px;
+        border: 2px solid rgba(200,0,0,0.7);
+        background: linear-gradient(135deg, rgba(40,40,40,0.9) 0%, rgba(20,20,20,0.95) 100%);
+        color: #fff;
+        font-weight: 900;
+        font-size: 14px;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        cursor: pointer;
+        box-shadow: 0 0 20px rgba(200,0,0,0.5);
+        transition: all 0.3s ease;
+        text-shadow: 0 0 10px rgba(255,0,0,0.7);
+        clip-path: polygon(8% 0, 100% 0, 92% 100%, 0 100%);
+    }
+
+    #authButtons button:hover {
+        background: linear-gradient(135deg, rgba(200,0,0,0.9) 0%, rgba(120,0,0,0.95) 100%);
+        transform: translateY(-2px);
+    }
+
+    h1 {
+        text-align: center;
+        color: #fff;
+        font-size: 48px;
+        font-weight: 900;
+        letter-spacing: 4px;
+        text-transform: uppercase;
+        margin: 80px 0 50px;
+        text-shadow: 0 0 25px rgba(255,0,0,0.9), 3px 3px 8px rgba(0,0,0,1);
+    }
+
+    /* Admin Panel */
     #adminPanel {
         display: none;
         position: fixed;
@@ -496,7 +608,6 @@
         }
     }
 </style>
-
 
 
 </head>
@@ -1120,9 +1231,6 @@ window.addEventListener('DOMContentLoaded', async function() {
 
 </body>
 </html>
-
-
-
 
 
 
