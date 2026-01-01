@@ -328,6 +328,19 @@
             background: #e74c3c;
         }
 
+        .api-info {
+            background: rgba(50, 130, 184, 0.1);
+            border: 1px solid rgba(50, 130, 184, 0.3);
+            border-radius: 12px;
+            padding: 15px;
+            margin-top: 20px;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            text-align: center;
+            position: relative;
+            z-index: 2;
+        }
+
         @media (max-width: 768px) {
             .text-areas {
                 grid-template-columns: 1fr;
@@ -385,7 +398,7 @@
     <div class="container">
         <header>
             <h1>Překladač</h1>
-            <p class="subtitle">AI překladač s podporou Claude</p>
+            <p class="subtitle">Inteligentní AI překladač</p>
         </header>
 
         <div class="translator-wrapper">
@@ -462,6 +475,10 @@
 
             <div class="loading" id="loading">
                 ⏳ Překládám...
+            </div>
+
+            <div class="api-info">
+                💡 Tento překladač využívá AI technologii Claude pro přesné překlady
             </div>
         </div>
     </div>
@@ -550,7 +567,7 @@
                 }
             } catch (error) {
                 console.error('Chyba při překladu:', error);
-                showNotification('Nepodařilo se přeložit text. Zkuste to prosím znovu.', true);
+                showNotification('Nepodařilo se přeložit text. Tento překladač funguje pouze v prostředí Claude.ai', true);
                 targetText.value = '';
             } finally {
                 loading.style.display = 'none';
