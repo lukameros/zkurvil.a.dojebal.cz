@@ -1317,6 +1317,9 @@ function checkDailyBonus() {
 // ============================================
 // ULOŽENÍ UŽIVATELE
 // ============================================
+// ============================================
+// ULOŽENÍ UŽIVATELE
+// ============================================
 async function saveUser() {
     if (!currentUser.id) return;
     
@@ -1340,10 +1343,11 @@ async function saveUser() {
                 last_daily_bonus: currentUser.lastDailyBonus,
                 owned_themes: currentUser.ownedThemes,
                 active_theme: currentUser.activeTheme,
-                stats: currentUser.stats, // Obsahuje i progressiveJackpot
+                stats: currentUser.stats, // Obsahuje progressiveJackpot
                 unlocked_achievements: currentUser.unlockedAchievements,
                 daily_missions: currentUser.dailyMissions,
-                last_mission_reset: currentUser.lastMissionReset
+                last_mission_reset: currentUser.lastMissionReset,
+                lucky_hours: currentUser.luckyHours || null  // PŘIDÁNO
             })
             .eq('id', currentUser.id);
     } catch (e) {
@@ -1984,7 +1988,7 @@ window.addEventListener('load', async () => {
                     currentUser.unlockedAchievements = existingUser.unlocked_achievements || [];
                     currentUser.dailyMissions = existingUser.daily_missions || {};
                     currentUser.lastMissionReset = existingUser.last_mission_reset;
-                    
+                    currentUser.luckyHours = existingUser.lucky_hours || null;
                     // Načti progressive jackpot ze stats
                     if (existingUser.stats && existingUser.stats.progressiveJackpot) {
                         progressiveJackpot = existingUser.stats.progressiveJackpot;
@@ -2015,6 +2019,7 @@ window.addEventListener('load', async () => {
         }
     }, 3500);
 });
+
 
 
 
