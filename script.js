@@ -617,53 +617,6 @@ async function evaluateSlotWin(results) {
     let isWin = false;
     const luckyMultiplier = getLuckyHourMultiplier();
     
-    // 1. Logika pro 3 stejné symboly
-    if (results[0] === results[1] && results[1] === results[2]) {
-        const multiplier = winMultipliers[results[0]];
-        winAmount = currentBet * multiplier;
-        isWin = true;
-        message = `🎉 VÝHRA! 🎉`;
-        
-        // Statistiky pro 3 stejné
-        currentUser.stats.totalWins++;
-        currentUser.stats.currentStreak++;
-        if (results[0] === '🎰') currentUser.stats.jackpots++;
-        if (results[0] === '💎') currentUser.stats.diamondWins++;
-    } 
-    // 2. Logika pro 2 stejné symboly
-    else if (results[0] === results[1] || results[1] === results[2] || results[0] === results[2]) {
-        let symbol = (results[0] === results[1]) ? results[0] : (results[1] === results[2] ? results[1] : results[0]);
-        const smallMultiplier = Math.floor(winMultipliers[symbol] * 0.3);
-        winAmount = Math.max(currentBet * smallMultiplier, Math.floor(currentBet * 0.5));
-        isWin = true;
-        message = `💫 Malá výhra! 💫`;
-    }
-
-    // 3. Aplikace Šťastné hodiny (násobení 2x)
-    if (isWin && luckyMultiplier > 1) {
-        winAmount = Math.floor(winAmount * luckyMultiplier);
-        message += ` 🍀 LUCKY HOUR 2x!`;
-    }
-
-    // 4. Zobrazení výsledku
-    const resultElement = document.getElementById('slotResult');
-    if (isWin) {
-        currentUser.coins += winAmount;
-        currentUser.stats.coinsWon += winAmount;
-        resultElement.textContent = `${message} +${winAmount} 🪙`;
-        resultElement.style.color = '#00ffaa';
-    } else {
-        currentUser.stats.currentStreak = 0;
-        resultElement.textContent = 'Zkus to znovu! ❌';
-        resultElement.style.color = '#ff4444';
-    }
-
-    spinning = false;
-    document.getElementById('spinSlotBtn').disabled = false;
-    await saveUser();
-    updateUI();
-}
-    
     // KONTROLA 3 STEJNÝCH
     if (results[0] === results[1] && results[1] === results[2]) {
         const multiplier = winMultipliers[results[0]];
@@ -680,29 +633,23 @@ async function evaluateSlotWin(results) {
         }
         
         if (results[0] === '🎰') {
-            message = `🎰 MEGA JACKPOT! 🎰 +${winAmount} 🪙`;
+            message = `🎰 MEGA JACKPOT! 🎰`;
             currentUser.stats.jackpots++;
         } else if (results[0] === '💎') {
-            message = `💎 DIAMANTOVÁ VÝHRA! 💎 +${winAmount} 🪙`;
+            message = `💎 DIAMANTOVÁ VÝHRA! 💎`;
             currentUser.stats.diamondWins++;
             updateMissionProgress('diamondWins', 1);
         } else if (results[0] === '🍒') {
-            message = `🍒 TŘEŠŇOVÁ VÝHRA! 🍒 +${winAmount} 🪙`;
+            message = `🍒 TŘEŠŇOVÁ VÝHRA! 🍒`;
             currentUser.stats.cherryWins++;
         } else if (results[0] === '🔔') {
-            message = `🔔 ZVONKOVÁ VÝHRA! 🔔 +${winAmount} 🪙`;
+            message = `🔔 ZVONKOVÁ VÝHRA! 🔔`;
             currentUser.stats.bellWins++;
         } else if (results[0] === '⭐') {
-            message = `⭐ HVĚZDNÁ VÝHRA! ⭐ +${winAmount} 🪙`;
+            message = `⭐ HVĚZDNÁ VÝHRA! ⭐`;
             currentUser.stats.starWins++;
         } else {
-            message = `🎉 VÝHRA! 🎉 +${winAmount} 🪙`;
-        }
-        
-        if (luckyMultiplier > 1) {
-            const originalWin = winAmount;
-            winAmount = Math.floor(winAmount * luckyMultiplier);
-            message += ` 🍀 LUCKY HOUR! ${originalWin} → ${winAmount}!`;
+            message = `🎉 VÝHRA! 🎉`;
         }
         
         if (multiplier >= 10) {
@@ -728,14 +675,8 @@ async function evaluateSlotWin(results) {
         currentUser.stats.dailyWins++;
         currentUser.stats.coinsWon += winAmount;
         
-        message = `💫 Malá výhra! 💫 +${winAmount} 🪙`;message = `💫 Malá výhra! 💫 +${winAmount} 🪙`;
+        message = `💫 Malá výhra! 💫`;
         
-        // Aplikuj Lucky Hour bonus
-        if (luckyMultiplier > 1) {
-            const originalWin = winAmount;
-            winAmount = Math.floor(winAmount * luckyMultiplier);
-            message += ` 🍀 LUCKY HOUR! ${originalWin} → ${winAmount}!`;
-        }
         updateMissionProgress('coinsWon', winAmount);
         updateMissionProgress('dailyWins', 1);
     }
@@ -744,7 +685,20 @@ async function evaluateSlotWin(results) {
         currentUser.stats.currentStreak = 0;
     }
     
+    // Aplikuj Lucky Hour bonus
+    if (isWin && luckyMultiplier > 1) {
+        const originalWin = winAmount;
+        winAmount = Math.floor(winAmount * luckyMultiplier);
+        message += ` 🍀 LUCKY HOUR! ${originalWin} → ${winAmount}!`;
+    }
+    
+    // Přidej mince k celkové částce
+    if (isWin) {
+        message += ` +${winAmount} 🪙`;
+    }
+    
     document.getElementById('slotResult').textContent = message;
+    document.getElementById('slotResult').style.color = isWin ? '#00ffaa' : '#ff4444';
     
     if (isWin) {
         currentUser.coins += winAmount;
@@ -1902,14 +1856,6 @@ function isLuckyHour() {
     return luckyHours.includes(currentHour);
 }
 
-// Pomocná funkce, která definuje časy (15:00 a 20:00)
-function isLuckyHour() {
-    const now = new Date();
-    const hour = now.getHours();
-    // Vrací true (pravda), pokud je hodina 15 nebo 20
-    return hour === 15 || hour === 20;
-}
-
 // Tvoje funkce, která se ptá té horní a vrací násobitel 2.0
 function getLuckyHourMultiplier() {
     return isLuckyHour() ? 2.0 : 1.0;
@@ -2022,6 +1968,7 @@ if (nicknameInput) {
 // ============================================
 window.addEventListener('load', async () => {
     console.log('🎰 Casino inicializace...');
+    createTurboToggle();
     createStars();
     showUpdateModal();
     startLoading();
@@ -2070,6 +2017,9 @@ window.addEventListener('load', async () => {
                     
                     updateUI();
                     checkDailyBonus();
+                    updateJackpotDisplay();
+updateLuckyHourDisplay();
+setInterval(updateLuckyHourDisplay, 60000); // Aktualizuj každou minutu
                 } else {
                     localStorage.removeItem('currentUser');
                     document.getElementById('loginModal').style.display = 'flex';
@@ -2084,6 +2034,7 @@ window.addEventListener('load', async () => {
         }
     }, 3500);
 });
+
 
 
 
