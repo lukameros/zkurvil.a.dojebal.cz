@@ -1849,6 +1849,15 @@ function isLuckyHour() {
     return luckyHours.includes(currentHour);
 }
 
+// Pomocná funkce, která definuje časy (15:00 a 20:00)
+function isLuckyHour() {
+    const now = new Date();
+    const hour = now.getHours();
+    // Vrací true (pravda), pokud je hodina 15 nebo 20
+    return hour === 15 || hour === 20;
+}
+
+// Tvoje funkce, která se ptá té horní a vrací násobitel 2.0
 function getLuckyHourMultiplier() {
     return isLuckyHour() ? 2.0 : 1.0;
 }
@@ -2022,6 +2031,7 @@ window.addEventListener('load', async () => {
         }
     }, 3500);
 });
+
 
 
 
