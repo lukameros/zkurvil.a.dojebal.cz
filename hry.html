@@ -6,6 +6,64 @@
     <title>Hry</title>
     
     <style>
+.modal-content {
+    background: rgba(20,20,30,0.95);
+    backdrop-filter: blur(20px);
+    border-radius: 20px;
+    padding: 40px;
+    width: 420px;
+    border: 1px solid rgba(255,8,68,.4);
+    box-shadow: 0 30px 80px rgba(0,0,0,.8);
+}
+
+.modal-content h3 {
+    font-family: 'Orbitron', sans-serif;
+    letter-spacing: 3px;
+    margin-bottom: 25px;
+    background: linear-gradient(135deg,#fff,var(--primary-red));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.modal-content input {
+    width: 100%;
+    padding: 14px 18px;
+    margin-bottom: 12px;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,.2);
+    border-radius: 12px;
+    color: #fff;
+    font-weight: 600;
+}
+
+.modal-content input:focus {
+    outline: none;
+    border-color: var(--primary-red);
+    box-shadow: 0 0 15px rgba(255,8,68,.4);
+}
+
+.modal-buttons {
+    display: flex;
+    gap: 12px;
+    margin-top: 20px;
+}
+
+.modal-btn {
+    flex: 1;
+    padding: 14px;
+    border-radius: 12px;
+    border: 1px solid rgba(255,8,68,.6);
+    background: rgba(255,8,68,.25);
+    color: #fff;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.modal-btn.cancel {
+    background: rgba(255,255,255,.06);
+    border-color: rgba(255,255,255,.2);
+}
+
     :root {
     --primary-red: #ff0844;
     --secondary-red: #c20033;
@@ -881,6 +939,7 @@ window.addEventListener('DOMContentLoaded', async function() {
 
 </body>
 </html>
+
 
 
 
