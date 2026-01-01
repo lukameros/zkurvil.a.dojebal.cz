@@ -1313,9 +1313,6 @@ function checkDailyBonus() {
 // ============================================
 // ULOŽENÍ UŽIVATELE
 // ============================================
-// ============================================
-// ULOŽENÍ UŽIVATELE
-// ============================================
 async function saveUser() {
     if (!currentUser.id) return;
     
@@ -1339,11 +1336,11 @@ async function saveUser() {
                 last_daily_bonus: currentUser.lastDailyBonus,
                 owned_themes: currentUser.ownedThemes,
                 active_theme: currentUser.activeTheme,
-                stats: currentUser.stats, // Obsahuje progressiveJackpot
+                stats: currentUser.stats,
                 unlocked_achievements: currentUser.unlockedAchievements,
                 daily_missions: currentUser.dailyMissions,
                 last_mission_reset: currentUser.lastMissionReset,
-                lucky_hours: currentUser.luckyHours || null  // PŘIDÁNO
+                lucky_hours: currentUser.luckyHours || null 
             })
             .eq('id', currentUser.id);
     } catch (e) {
@@ -2030,6 +2027,7 @@ window.addEventListener('load', async () => {
         }
     }, 3500);
 });
+
 
 
 
