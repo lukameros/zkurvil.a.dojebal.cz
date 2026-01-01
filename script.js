@@ -1815,9 +1815,9 @@ function showNotification(message) {
 }
 
 function getLuckyHours() {
-    // Náhodně vygeneruj 2 hodiny pro dnešek
     const today = new Date().toISOString().split('T')[0];
     
+    // ✅ OPRAVA: Generuj nové hodiny POUZE pokud neexistují nebo je nový den
     if (!currentUser.luckyHours || currentUser.luckyHours.date !== today) {
         const hour1 = Math.floor(Math.random() * 24);
         let hour2 = Math.floor(Math.random() * 24);
@@ -1829,7 +1829,10 @@ function getLuckyHours() {
             date: today,
             hours: [hour1, hour2].sort((a, b) => a - b)
         };
+        
+        // ✅ DŮLEŽITÉ: Ulož do DB okamžitě
         saveUser();
+        console.log('🍀 Nové Lucky Hours vygenerovány:', currentUser.luckyHours.hours);
     }
     
     return currentUser.luckyHours.hours;
@@ -2019,6 +2022,7 @@ window.addEventListener('load', async () => {
         }
     }, 3500);
 });
+
 
 
 
