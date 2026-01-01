@@ -7,6 +7,17 @@ const SUPABASE_URL = 'https://bmmaijlbpwgzhrxzxphf.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJtbWFpamxicHdnemhyeHp4cGhmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjY4NjQ5MDcsImV4cCI6MjA4MjQ0MDkwN30.s0YQVnAjMXFu1pSI1NXZ2naSab179N0vQPglsmy3Pgw';
 const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 // ============================================
+// LOGIKA ŠŤASTNÉ HODINY (15:00 a 20:00)
+// ============================================
+function isLuckyHour() {
+    const hour = new Date().getHours();
+    return hour === 15 || hour === 20;
+}
+
+function getLuckyHourMultiplier() {
+    return isLuckyHour() ? 2.0 : 1.0;
+}
+// ============================================
 // LANDSCAPE WARNING PRO MOBILY
 // ============================================
 function checkOrientation() {
@@ -600,15 +611,50 @@ window.spinSlot = async function() {
 // SLOT MACHINE - VYHODNOCENÍ VÝHRY
 // ============================================
 async function evaluateSlotWin(results) {
-    const progressiveWin = checkProgressiveJackpot(results);
     let winAmount = 0;
     let message = '';
     let isWin = false;
     const luckyMultiplier = getLuckyHourMultiplier();
-winAmount = Math.floor(winAmount * luckyMultiplier);
+    
+    // 1. Logika pro 3 stejné symboly
+    if (results[0] === results[1] && results[1] === results[2]) {
+        const multiplier = winMultipliers[results[0]];
+        winAmount = currentBet * multiplier;
+        isWin = true;
+        message = `🎉 VÝHRA! 🎉`;
+    } 
+    // 2. Logika pro 2 stejné symboly
+    else if (results[0] === results[1] || results[1] === results[2] || results[0] === results[2]) {
+        let symbol = (results[0] === results[1]) ? results[0] : (results[1] === results[2] ? results[1] : results[0]);
+        const smallMultiplier = Math.floor(winMultipliers[symbol] * 0.3);
+        winAmount = Math.max(currentBet * smallMultiplier, Math.floor(currentBet * 0.5));
+        isWin = true;
+        message = `💫 Malá výhra! 💫`;
+    }
 
-if (luckyMultiplier > 1) {
-    message += ' 🍀 LUCKY HOUR BONUS!';
+    // 3. Aplikace Šťastné hodiny (násobení 2x)
+    if (isWin && luckyMultiplier > 1) {
+        winAmount = Math.floor(winAmount * luckyMultiplier);
+        message += ` 🍀 LUCKY HOUR 2x!`;
+    }
+
+    // 4. Připsání výhry a zobrazení výsledku
+    const resultElement = document.getElementById('slotResult');
+    if (isWin) {
+        currentUser.coins += winAmount;
+        currentUser.stats.coinsWon += winAmount;
+        resultElement.textContent = `${message} +${winAmount} 🪙`;
+        resultElement.style.color = '#00ffaa';
+    } else {
+        currentUser.stats.currentStreak = 0;
+        resultElement.textContent = 'Zkus to znovu! ❌';
+        resultElement.style.color = '#ff4444';
+    }
+
+    spinning = false;
+    document.getElementById('spinSlotBtn').disabled = false;
+    await saveUser();
+    updateUI();
 }
     
     // KONTROLA 3 STEJNÝCH
@@ -2031,6 +2077,7 @@ window.addEventListener('load', async () => {
         }
     }, 3500);
 });
+
 
 
 
