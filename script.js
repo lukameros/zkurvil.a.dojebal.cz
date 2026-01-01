@@ -354,12 +354,12 @@ const winMultipliers = {
 // WHEEL OF FORTUNE KONFIGURACE
 // ============================================
 const wheelPrizes = [
-    { coins: 0, color: '#666666', weight: 50 },
-    { coins: 5, color: '#ff0080', weight: 20 },
-    { coins: 15, color: '#00ff80', weight: 15 },
-    { coins: 25, color: '#0080ff', weight: 10 },
-    { coins: 50, color: '#ff8000', weight: 4 },
-    { coins: 100, color: '#ffff00', weight: 1 }
+    { coins: 1, color: '#666666', weight: 50 },
+    { coins: 50, color: '#ff0080', weight: 20 },
+    { coins: 75, color: '#00ff80', weight: 15 },
+    { coins: 120, color: '#0080ff', weight: 10 },
+    { coins: 250, color: '#ff8000', weight: 4 },
+    { coins: 500, color: '#ffff00', weight: 1 }
 ];
 
 // ============================================
@@ -842,11 +842,11 @@ function autoRotate(currentTime = 0) {
 // WHEEL OF FORTUNE - SPIN
 // ============================================
 window.spinWheel = async function() {
-    const wheelCost = 10;
+    const wheelCost = 30;
     
     if (wheelSpinning) return;
     if (currentUser.coins < wheelCost) {
-        alert('Nemáte dostatek mincí! Kolo stojí 10 🪙');
+        alert('Nemáte dostatek mincí! Kolo stojí 30 🪙');
         return;
     }
     
@@ -2143,6 +2143,7 @@ autoRotate();
         }
     }, 3500);
 });
+
 
 
 
