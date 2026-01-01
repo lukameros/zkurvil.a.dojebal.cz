@@ -888,18 +888,23 @@ window.spinWheel = async function() {
     if (!selectedPrize) selectedPrize = wheelPrizes[0];
     
     const prizeIndex = wheelPrizes.indexOf(selectedPrize);
-    const slice = 2 * Math.PI / wheelPrizes.length;
-    
-    // ✅ KLÍČOVÁ OPRAVA: Vezmi aktuální rotaci jako start
-    const startRotation = rotation;
-    
-    // ✅ Výpočet: přidej 8 otáček + dojeď na cílový segment
-    const spins = 8; // Počet celých otáček
-    const targetAngle = (3 / 2 * Math.PI - prizeIndex * slice - slice / 2);
-    const fullRotation = spins * 2 * Math.PI;
-    
-    // ✅ Cílová pozice = start + otáčky + cílový úhel
-    const finalRotation = startRotation + fullRotation + targetAngle;
+const slice = 2 * Math.PI / wheelPrizes.length;
+
+const startRotation = rotation;
+
+// ✅ Počítej od aktuální pozice
+const spins = 8;
+const currentNormalized = startRotation % (2 * Math.PI);
+
+// Cílový úhel pro vybraný prize (šipka ukazuje nahoru = 0°)
+// Segments jsou kresleny po směru hodin, takže:
+const targetAngle = -prizeIndex * slice;
+
+// Kolik ještě musíme dorotovat od aktuální pozice
+let rotationNeeded = targetAngle - currentNormalized;
+if (rotationNeeded < 0) rotationNeeded += 2 * Math.PI;
+
+const finalRotation = startRotation + (spins * 2 * Math.PI) + rotationNeeded;
     
     const duration = 7000;
     let startTime = null;
@@ -2117,6 +2122,7 @@ autoRotate();
         }
     }, 3500);
 });
+
 
 
 
