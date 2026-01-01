@@ -2620,6 +2620,17 @@ button, .game-btn, .bet-btn {
     }
 }
 
+@keyframes luckyPulse {
+    0%, 100% { 
+        box-shadow: 0 0 20px rgba(255,215,0,0.8);
+        transform: scale(1);
+    }
+    50% { 
+        box-shadow: 0 0 40px rgba(255,215,0,1);
+        transform: scale(1.05);
+    }
+}
+
 
 
 
