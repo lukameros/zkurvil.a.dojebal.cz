@@ -6,6 +6,7 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
 const SUPABASE_URL = 'https://bmmaijlbpwgzhrxzxphf.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJtbWFpamxicHdnemhyeHp4cGhmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjY4NjQ5MDcsImV4cCI6MjA4MjQ0MDkwN30.s0YQVnAjMXFu1pSI1NXZ2naSab179N0vQPglsmy3Pgw';
 const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
 // ============================================
 // LOGIKA ŠŤASTNÉ HODINY (15:00 a 20:00)
 // ============================================
@@ -17,6 +18,7 @@ function isLuckyHour() {
 function getLuckyHourMultiplier() {
     return isLuckyHour() ? 2.0 : 1.0;
 }
+
 // ============================================
 // LANDSCAPE WARNING PRO MOBILY
 // ============================================
@@ -37,7 +39,6 @@ function checkOrientation() {
     }
 }
 
-// Kontrola při načtení a při otočení
 window.addEventListener('load', checkOrientation);
 window.addEventListener('resize', checkOrientation);
 window.addEventListener('orientationchange', checkOrientation);
@@ -622,6 +623,12 @@ async function evaluateSlotWin(results) {
         winAmount = currentBet * multiplier;
         isWin = true;
         message = `🎉 VÝHRA! 🎉`;
+        
+        // Statistiky pro 3 stejné
+        currentUser.stats.totalWins++;
+        currentUser.stats.currentStreak++;
+        if (results[0] === '🎰') currentUser.stats.jackpots++;
+        if (results[0] === '💎') currentUser.stats.diamondWins++;
     } 
     // 2. Logika pro 2 stejné symboly
     else if (results[0] === results[1] || results[1] === results[2] || results[0] === results[2]) {
@@ -638,7 +645,7 @@ async function evaluateSlotWin(results) {
         message += ` 🍀 LUCKY HOUR 2x!`;
     }
 
-    // 4. Připsání výhry a zobrazení výsledku
+    // 4. Zobrazení výsledku
     const resultElement = document.getElementById('slotResult');
     if (isWin) {
         currentUser.coins += winAmount;
@@ -2077,6 +2084,7 @@ window.addEventListener('load', async () => {
         }
     }, 3500);
 });
+
 
 
 
