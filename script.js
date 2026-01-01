@@ -752,7 +752,7 @@ async function evaluateSlotWin(results) {
     if (spinBtn) {
         spinBtn.disabled = false;
     }
-    
+}    
 // ============================================
 // SLOT MACHINE - NASTAVENÍ SÁZKY
 // ============================================
@@ -2047,6 +2047,7 @@ window.addEventListener('load', async () => {
         }
     }, 3500);
 });
+
 
 
 
