@@ -1829,24 +1829,35 @@ function updateLevelDisplay() {
 }
 
 async function addXP(amount) {
-    if (playerLevel >= 10) return;
+    if (playerLevel >= 10) {
+        console.log('Max level dosažen');
+        return;
+    }
     
     const oldLevel = playerLevel;
     playerXP += amount;
     
-    // ✅ OPRAVENO - level up jen jednou
+    console.log(`💎 Před kontrolou: Level ${playerLevel}, XP ${playerXP}/${xpRequirements[playerLevel]}`);
+    
+    // Level up kontrola
+    let leveledUp = false;
     while (playerLevel < 10 && playerXP >= xpRequirements[playerLevel]) {
         playerLevel++;
+        leveledUp = true;
+        console.log(`🎉 LEVEL UP! Nový level: ${playerLevel}`);
     }
     
     updateLevelDisplay();
+    updateCoinsDisplay();
     
     console.log(`💎 XP přidáno: +${amount} | Level: ${playerLevel} | XP: ${playerXP}`);
+    
+    // Ulož data
     await saveUserData();
     console.log('✅ Data uložena po XP změně');
     
-    // ✅ Zobraz notifikaci JEN JEDNOU na konci všech level upů
-    if (playerLevel > oldLevel) {
+    // Zobraz notifikaci JEN POKUD došlo k level upu
+    if (leveledUp) {
         showLevelUpNotification();
         updateUnlockedItems();
     }
@@ -1859,10 +1870,19 @@ function showLevelUpNotification() {
         <h2>🎉 LEVEL UP! 🎉</h2>
         <p>Dosáhl jsi Level ${playerLevel}!</p>
         <p style="font-size: 20px; margin-top: 10px;">Nové položky odemčeny v shopu! 🛒</p>
-        <button class="menuBtn" onclick="closeLevelUpNotification(this)" style="margin-top: 20px; min-width: 200px;">
-            ✅ Pokračovat
-        </button>
     `;
+    
+    const continueBtn = document.createElement('button');
+    continueBtn.className = 'menuBtn';
+    continueBtn.textContent = '✅ Pokračovat';
+    continueBtn.style.marginTop = '20px';
+    continueBtn.style.minWidth = '200px';
+    continueBtn.onclick = function() {
+        notification.classList.add('hide');
+        setTimeout(() => notification.remove(), 300);
+    };
+    
+    notification.appendChild(continueBtn);
     document.body.appendChild(notification);
     
     playSound('levelup');
@@ -2101,23 +2121,33 @@ async function updateAfterGame(finalScore) {
     const baseCoins = baseCoinsFromScore + 10;
     
     // Happy Hour multiplier na mince
-    const totalCoins = baseCoins * getHappyHourMultiplier();
+    const multiplier = getHappyHourMultiplier();
+    const totalCoins = baseCoins * multiplier;
     
-    const earnedXP = Math.floor(finalScore / 1000) * 10;
+    // XP výpočet
+    const earnedXP = Math.max(10, Math.floor(finalScore / 1000) * 10);
     
     earnedCoinsThisGame = totalCoins;
     playerCoins += totalCoins;
     
+    console.log(`🎮 Hra skončila - Skóre: ${finalScore}`);
+    console.log(`💰 Získané mince: ${totalCoins}${isHappyHour() ? ' (HAPPY HOUR!)' : ''}`);
+    console.log(`⭐ Získané XP: ${earnedXP}`);
+    console.log(`📊 Před XP: Level ${playerLevel}, XP ${playerXP}`);
+    
+    // Přidej XP (volá addXP která ukládá data)
     await addXP(earnedXP);
     
-    console.log(`💰 Získané mince: ${totalCoins}${isHappyHour() ? ' (HAPPY HOUR!)' : ''}, XP: ${earnedXP}`);
-    console.log(`📊 Celkem mincí: ${playerCoins}, Level: ${playerLevel}, XP: ${playerXP}`);
+    console.log(`📊 Po XP: Level ${playerLevel}, XP ${playerXP}`);
+    console.log(`💎 Celkem mincí: ${playerCoins}`);
     
+    // Aktualizuj UI
+    updateCoinsDisplay();
+    updateLevelDisplay();
+    
+    // Ulož do Supabase pokud není guest
     if (!currentUser || currentUser.is_guest) {
-        saveUserData()
-        updateCoinsDisplay()
-        updateLevelDisplay()
-        return earnedXP
+        return earnedXP;
     }
     
     try {
@@ -2125,10 +2155,10 @@ async function updateAfterGame(finalScore) {
             .from('tetris_player_data')
             .select('*')
             .eq('user_id', currentUser.id)
-            .single()
+            .single();
         
-        const newTotalScore = (current?.total_score || 0) + finalScore
-        const newBestScore = Math.max(current?.best_score || 0, finalScore)
+        const newTotalScore = (current?.total_score || 0) + finalScore;
+        const newBestScore = Math.max(current?.best_score || 0, finalScore);
         
         const { error } = await supabase
             .from('tetris_player_data')
@@ -2141,20 +2171,17 @@ async function updateAfterGame(finalScore) {
                 best_score: newBestScore,
                 last_played: new Date().toISOString()
             })
-            .eq('user_id', currentUser.id)
+            .eq('user_id', currentUser.id);
         
-        if (error) throw error
+        if (error) throw error;
         
-        console.log('✅ Data úspěšně uložena do Supabase')
+        console.log('✅ Data úspěšně uložena do Supabase');
         
     } catch (error) {
-        console.error('❌ Chyba při aktualizaci dat:', error)
+        console.error('❌ Chyba při aktualizaci dat:', error);
     }
     
-    await saveUserData()
-    updateCoinsDisplay()
-    updateLevelDisplay()
-    return earnedXP
+    return earnedXP;
 }
 
 window.updateCoinsDisplay = function() {
@@ -3094,6 +3121,7 @@ await loadCurrentUser()
 </script>
 </body>
 </html>
+
 
 
 
