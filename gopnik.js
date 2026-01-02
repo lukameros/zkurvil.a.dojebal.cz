@@ -4,20 +4,23 @@ document.addEventListener("DOMContentLoaded", () => {
   const bgMusic   = document.getElementById("bgMusic");
   const clickSnd  = document.getElementById("clickSnd");
 
-  // MAIN MENU refs
-  const mainMenu      = document.getElementById("mainMenu");
-  const mmPlay        = document.getElementById("mmPlay");
-  const mmShop        = document.getElementById("mmShop");
-  const mmUpgrades    = document.getElementById("mmUpgrades");
-  const mmPrestige    = document.getElementById("mmPrestige");
-  const mmBtnSettings = document.getElementById("mmBtnSettings");
-  const mmBtnClose    = document.getElementById("mmBtnClose");
-
   const settingsModal     = document.getElementById("settingsModal");
   const btnSettings       = document.getElementById("btnSettings");
   const btnCloseSettings  = document.getElementById("btnCloseSettings");
   const musicToggle       = document.getElementById("musicToggle");
   const langSelect        = document.getElementById("langSelect");
+
+  // sidebar nav
+  const navPlay     = document.getElementById("navPlay");
+  const navShop     = document.getElementById("navShop");
+  const navUpgrades = document.getElementById("navUpgrades");
+  const navPrestige = document.getElementById("navPrestige");
+  const navSettings = document.getElementById("navSettings");
+
+  // sidebar stats
+  const moneySideEl = document.getElementById("moneySide");
+  const cpcSideEl   = document.getElementById("cpcSide");
+  const cpsSideEl   = document.getElementById("cpsSide");
 
   const btnCursor = document.getElementById("buyCursor");
   const btnGranny = document.getElementById("buyGranny");
@@ -49,9 +52,9 @@ document.addEventListener("DOMContentLoaded", () => {
   const SP_BONUS_PER_POINT = 0.02; // +2% za point
 
   // Combo
-  const COMBO_WINDOW_MS = 900; // do 0.9s se drží combo
-  const COMBO_ADD = 0.06;      // kolik přidá za rychlý klik
-  const COMBO_MAX = 3.00;      // max combo
+  const COMBO_WINDOW_MS = 900;
+  const COMBO_ADD = 0.06;
+  const COMBO_MAX = 3.00;
 
   // Crit
   const CRIT_CHANCE = 0.10;
@@ -171,7 +174,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // ===== modal helpers =====
   function openSettings(){
     if(!settingsModal) return;
     settingsModal.classList.add("show");
@@ -184,63 +186,31 @@ document.addEventListener("DOMContentLoaded", () => {
     settingsModal.setAttribute("aria-hidden","true");
   }
 
-  // ===== main menu helpers =====
-  function showMainMenu(){
-    if(!mainMenu) return;
-    mainMenu.classList.add("show");
-    mainMenu.setAttribute("aria-hidden","false");
-  }
-  function hideMainMenu(){
-    if(!mainMenu) return;
-    mainMenu.classList.remove("show");
-    mainMenu.setAttribute("aria-hidden","true");
-  }
+  // ===== modal =====
+  btnSettings?.addEventListener("click", openSettings);
+  navSettings?.addEventListener("click", openSettings);
 
-  // ===== modal events =====
-  if(btnSettings){
-    btnSettings.addEventListener("click", openSettings);
-  }
-  if(btnCloseSettings){
-    btnCloseSettings.addEventListener("click", closeSettings);
-  }
-  if(settingsModal){
-    settingsModal.addEventListener("click", (e) => {
-      if(e.target === settingsModal) closeSettings();
-    });
-  }
+  btnCloseSettings?.addEventListener("click", closeSettings);
+  settingsModal?.addEventListener("click", (e) => {
+    if(e.target === settingsModal) closeSettings();
+  });
+
   musicToggle?.addEventListener("change", () => applyMusicEnabled(musicToggle.checked));
   langSelect?.addEventListener("change", () => applyLang(langSelect.value));
 
-  // ===== MAIN MENU events =====
-  mmPlay?.addEventListener("click", () => {
-    hideMainMenu();
+  // ===== nav actions =====
+  navPlay?.addEventListener("click", () => {
+    // jen vizuálně – klidně později dáme highlight
+    gopnikBtn?.scrollIntoView?.({ behavior: "smooth", block: "center" });
   });
-
-  mmBtnSettings?.addEventListener("click", openSettings);
-
-  mmBtnClose?.addEventListener("click", () => {
-    // “X” jen schová menu (uživatel může hrát)
-    hideMainMenu();
+  navShop?.addEventListener("click", () => {
+    document.getElementById("t_shopTitle")?.scrollIntoView?.({ behavior: "smooth", block: "start" });
   });
-
-  // Zatím jen placeholder chování:
-  mmShop?.addEventListener("click", () => {
-    hideMainMenu();
-    // jemný hint: scroll panel do shop části (nemusí být vidět, ale nevadí)
-    const shopTitle = document.getElementById("t_shopTitle");
-    shopTitle?.scrollIntoView?.({ behavior: "smooth", block: "start" });
+  navUpgrades?.addEventListener("click", () => {
+    document.getElementById("t_shopTitle")?.scrollIntoView?.({ behavior: "smooth", block: "start" });
   });
-
-  mmUpgrades?.addEventListener("click", () => {
-    hideMainMenu();
-    const shopTitle = document.getElementById("t_shopTitle");
-    shopTitle?.scrollIntoView?.({ behavior: "smooth", block: "start" });
-  });
-
-  mmPrestige?.addEventListener("click", () => {
-    hideMainMenu();
-    const pTitle = document.getElementById("t_prestigeTitle");
-    pTitle?.scrollIntoView?.({ behavior: "smooth", block: "start" });
+  navPrestige?.addEventListener("click", () => {
+    document.getElementById("t_prestigeTitle")?.scrollIntoView?.({ behavior: "smooth", block: "start" });
   });
 
   // ===== GAME STATE =====
@@ -271,285 +241,4 @@ document.addEventListener("DOMContentLoaded", () => {
   }
   function clickEventMultiplier(){
     if(isEventActive("vodka")) return 1.5;
-    if(isEventActive("raid")) return 2.0;
-    return 1.0;
-  }
-  function cpsEventMultiplier(){
-    if(isEventActive("raid")) return 0.5;
-    return 1.0;
-  }
-  function shopDiscountMultiplier(){
-    if(isEventActive("market")) return 0.70;
-    return 1.0;
-  }
-
-  function effectiveCost(base){
-    return Math.ceil(base * shopDiscountMultiplier());
-  }
-
-  // ===== save/load =====
-  function getSave(){
-    return {
-      version: 2,
-      money, cpc, cps,
-      slavPoints,
-      updatedAt: Date.now()
-    };
-  }
-  function applySave(d){
-    money = d?.money ?? 0;
-    cpc   = d?.cpc ?? 1;
-    cps   = d?.cps ?? 0;
-    slavPoints = d?.slavPoints ?? 0;
-  }
-  function saveGame(){
-    localStorage.setItem("slavClickerSave", JSON.stringify(getSave()));
-  }
-  function loadGame(){
-    const s = localStorage.getItem("slavClickerSave");
-    if(!s) return;
-    try { applySave(JSON.parse(s)); } catch {}
-  }
-
-  // ===== UI helpers =====
-  function renderEventLine(){
-    const tr = t();
-    if(!eventLine) return;
-
-    if(activeEvent && Date.now() >= eventEndsAt){
-      activeEvent = null;
-      eventEndsAt = 0;
-    }
-
-    if(!activeEvent){
-      eventLine.textContent = tr.eventNone;
-      return;
-    }
-
-    const left = Math.max(0, Math.ceil((eventEndsAt - Date.now()) / 1000));
-    let label = tr.eventNone;
-    if(activeEvent === "vodka") label = tr.eventVodka;
-    if(activeEvent === "raid") label = tr.eventRaid;
-    if(activeEvent === "market") label = tr.eventMarket;
-
-    eventLine.textContent = `${label}: ${left}s`;
-  }
-
-  function render(){
-    const prestigeMult = totalPrestigeMultiplier();
-    const cpsMult = prestigeMult * cpsEventMultiplier();
-
-    if(moneyEl) moneyEl.textContent = Math.floor(money);
-
-    const effClick = cpc * prestigeMult * combo * clickEventMultiplier();
-    if(cpcEl) cpcEl.textContent = `${cpc} (≈ ${Math.floor(effClick)})`;
-
-    const effCps = cps * cpsMult;
-    if(cpsEl) cpsEl.textContent = effCps.toFixed(1);
-
-    if(comboEl) comboEl.textContent = `x${combo.toFixed(2)}`;
-    if(critEl) critEl.textContent = `${Math.round(CRIT_CHANCE * 100)}%`;
-    renderEventLine();
-
-    const cCost = effectiveCost(CURSOR_COST);
-    const gCost = effectiveCost(GRANNY_COST);
-    const kCost = effectiveCost(CLICK_COST);
-
-    if(btnCursor){
-      btnCursor.disabled = money < cCost;
-      btnCursor.textContent = `${t().buy} (${cCost})`;
-    }
-    if(btnGranny){
-      btnGranny.disabled = money < gCost;
-      btnGranny.textContent = `${t().buy} (${gCost})`;
-    }
-    if(btnClick){
-      btnClick.disabled = money < kCost;
-      btnClick.textContent = `${t().upgrade} (${kCost})`;
-    }
-
-    const gain = calcPrestigeGain(money);
-    if(spEl) spEl.textContent = String(slavPoints);
-    if(bonusEl) bonusEl.textContent = `+${Math.round((prestigeMult - 1) * 100)}%`;
-    if(spGainEl) spGainEl.textContent = String(gain);
-    if(btnPrestige) btnPrestige.disabled = gain <= 0;
-
-    saveGame();
-  }
-
-  // ===== prestige action =====
-  function doPrestige(){
-    const gain = calcPrestigeGain(money);
-    if(gain <= 0) return;
-
-    const ok = confirm(t().prestigeConfirm(gain));
-    if(!ok) return;
-
-    slavPoints += gain;
-
-    money = 0;
-    cpc = 1;
-    cps = 0;
-
-    combo = 1.0;
-    lastClickAt = 0;
-    activeEvent = null;
-    eventEndsAt = 0;
-
-    render();
-  }
-  btnPrestige?.addEventListener("click", doPrestige);
-
-  // ===== shop =====
-  btnCursor?.addEventListener("click", () => {
-    const cost = effectiveCost(CURSOR_COST);
-    if(money < cost) return;
-    money -= cost;
-    cps += 0.1;
-    render();
-  });
-  btnGranny?.addEventListener("click", () => {
-    const cost = effectiveCost(GRANNY_COST);
-    if(money < cost) return;
-    money -= cost;
-    cps += 1;
-    render();
-  });
-  btnClick?.addEventListener("click", () => {
-    const cost = effectiveCost(CLICK_COST);
-    if(money < cost) return;
-    money -= cost;
-    cpc += 1;
-    render();
-  });
-
-  // ===== combo + click gain =====
-  // ✅ A → B → C → A
-  const imgs = ["gopnik_A.png", "gopnik_B.png", "gopnik_C.png"];
-  let imgIndex = 0;
-
-  function updateComboOnClick(){
-    const now = Date.now();
-    if(lastClickAt && (now - lastClickAt) <= COMBO_WINDOW_MS){
-      combo = Math.min(COMBO_MAX, combo + COMBO_ADD);
-    }else{
-      combo = 1.0;
-    }
-    lastClickAt = now;
-  }
-
-  function rollCrit(){
-    return Math.random() < CRIT_CHANCE;
-  }
-
-  gopnikBtn?.addEventListener("click", () => {
-    if(clickSnd){
-      clickSnd.currentTime = 0;
-      clickSnd.play().catch(()=>{});
-    }
-
-    updateComboOnClick();
-
-    const prestigeMult = totalPrestigeMultiplier();
-    let gain = cpc * prestigeMult * combo * clickEventMultiplier();
-
-    if(rollCrit()){
-      gain *= CRIT_MULT;
-      if(eventLine){
-        const old = eventLine.textContent;
-        eventLine.textContent = `💥 CRIT! +${Math.floor(gain)}`;
-        setTimeout(() => renderEventLine(), 900);
-        setTimeout(() => { if(eventLine && eventLine.textContent === `💥 CRIT! +${Math.floor(gain)}`) eventLine.textContent = old; }, 901);
-      }
-    }
-
-    money += gain;
-
-    imgIndex = (imgIndex + 1) % imgs.length;
-    if(gopnikImg) gopnikImg.src = imgs[imgIndex];
-
-    if(gopnikImg){
-      gopnikImg.style.transform = "scale(1.05)";
-      setTimeout(() => gopnikImg.style.transform = "scale(1)", 80);
-    }
-
-    render();
-  });
-
-  // combo decay
-  setInterval(() => {
-    if(!lastClickAt) return;
-    const idle = Date.now() - lastClickAt;
-    if(idle > COMBO_WINDOW_MS && combo !== 1.0){
-      combo = 1.0;
-      render();
-    }
-  }, 250);
-
-  // passive income
-  setInterval(() => {
-    const prestigeMult = totalPrestigeMultiplier();
-    const gain = cps * prestigeMult * cpsEventMultiplier();
-    money += gain;
-    render();
-  }, 1000);
-
-  // ===== events scheduler =====
-  function scheduleNextEvent(){
-    clearTimeout(nextEventTimer);
-    const delay = EVENT_MIN_MS + Math.random() * (EVENT_MAX_MS - EVENT_MIN_MS);
-    nextEventTimer = setTimeout(startRandomEvent, delay);
-  }
-
-  function startRandomEvent(){
-    if(activeEvent && Date.now() < eventEndsAt){
-      scheduleNextEvent();
-      return;
-    }
-
-    const pool = ["vodka", "raid", "market"];
-    activeEvent = pool[Math.floor(Math.random() * pool.length)];
-
-    let dur = 15;
-    if(activeEvent === "raid") dur = 10;
-    if(activeEvent === "market") dur = 20;
-
-    eventEndsAt = Date.now() + dur * 1000;
-    render();
-
-    setTimeout(() => {
-      if(Date.now() >= eventEndsAt){
-        activeEvent = null;
-        eventEndsAt = 0;
-        render();
-      }
-      scheduleNextEvent();
-    }, (dur + 0.2) * 1000);
-  }
-
-  // ===== init =====
-  const savedMusic = localStorage.getItem("musicEnabled");
-  if(musicToggle){
-    musicToggle.checked = (savedMusic !== "0");
-    if(!musicToggle.checked && bgMusic){
-      bgMusic.pause();
-      bgMusic.currentTime = 0;
-    }
-  }
-
-  if(langSelect) langSelect.value = lang;
-  applyLang(lang);
-
-  loadGame();
-  render();
-
-  // LOADING click => start music + show main menu
-  loading?.addEventListener("click", () => {
-    if(musicToggle?.checked) applyMusicEnabled(true);
-    loading.style.display = "none";
-    showMainMenu();
-  }, { once:true });
-
-  // start event loop
-  scheduleNextEvent();
-});
+    if(isEv
