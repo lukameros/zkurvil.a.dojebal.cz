@@ -1537,12 +1537,11 @@ let playerXP = 0;
 let playerCoins = 0;
 let unlockedThemes = ['classic', 'neon'];
 let unlockedMaps = ['20x10', '18x12'];
-let currentUser = null;
 let totalGamesPlayed = 0;
-
 let activeEvent = null;
 let eventTimeout = null;
 let canRotate = true;
+let currentUser = null;
 
 function updateHappyHourIndicator() {
     const indicator = document.getElementById('happyHourIndicator');
@@ -1719,14 +1718,15 @@ function startPageLoading() {
     }, interval);
     
     setTimeout(() => {
-    document.getElementById('loadingScreen').style.display = 'none';
-    document.getElementById('mainMenu').style.display = 'flex';
-    loadingBar.style.width = '0%';
-    loadingText.textContent = 'Připravuji herní pole...';
-    
-    // Zobraz update modal po 500ms
-    setTimeout(() => showUpdateModal(), 500);
-}, loadingTime);
+        document.getElementById('loadingScreen').style.display = 'none';
+        document.getElementById('mainMenu').style.display = 'flex';
+        loadingBar.style.width = '0%';
+        loadingText.textContent = 'Připravuji herní pole...';
+        
+        // Zobraz update modal po 500ms
+        setTimeout(() => showUpdateModal(), 500);
+    }, loadingTime);
+}
 
 // Spusť loading při načtení stránky
 window.addEventListener('DOMContentLoaded', () => {
@@ -3011,6 +3011,7 @@ await loadCurrentUser()
 </script>
 </body>
 </html>
+
 
 
 
