@@ -622,16 +622,28 @@ function showLevelUpNotification() {
         <h2>🎉 LEVEL UP! 🎉</h2>
         <p>Dosáhl jsi Level ${playerLevel}!</p>
         <p style="font-size: 20px; margin-top: 10px;">Nové položky odemčeny v shopu! 🛒</p>
+
+        <div style="margin-top: 20px; display:flex; gap:12px; justify-content:center; flex-wrap:wrap;">
+            <button class="menuBtn" style="min-width:220px;" onclick="window.goToMenu ? window.goToMenu() : window.backToMainMenu()">
+                ⬅ Zpět do menu
+            </button>
+            <button class="menuBtn" style="min-width:220px;" onclick="this.closest('.level-up-notification').classList.add('hide'); setTimeout(()=>this.closest('.level-up-notification').remove(),300);">
+                ✅ Pokračovat
+            </button>
+        </div>
     `;
     document.body.appendChild(notification);
-    
+
     playSound('levelup');
-    
+
+    // Auto hide po 6s (když to chceš nechat bez auto-hide, smaž tenhle setTimeout)
     setTimeout(() => {
+        if (!notification.isConnected) return;
         notification.classList.add('hide');
         setTimeout(() => notification.remove(), 300);
-    }, 4000);
+    }, 6000);
 }
+
 </script>
 
 <script type="module">
@@ -1301,6 +1313,7 @@ setTimeout(() => {
 </script>
 </body>
 </html>
+
 
 
 
