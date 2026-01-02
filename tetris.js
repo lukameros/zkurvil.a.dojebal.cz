@@ -278,7 +278,6 @@ window.setLanguage = function(lang) {
     alert(lang === 'cs' ? 'Jazyk změněn na češtinu!' : 'Language changed to English!')
 }
 
-// ===== LOADING SCREEN =====
 function startPageLoading() {
     const loadingTime = 3000 + Math.random() * 2000
     const loadingBar = document.getElementById('loadingBar')
@@ -317,11 +316,13 @@ function startPageLoading() {
         document.getElementById('mainMenu').style.display = 'flex'
         loadingBar.style.width = '0%'
         
-        // ✅ OPRAVENO - zobrazení update modalu
-        const hasSeenUpdate = localStorage.getItem('tetris_update_v2.0_seen')
-        if (!hasSeenUpdate) {
-            setTimeout(() => showUpdateModal(), 500)
-        }
+        // ✅ OPRAVENO - zobrazení update modalu AŽ PO zobrazení menu
+        setTimeout(() => {
+            const hasSeenUpdate = localStorage.getItem('tetris_update_v2.0_seen')
+            if (!hasSeenUpdate) {
+                showUpdateModal()
+            }
+        }, 500)
     }, loadingTime)
 }
 
@@ -431,7 +432,11 @@ async function loadCurrentUser() {
 }
 
 async function loadUserData() {
-    if (!currentUser || currentUser.is_guest) return
+    if (!currentUser || currentUser.is_guest) {
+        console.log('👤 Guest režim - načítám lokální data')
+        loadLocalData()
+        return
+    }
     
     console.log('📥 Načítám data pro uživatele:', currentUser.username, 'ID:', currentUser.id)
     
@@ -449,10 +454,18 @@ async function loadUserData() {
             unlockedThemes = data.unlocked_themes || ['classic', 'neon']
             unlockedMaps = data.unlocked_maps || ['20x10', '18x12']
             totalGamesPlayed = data.games_played || 0
-            console.log('✅ Data načtena:', { playerCoins, playerLevel, playerXP, totalGamesPlayed })
-        } else {
+            
+            console.log('✅ Data načtena z Supabase:', { 
+                playerCoins, 
+                playerLevel, 
+                playerXP, 
+                totalGamesPlayed 
+            })
+        } else if (error && error.code === 'PGRST116') {
+            // Uživatel ještě nemá záznam, vytvoříme nový
             console.log('🆕 První spuštění - vytvářím nový záznam')
-            await supabase
+            
+            const { error: insertError } = await supabase
                 .from('tetris_player_data')
                 .insert([{
                     user_id: currentUser.id,
@@ -466,11 +479,20 @@ async function loadUserData() {
                     total_score: 0,
                     best_score: 0
                 }])
+            
+            if (insertError) {
+                console.error('❌ Chyba při vytváření záznamu:', insertError)
+            } else {
+                console.log('✅ Nový záznam vytvořen')
+            }
+        } else {
+            console.error('❌ Chyba při načítání dat:', error)
         }
     } catch (error) {
         console.error('❌ Chyba při načítání dat:', error)
     }
     
+    // ✅ DŮLEŽITÉ - vždy aktualizuj UI po načtení
     updateCoinsDisplay()
     updateLevelDisplay()
     updateUnlockedItems()
@@ -493,7 +515,7 @@ function loadLocalData() {
 }
 
 async function saveUserData() {
-    console.log('💾 Ukládám data...', { playerLevel, playerXP, playerCoins })
+    console.log('💾 Ukládám data...', { playerLevel, playerXP, playerCoins, totalGamesPlayed })
     
     if (!currentUser || currentUser.is_guest) {
         const data = {
@@ -527,12 +549,16 @@ async function saveUserData() {
             .eq('user_id', currentUser.id)
             .select()
         
-        if (error) throw error
+        if (error) {
+            console.error('❌ Chyba při ukládání:', error)
+            throw error
+        }
         
         console.log('✅ Data úspěšně uložena do Supabase:', data)
         
     } catch (error) {
         console.error('❌ Chyba při ukládání dat:', error)
+        alert('⚠️ Nepodařilo se uložit data! Zkus to znovu.')
     }
 }
 
@@ -573,29 +599,35 @@ function updateLevelDisplay() {
 }
 
 async function addXP(amount) {
-    console.log(`⭐ Přidávám ${amount} XP...`)
+    console.log(`⭐ Přidávám ${amount} XP... (aktuálně: ${playerXP})`)
     playerXP += amount
     
     let leveledUp = false
+    
+    // Kontrola level upu
     while (playerLevel < 10 && playerXP >= xpRequirements[playerLevel]) {
         playerLevel++
         leveledUp = true
         console.log(`🎉 LEVEL UP! Nový level: ${playerLevel}`)
     }
     
-    updateLevelDisplay()
-    updateCoinsDisplay()
-    
     console.log(`💎 Po přidání: Level ${playerLevel}, XP ${playerXP}`)
     
-    // ✅ OPRAVENO - ukládání po XP změně
+    // ✅ OPRAVENO - ukládání PŘED zobrazením UI
     await saveUserData()
     console.log('✅ Data uložena po XP změně')
     
+    // Aktualizuj UI
+    updateLevelDisplay()
+    updateCoinsDisplay()
+    
+    // Zobraz level up notifikaci
     if (leveledUp) {
         showLevelUpNotification()
         updateUnlockedItems()
     }
+    
+    return amount
 }
 
 function showLevelUpNotification() {
@@ -1530,3 +1562,4 @@ function startEventSystem() {
 }
 
 console.log('✅ Tetris.js načten')
+
