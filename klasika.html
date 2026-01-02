@@ -570,6 +570,10 @@ function updateLevelDisplay() {
     document.getElementById('xpText').textContent = `${currentProgress} / ${xpNeeded} XP`;
 }
 
+function updateCoinsDisplay() {
+    document.getElementById('coinCount').textContent = playerCoins;
+}
+    
 async function addXP(amount) {
     if (playerLevel >= 10) return amount;
     
@@ -793,10 +797,6 @@ async function updateAfterGame(finalScore) {
     updateCoinsDisplay()
     updateLevelDisplay()
     return earnedXP
-}
-
-window.updateCoinsDisplay = function() {
-    document.getElementById('coinCount').textContent = playerCoins
 }
 
 // Barevná témata
@@ -1236,6 +1236,7 @@ setTimeout(() => {
 </script>
 </body>
 </html>
+
 
 
 
