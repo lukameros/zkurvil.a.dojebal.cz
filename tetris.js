@@ -568,6 +568,11 @@ function getXPForNextLevel(currentLevel) {
     return xpRequirements[currentLevel]
 }
 
+// ✅ NOVÁ FUNKCE pro Magic Play
+window.startMagicPlay = function() {
+    window.startTetris(selectedDifficulty)
+}
+
 function updateLevelDisplay() {
     const levelElement = document.getElementById('playerLevel')
     if (levelElement) {
@@ -1565,5 +1570,6 @@ function startEventSystem() {
 }
 
 console.log('✅ Tetris.js načten')
+
 
 
