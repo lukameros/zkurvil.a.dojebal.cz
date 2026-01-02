@@ -491,6 +491,12 @@ button.menuBtn:active {
 </div>
 
 <script>
+
+function updateCoinsDisplay() {
+    document.getElementById('coinCount').textContent = playerCoins
+}
+
+
 // Načtení nastavení z URL parametrů
 const urlParams = new URLSearchParams(window.location.search);
 const savedDifficulty = urlParams.get('difficulty') || 'medium';
@@ -793,10 +799,6 @@ async function updateAfterGame(finalScore) {
     updateCoinsDisplay()
     updateLevelDisplay()
     return earnedXP
-}
-
-window.updateCoinsDisplay = function() {
-    document.getElementById('coinCount').textContent = playerCoins
 }
 
 // Barevná témata
@@ -1236,6 +1238,7 @@ setTimeout(() => {
 </script>
 </body>
 </html>
+
 
 
 
