@@ -5,54 +5,55 @@ document.addEventListener("DOMContentLoaded", async () => {
   const SUPABASE_URL = 'https://bmmaijlbpwgzhrxzxphf.supabase.co';
   const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJtbWFpamxicHdnemhyeHp4cGhmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjY4NjQ5MDcsImV4cCI6MjA4MjQ0MDkwN30.s0YQVnAjMXFu1pSI1NXZ2naSab179N0vQPglsmy3Pgw';
 
-  const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  const supabase = window.supabase?.createClient?.(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+  // =========================
+  // SAFE HELPERS
+  // =========================
+  const must = (el, name) => {
+    if (!el) console.warn(`Chybí element #${name}`);
+    return el;
+  };
+  const on = (el, ev, fn, opts) => {
+    if (!el) return;
+    el.addEventListener(ev, fn, opts);
+  };
 
   // =========================
   // DOM
   // =========================
-  const loading = document.getElementById("loading");
+  const loading = must(document.getElementById("loading"), "loading");
   const bgMusic = document.getElementById("bgMusic");
   const clickSnd = document.getElementById("clickSnd");
 
   const settingsModal = document.getElementById("settingsModal");
   const btnSettings = document.getElementById("btnSettings");
   const btnCloseSettings = document.getElementById("btnCloseSettings");
-  const musicToggle = document.getElementById("musicToggle");
-  const langSelect = document.getElementById("langSelect");
+  const musicToggle = must(document.getElementById("musicToggle"), "musicToggle");
+  const langSelect = must(document.getElementById("langSelect"), "langSelect");
 
   const cloudStatus = document.getElementById("cloudStatus");
   const cloudHint = document.getElementById("cloudHint");
 
-  const moneyEl = document.getElementById("money");
-  const cpcEl = document.getElementById("cpc");
-  const cpsEl = document.getElementById("cps");
+  const moneyEl = must(document.getElementById("money"), "money");
+  const cpcEl = must(document.getElementById("cpc"), "cpc");
+  const cpsEl = must(document.getElementById("cps"), "cps");
 
   const comboEl = document.getElementById("combo");
   const critEl = document.getElementById("crit");
-  const eventLine = document.getElementById("eventLine");
+  const eventLine = must(document.getElementById("eventLine"), "eventLine");
 
-  const gopnikBtn = document.getElementById("gopnik");
-  const gopnikImg = document.getElementById("gopnikImg");
+  const gopnikBtn = must(document.getElementById("gopnik"), "gopnik");
+  const gopnikImg = must(document.getElementById("gopnikImg"), "gopnikImg");
 
-  const btnCursor = document.getElementById("buyCursor");
-  const btnGranny = document.getElementById("buyGranny");
-  const btnClick = document.getElementById("buyClick");
+  const btnCursor = must(document.getElementById("buyCursor"), "buyCursor");
+  const btnGranny = must(document.getElementById("buyGranny"), "buyGranny");
+  const btnClick = must(document.getElementById("buyClick"), "buyClick");
 
   const spEl = document.getElementById("sp");
   const bonusEl = document.getElementById("bonus");
   const spGainEl = document.getElementById("spGain");
   const btnPrestige = document.getElementById("btnPrestige");
-
-  // ===== SAFE HELPERS =====
-const must = (el, name) => {
-  if(!el) console.warn(`Chybí element #${name}`);
-  return el;
-};
-const on = (el, ev, fn, opts) => {
-  if(!el) return;
-  el.addEventListener(ev, fn, opts);
-};
-
 
   // =========================
   // CONSTANTS
@@ -130,12 +131,38 @@ const on = (el, ev, fn, opts) => {
   let lang = localStorage.getItem("slavLang") || "cs";
   function t(){ return i18n[lang] || i18n.cs; }
 
+  // =========================
+  // GAME STATE
+  // =========================
+  let money = 0, cpc = 1, cps = 0;
+  let slavPoints = 0;
+
+  let combo = 1.0;
+  let lastClickAt = 0;
+
+  let activeEvent = null; // vodka|raid|market|null
+  let eventEndsAt = 0;
+  let nextEventTimer = null;
+
+  // 3 statické obrázky A -> B -> C -> A
+  const imgs = ["gopnik_A.png", "gopnik_B.png", "gopnik_C.png"];
+  let imgIndex = 0;
+
+  // Supabase user (z session)
+  let user = null;
+
+  // =========================
+  // Settings: language + music
+  // =========================
   function applyLang(newLang){
     lang = newLang;
     localStorage.setItem("slavLang", lang);
 
     const tr = t();
-    const setText = (id, txt) => { const x = document.getElementById(id); if(x) x.textContent = txt; };
+    const setText = (id, txt) => {
+      const x = document.getElementById(id);
+      if(x) x.textContent = txt;
+    };
 
     setText("t_startHint", tr.startHint);
     setText("t_moneyLabel", tr.moneyLabel);
@@ -152,7 +179,7 @@ const on = (el, ev, fn, opts) => {
     setText("t_critLabel", tr.crit);
 
     setText("t_prestigeHint", tr.prestigeHint);
-    btnPrestige.textContent = tr.prestigeBtn;
+    if(btnPrestige) btnPrestige.textContent = tr.prestigeBtn;
 
     render();
   }
@@ -171,47 +198,7 @@ const on = (el, ev, fn, opts) => {
   }
 
   // =========================
-  // SETTINGS modal
-  // =========================
-  btnSettings?.addEventListener("click", () => {
-    settingsModal.classList.add("show");
-    settingsModal.setAttribute("aria-hidden","false");
-  });
-  btnCloseSettings?.addEventListener("click", () => {
-    settingsModal.classList.remove("show");
-    settingsModal.setAttribute("aria-hidden","true");
-  });
-  settingsModal?.addEventListener("click", (e) => {
-    if(e.target === settingsModal){
-      settingsModal.classList.remove("show");
-      settingsModal.setAttribute("aria-hidden","true");
-    }
-  });
-
-  musicToggle.addEventListener("change", () => applyMusicEnabled(musicToggle.checked));
-  langSelect.addEventListener("change", () => applyLang(langSelect.value));
-
-  // =========================
-  // GAME STATE
-  // =========================
-  let money = 0, cpc = 1, cps = 0;
-  let slavPoints = 0;
-
-  let combo = 1.0;
-  let lastClickAt = 0;
-
-  let activeEvent = null; // vodka|raid|market|null
-  let eventEndsAt = 0;
-  let nextEventTimer = null;
-
-  const imgs = ["gopnik_A.png", "gopnik_B.png"];
-  let imgIndex = 0;
-
-  // Supabase user (z session)
-  let user = null;
-
-  // =========================
-  // Helpers
+  // Prestige + multipliers
   // =========================
   function prestigeMult(){ return 1 + slavPoints * SP_BONUS_PER_POINT; }
   function calcPrestigeGain(currentMoney){
@@ -219,6 +206,19 @@ const on = (el, ev, fn, opts) => {
     return Math.floor(Math.sqrt(currentMoney / PRESTIGE_MIN));
   }
 
+  // Combo
+  function updateComboOnClick(){
+    const now = Date.now();
+    if(lastClickAt && (now - lastClickAt) <= COMBO_WINDOW_MS){
+      combo = Math.min(COMBO_MAX, combo + COMBO_ADD);
+    }else{
+      combo = 1.0;
+    }
+    lastClickAt = now;
+  }
+  function rollCrit(){ return Math.random() < CRIT_CHANCE; }
+
+  // Events multipliers
   function isEventActive(name){
     return activeEvent === name && Date.now() < eventEndsAt;
   }
@@ -238,17 +238,6 @@ const on = (el, ev, fn, opts) => {
   function effectiveCost(base){
     return Math.ceil(base * shopDiscountMultiplier());
   }
-
-  function updateComboOnClick(){
-    const now = Date.now();
-    if(lastClickAt && (now - lastClickAt) <= COMBO_WINDOW_MS){
-      combo = Math.min(COMBO_MAX, combo + COMBO_ADD);
-    }else{
-      combo = 1.0;
-    }
-    lastClickAt = now;
-  }
-  function rollCrit(){ return Math.random() < CRIT_CHANCE; }
 
   // =========================
   // SAVE local + cloud
@@ -272,7 +261,7 @@ const on = (el, ev, fn, opts) => {
   }
 
   async function loadCloud(){
-    if(!user) return null;
+    if(!user || !supabase) return null;
     const { data, error } = await supabase
       .from("saves")
       .select("data")
@@ -284,18 +273,18 @@ const on = (el, ev, fn, opts) => {
   }
 
   async function saveCloudNow(){
-    if(!user) return;
+    if(!user || !supabase) return;
     const payload = getSave();
     const { error } = await supabase
       .from("saves")
       .upsert({ user_id: user.id, data: payload }, { onConflict: "user_id" });
 
     if(error){
-      cloudStatus.textContent = "chyba";
-      cloudHint.textContent = "Cloud save chyba: " + error.message;
+      if(cloudStatus) cloudStatus.textContent = "chyba";
+      if(cloudHint) cloudHint.textContent = "Cloud save chyba: " + error.message;
     }else{
-      cloudStatus.textContent = "online";
-      cloudHint.textContent = "Uloženo do cloudu (" + new Date().toLocaleTimeString() + ")";
+      if(cloudStatus) cloudStatus.textContent = "online";
+      if(cloudHint) cloudHint.textContent = "Uloženo do cloudu (" + new Date().toLocaleTimeString() + ")";
     }
   }
 
@@ -328,7 +317,7 @@ const on = (el, ev, fn, opts) => {
     }
 
     if(!activeEvent){
-      eventLine.textContent = tr.eventNone;
+      if(eventLine) eventLine.textContent = tr.eventNone;
       return;
     }
 
@@ -338,57 +327,83 @@ const on = (el, ev, fn, opts) => {
     if(activeEvent === "raid") label = tr.eventRaid;
     if(activeEvent === "market") label = tr.eventMarket;
 
-    eventLine.textContent = `${label}: ${left}s`;
+    if(eventLine) eventLine.textContent = `${label}: ${left}s`;
   }
 
   function render(){
     const pm = prestigeMult();
     const cpsMult = pm * cpsEventMultiplier();
 
-    moneyEl.textContent = Math.floor(money);
+    if(moneyEl) moneyEl.textContent = String(Math.floor(money));
 
     const effClick = cpc * pm * combo * clickEventMultiplier();
-    cpcEl.textContent = `${Math.floor(effClick)}`;
+    if(cpcEl) cpcEl.textContent = `${Math.floor(effClick)}`;
+    if(cpsEl) cpsEl.textContent = (cps * cpsMult).toFixed(1);
 
-    cpsEl.textContent = (cps * cpsMult).toFixed(1);
-
-    comboEl.textContent = `x${combo.toFixed(2)}`;
-    critEl.textContent = `${Math.round(CRIT_CHANCE * 100)}%`;
+    if(comboEl) comboEl.textContent = `x${combo.toFixed(2)}`;
+    if(critEl) critEl.textContent = `${Math.round(CRIT_CHANCE * 100)}%`;
     renderEventLine();
 
     const cCost = effectiveCost(CURSOR_COST);
     const gCost = effectiveCost(GRANNY_COST);
     const kCost = effectiveCost(CLICK_COST);
 
-    btnCursor.disabled = money < cCost;
-    btnGranny.disabled = money < gCost;
-    btnClick.disabled  = money < kCost;
+    if(btnCursor) btnCursor.disabled = money < cCost;
+    if(btnGranny) btnGranny.disabled = money < gCost;
+    if(btnClick)  btnClick.disabled  = money < kCost;
 
-    btnCursor.textContent = `${t().buy} (${cCost})`;
-    btnGranny.textContent = `${t().buy} (${gCost})`;
-    btnClick.textContent  = `${t().upgrade} (${kCost})`;
+    if(btnCursor) btnCursor.textContent = `${t().buy} (${cCost})`;
+    if(btnGranny) btnGranny.textContent = `${t().buy} (${gCost})`;
+    if(btnClick)  btnClick.textContent  = `${t().upgrade} (${kCost})`;
 
     const gain = calcPrestigeGain(money);
-    spEl.textContent = String(slavPoints);
-    bonusEl.textContent = `+${Math.round((pm - 1) * 100)}%`;
-    spGainEl.textContent = String(gain);
-    btnPrestige.disabled = gain <= 0;
+    if(spEl) spEl.textContent = String(slavPoints);
+    if(bonusEl) bonusEl.textContent = `+${Math.round((pm - 1) * 100)}%`;
+    if(spGainEl) spGainEl.textContent = String(gain);
+    if(btnPrestige) btnPrestige.disabled = gain <= 0;
 
     saveLocal();
     scheduleCloudSave();
   }
 
   // =========================
-  // Prestige
+  // SETTINGS modal (safe)
   // =========================
-  on(btnPrestige, "click", () => { ... });
+  on(btnSettings, "click", () => {
+    if(!settingsModal) return;
+    settingsModal.classList.add("show");
+    settingsModal.setAttribute("aria-hidden","false");
+  });
+
+  on(btnCloseSettings, "click", () => {
+    if(!settingsModal) return;
+    settingsModal.classList.remove("show");
+    settingsModal.setAttribute("aria-hidden","true");
+  });
+
+  on(settingsModal, "click", (e) => {
+    if(e.target === settingsModal){
+      settingsModal.classList.remove("show");
+      settingsModal.setAttribute("aria-hidden","true");
+    }
+  });
+
+  on(musicToggle, "change", () => applyMusicEnabled(!!musicToggle?.checked));
+  on(langSelect, "change", () => applyLang(langSelect?.value || "cs"));
+
+  // =========================
+  // Prestige (FIX)
+  // =========================
+  on(btnPrestige, "click", () => {
     const gain = calcPrestigeGain(money);
     if(gain <= 0) return;
 
     if(!confirm(t().prestigeConfirm(gain))) return;
 
     slavPoints += gain;
-    money = 0; cpc = 1; cps = 0;
+    money = 0;
+    cpc = 1;
+    cps = 0;
 
     combo = 1.0;
     lastClickAt = 0;
@@ -400,9 +415,9 @@ const on = (el, ev, fn, opts) => {
   });
 
   // =========================
-  // Shop
+  // Shop (safe)
   // =========================
-  btnCursor.addEventListener("click", () => {
+  on(btnCursor, "click", () => {
     const cost = effectiveCost(CURSOR_COST);
     if(money < cost) return;
     money -= cost;
@@ -410,7 +425,7 @@ const on = (el, ev, fn, opts) => {
     render();
   });
 
-  btnGranny.addEventListener("click", () => {
+  on(btnGranny, "click", () => {
     const cost = effectiveCost(GRANNY_COST);
     if(money < cost) return;
     money -= cost;
@@ -418,7 +433,7 @@ const on = (el, ev, fn, opts) => {
     render();
   });
 
-  btnClick.addEventListener("click", () => {
+  on(btnClick, "click", () => {
     const cost = effectiveCost(CLICK_COST);
     if(money < cost) return;
     money -= cost;
@@ -427,9 +442,9 @@ const on = (el, ev, fn, opts) => {
   });
 
   // =========================
-  // Click = combo + crit
+  // Click = combo + crit + A/B/C image toggle
   // =========================
-  gopnikBtn.addEventListener("click", () => {
+  on(gopnikBtn, "click", () => {
     if(clickSnd){
       clickSnd.currentTime = 0;
       clickSnd.play().catch(()=>{});
@@ -441,17 +456,21 @@ const on = (el, ev, fn, opts) => {
 
     if(rollCrit()){
       gain *= CRIT_MULT;
-      const old = eventLine.textContent;
-      eventLine.textContent = `💥 CRIT! +${Math.floor(gain)}`;
-      setTimeout(() => renderEventLine(), 900);
+      if(eventLine){
+        eventLine.textContent = `💥 CRIT! +${Math.floor(gain)}`;
+        setTimeout(() => renderEventLine(), 900);
+      }
     }
 
     money += gain;
 
+    // A -> B -> C -> A
     imgIndex = (imgIndex + 1) % imgs.length;
-    gopnikImg.src = imgs[imgIndex];
-    gopnikImg.style.transform = "scale(1.05)";
-    setTimeout(() => gopnikImg.style.transform = "scale(1)", 80);
+    if(gopnikImg){
+      gopnikImg.src = imgs[imgIndex];
+      gopnikImg.style.transform = "scale(1.05)";
+      setTimeout(() => { if(gopnikImg) gopnikImg.style.transform = "scale(1)"; }, 80);
+    }
 
     render();
   });
@@ -509,58 +528,62 @@ const on = (el, ev, fn, opts) => {
   // =========================
   // Loading click (music start)
   // =========================
-  loading.addEventListener("click", () => {
-    if(musicToggle.checked) applyMusicEnabled(true);
-    loading.style.display = "none";
+  on(loading, "click", () => {
+    if(musicToggle?.checked) applyMusicEnabled(true);
+    if(loading) loading.style.display = "none";
   }, { once:true });
-
-  // =========================
-  // INIT: settings
-  // =========================
-  const savedMusic = localStorage.getItem("musicEnabled");
-  musicToggle.checked = (savedMusic !== "0");
-
-  if(langSelect) langSelect.value = lang;
-  applyLang(lang);
-
-  // apply local save first
-  const local = loadLocal();
-  if(local) applySave(local);
 
   // =========================
   // AUTO SESSION (z hry.html)
   // =========================
   async function refreshSession(){
+    if(!supabase){
+      if(cloudStatus) cloudStatus.textContent = "offline";
+      if(cloudHint) cloudHint.textContent = "Supabase není načtené (chybí script supabase-js?).";
+      user = null;
+      return;
+    }
+
     const { data } = await supabase.auth.getSession();
     user = data?.session?.user ?? null;
 
     if(user){
-      cloudStatus.textContent = "online";
-      cloudHint.textContent = "Přihlášen automaticky: " + (user.email || "OK");
+      if(cloudStatus) cloudStatus.textContent = "online";
+      if(cloudHint) cloudHint.textContent = "Přihlášen automaticky: " + (user.email || "OK");
     }else{
-      cloudStatus.textContent = "offline";
-      cloudHint.textContent = "Nepřihlášen (login je v hry.html).";
+      if(cloudStatus) cloudStatus.textContent = "offline";
+      if(cloudHint) cloudHint.textContent = "Nepřihlášen (login je v hry.html).";
     }
   }
-
-  // když se session změní (login/logout v jiné stránce / tab)
-  supabase.auth.onAuthStateChange(async (_event, session) => {
-    user = session?.user ?? null;
-    await initBestSaveFromCloud();
-  });
 
   async function initBestSaveFromCloud(){
     await refreshSession();
     if(user){
       const best = await resolveBestSave();
-      if(best){
-        applySave(best);
-      }
-      // sjednocení
+      if(best) applySave(best);
       await saveCloudNow().catch(()=>{});
     }
     render();
   }
+
+  if(supabase?.auth?.onAuthStateChange){
+    supabase.auth.onAuthStateChange(async (_event, session) => {
+      user = session?.user ?? null;
+      await initBestSaveFromCloud();
+    });
+  }
+
+  // =========================
+  // INIT: settings + local save
+  // =========================
+  const savedMusic = localStorage.getItem("musicEnabled");
+  if(musicToggle) musicToggle.checked = (savedMusic !== "0");
+
+  if(langSelect) langSelect.value = lang;
+  applyLang(lang);
+
+  const local = loadLocal();
+  if(local) applySave(local);
 
   // start
   render();
@@ -575,4 +598,3 @@ const on = (el, ev, fn, opts) => {
     }
   });
 });
-
