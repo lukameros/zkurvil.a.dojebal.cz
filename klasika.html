@@ -1228,6 +1228,24 @@ async function gameOver() {
     document.getElementById('nameModal').style.display = 'flex'
 }
 
+async function loadCurrentUser() {
+    const { data, error } = await supabase.auth.getUser()
+
+    if (data && data.user) {
+        currentUser = {
+            id: data.user.id,
+            username: data.user.user_metadata?.username || data.user.email,
+            is_guest: false
+        }
+        await loadUserData()
+    } else {
+        currentUser = { is_guest: true }
+        loadLocalData()
+    }
+
+    window.currentUser = currentUser
+}
+
 // Inicializace
 await loadCurrentUser()
 
@@ -1238,6 +1256,7 @@ setTimeout(() => {
 </script>
 </body>
 </html>
+
 
 
 
