@@ -896,6 +896,10 @@ window.startTetris = function(difficulty) {
     holdPiece = null
     earnedCoinsThisGame = 0
     activeEvent = null
+    canRotate = true  // ✅ PŘIDÁNO - reset rotace
+    
+    // ✅ OPRAVENO - nastavení difficulty
+    selectedDifficulty = difficulty
     
     dropInterval = difficulty === 'easy' ? 800 : 
                    difficulty === 'medium' ? 600 : 
@@ -912,7 +916,6 @@ window.startTetris = function(difficulty) {
         setTimeout(() => showHappyHourNotification(), 1000)
     }
 }
-
 function randomTetromino() {
     const index = Math.floor(Math.random() * shapes.length)
     return {
@@ -1562,4 +1565,5 @@ function startEventSystem() {
 }
 
 console.log('✅ Tetris.js načten')
+
 
