@@ -47,6 +47,39 @@
     text-shadow: 0 0 10px rgba(0, 0, 0, 0.8);
 }
 
+/* Update modal overlay */
+.modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.85);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 9998;
+}
+
+/* Tlačítko v update modalu ve stylu hry */
+.modal-close {
+    margin-top: 15px;
+    padding: 16px 48px;
+    font-size: 18px;
+    border: 2px solid #00ffff;
+    border-radius: 12px;
+    cursor: pointer;
+    font-weight: bold;
+    background: linear-gradient(135deg, rgba(0, 100, 200, 0.4), rgba(100, 0, 200, 0.4));
+    color: white;
+    box-shadow: 0 0 20px rgba(0, 255, 255, 0.4);
+    transition: all 0.3s;
+    width: 100%;
+}
+
+.modal-close:hover {
+    transform: scale(1.05) translateY(-2px);
+    box-shadow: 0 0 35px rgba(0, 255, 255, 0.8);
+    background: linear-gradient(135deg, rgba(0, 150, 255, 0.6), rgba(150, 0, 255, 0.6));
+}
+
 .event-timer {
     position: fixed;
     top: 80px;
@@ -1560,6 +1593,7 @@ function startPageLoading() {
         document.getElementById('mainMenu').style.display = 'flex';
         loadingBar.style.width = '0%';
         loadingText.textContent = 'Připravuji herní pole...';
+     showUpdateModal();
     }, loadingTime);
 }
 
@@ -1635,47 +1669,81 @@ function showLevelUpNotification() {
         <h2>🎉 LEVEL UP! 🎉</h2>
         <p>Dosáhl jsi Level ${playerLevel}!</p>
         <p style="font-size: 20px; margin-top: 10px;">Nové položky odemčeny v shopu! 🛒</p>
+
+        <div style="margin-top: 20px; display:flex; gap:12px; justify-content:center; flex-wrap:wrap;">
+            <button class="menuBtn" style="min-width:220px;" onclick="window.goToMenu ? window.goToMenu() : window.backToMainMenu()">
+                ⬅ Zpět do menu
+            </button>
+            <button class="menuBtn" style="min-width:220px;" onclick="this.closest('.level-up-notification').classList.add('hide'); setTimeout(()=>this.closest('.level-up-notification').remove(),300);">
+                ✅ Pokračovat
+            </button>
+        </div>
     `;
     document.body.appendChild(notification);
-    
+
     playSound('levelup');
-    
+
+    // Auto hide po 6s (když to chceš nechat bez auto-hide, smaž tenhle setTimeout)
     setTimeout(() => {
+        if (!notification.isConnected) return;
         notification.classList.add('hide');
         setTimeout(() => notification.remove(), 300);
-    }, 4000);
+    }, 6000);
+}
+
+
+const UPDATE_MODAL_VERSION = "1"; 
+// když někdy změníš obsah modalu, zvedni verzi na "2" a ukáže se znovu všem.
+
+function closeUpdateModal() {
+    const modal = document.getElementById('updateModalContainer');
+    if (modal) modal.remove();
+    localStorage.setItem(`tetris_seen_update_${UPDATE_MODAL_VERSION}`, "1");
 }
 
 function showUpdateModal() {
-    if (!hasSeenUpdateModal) {
-        setTimeout(() => {
-            const modal = document.createElement('div');
-            modal.className = 'modal';
-            modal.id = 'updateModalContainer';
-            modal.style.display = 'flex';
-            modal.innerHTML = `
-                <div class="modal-content">
-                    <h2>🎉 NOVÁ AKTUALIZACE! 🎉</h2>
-                    <div style="color: #fff; font-size: 18px; text-align: left; margin: 20px 0;">
-                        <p style="margin: 10px 0;">✨ <strong>Nové funkce:</strong></p>
-                        <ul style="margin-left: 20px; line-height: 1.8;">
-                            <li>🎰 Výhry i se 2 stejnými symboly!</li>
-                            <li>🏆 20+ nových úspěchů</li>
-                            <li>📋 15 denních úkolů</li>
-                            <li>🎨 Vylepšené téma mění celou hru</li>
-                            <li>💰 Denní bonus 300 mincí každých 12h</li>
-                        </ul>
-                        <p style="margin: 15px 0; font-size: 16px; color: #00ffaa; text-align: center; padding: 10px; background: rgba(0,255,170,0.1); border-radius: 10px;">
-                            🎮 Hra je 100% ZDARMA, bez mikrotransakcí<br>
-                            👶 Vhodné pro hráče od 10 let
-                        </p>
-                    </div>
-                    <button class="modal-close" onclick="closeUpdateModal()">SUPER! ZAČNĚME HRÁT! 🎰</button>
+    const seen = localStorage.getItem(`tetris_seen_update_${UPDATE_MODAL_VERSION}`);
+    if (seen === "1") return; // ✅ už viděl, neukazuj
+
+    setTimeout(() => {
+        // kdyby se to mezitím nastavilo, znovu zkontroluj
+        const seen2 = localStorage.getItem(`tetris_seen_update_${UPDATE_MODAL_VERSION}`);
+        if (seen2 === "1") return;
+
+        const modal = document.createElement('div');
+        modal.className = 'modal';
+        modal.id = 'updateModalContainer';
+        modal.style.display = 'flex';
+
+        modal.innerHTML = `
+            <div class="modal-content">
+                <h2>🎉 NOVÁ AKTUALIZACE! 🎉</h2>
+
+                <div style="color:#fff; font-size:18px; text-align:left; margin:20px 0;">
+                    <p style="margin:10px 0;">✨ <strong>Nové funkce:</strong></p>
+                    <ul style="margin-left:20px; line-height:1.8;">
+                        <li>🎰 Výhry i se 2 stejnými symboly!</li>
+                        <li>🏆 20+ nových úspěchů</li>
+                        <li>📋 15 denních úkolů</li>
+                        <li>🎨 Vylepšené téma mění celou hru</li>
+                        <li>💰 Denní bonus 300 mincí každých 12h</li>
+                    </ul>
+
+                    <p style="margin:15px 0; font-size:16px; color:#00ffaa; text-align:center; padding:10px; background: rgba(0,255,170,0.1); border-radius:10px;">
+                        🎮 Hra je 100% ZDARMA, bez mikrotransakcí<br>
+                        👶 Vhodné pro hráče od 10 let
+                    </p>
                 </div>
-            `;
-            document.body.appendChild(modal);
-        }, 3500);
-    }
+
+                <button class="modal-close" onclick="closeUpdateModal()">
+                    SUPER! ZAČNĚME HRÁT! 🎮
+                </button>
+            </div>
+        `;
+        document.body.appendChild(modal);
+    }, 3500);
+}
+
 } 
  
 </script>
@@ -2798,4 +2866,5 @@ await loadCurrentUser()
 </script>
 </body>
 </html>
+
 
