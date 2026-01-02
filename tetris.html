@@ -1566,6 +1566,9 @@ body {
 </div>
 
 <script>
+// ========================================
+// GLOBÁLNÍ PROMĚNNÉ - NA ZAČÁTEK
+// ========================================
 let selectedDifficulty = 'medium';
 let mapRows = 20;
 let mapCols = 10;
@@ -1601,6 +1604,15 @@ let currentUser = null;
 let backgroundMusic = null;
 let isMusicPlaying = false;
 
+// Nastavení
+let soundEnabled = true;
+let currentLanguage = 'cs';
+
+// ========================================
+// HAPPY HOURS SYSTÉM
+// ========================================
+const HAPPY_HOURS = [15, 20];
+
 function updateHappyHourIndicator() {
     const indicator = document.getElementById('happyHourIndicator');
     if (!indicator) return;
@@ -1620,23 +1632,10 @@ function updateHappyHourIndicator() {
         indicator.textContent = `⏰ Play Hour v ${next}`;
     }
 }
-// Aktualizuj indikátor každou minutu
-setInterval(updateHappyHourIndicator, 60000);
-
-// Happy Hours system
-const HAPPY_HOURS = [15, 20]; // 15:00 a 20:00
-
-// ✅ OPRAVENO - spusť jen JEDNOU
-window.addEventListener('DOMContentLoaded', () => {
-    updateHappyHourIndicator();
-    loadSettings();
-    startPageLoading(); // Volá se JEN TADY
-});
 
 function isHappyHour() {
     const now = new Date();
     const hour = now.getHours();
-    // Zobrazí se od 15:00 do 15:59 a od 20:00 do 20:59
     return hour === 15 || hour === 20;
 }
 
@@ -1663,39 +1662,16 @@ function showHappyHourNotification() {
     }, 5000);
 }
 
-// Kontrola Happy Hour každou minutu
-setInterval(() => {
-    const now = new Date();
-    if (now.getMinutes() === 0 && isHappyHour()) {
-        showHappyHourNotification();
-    }
-}, 60000);
-
-// Nastavení
-let soundEnabled = true;
-let currentLanguage = 'cs';
-
-// Načti nastavení
-function loadSettings() {
-    soundEnabled = localStorage.getItem('tetris_sound') !== 'false';
-    currentLanguage = localStorage.getItem('tetris_language') || 'cs';
-    updateSettingsUI();
-}
-
 // ========================================
 // HUDEBNÍ SYSTÉM
 // ========================================
 function initBackgroundMusic() {
     if (!soundEnabled) return;
     
-    // Vytvoř hudbu pomocí Web Audio API
     const audioContext = new (window.AudioContext || window.webkitAudioContext)();
     
-    // Jednoduché melodie pro Tetris
     const melodies = [
-        // Tetris Theme A (zjednodušeno)
         [659, 494, 523, 587, 523, 494, 440, 440, 523, 659, 587, 523, 494, 494, 523, 587, 659, 523, 440, 440],
-        // Tetris Theme B
         [587, 494, 523, 440, 392, 392, 440, 523, 494, 440, 392, 440, 523, 587, 659, 523, 440, 392, 392, 440]
     ];
     
@@ -1726,15 +1702,14 @@ function initBackgroundMusic() {
             gainNode.connect(audioContext.destination);
             
             oscillator.frequency.value = frequency;
-            oscillator.type = 'square'; // Retro zvuk
-            gainNode.gain.value = 0.05; // Tichá hudba na pozadí
+            oscillator.type = 'square';
+            gainNode.gain.value = 0.05;
             
             oscillator.start(audioContext.currentTime);
             oscillator.stop(audioContext.currentTime + 0.3);
             
             currentNote = (currentNote + 1) % melody.length;
             
-            // Změň melodii po dokončení
             if (currentNote === 0) {
                 currentMelody = (currentMelody + 1) % melodies.length;
             }
@@ -1750,12 +1725,15 @@ function initBackgroundMusic() {
     };
 }
 
-// Spusť hudbu při startu hry
-window.addEventListener('DOMContentLoaded', () => {
-    initBackgroundMusic();
-});
- 
-// Aktualizuj UI tlačítek
+// ========================================
+// NASTAVENÍ
+// ========================================
+function loadSettings() {
+    soundEnabled = localStorage.getItem('tetris_sound') !== 'false';
+    currentLanguage = localStorage.getItem('tetris_language') || 'cs';
+    updateSettingsUI();
+}
+
 function updateSettingsUI() {
     const soundOnBtn = document.getElementById('soundOn');
     const soundOffBtn = document.getElementById('soundOff');
@@ -1802,7 +1780,6 @@ window.setSoundEnabled = function(enabled) {
     localStorage.setItem('tetris_sound', enabled);
     updateSettingsUI();
     
-    // Zahraj testovací zvuk
     if (enabled) {
         playSound('rotate');
     }
@@ -1813,11 +1790,13 @@ window.setLanguage = function(lang) {
     localStorage.setItem('tetris_language', lang);
     updateSettingsUI();
     alert(lang === 'cs' ? 'Jazyk změněn na češtinu!' : 'Language changed to English!');
-    // Tady později můžeš přeložit celé UI
 }
- 
+
+// ========================================
+// LOADING & MODALS
+// ========================================
 function startPageLoading() {
-    const loadingTime = 3000 + Math.random() * 2000; // Zkráceno na 3-5s
+    const loadingTime = 3000 + Math.random() * 2000;
     const loadingBar = document.getElementById('loadingBar');
     const loadingText = document.getElementById('loadingText');
     
@@ -1854,7 +1833,6 @@ function startPageLoading() {
         document.getElementById('mainMenu').style.display = 'flex';
         loadingBar.style.width = '0%';
         
-        // ✅ OPRAVENO - zobraz modal jen JEDNOU
         const hasSeenUpdate = localStorage.getItem('tetris_update_v2.0_seen');
         if (!hasSeenUpdate) {
             setTimeout(() => showUpdateModal(), 500);
@@ -1862,18 +1840,81 @@ function startPageLoading() {
     }, loadingTime);
 }
 
-// XP requirements for each level (progresivní)
+function showUpdateModal() {
+    const hasSeenUpdate = localStorage.getItem('tetris_update_v2.0_seen');
+    if (hasSeenUpdate) return;
+    
+    const modal = document.createElement('div');
+    modal.id = 'updateModal';
+    modal.style.cssText = `
+        display: flex;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.9);
+        justify-content: center;
+        align-items: center;
+        z-index: 10000;
+    `;
+    
+    modal.innerHTML = `
+        <div style="
+            background: linear-gradient(135deg, #1a1a2e, #2a2a4e);
+            padding: 40px;
+            border-radius: 20px;
+            border: 3px solid #00ffff;
+            box-shadow: 0 0 60px rgba(0, 255, 255, 0.6);
+            max-width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            text-align: center;
+            animation: fadeIn 0.5s ease-in;
+        ">
+            <h2 style="font-size: 36px; color: #00ffff; text-shadow: 0 0 20px #00ffff; margin-bottom: 20px;">
+                🎉 NOVÁ AKTUALIZACE! 🎉
+            </h2>
+            
+            <div style="text-align: left; margin: 20px 0; font-size: 16px; line-height: 1.8;">
+                <p style="color: #00ffff; font-weight: bold; margin-bottom: 15px;">✨ Co je nového:</p>
+                <ul style="color: #fff; margin-left: 25px;">
+                    <li>🎵 <strong>Hudba na pozadí</strong> - retro Tetris melodie!</li>
+                    <li>🎨 <strong>Pokročilé téma efekty</strong> - hvězdy, animace, třpyt!</li>
+                    <li>⚡ <strong>4 power-upy</strong> - Slow Time, Clear Bottom, Perfect Drop...</li>
+                    <li>🎊 <strong>Happy Hours</strong> - 2× skóre a mince v 15:00 a 20:00!</li>
+                    <li>⭐ <strong>Level systém</strong> - získávej XP a odemykej obsah</li>
+                    <li>🏆 <strong>Online žebříček</strong> - konkuruj ostatním!</li>
+                </ul>
+            </div>
+            
+            <button onclick="closeUpdateModal()" class="menuBtn" style="
+                margin-top: 20px;
+                font-size: 20px;
+                padding: 12px 40px;
+            ">
+                🚀 ZAČÍT HRÁT! 🚀
+            </button>
+        </div>
+    `;
+    
+    document.body.appendChild(modal);
+}
+
+window.closeUpdateModal = function() {
+    localStorage.setItem('tetris_update_v2.0_seen', 'true');
+    const modal = document.getElementById('updateModal');
+    if (modal) {
+        modal.style.animation = 'fadeOut 0.3s ease-out';
+        setTimeout(() => modal.remove(), 300);
+    }
+}
+
+// ========================================
+// LEVEL SYSTÉM
+// ========================================
 const xpRequirements = [
-    0,    // Level 1
-    50,   // Level 2
-    150,  // Level 3 (50 + 100)
-    300,  // Level 4 (150 + 150)
-    500,  // Level 5 (300 + 200)
-    750,  // Level 6 (500 + 250)
-    1050, // Level 7 (750 + 300)
-    1400, // Level 8 (1050 + 350)
-    1800, // Level 9 (1400 + 400)
-    2250  // Level 10 (1800 + 450)
+    0, 50, 150, 300, 500, 750, 1050, 1400, 1800, 2250
 ];
 
 function getXPForNextLevel(currentLevel) {
@@ -1905,10 +1946,12 @@ function updateLevelDisplay() {
     
     if (xpBar) xpBar.style.width = percentage + '%';
     if (xpText) xpText.textContent = `${currentProgress} / ${xpNeeded} XP`;
-    
-    console.log(`📊 Level display: ${playerLevel} | ${currentProgress}/${xpNeeded} XP (${percentage.toFixed(1)}%)`);
 }
-    // Level up kontrola
+
+// ✅ OPRAVENO - Chybějící funkce addXP
+async function addXP(amount) {
+    playerXP += amount;
+    
     let leveledUp = false;
     while (playerLevel < 10 && playerXP >= xpRequirements[playerLevel]) {
         playerLevel++;
@@ -1921,19 +1964,17 @@ function updateLevelDisplay() {
     
     console.log(`💎 XP přidáno: +${amount} | Level: ${playerLevel} | XP: ${playerXP}`);
     
-    // Ulož data
-    await saveUserData();
-    console.log('✅ Data uložena po XP změně');
+    if (typeof saveUserData === 'function') {
+        await saveUserData();
+    }
     
-    // Zobraz notifikaci JEN POKUD došlo k level upu
     if (leveledUp) {
         showLevelUpNotification();
         updateUnlockedItems();
     }
 }
- 
+
 function showLevelUpNotification() {
-    // Zkontroluj jestli už notifikace neexistuje
     const existing = document.querySelector('.level-up-notification');
     if (existing) {
         existing.remove();
@@ -1971,8 +2012,6 @@ function showLevelUpNotification() {
     document.body.appendChild(notification);
     
     playSound('levelup');
-    
-    console.log('✅ Level up notifikace zobrazena');
 }
 
 window.closeLevelUpNotification = function(button) {
@@ -1982,412 +2021,45 @@ window.closeLevelUpNotification = function(button) {
         setTimeout(() => notification.remove(), 300);
     }
 }
-    
-function showUpdateModal() {
-    // ✅ OPRAVENO - kontrola na začátku
-    const hasSeenUpdate = localStorage.getItem('tetris_update_v2.0_seen');
-    if (hasSeenUpdate) {
-        console.log('Update modal už byl zobrazen');
-        return;
-    }
-    
-    const modal = document.createElement('div');
-    modal.id = 'updateModal';
-    modal.style.cssText = `
-        display: flex;
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0, 0, 0, 0.9);
-        justify-content: center;
-        align-items: center;
-        z-index: 10000;
-    `;
-    
-    modal.innerHTML = `
-        <div style="
-            background: linear-gradient(135deg, #1a1a2e, #2a2a4e);
-            padding: 40px;
-            border-radius: 20px;
-            border: 3px solid #00ffff;
-            box-shadow: 0 0 60px rgba(0, 255, 255, 0.6);
-            max-width: 90%;
-            max-height: 90vh;
-            overflow-y: auto;
-            text-align: center;
-            animation: fadeIn 0.5s ease-in;
-        ">
-            <h2 style="font-size: 36px; color: #00ffff; text-shadow: 0 0 20px #00ffff; margin-bottom: 20px;">
-                🎉 NOVÁ AKTUALIZACE! 🎉
-            </h2>
-            
-            <div style="text-align: left; margin: 20px 0; font-size: 16px; line-height: 1.8;">
-                <p style="color: #00ffff; font-weight: bold; margin-bottom: 15px;">✨ Co je nového:</p>
-                <ul style="color: #fff; margin-left: 25px;">
-                    <li>🎊 <strong>Happy Hours</strong> - 2× skóre a mince v 15:00 a 20:00!</li>
-                    <li>⭐ <strong>Level systém</strong> - získávej XP a odemykej obsah</li>
-                    <li>🎨 <strong>15 nových témat</strong> - od Fire po Galaxy!</li>
-                    <li>🗺️ <strong>16 různých map</strong> - od 10x25 po 25x25</li>
-                    <li>⚡ <strong>6 random eventů</strong> - Turbo Speed, Invisible Blocks...</li>
-                    <li>🏆 <strong>Online žebříček</strong> - konkuruj ostatním hráčům!</li>
-                    <li>💰 <strong>Coinový systém</strong> - nakupuj témata a mapy</li>
-                </ul>
-            </div>
-            
-            <button onclick="closeUpdateModal()" class="menuBtn" style="
-                margin-top: 20px;
-                font-size: 20px;
-                padding: 12px 40px;
-            ">
-                🚀 ZAČÍT HRÁT! 🚀
-            </button>
-        </div>
-    `;
-    
-    document.body.appendChild(modal);
-    console.log('Update modal zobrazen');
-}
-
-window.closeUpdateModal = function() {
-    localStorage.setItem('tetris_update_v2.0_seen', 'true');
-    const modal = document.getElementById('updateModal');
-    if (modal) {
-        modal.style.animation = 'fadeOut 0.3s ease-out';
-        setTimeout(() => modal.remove(), 300);
-    }
-    console.log('Update modal zavřen a uložen do localStorage');
-}
-window.closeUpdateModal = function() {
-    localStorage.setItem('tetris_update_v2.0_seen', 'true');
-    const modal = document.getElementById('updateModal');
-    if (modal) {
-        modal.style.animation = 'fadeOut 0.3s ease-out';
-        setTimeout(() => modal.remove(), 300);
-    }
-    console.log('Update modal zavřen a uložen do localStorage');
-}
- 
-</script>
-
-<script type="module">
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.3'
-
-const SUPABASE_URL = 'https://bmmaijlbpwgzhrxzxphf.supabase.co'
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJtbWFpamxicHdnemhyeHp4cGhmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjY4NjQ5MDcsImV4cCI6MjA4MjQ0MDkwN30.s0YQVnAjMXFu1pSI1NXZ2naSab179N0vQPglsmy3Pgw'
-
-const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
-
-async function loadCurrentUser() {
-    const savedUser = localStorage.getItem('currentUser')
-    
-    if (savedUser) {
-        try {
-            const parsed = JSON.parse(savedUser)
-            
-            if (parsed && parsed.id && parsed.username) {
-                currentUser = parsed
-                console.log('✅ Přihlášený uživatel:', currentUser.username, 'ID:', currentUser.id)
-                await loadUserData()
-                return // ✅ DŮLEŽITÉ - zastav zde!
-            } else {
-                throw new Error('Neplatný formát')
-            }
-        } catch (e) {
-            console.log('⚠️ Nelze parsovat JSON, zkouším jako string')
-            currentUser = { username: savedUser, is_guest: true }
-            loadLocalData()
-        }
-    } else {
-        currentUser = { username: 'Host', is_guest: true }
-        console.log('👤 Host režim')
-        loadLocalData()
-    }
-}
-
-async function loadUserData() {
-    if (!currentUser || currentUser.is_guest) return
-    
-    console.log('Načítám data pro uživatele:', currentUser.username, 'ID:', currentUser.id)
-    
-    try {
-        const { data, error } = await supabase
-            .from('tetris_player_data')
-            .select('*')
-            .eq('user_id', currentUser.id)
-            .single()
-        
-        if (data) {
-            playerCoins = data.coins || 0
-            playerLevel = data.level || 1
-            playerXP = data.xp || 0
-            unlockedThemes = data.unlocked_themes || ['classic', 'neon']
-            unlockedMaps = data.unlocked_maps || ['20x10', '18x12']
-            totalGamesPlayed = data.games_played || 0
-            console.log('Data načtena:', { playerCoins, playerLevel, playerXP, totalGamesPlayed })
-        } else {
-            console.log('První spuštění - vytvářím nový záznam')
-            await supabase
-                .from('tetris_player_data')
-                .insert([{
-                    user_id: currentUser.id,
-                    username: currentUser.username,
-                    coins: 0,
-                    level: 1,
-                    xp: 0,
-                    unlocked_themes: ['classic', 'neon'],
-                    unlocked_maps: ['20x10', '18x12'],
-                    games_played: 0,
-                    total_score: 0,
-                    best_score: 0
-                }])
-        }
-    } catch (error) {
-        console.error('Chyba při načítání dat:', error)
-    }
-    
-    updateCoinsDisplay()
-    updateLevelDisplay()
-    updateUnlockedItems()
-}
-
-function loadLocalData() {
-    const saved = localStorage.getItem('tetrisPlayerData')
-    if (saved) {
-        const data = JSON.parse(saved)
-        playerCoins = data.coins || 0
-        playerLevel = data.level || 1
-        playerXP = data.xp || 0
-        unlockedThemes = data.themes || ['classic', 'neon']
-        unlockedMaps = data.maps || ['20x10', '18x12']
-    }
-    updateCoinsDisplay()
-    updateLevelDisplay()
-    updateUnlockedItems()
-}
-
-async function saveUserData() {
-    console.log('💾 Ukládám data...', { playerLevel, playerXP, playerCoins });
-    
-    if (!currentUser || currentUser.is_guest) {
-        const data = {
-            coins: playerCoins,
-            level: playerLevel,
-            xp: playerXP,
-            themes: unlockedThemes,
-            maps: unlockedMaps
-        };
-        localStorage.setItem('tetrisPlayerData', JSON.stringify(data));
-        console.log('💾 Uloženo lokálně:', data);
-        return;
-    }
-    
-    try {
-        const updateData = {
-            coins: playerCoins,
-            level: playerLevel,
-            xp: playerXP,
-            unlocked_themes: unlockedThemes,
-            unlocked_maps: unlockedMaps,
-            games_played: totalGamesPlayed,
-            last_played: new Date().toISOString()
-        };
-        
-        console.log('💾 Ukládám do Supabase:', updateData);
-        
-        const { data, error } = await supabase
-            .from('tetris_player_data')
-            .update(updateData)
-            .eq('user_id', currentUser.id)
-            .select();
-        
-        if (error) throw error;
-        
-        console.log('✅ Data úspěšně uložena do Supabase:', data);
-        
-    } catch (error) {
-        console.error('❌ Chyba při ukládání dat:', error);
-    }
-}
- 
-async function updateAfterGame(finalScore) {
-    totalGamesPlayed++;
-    
-    const baseCoinsFromScore = Math.floor(finalScore / 100) * 5;
-    const baseCoins = baseCoinsFromScore + 10;
-    
-    // Happy Hour multiplier na mince
-    const multiplier = getHappyHourMultiplier();
-    const totalCoins = baseCoins * multiplier;
-    
-    // XP výpočet
-    const earnedXP = Math.max(10, Math.floor(finalScore / 1000) * 10);
-    
-    earnedCoinsThisGame = totalCoins;
-    playerCoins += totalCoins;
-    
-    console.log(`🎮 Hra skončila - Skóre: ${finalScore}`);
-    console.log(`💰 Získané mince: ${totalCoins}${isHappyHour() ? ' (HAPPY HOUR!)' : ''}`);
-    console.log(`⭐ Získané XP: ${earnedXP}`);
-    console.log(`📊 Před XP: Level ${playerLevel}, XP ${playerXP}`);
-    
-    // Přidej XP (volá addXP která ukládá data)
-    await addXP(earnedXP);
-    
-    console.log(`📊 Po XP: Level ${playerLevel}, XP ${playerXP}`);
-    console.log(`💎 Celkem mincí: ${playerCoins}`);
-    
-    // Aktualizuj UI
-    updateCoinsDisplay();
-    updateLevelDisplay();
-    
-    // Ulož do Supabase pokud není guest
-    if (!currentUser || currentUser.is_guest) {
-        return earnedXP;
-    }
-    
-    try {
-        const { data: current } = await supabase
-            .from('tetris_player_data')
-            .select('*')
-            .eq('user_id', currentUser.id)
-            .single();
-        
-        const newTotalScore = (current?.total_score || 0) + finalScore;
-        const newBestScore = Math.max(current?.best_score || 0, finalScore);
-        
-        const { error } = await supabase
-            .from('tetris_player_data')
-            .update({
-                coins: playerCoins,
-                level: playerLevel,
-                xp: playerXP,
-                games_played: totalGamesPlayed,
-                total_score: newTotalScore,
-                best_score: newBestScore,
-                last_played: new Date().toISOString()
-            })
-            .eq('user_id', currentUser.id);
-        
-        if (error) throw error;
-        
-        console.log('✅ Data úspěšně uložena do Supabase');
-        
-    } catch (error) {
-        console.error('❌ Chyba při aktualizaci dat:', error);
-    }
-    
-    return earnedXP;
-}
 
 window.updateCoinsDisplay = function() {
-    document.getElementById('coinCount').textContent = playerCoins
+    document.getElementById('coinCount').textContent = playerCoins;
     
-    const gameCoinsElement = document.getElementById('gameCoins')
+    const gameCoinsElement = document.getElementById('gameCoins');
     if (gameCoinsElement) {
-        gameCoinsElement.textContent = earnedCoinsThisGame
+        gameCoinsElement.textContent = earnedCoinsThisGame;
     }
 }
 
 window.updateUnlockedItems = function() {
-    const themes = ['classic', 'neon', 'fire', 'candy', 'ocean', 'ice', 'matrix', 'forest', 'lava', 'sunset', 'toxic', 'galaxy', 'midnight', 'rainbow', 'crystal', 'gold']
+    const themes = ['classic', 'neon', 'fire', 'candy', 'ocean', 'ice', 'matrix', 'forest', 'lava', 'sunset', 'toxic', 'galaxy', 'midnight', 'rainbow', 'crystal', 'gold'];
     themes.forEach(theme => {
-        const btn = document.getElementById(`theme-${theme}`)
+        const btn = document.getElementById(`theme-${theme}`);
         if (btn && unlockedThemes.includes(theme)) {
-            btn.classList.remove('locked')
-            const priceTag = btn.querySelector('.price-tag')
-            const levelReq = btn.querySelector('.level-req')
-            if (priceTag) priceTag.remove()
-            if (levelReq) levelReq.remove()
+            btn.classList.remove('locked');
+            const priceTag = btn.querySelector('.price-tag');
+            const levelReq = btn.querySelector('.level-req');
+            if (priceTag) priceTag.remove();
+            if (levelReq) levelReq.remove();
         }
-    })
+    });
     
-    const maps = ['20x10', '18x12', '22x8', '15x15', '16x16', '24x12', '28x9', '14x18', '12x20', '18x18', '25x8', '26x10', '10x25', '20x20', '30x10', '25x25']
+    const maps = ['20x10', '18x12', '22x8', '15x15', '16x16', '24x12', '28x9', '14x18', '12x20', '18x18', '25x8', '26x10', '10x25', '20x20', '30x10', '25x25'];
     maps.forEach(map => {
-        const btn = document.getElementById(`map-${map}`)
+        const btn = document.getElementById(`map-${map}`);
         if (btn && unlockedMaps.includes(map)) {
-            btn.classList.remove('locked')
-            const priceTag = btn.querySelector('.price-tag')
-            const levelReq = btn.querySelector('.level-req')
-            if (priceTag) priceTag.remove()
-            if (levelReq) levelReq.remove()
+            btn.classList.remove('locked');
+            const priceTag = btn.querySelector('.price-tag');
+            const levelReq = btn.querySelector('.level-req');
+            if (priceTag) priceTag.remove();
+            if (levelReq) levelReq.remove();
         }
-    })
+    });
 }
 
-window.buyTheme = async function(theme, price, requiredLevel) {
-    if (unlockedThemes.includes(theme)) {
-        setTheme(theme)
-        return
-    }
-    
-    if (playerLevel < requiredLevel) {
-        alert(`Pro odemčení tohoto tématu potřebuješ Level ${requiredLevel}! (máš Level ${playerLevel})`)
-        return
-    }
-    
-    if (playerCoins >= price) {
-        if (confirm(`Koupit téma "${theme}" za ${price} mincí?`)) {
-            playerCoins -= price
-            unlockedThemes.push(theme)
-            await saveUserData()
-            updateCoinsDisplay()
-            updateUnlockedItems()
-            setTheme(theme)
-            alert('Téma odemčeno! 🎉')
-        }
-    } else {
-        alert(`Nemáš dost mincí! Potřebuješ ${price}, máš jen ${playerCoins}.`)
-    }
-}
-
-window.buyMap = async function(mapName, rows, cols, price, requiredLevel) {
-    if (unlockedMaps.includes(mapName)) {
-        setMap(rows, cols)
-        return
-    }
-    
-    if (playerLevel < requiredLevel) {
-        alert(`Pro odemčení této mapy potřebuješ Level ${requiredLevel}! (máš Level ${playerLevel})`)
-        return
-    }
-    
-    if (playerCoins >= price) {
-        if (confirm(`Koupit mapu "${mapName}" za ${price} mincí?`)) {
-            playerCoins -= price
-            unlockedMaps.push(mapName)
-            await saveUserData()
-            updateCoinsDisplay()
-            updateUnlockedItems()
-            setMap(rows, cols)
-            alert('Mapa odemčena! 🎉')
-        }
-    } else {
-        alert(`Nemáš dost mincí! Potřebuješ ${price}, máš jen ${playerCoins}.`)
-    }
-}
-
-async function addCoins(amount) {
-    earnedCoinsThisGame += amount
-    playerCoins += amount
-    updateCoinsDisplay()
-
-    await saveUserData()
-    
-    for (let i = 0; i < 5; i++) {
-        setTimeout(() => {
-            const coin = document.createElement('div')
-            coin.className = 'coin-particle'
-            coin.textContent = '💰'
-            coin.style.left = (window.innerWidth / 2 + Math.random() * 200 - 100) + 'px'
-            coin.style.top = (window.innerHeight / 2) + 'px'
-            document.body.appendChild(coin)
-            setTimeout(() => coin.remove(), 2000)
-        }, i * 100)
-    }
-}
-
+// ========================================
+// TÉMA SYSTÉM - KOMPLETNÍ
+// ========================================
 const themes = {
     classic: ['cyan', 'yellow', 'purple', 'green', 'red', 'blue', 'orange'],
     neon: ['#00ffff', '#ff00ff', '#ffff00', '#00ff00', '#ff0080', '#0080ff', '#ff8000'],
@@ -2405,11 +2077,9 @@ const themes = {
     lava: ['#8b0000', '#b22222', '#dc143c', '#ff4500', '#ff6347', '#ff7f50', '#ffa07a'],
     midnight: ['#191970', '#000080', '#00008b', '#0000cd', '#4169e1', '#6495ed', '#1e3a8a'],
     crystal: ['#e0ffff', '#afeeee', '#add8e6', '#87ceeb', '#b0e0e6', '#d4f1f4', '#c0f0f5']
-}
+};
 
-// ========================================
-// POKROČILÝ THEME SYSTÉM
-// ========================================
+// ✅ KOMPLETNÍ pokročilá témata se VŠEMI 16 tématy
 const advancedThemes = {
     classic: {
         colors: ['cyan', 'yellow', 'purple', 'green', 'red', 'blue', 'orange'],
@@ -2435,6 +2105,24 @@ const advancedThemes = {
         textColor: '#ffaa00',
         glowColor: '#ff0000',
         particles: '🔥'
+    },
+    candy: {
+        colors: ['#ff69b4', '#ffb6c1', '#ff1493', '#ff82ab', '#ffc0cb', '#ffaec9', '#ff4da6'],
+        background: 'linear-gradient(135deg, #1a0010 0%, #330020 50%, #1a0010 100%)',
+        gridBorder: '#ff69b4',
+        cellBg: '#220015',
+        textColor: '#ffb6c1',
+        glowColor: '#ff1493',
+        particles: '🍬'
+    },
+    ocean: {
+        colors: ['#006994', '#0080b3', '#0099cc', '#00b3e6', '#33ccff', '#66d9ff', '#99e6ff'],
+        background: 'linear-gradient(135deg, #001a33 0%, #003366 50%, #001a33 100%)',
+        gridBorder: '#0099cc',
+        cellBg: '#001a2e',
+        textColor: '#66d9ff',
+        glowColor: '#00b3e6',
+        particles: '🌊'
     },
     ice: {
         colors: ['#00bfff', '#4169e1', '#1e90ff', '#87ceeb', '#add8e6', '#b0e0e6', '#87cefa'],
@@ -3538,6 +3226,7 @@ function getDifficultyEmoji(difficulty) {
 </script>
 </body>
 </html>
+
 
 
 
