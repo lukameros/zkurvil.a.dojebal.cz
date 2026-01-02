@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Tetris - Enhanced</title>
+<link rel="stylesheet" href="tetris.css">
+</head>
+<body>
+
+<button id="backBtn" onclick="window.location.href='hry.html'">⬅ Zpět</button>
+
+<div id="playerStats">
+    <div id="levelDisplay">
+        ⭐ Level <span id="playerLevel">1</span>
+        <div class="xp-bar-container">
+            <div class="xp-bar" id="xpBar"></div>
+        </div>
+        <div class="xp-text" id="xpText">0 / 50 XP</div>
+    </div>
+    <div id="coinsDisplay">💰 <span id="coinCount">0</span></div>
+    <div id="happyHourIndicator" style="padding: 8px 15px; background: rgba(100, 100, 100, 0.5); border: 2px solid #666; border-radius: 8px; font-size: 14px; font-weight: bold; color: #aaa; text-align: center;">
+        ⏰ Happy Hour v 15:00
+    </div>
+</div>
+
+<div id="mainMenu" class="centered" style="display:none;">
+    <h1>🎮 TETRIS 🎮</h1>
+    <button class="menuBtn" onclick="goToKlasika()">🕹️ Classicplay</button>
+    <button class="menuBtn" onclick="startTetris(selectedDifficulty)">🚀 Magicplay</button>
+    <button class="menuBtn" onclick="window.location.href='tetrismulti.html'">🌐 Multiplayer</button>
+    <button class="menuBtn" onclick="showSettingsMenu()">⚙️ Nastavení</button>
+    <button class="menuBtn" onclick="showDifficultyMenu()">🎚️ Obtížnost</button>
+    <button class="menuBtn" onclick="showMapMenu()">📐 Mapy</button>
+    <button class="menuBtn" onclick="showThemeMenu()">🎨 Vzhled</button>
+    <button class="menuBtn" onclick="showLeaderboard()">🏆 Žebříček</button>
+</div>
+
+<div id="settingsMenu" class="centered" style="display:none;">
+    <h1>⚙️ Nastavení</h1>
+    <div style="display: flex; flex-direction: column; gap: 20px; align-items: center;">
+        
+        <!-- Zvuk -->
+        <div style="background: rgba(30, 30, 60, 0.7); padding: 25px; border-radius: 12px; border: 2px solid #00ffff; min-width: 400px;">
+            <h3 style="color: #00ffff; margin-bottom: 15px; text-align: center;">🔊 Zvuk</h3>
+            <div style="display: flex; justify-content: center; gap: 15px;">
+                <button class="menuBtn" id="soundOn" onclick="setSoundEnabled(true)" style="min-width: 150px;">
+                    🔊 Zapnuto
+                </button>
+                <button class="menuBtn" id="soundOff" onclick="setSoundEnabled(false)" style="min-width: 150px;">
+                    🔇 Vypnuto
+                </button>
+            </div>
+        </div>
+        
+        <!-- Jazyk -->
+        <div style="background: rgba(30, 30, 60, 0.7); padding: 25px; border-radius: 12px; border: 2px solid #00ffff; min-width: 400px;">
+            <h3 style="color: #00ffff; margin-bottom: 15px; text-align: center;">🌍 Jazyk</h3>
+            <div style="display: flex; justify-content: center; gap: 15px;">
+                <button class="menuBtn" id="langCs" onclick="setLanguage('cs')" style="min-width: 150px;">
+                    🇨🇿 Čeština
+                </button>
+                <button class="menuBtn" id="langEn" onclick="setLanguage('en')" style="min-width: 150px;">
+                    🇬🇧 English
+                </button>
+            </div>
+        </div>
+        
+    </div>
+    <button class="menuBtn" onclick="backToMainMenu()" style="margin-top: 30px;">⬅ Zpět</button>
+</div>
+ 
+<div id="difficultyMenu" class="centered" style="display:none;">
+    <h1>Obtížnost</h1>
+    <button class="menuBtn" onclick="setDifficulty('easy')">😊 Snadná</button>
+    <button class="menuBtn" onclick="setDifficulty('medium')">😐 Střední</button>
+    <button class="menuBtn" onclick="setDifficulty('hard')">😈 Těžká</button>
+    <button class="menuBtn" onclick="setDifficulty('insane')">💀 Šílená</button>
+    <button class="menuBtn" onclick="backToMainMenu()">⬅ Zpět</button>
+</div>
+
+<div id="themeMenu" class="centered" style="display:none;">
+    <h1>Barevné téma</h1>
+    <div class="menu-section">
+        <button class="menuBtn" id="theme-classic" onclick="setTheme('classic')">🌈 Klasické</button>
+        <button class="menuBtn" id="theme-neon" onclick="setTheme('neon')">✨ Neon</button>
+        <button class="menuBtn locked" id="theme-fire" onclick="buyTheme('fire', 500, 2)">
+            🔥 Oheň
+            <span class="level-req">Lvl 2</span>
+            <span class="price-tag">💰 500</span>
+        </button>
+        <button class="menuBtn locked" id="theme-candy" onclick="buyTheme('candy', 800, 2)">
+            🍬 Candy
+            <span class="level-req">Lvl 2</span>
+            <span class="price-tag">💰 800</span>
+        </button>
+        <button class="menuBtn locked" id="theme-ocean" onclick="buyTheme('ocean', 1200, 3)">
+            🌊 Oceán
+            <span class="level-req">Lvl 3</span>
+            <span class="price-tag">💰 1200</span>
+        </button>
+        <button class="menuBtn locked" id="theme-ice" onclick="buyTheme('ice', 1500, 3)">
+            ❄️ Led
+            <span class="level-req">Lvl 3</span>
+            <span class="price-tag">💰 1500</span>
+        </button>
+        <button class="menuBtn locked" id="theme-matrix" onclick="buyTheme('matrix', 1800, 4)">
+            💻 Matrix
+            <span class="level-req">Lvl 4</span>
+            <span class="price-tag">💰 1800</span>
+        </button>
+        <button class="menuBtn locked" id="theme-forest" onclick="buyTheme('forest', 2200, 4)">
+            🌲 Les
+            <span class="level-req">Lvl 4</span>
+            <span class="price-tag">💰 2200</span>
+        </button>
+        <button class="menuBtn locked" id="theme-lava" onclick="buyTheme('lava', 2600, 5)">
+            🌋 Láva
+            <span class="level-req">Lvl 5</span>
+            <span class="price-tag">💰 2600</span>
+        </button>
+        <button class="menuBtn locked" id="theme-sunset" onclick="buyTheme('sunset', 3000, 5)">
+            🌅 Západ slunce
+            <span class="level-req">Lvl 5</span>
+            <span class="price-tag">💰 3000</span>
+        </button>
+        <button class="menuBtn locked" id="theme-toxic" onclick="buyTheme('toxic', 3400, 6)">
+            ☢️ Toxic
+            <span class="level-req">Lvl 6</span>
+            <span class="price-tag">💰 3400</span>
+        </button>
+        <button class="menuBtn locked" id="theme-galaxy" onclick="buyTheme('galaxy', 3800, 6)">
+            🌌 Galaxie
+            <span class="level-req">Lvl 6</span>
+            <span class="price-tag">💰 3800</span>
+        </button>
+        <button class="menuBtn locked" id="theme-midnight" onclick="buyTheme('midnight', 4200, 7)">
+            🌙 Půlnoc
+            <span class="level-req">Lvl 7</span>
+            <span class="price-tag">💰 4200</span>
+        </button>
+        <button class="menuBtn locked" id="theme-rainbow" onclick="buyTheme('rainbow', 4600, 8)">
+            🦄 Duha
+            <span class="level-req">Lvl 8</span>
+            <span class="price-tag">💰 4600</span>
+        </button>
+        <button class="menuBtn locked" id="theme-crystal" onclick="buyTheme('crystal', 4900, 9)">
+            💎 Krystal
+            <span class="level-req">Lvl 9</span>
+            <span class="price-tag">💰 4900</span>
+        </button>
+        <button class="menuBtn locked" id="theme-gold" onclick="buyTheme('gold', 5000, 10)">
+            👑 Zlaté
+            <span class="level-req">Lvl 10</span>
+            <span class="price-tag">💰 5000</span>
+        </button>
+    </div>
+    <button class="menuBtn" onclick="backToMainMenu()">⬅ Zpět</button>
+</div>
+
+<div id="mapMenu" class="centered" style="display:none;">
+    <h1>Rozměry mapy</h1>
+    <div class="menu-section">
+        <button class="menuBtn" id="map-20x10" onclick="setMap(20,10)">📏 Standardní 20x10</button>
+        <button class="menuBtn" id="map-18x12" onclick="setMap(18,12)">↔️ Široká 18x12</button>
+        <button class="menuBtn locked" id="map-22x8" onclick="buyMap('22x8', 22, 8, 600, 2)">
+            ↕️ Úzká 22x8
+            <span class="level-req">Lvl 2</span>
+            <span class="price-tag">💰 600</span>
+        </button>
+        <button class="menuBtn locked" id="map-15x15" onclick="buyMap('15x15', 15, 15, 900, 2)">
+            🟦 Kompakt 15x15
+            <span class="level-req">Lvl 2</span>
+            <span class="price-tag">💰 900</span>
+        </button>
+        <button class="menuBtn locked" id="map-16x16" onclick="buyMap('16x16', 16, 16, 1300, 3)">
+            ⬜ Čtverec 16x16
+            <span class="level-req">Lvl 3</span>
+            <span class="price-tag">💰 1300</span>
+        </button>
+        <button class="menuBtn locked" id="map-24x12" onclick="buyMap('24x12', 24, 12, 1700, 3)">
+            ⬆️ Vysoká 24x12
+            <span class="level-req">Lvl 3</span>
+            <span class="price-tag">💰 1700</span>
+        </button>
+        <button class="menuBtn locked" id="map-28x9" onclick="buyMap('28x9', 28, 9, 2100, 4)">
+            🗼 Věž 28x9
+            <span class="level-req">Lvl 4</span>
+            <span class="price-tag">💰 2100</span>
+        </button>
+        <button class="menuBtn locked" id="map-14x18" onclick="buyMap('14x18', 14, 18, 2500, 4)">
+            🔲 Vertikální 14x18
+            <span class="level-req">Lvl 4</span>
+            <span class="price-tag">💰 2500</span>
+        </button>
+        <button class="menuBtn locked" id="map-12x20" onclick="buyMap('12x20', 12, 20, 2900, 5)">
+            📱 Dlouhá 12x20
+            <span class="level-req">Lvl 5</span>
+            <span class="price-tag">💰 2900</span>
+        </button>
+        <button class="menuBtn locked" id="map-18x18" onclick="buyMap('18x18', 18, 18, 3300, 5)">
+            ⬛ Velký čtverec 18x18
+            <span class="level-req">Lvl 5</span>
+            <span class="price-tag">💰 3300</span>
+        </button>
+        <button class="menuBtn locked" id="map-25x8" onclick="buyMap('25x8', 25, 8, 3700, 6)">
+            📏 Extra úzká 25x8
+            <span class="level-req">Lvl 6</span>
+            <span class="price-tag">💰 3700</span>
+        </button>
+        <button class="menuBtn locked" id="map-26x10" onclick="buyMap('26x10', 26, 10, 4100, 7)">
+            🏢 Mrakodrap 26x10
+            <span class="level-req">Lvl 7</span>
+            <span class="price-tag">💰 4100</span>
+        </button>
+        <button class="menuBtn locked" id="map-10x25" onclick="buyMap('10x25', 10, 25, 4400, 8)">
+            🎯 Ultra široká 10x25
+            <span class="level-req">Lvl 8</span>
+            <span class="price-tag">💰 4400</span>
+        </button>
+        <button class="menuBtn locked" id="map-20x20" onclick="buyMap('20x20', 20, 20, 4700, 9)">
+            🎪 Aréna 20x20
+            <span class="level-req">Lvl 9</span>
+            <span class="price-tag">💰 4700</span>
+        </button>
+        <button class="menuBtn locked" id="map-30x10" onclick="buyMap('30x10', 30, 10, 4900, 9)">
+            🏰 Epická 30x10
+            <span class="level-req">Lvl 9</span>
+            <span class="price-tag">💰 4900</span>
+        </button>
+        <button class="menuBtn locked" id="map-25x25" onclick="buyMap('25x25', 25, 25, 5000, 10)">
+            👑 Mega aréna 25x25
+            <span class="level-req">Lvl 10</span>
+            <span class="price-tag">💰 5000</span>
+        </button>
+    </div>
+    <button class="menuBtn" onclick="backToMainMenu()">⬅ Zpět</button>
+</div>
+
+<div id="leaderboard" class="centered">
+    <h1>🏆 žebříček 🏆</h1>
+    <div class="loading">Načítání žebříčku...</div>
+    <table id="leaderboardTable" style="display:none;">
+        <tr><th>Pozice</th><th>Hráč</th><th>Skóre</th><th>Obtížnost</th><th>Datum</th></tr>
+    </table>
+    <button class="menuBtn" onclick="backToMainMenu()" style="margin-top: 20px;">⬅ Zpět</button>
+</div>
+
+<div id="tetrisGame" class="centered">
+    <div class="game-container">
+        <div class="side-panel">
+            <div class="info-box">
+                <h3>DALŠÍ</h3>
+                <div id="nextPiece"></div>
+            </div>
+            <div class="info-box">
+                <h3>HOLD</h3>
+                <div id="holdPiece"></div>
+            </div>
+        </div>
+        <div>
+            <div id="tetris"></div>
+        </div>
+        
+        <div class="side-panel">
+            <div class="info-box">
+                <h3>SKÓRE</h3>
+                <div id="score">0</div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="controls">
+        <h4>OVLÁDÁNÍ:</h4>
+        <div>⬅️➡️ - Pohyb</div>
+        <div>⬆️ - Rotace</div>
+        <div>⬇️ - Rychlejší pád</div>
+        <div>MEZERNÍK - Okamžité umístění</div>
+        <div>P - Pauza</div>
+        <div>ESC - Menu</div>
+    </div>
+</div>
+
+<div id="loadingScreen">
+    <div class="loading-content">
+        <h2>⚡ NAČÍTÁNÍ HRY ⚡</h2>
+        <div class="loading-bar-container">
+            <div class="loading-bar" id="loadingBar"></div>
+        </div>
+        <div class="loading-text" id="loadingText">Připravuji herní pole...</div>
+        <div class="loading-spinner">
+            <div class="spinner-dot"></div>
+            <div class="spinner-dot"></div>
+            <div class="spinner-dot"></div>
+        </div>
+    </div>
+</div>
+
+<div class="pause-overlay" id="pauseOverlay">
+    <div class="pause-text">PAUZA</div>
+</div>
+
+<div id="nameModal">
+    <div class="modal-content">
+        <h2>🎉 Skvělá hra! 🎉</h2>
+        <p style="font-size: 24px; margin-bottom: 10px;">Tvoje skóre: <span id="finalScore">0</span></p>
+        <div class="coin-reward">
+            💰 +<span id="earnedCoins">0</span> mincí!
+        </div>
+        <div class="xp-reward">
+            ⭐ +<span id="earnedXP">0</span> XP
+        </div>
+        <p id="saveMessage" style="font-size: 18px; color: #00ff00; margin: 20px 0;">
+            ✅ Skóre automaticky uloženo!
+        </p>
+        <button class="menuBtn" onclick="backToMainMenu()">🏠 Zpět do menu</button>
+    </div>
+</div>
+
+<script type="module" src="tetris.js"></script>
+</body>
+</html>
