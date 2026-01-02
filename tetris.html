@@ -26,8 +26,8 @@
 
 <div id="mainMenu" class="centered" style="display:none;">
     <h1>🎮 TETRIS 🎮</h1>
-    <button class="menuBtn" onclick="window.goToKlasika()">🕹️ Classicplay</button>
-    <button class="menuBtn" onclick="window.startMagicPlay()">🚀 Magicplay</button>
+    <button class="menuBtn" onclick="goToKlasika()">🕹️ Classicplay</button>
+    <button class="menuBtn" onclick="startTetris(selectedDifficulty)">🚀 Magicplay</button>
     <button class="menuBtn" onclick="window.location.href='tetrismulti.html'">🌐 Multiplayer</button>
     <button class="menuBtn" onclick="showSettingsMenu()">⚙️ Nastavení</button>
     <button class="menuBtn" onclick="showDifficultyMenu()">🎚️ Obtížnost</button>
@@ -319,7 +319,4 @@
 
 <script type="module" src="tetris.js"></script>
 </body>
-
 </html>
-
-
