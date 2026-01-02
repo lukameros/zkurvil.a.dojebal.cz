@@ -147,11 +147,9 @@ const nextPieceDisplay = document.getElementById('nextPiece')
 const holdPieceDisplay = document.getElementById('holdPiece')
 
 // ===== INITIALIZATION =====
-window.addEventListener('DOMContentLoaded', async () => {
-    console.log('🎮 Inicializace hry...')
+window.addEventListener('DOMContentLoaded', () => {
     updateHappyHourIndicator()
     loadSettings()
-    await loadCurrentUser()
     startPageLoading()
 })
 
@@ -278,6 +276,7 @@ window.setLanguage = function(lang) {
     alert(lang === 'cs' ? 'Jazyk změněn na češtinu!' : 'Language changed to English!')
 }
 
+// ===== LOADING SCREEN =====
 function startPageLoading() {
     const loadingTime = 3000 + Math.random() * 2000
     const loadingBar = document.getElementById('loadingBar')
@@ -316,17 +315,13 @@ function startPageLoading() {
         document.getElementById('mainMenu').style.display = 'flex'
         loadingBar.style.width = '0%'
         
-        // ✅ OPRAVENO - zobrazení update modalu AŽ PO zobrazení menu
-        setTimeout(() => {
-            const hasSeenUpdate = localStorage.getItem('tetris_update_v2.0_seen')
-            if (!hasSeenUpdate) {
-                showUpdateModal()
-            }
-        }, 500)
+        const hasSeenUpdate = localStorage.getItem('tetris_update_v2.0_seen')
+        if (!hasSeenUpdate) {
+            setTimeout(() => showUpdateModal(), 500)
+        }
     }, loadingTime)
 }
 
-// ✅ PŘIDÁNO - Update modal
 function showUpdateModal() {
     const hasSeenUpdate = localStorage.getItem('tetris_update_v2.0_seen')
     if (hasSeenUpdate) {
@@ -390,7 +385,6 @@ function showUpdateModal() {
     `
     
     document.body.appendChild(modal)
-    console.log('✅ Update modal zobrazen')
 }
 
 window.closeUpdateModal = function() {
@@ -400,7 +394,6 @@ window.closeUpdateModal = function() {
         modal.style.animation = 'fadeOut 0.3s ease-out'
         setTimeout(() => modal.remove(), 300)
     }
-    console.log('✅ Update modal zavřen')
 }
 
 // ===== USER DATA MANAGEMENT =====
@@ -432,13 +425,9 @@ async function loadCurrentUser() {
 }
 
 async function loadUserData() {
-    if (!currentUser || currentUser.is_guest) {
-        console.log('👤 Guest režim - načítám lokální data')
-        loadLocalData()
-        return
-    }
+    if (!currentUser || currentUser.is_guest) return
     
-    console.log('📥 Načítám data pro uživatele:', currentUser.username, 'ID:', currentUser.id)
+    console.log('Načítám data pro uživatele:', currentUser.username, 'ID:', currentUser.id)
     
     try {
         const { data, error } = await supabase
@@ -454,18 +443,10 @@ async function loadUserData() {
             unlockedThemes = data.unlocked_themes || ['classic', 'neon']
             unlockedMaps = data.unlocked_maps || ['20x10', '18x12']
             totalGamesPlayed = data.games_played || 0
-            
-            console.log('✅ Data načtena z Supabase:', { 
-                playerCoins, 
-                playerLevel, 
-                playerXP, 
-                totalGamesPlayed 
-            })
-        } else if (error && error.code === 'PGRST116') {
-            // Uživatel ještě nemá záznam, vytvoříme nový
-            console.log('🆕 První spuštění - vytvářím nový záznam')
-            
-            const { error: insertError } = await supabase
+            console.log('Data načtena:', { playerCoins, playerLevel, playerXP, totalGamesPlayed })
+        } else {
+            console.log('První spuštění - vytvářím nový záznam')
+            await supabase
                 .from('tetris_player_data')
                 .insert([{
                     user_id: currentUser.id,
@@ -479,20 +460,11 @@ async function loadUserData() {
                     total_score: 0,
                     best_score: 0
                 }])
-            
-            if (insertError) {
-                console.error('❌ Chyba při vytváření záznamu:', insertError)
-            } else {
-                console.log('✅ Nový záznam vytvořen')
-            }
-        } else {
-            console.error('❌ Chyba při načítání dat:', error)
         }
     } catch (error) {
-        console.error('❌ Chyba při načítání dat:', error)
+        console.error('Chyba při načítání dat:', error)
     }
     
-    // ✅ DŮLEŽITÉ - vždy aktualizuj UI po načtení
     updateCoinsDisplay()
     updateLevelDisplay()
     updateUnlockedItems()
@@ -507,7 +479,6 @@ function loadLocalData() {
         playerXP = data.xp || 0
         unlockedThemes = data.themes || ['classic', 'neon']
         unlockedMaps = data.maps || ['20x10', '18x12']
-        console.log('📂 Načtena lokální data:', { playerCoins, playerLevel, playerXP })
     }
     updateCoinsDisplay()
     updateLevelDisplay()
@@ -515,7 +486,7 @@ function loadLocalData() {
 }
 
 async function saveUserData() {
-    console.log('💾 Ukládám data...', { playerLevel, playerXP, playerCoins, totalGamesPlayed })
+    console.log('💾 Ukládám data...', { playerLevel, playerXP, playerCoins })
     
     if (!currentUser || currentUser.is_guest) {
         const data = {
@@ -549,16 +520,12 @@ async function saveUserData() {
             .eq('user_id', currentUser.id)
             .select()
         
-        if (error) {
-            console.error('❌ Chyba při ukládání:', error)
-            throw error
-        }
+        if (error) throw error
         
         console.log('✅ Data úspěšně uložena do Supabase:', data)
         
     } catch (error) {
         console.error('❌ Chyba při ukládání dat:', error)
-        alert('⚠️ Nepodařilo se uložit data! Zkus to znovu.')
     }
 }
 
@@ -568,11 +535,6 @@ function getXPForNextLevel(currentLevel) {
     return xpRequirements[currentLevel]
 }
 
-// ✅ NOVÁ FUNKCE pro Magic Play
-window.startMagicPlay = function() {
-    window.startTetris(selectedDifficulty)
-}
-
 function updateLevelDisplay() {
     const levelElement = document.getElementById('playerLevel')
     if (levelElement) {
@@ -580,10 +542,8 @@ function updateLevelDisplay() {
     }
     
     if (playerLevel >= 10) {
-        const xpText = document.getElementById('xpText')
-        const xpBar = document.getElementById('xpBar')
-        if (xpText) xpText.textContent = 'MAX LEVEL'
-        if (xpBar) xpBar.style.width = '100%'
+        document.getElementById('xpText').textContent = 'MAX LEVEL'
+        document.getElementById('xpBar').style.width = '100%'
         return
     }
     
@@ -599,40 +559,27 @@ function updateLevelDisplay() {
     
     if (xpBar) xpBar.style.width = percentage + '%'
     if (xpText) xpText.textContent = `${currentProgress} / ${xpNeeded} XP`
-    
-    console.log(`📊 Level display: ${playerLevel} | ${currentProgress}/${xpNeeded} XP (${percentage.toFixed(1)}%)`)
 }
 
 async function addXP(amount) {
-    console.log(`⭐ Přidávám ${amount} XP... (aktuálně: ${playerXP})`)
     playerXP += amount
     
     let leveledUp = false
-    
-    // Kontrola level upu
     while (playerLevel < 10 && playerXP >= xpRequirements[playerLevel]) {
         playerLevel++
         leveledUp = true
         console.log(`🎉 LEVEL UP! Nový level: ${playerLevel}`)
     }
     
-    console.log(`💎 Po přidání: Level ${playerLevel}, XP ${playerXP}`)
-    
-    // ✅ OPRAVENO - ukládání PŘED zobrazením UI
-    await saveUserData()
-    console.log('✅ Data uložena po XP změně')
-    
-    // Aktualizuj UI
     updateLevelDisplay()
     updateCoinsDisplay()
     
-    // Zobraz level up notifikaci
+    await saveUserData()
+    
     if (leveledUp) {
         showLevelUpNotification()
         updateUnlockedItems()
     }
-    
-    return amount
 }
 
 function showLevelUpNotification() {
@@ -653,7 +600,6 @@ function showLevelUpNotification() {
     
     document.body.appendChild(notification)
     playSound('levelup')
-    console.log('✅ Level up notifikace zobrazena')
 }
 
 window.closeLevelUpNotification = function(button) {
@@ -665,10 +611,7 @@ window.closeLevelUpNotification = function(button) {
 }
 
 window.updateCoinsDisplay = function() {
-    const coinElement = document.getElementById('coinCount')
-    if (coinElement) {
-        coinElement.textContent = playerCoins
-    }
+    document.getElementById('coinCount').textContent = playerCoins
     
     const gameCoinsElement = document.getElementById('gameCoins')
     if (gameCoinsElement) {
@@ -780,11 +723,7 @@ window.goToKlasika = function() {
     window.location.href = url
 }
 
-// ✅ OPRAVENO - tlačítko zpět do menu
 window.backToMainMenu = function() {
-    console.log('🔙 Zpět do menu')
-    
-    // Skryj všechny obrazovky
     document.getElementById('mainMenu').style.display = 'flex'
     document.getElementById('difficultyMenu').style.display = 'none'
     document.getElementById('settingsMenu').style.display = 'none'
@@ -795,30 +734,23 @@ window.backToMainMenu = function() {
     document.getElementById('nameModal').style.display = 'none'
     document.getElementById('pauseOverlay').style.display = 'none'
     
-    // Úplné zastavení hry
     isGameOver = true
     isPaused = false
     
-    // Zastav všechny timeouty
     clearTimeout(dropTimeout)
     clearTimeout(eventTimeout)
     
-    // Ukončit aktivní event
     if (activeEvent) {
         endEvent()
     }
     
-    // Skrýt event timer
     const timer = document.getElementById('eventTimer')
     if (timer) {
         timer.style.display = 'none'
     }
     
-    // Reset game state
     activeEvent = null
     canRotate = true
-    
-    console.log('✅ Návrat do menu dokončen')
 }
 
 window.showDifficultyMenu = function() {
@@ -886,8 +818,6 @@ function initGrid() {
 }
 
 window.startTetris = function(difficulty) {
-    console.log('🎮 Spouštím hru, obtížnost:', difficulty)
-    
     document.getElementById('mainMenu').style.display = 'none'
     document.getElementById('tetrisGame').style.display = 'flex'
     
@@ -901,10 +831,6 @@ window.startTetris = function(difficulty) {
     holdPiece = null
     earnedCoinsThisGame = 0
     activeEvent = null
-    canRotate = true  // ✅ PŘIDÁNO - reset rotace
-    
-    // ✅ OPRAVENO - nastavení difficulty
-    selectedDifficulty = difficulty
     
     dropInterval = difficulty === 'easy' ? 800 : 
                    difficulty === 'medium' ? 600 : 
@@ -921,6 +847,7 @@ window.startTetris = function(difficulty) {
         setTimeout(() => showHappyHourNotification(), 1000)
     }
 }
+
 function randomTetromino() {
     const index = Math.floor(Math.random() * shapes.length)
     return {
@@ -1302,7 +1229,6 @@ function gameLoop() {
 
 // ===== GAME OVER =====
 async function gameOver() {
-    console.log('💀 Game Over! Konečné skóre:', score)
     isGameOver = true
     endEvent()
     clearTimeout(eventTimeout)
@@ -1322,9 +1248,9 @@ async function gameOver() {
                     level_reached: level,
                     timestamp: new Date().toISOString()
                 }])
-            console.log('✅ Skóre uloženo do žebříčku!')
+            console.log('Skóre uloženo do žebříčku!')
         } catch (error) {
-            console.error('❌ Chyba při ukládání skóre:', error)
+            console.error('Chyba při ukládání skóre:', error)
         }
     }
     
@@ -1345,7 +1271,6 @@ async function gameOver() {
 }
 
 async function updateAfterGame(finalScore) {
-    console.log('📊 Aktualizuji statistiky po hře...')
     totalGamesPlayed++
     
     const baseCoinsFromScore = Math.floor(finalScore / 100) * 5
@@ -1359,10 +1284,6 @@ async function updateAfterGame(finalScore) {
     earnedCoinsThisGame = totalCoins
     playerCoins += totalCoins
     
-    console.log(`💰 Získané mince: ${totalCoins}${isHappyHour() ? ' (HAPPY HOUR!)' : ''}`)
-    console.log(`⭐ Získané XP: ${earnedXP}`)
-    
-    // Přidej XP (volá addXP která ukládá data)
     await addXP(earnedXP)
     
     updateCoinsDisplay()
@@ -1396,8 +1317,6 @@ async function updateAfterGame(finalScore) {
             .eq('user_id', currentUser.id)
         
         if (error) throw error
-        
-        console.log('✅ Statistiky úspěšně uloženy')
         
     } catch (error) {
         console.error('❌ Chyba při aktualizaci dat:', error)
@@ -1569,7 +1488,5 @@ function startEventSystem() {
     scheduleNextEvent()
 }
 
-console.log('✅ Tetris.js načten')
-
-
-
+// ===== INITIALIZE =====
+loadCurrentUser()
