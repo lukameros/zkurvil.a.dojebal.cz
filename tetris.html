@@ -1194,7 +1194,7 @@ body {
 </head>
 <body>
 
-<button id="backBtn" onclick="window.location.href='hry.html'">⬅ Zpět</button>
+<button id="backBtn" onclick="goBack()">⬅ Zpět</button>
 
 <div id="playerStats">
     <div id="levelDisplay">
@@ -1462,6 +1462,31 @@ body {
 </div>
 
 <script>
+ async function safeSave() {
+    try {
+        if (typeof window.saveUserData === 'function') {
+            await window.saveUserData();
+        }
+    } catch (e) {
+        console.error('Chyba při ukládání:', e);
+    }
+}
+
+async function goBack() {
+    try {
+        // stop herní smyčky + eventy (když bys náhodou byl ve hře)
+        clearTimeout(dropTimeout);
+        clearTimeout(eventTimeout);
+        try { endEvent(); } catch {}
+        activeEvent = null;
+
+        await safeSave();
+    } finally {
+        window.location.href = 'hry.html';
+    }
+}
+window.goBack = goBack;
+
 let selectedDifficulty = 'medium';
 let mapRows = 20;
 let mapCols = 10;
@@ -1581,19 +1606,27 @@ function updateLevelDisplay() {
     document.getElementById('xpText').textContent = `${currentProgress} / ${xpNeeded} XP`;
 }
 
-function addXP(amount) {
-    if (playerLevel >= 10) return;
-    
+async function addXP(amount) {
+    if (playerLevel >= 10) return amount;
+
     playerXP += amount;
-    
+
     while (playerLevel < 10 && playerXP >= xpRequirements[playerLevel]) {
         playerLevel++;
         showLevelUpNotification();
         updateUnlockedItems();
     }
-    
+
     updateLevelDisplay();
+
+    // ✅ okamžitý persist (Supabase / localStorage)
+    if (typeof window.saveUserData === 'function') {
+        await window.saveUserData();
+    }
+
+    return amount;
 }
+window.addXP = addXP;
 
 function showLevelUpNotification() {
     const notification = document.createElement('div');
@@ -1764,6 +1797,7 @@ function loadLocalData() {
 }
 
 async function saveUserData() {
+ window.saveUserData = saveUserData;
     if (!currentUser || currentUser.is_guest) {
         const data = {
             coins: playerCoins,
@@ -1808,7 +1842,7 @@ async function updateAfterGame(finalScore) {
     earnedCoinsThisGame = totalCoins
     playerCoins += totalCoins
     
-    addXP(earnedXP)
+    await addXP(earnedXP)
     
     console.log(`Získané mince: ${totalCoins}, XP: ${earnedXP}`)
     console.log(`Celkem mincí: ${playerCoins}, Level: ${playerLevel}, XP: ${playerXP}`)
@@ -2605,9 +2639,11 @@ document.addEventListener('keydown', e => {
     }
     
     if (e.key === 'Escape') {
-        backToMainMenu();
-        return;
-    }
+    backToMainMenu();
+    safeSave(); // bez await (listener není async)
+    return;
+}
+
     
     if (isPaused) return;
     
@@ -2762,3 +2798,4 @@ await loadCurrentUser()
 </script>
 </body>
 </html>
+
