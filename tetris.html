@@ -1581,7 +1581,7 @@ function updateLevelDisplay() {
     document.getElementById('xpText').textContent = `${currentProgress} / ${xpNeeded} XP`;
 }
 
-function addXP(amount) {
+async function addXP(amount) {
     if (playerLevel >= 10) return;
     
     playerXP += amount;
@@ -1593,6 +1593,10 @@ function addXP(amount) {
     }
     
     updateLevelDisplay();
+    
+    console.log(`💎 XP přidáno: +${amount} | Level: ${playerLevel} | XP: ${playerXP}`);
+    await saveUserData();
+    console.log('✅ Data uložena po XP změně');
 }
 
 function showLevelUpNotification() {
@@ -1768,7 +1772,7 @@ async function saveUserData() {
         const data = {
             coins: playerCoins,
             level: playerLevel,
-            xp: playerXP,
+            xp: playerXP,  // ✅ Toto musí být tady
             themes: unlockedThemes,
             maps: unlockedMaps
         }
@@ -1782,7 +1786,7 @@ async function saveUserData() {
             .update({
                 coins: playerCoins,
                 level: playerLevel,
-                xp: playerXP,
+                xp: playerXP,  // ✅ A tady také
                 unlocked_themes: unlockedThemes,
                 unlocked_maps: unlockedMaps,
                 games_played: totalGamesPlayed
@@ -1790,28 +1794,28 @@ async function saveUserData() {
             .eq('user_id', currentUser.id)
         
         if (error) throw error
+        console.log('✅ Data uložena do Supabase')  // ✅ Přidej log
     } catch (error) {
-        console.error('Chyba při ukládání dat:', error)
+        console.error('❌ Chyba při ukládání dat:', error)
     }
 }
 
 async function updateAfterGame(finalScore) {
-    totalGamesPlayed++
+    totalGamesPlayed++;
     
-    // Mince: každých 100 bodů = 5 mincí + bonus 10
-    const coinsFromScore = Math.floor(finalScore / 100) * 5
-    const totalCoins = coinsFromScore + 10
+    const coinsFromScore = Math.floor(finalScore / 100) * 5;
+    const totalCoins = coinsFromScore + 10;
+    const earnedXP = Math.floor(finalScore / 1000) * 10;
     
-    // XP: každých 1000 bodů = 10 XP
-    const earnedXP = Math.floor(finalScore / 1000) * 10
+    earnedCoinsThisGame = totalCoins;
+    playerCoins += totalCoins;
     
-    earnedCoinsThisGame = totalCoins
-    playerCoins += totalCoins
+    await addXP(earnedXP);  // ✅ DŮLEŽITÉ: Musí být AWAIT!
     
-    addXP(earnedXP)
+    console.log(`Získané mince: ${totalCoins}, XP: ${earnedXP}`);
+    console.log(`Celkem mincí: ${playerCoins}, Level: ${playerLevel}, XP: ${playerXP}`);
     
-    console.log(`Získané mince: ${totalCoins}, XP: ${earnedXP}`)
-    console.log(`Celkem mincí: ${playerCoins}, Level: ${playerLevel}, XP: ${playerXP}`)
+    // Zbytek funkce...
     
     if (!currentUser || currentUser.is_guest) {
         saveUserData()
@@ -2763,6 +2767,7 @@ await loadCurrentUser()
 </script>
 </body>
 </html>
+
 
 
 
