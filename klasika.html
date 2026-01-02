@@ -545,9 +545,9 @@ const xpRequirements = [
     2250  // Level 10 (1800 + 450)
 ];
 
-// ✅ Definice funkcí PŘED jejich použitím
-function updateCoinsDisplay() {
-    document.getElementById('coinCount').textContent = playerCoins;
+function getXPForNextLevel(currentLevel) {
+    if (currentLevel >= 10) return 0;
+    return xpRequirements[currentLevel];
 }
 
 function updateLevelDisplay() {
@@ -569,12 +569,7 @@ function updateLevelDisplay() {
     document.getElementById('xpBar').style.width = percentage + '%';
     document.getElementById('xpText').textContent = `${currentProgress} / ${xpNeeded} XP`;
 }
-    
-function getXPForNextLevel(currentLevel) {
-    if (currentLevel >= 10) return 0;
-    return xpRequirements[currentLevel];
-}
-   
+
 async function addXP(amount) {
     if (playerLevel >= 10) return amount;
     
@@ -798,6 +793,10 @@ async function updateAfterGame(finalScore) {
     updateCoinsDisplay()
     updateLevelDisplay()
     return earnedXP
+}
+
+window.updateCoinsDisplay = function() {
+    document.getElementById('coinCount').textContent = playerCoins
 }
 
 // Barevná témata
@@ -1237,8 +1236,6 @@ setTimeout(() => {
 </script>
 </body>
 </html>
-
-
 
 
 
