@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="cs">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Slav Clicker</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+  <!-- LOADING -->
+  <div id="loading">
+    <div class="loader">
+      <div class="title">SLAV CLICKER</div>
+      <div class="hint" id="t_startHint">klikni pro start</div>
+    </div>
+  </div>
+
+  <!-- AUDIO -->
+  <audio id="clickSnd" src="click.mp3" preload="auto"></audio>
+  <audio id="bgMusic" src="go.mp3" preload="auto" loop></audio>
+
+  <!-- SETTINGS MODAL -->
+  <div id="settingsModal" class="modal" aria-hidden="true">
+    <div class="modalBox">
+      <div class="modalHeader">
+        <div id="t_settingsTitle" class="modalTitle">Nastavení</div>
+        <button id="btnCloseSettings" class="iconBtn" title="Zavřít">✖</button>
+      </div>
+
+      <div class="modalRow">
+        <label class="switchRow">
+          <input type="checkbox" id="musicToggle" checked>
+          <span id="t_musicLabel">Hudba</span>
+        </label>
+      </div>
+
+      <div class="modalRow">
+        <label for="langSelect" id="t_langLabel">Jazyk</label>
+        <select id="langSelect" class="select">
+          <option value="cs">Čeština</option>
+          <option value="en">English</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <!-- GAME -->
+  <div class="wrap">
+
+    <!-- LEFT -->
+    <div class="leftcol">
+      <div class="logo">SLAV <span>CLICKER</span></div>
+
+      <div class="ring" id="gopnik">
+        <img id="gopnikImg" src="gopnik_A.png" alt="gopnik">
+      </div>
+    </div>
+
+    <!-- PANEL -->
+    <div class="panel">
+
+      <div class="panelTop">
+        <button id="btnSettings" class="iconBtn" title="Nastavení">⚙️</button>
+      </div>
+
+      <h2 id="t_moneyTitle">PENÍZE</h2>
+      <div class="stat"><span>Peníze:</span><b id="money">0</b></div>
+      <div class="stat"><span>Za klik:</span><b id="cpc">1</b></div>
+      <div class="stat"><span>Za sekundu:</span><b id="cps">0</b></div>
+
+      <h2 id="t_shopTitle" style="margin-top:15px">OBCHOD</h2>
+
+      <div class="item">
+        <b id="t_itemCursor">Kurzor</b><br>
+        +0.1 / s<br>
+        <button id="buyCursor">Koupit (15)</button>
+      </div>
+
+      <div class="item">
+        <b id="t_itemGranny">Babička</b><br>
+        +1 / s<br>
+        <button id="buyGranny">Koupit (100)</button>
+      </div>
+
+      <div class="item">
+        <b id="t_itemClick">Síla kliku</b><br>
+        <button id="buyClick">Vylepšit (50)</button>
+      </div>
+
+      <h2 id="t_prestigeTitle" style="margin-top:15px">PRESTIGE</h2>
+
+      <div class="item prestigeBox">
+        <div class="prestigeStat"><span>Slav Points:</span><b id="sp">0</b></div>
+        <div class="prestigeStat"><span>Bonus celkem:</span><b id="bonus">+0%</b></div>
+
+        <div class="prestigeBonus">
+          Získáš při prestiži: <b id="spGain">0</b>
+        </div>
+
+        <button id="btnPrestige" class="prestigeBtn" disabled>Prestige (reset)</button>
+
+        <small id="t_prestigeHint" class="prestigeHint">
+          Resetuje peníze a upgradey, ale dá trvalý bonus.
+        </small>
+      </div>
+
+      <small id="t_danceHint">Tanec gopníka (A ↔ B)</small>
+    </div>
+  </div>
+
+  <!-- JS -->
+  <script src="game.js"></script>
+</body>
+</html>
