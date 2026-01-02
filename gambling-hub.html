@@ -88,11 +88,11 @@
                    <div id="slotControls">
                         <div id="betAmount">Sázka: <span id="currentBet">10</span> 🪙</div>
                         <div class="bet-controls">
-                            <button class="bet-btn" onclick="setBet(10)">10 🪙</button>
-                            <button class="bet-btn" onclick="setBet(25)">50 🪙</button>
-                            <button class="bet-btn" onclick="setBet(50)">100 🪙</button>
-                            <button class="bet-btn" onclick="setBet(100)">500 🪙</button>
-                        </div>
+                        <button class="bet-btn" onclick="setBet(10)">10 🪙</button>
+                        <button class="bet-btn active" onclick="setBet(50)">50 🪙</button>
+                        <button class="bet-btn" onclick="setBet(100)">100 🪙</button>
+                        <button class="bet-btn" onclick="setBet(500)">500 🪙</button>
+                    </div>
                         <button id="spinSlotBtn" onclick="spinSlot()">🎰 ZATOČIT 🎰</button>
                         <div id="slotResult"></div>
                     </div>
@@ -214,6 +214,7 @@
     <script type="module" src="script.js"></script>
 </body>
 </html>
+
 
 
 
