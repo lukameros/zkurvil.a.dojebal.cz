@@ -1565,9 +1565,13 @@ function updateHappyHourIndicator() {
 // Aktualizuj indikátor každou minutu
 setInterval(updateHappyHourIndicator, 60000);
 
-// Aktualizuj hned při načtení
+// Happy Hours system
+const HAPPY_HOURS = [15, 20]; // 15:00 a 20:00
+// Spusť při načtení
+window.addEventListener('DOMContentLoaded', () => {
+    startPageLoading();
     updateHappyHourIndicator();
-    loadSettings();// Přidej tenhle řádek
+    loadSettings();
 });
 
  // Happy Hours system
@@ -3011,6 +3015,7 @@ await loadCurrentUser()
 </script>
 </body>
 </html>
+
 
 
 
