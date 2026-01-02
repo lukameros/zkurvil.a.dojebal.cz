@@ -6,6 +6,117 @@
 
 <style>
 
+/* ===== panel top (settings button) ===== */
+.panelTop{
+  display:flex;
+  justify-content:flex-end;
+  margin-bottom:8px;
+}
+
+.iconBtn{
+  background:#6d4b2a;
+  color:#fff;
+  border:none;
+  padding:6px 10px;
+  border-radius:8px;
+  cursor:pointer;
+  font-weight:900;
+  box-shadow:0 10px 25px rgba(0,0,0,.25);
+}
+.iconBtn:active{ transform: translateY(1px); }
+
+/* ===== modal ===== */
+.modal{
+  position:fixed;
+  inset:0;
+  display:none;
+  place-items:center;
+  z-index:10000;
+}
+.modal.show{ display:grid; }
+
+.modal::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  background:rgba(0,0,0,.55);
+  backdrop-filter: blur(2px);
+}
+
+.modalBox{
+  position:relative;
+  width:min(420px, 92vw);
+  padding:18px;
+  border-radius:16px;
+  overflow:hidden;
+
+  background-image: url("rug_panel.png");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+
+  border: 10px solid #7a1f1f;
+  box-shadow:
+    inset 0 0 0 4px #e6c88f,
+    0 20px 40px rgba(0,0,0,.55);
+
+  isolation:isolate;
+}
+
+.modalBox::before{
+  content:"";
+  position:absolute;
+  inset: 14px;
+  background: rgba(255, 248, 230, 0.96);
+  border-radius: 12px;
+  z-index:0;
+}
+
+.modalBox > *{ position:relative; z-index:1; color:#2b1a0f; }
+
+.modalHeader{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  margin-bottom:10px;
+}
+
+.modalTitle{
+  font-weight:900;
+  font-size:22px;
+  background: rgba(255,255,255,.55);
+  display:inline-block;
+  padding:4px 10px;
+  border-radius:8px;
+}
+
+.modalRow{
+  margin-top:10px;
+  background: rgba(255,245,220,.95);
+  border: 2px solid #9b6a2f;
+  border-radius:10px;
+  padding:10px;
+  box-shadow: inset 0 0 8px rgba(0,0,0,.18);
+}
+
+.switchRow{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  font-weight:800;
+}
+
+.select{
+  width:100%;
+  margin-top:6px;
+  padding:8px 10px;
+  border-radius:8px;
+  border:2px solid #9b6a2f;
+  background: rgba(255,255,255,.85);
+  font-weight:700;
+}
+
+
   /* ===== LOADING OVERLAY ===== */
 #loading{
   position:fixed;
@@ -276,12 +387,15 @@ small{ display:block; margin-top:10px; }
   </div>
 
   <div class="panel">
-    <h2>PENÍZE</h2>
+    <div class="panelTop">
+  <button id="btnSettings" class="iconBtn" title="Nastavení">⚙️</button>
+</div>
+    <h2 id="t_moneyTitle">PENÍZE</h2>
     <div class="stat"><span>Peníze:</span><b id="money">0</b></div>
     <div class="stat"><span>Za klik:</span><b id="cpc">1</b></div>
     <div class="stat"><span>Za sekundu:</span><b id="cps">0</b></div>
 
-    <h2 style="margin-top:15px">OBCHOD</h2>
+    <h2 id="t_shopTitle" style="margin-top:15px">OBCHOD</h2>
 
     <div class="item">
       <b>Kurzor</b><br>
@@ -306,14 +420,137 @@ small{ display:block; margin-top:10px; }
 </div>
 
 <script>
+
+function applyLang(lang){
+  const t = i18n[lang] || i18n.cs;
+
+  const el = (id) => document.getElementById(id);
+
+  if(el("t_settingsTitle")) el("t_settingsTitle").textContent = t.settingsTitle;
+  if(el("t_musicLabel")) el("t_musicLabel").textContent = t.music;
+  if(el("t_langLabel")) el("t_langLabel").textContent = t.lang;
+
+  if(el("t_moneyTitle")) el("t_moneyTitle").textContent = t.moneyTitle;
+  if(el("t_shopTitle")) el("t_shopTitle").textContent = t.shopTitle;
+
+  if(el("t_itemCursor")) el("t_itemCursor").textContent = t.cursor;
+  if(el("t_itemGranny")) el("t_itemGranny").textContent = t.granny;
+  if(el("t_itemClick")) el("t_itemClick").textContent = t.clickPower;
+
+  // přepíš text tlačítek, ale zachovej ceny
+  const curPrice = 15, graPrice = 100, clkPrice = 50;
+  if(btnCursor) btnCursor.textContent = `${t.buy} (${curPrice})`;
+  if(btnGranny) btnGranny.textContent = `${t.buy} (${graPrice})`;
+  if(btnClick)  btnClick.textContent  = `${t.upgrade} (${clkPrice})`;
+
+  if(el("t_danceHint")) el("t_danceHint").textContent = t.dance;
+  if(el("t_startHint")) el("t_startHint").textContent = t.startHint;
+
+  localStorage.setItem("slavLang", lang);
+}
+
+function applyMusicEnabled(enabled){
+  localStorage.setItem("musicEnabled", enabled ? "1" : "0");
+
+  if(!bgMusic) return;
+
+  if(enabled){
+    bgMusic.muted = false;
+    bgMusic.volume = 0.35;
+
+    // pokus o play – pokud už jsi kliknul start/otevřel settings, je to user gesture a projde
+    bgMusic.play().catch(()=>{});
+  }else{
+    bgMusic.pause();
+    bgMusic.currentTime = 0;
+  }
+}
+
+btnSettings.addEventListener("click", () => {
+  settingsModal.classList.add("show");
+  settingsModal.setAttribute("aria-hidden","false");
+});
+
+btnCloseSettings.addEventListener("click", () => {
+  settingsModal.classList.remove("show");
+  settingsModal.setAttribute("aria-hidden","true");
+});
+
+// klik mimo box zavře
+settingsModal.addEventListener("click", (e) => {
+  if(e.target === settingsModal){
+    settingsModal.classList.remove("show");
+    settingsModal.setAttribute("aria-hidden","true");
+  }
+});
+
+musicToggle.addEventListener("change", () => {
+  applyMusicEnabled(musicToggle.checked);
+});
+
+langSelect.addEventListener("change", () => {
+  applyLang(langSelect.value);
+});
+
+// init z localStorage
+const savedMusic = localStorage.getItem("musicEnabled");
+musicToggle.checked = (savedMusic !== "0"); // default ON
+applyMusicEnabled(musicToggle.checked);
+
+const savedLang = localStorage.getItem("slavLang") || "cs";
+langSelect.value = savedLang;
+applyLang(savedLang);
+
+  
 const loading = document.getElementById("loading");
 const bgMusic = document.getElementById("bgMusic");
 
 loading.addEventListener("click", () => {
-  bgMusic.volume = 0.35;
-  bgMusic.play().catch(()=>{});
+  if(musicToggle.checked){
+    bgMusic.volume = 0.35;
+    bgMusic.play().catch(()=>{});
+  }
   loading.style.display = "none";
 }, { once:true });
+
+// ===== SETTINGS UI =====
+const settingsModal = document.getElementById("settingsModal");
+const btnSettings = document.getElementById("btnSettings");
+const btnCloseSettings = document.getElementById("btnCloseSettings");
+const musicToggle = document.getElementById("musicToggle");
+const langSelect = document.getElementById("langSelect");
+
+// texty (minimální i18n)
+const i18n = {
+  cs: {
+    settingsTitle: "Nastavení",
+    music: "Hudba",
+    lang: "Jazyk",
+    moneyTitle: "PENÍZE",
+    shopTitle: "OBCHOD",
+    cursor: "Kurzor",
+    granny: "Babička",
+    clickPower: "Síla kliku",
+    buy: "Koupit",
+    upgrade: "Vylepšit",
+    dance: "Tanec gopníka (A ↔ B)",
+    startHint: "klikni pro start"
+  },
+  en: {
+    settingsTitle: "Settings",
+    music: "Music",
+    lang: "Language",
+    moneyTitle: "MONEY",
+    shopTitle: "SHOP",
+    cursor: "Cursor",
+    granny: "Grandma",
+    clickPower: "Click power",
+    buy: "Buy",
+    upgrade: "Upgrade",
+    dance: "Gopnik dance (A ↔ B)",
+    startHint: "click to start"
+  }
+};
 
   
 let unmuted = false;
@@ -403,9 +640,33 @@ window.addEventListener("load", () => {
 });
 
 </script>
+<div id="settingsModal" class="modal" aria-hidden="true">
+  <div class="modalBox">
+    <div class="modalHeader">
+      <div id="t_settingsTitle" class="modalTitle">Nastavení</div>
+      <button id="btnCloseSettings" class="iconBtn" title="Zavřít">✖</button>
+    </div>
+
+    <div class="modalRow">
+      <label class="switchRow">
+        <input type="checkbox" id="musicToggle" checked>
+        <span id="t_musicLabel">Hudba</span>
+      </label>
+    </div>
+
+    <div class="modalRow">
+      <label for="langSelect" id="t_langLabel">Jazyk</label>
+      <select id="langSelect" class="select">
+        <option value="cs">Čeština</option>
+        <option value="en">English</option>
+      </select>
+    </div>
+  </div>
+</div>
 
 </body>
 </html>
+
 
 
 
