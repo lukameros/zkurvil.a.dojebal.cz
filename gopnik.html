@@ -421,6 +421,135 @@ small{ display:block; margin-top:10px; }
 
 <script>
 
+  // ===== DOM refs =====
+const loading = document.getElementById("loading");
+const bgMusic = document.getElementById("bgMusic");
+
+const settingsModal = document.getElementById("settingsModal");
+const btnSettings = document.getElementById("btnSettings");
+const btnCloseSettings = document.getElementById("btnCloseSettings");
+const musicToggle = document.getElementById("musicToggle");
+const langSelect = document.getElementById("langSelect");
+
+// shop button refs (už existují i pro render())
+const btnCursor = document.getElementById("buyCursor");
+const btnGranny = document.getElementById("buyGranny");
+const btnClick  = document.getElementById("buyClick");
+
+// ===== i18n =====
+const i18n = {
+  cs: {
+    settingsTitle: "Nastavení",
+    music: "Hudba",
+    lang: "Jazyk",
+    moneyTitle: "PENÍZE",
+    shopTitle: "OBCHOD",
+    cursor: "Kurzor",
+    granny: "Babička",
+    clickPower: "Síla kliku",
+    buy: "Koupit",
+    upgrade: "Vylepšit",
+    dance: "Tanec gopníka (A ↔ B)",
+    startHint: "klikni pro start"
+  },
+  en: {
+    settingsTitle: "Settings",
+    music: "Music",
+    lang: "Language",
+    moneyTitle: "MONEY",
+    shopTitle: "SHOP",
+    cursor: "Cursor",
+    granny: "Grandma",
+    clickPower: "Click power",
+    buy: "Buy",
+    upgrade: "Upgrade",
+    dance: "Gopnik dance (A ↔ B)",
+    startHint: "click to start"
+  }
+};
+
+function applyLang(lang){
+  const t = i18n[lang] || i18n.cs;
+  const el = (id) => document.getElementById(id);
+
+  if(el("t_settingsTitle")) el("t_settingsTitle").textContent = t.settingsTitle;
+  if(el("t_musicLabel")) el("t_musicLabel").textContent = t.music;
+  if(el("t_langLabel")) el("t_langLabel").textContent = t.lang;
+
+  if(el("t_moneyTitle")) el("t_moneyTitle").textContent = t.moneyTitle;
+  if(el("t_shopTitle")) el("t_shopTitle").textContent = t.shopTitle;
+
+  if(el("t_itemCursor")) el("t_itemCursor").textContent = t.cursor;
+  if(el("t_itemGranny")) el("t_itemGranny").textContent = t.granny;
+  if(el("t_itemClick"))  el("t_itemClick").textContent  = t.clickPower;
+
+  const curPrice = 15, graPrice = 100, clkPrice = 50;
+  if(btnCursor) btnCursor.textContent = `${t.buy} (${curPrice})`;
+  if(btnGranny) btnGranny.textContent = `${t.buy} (${graPrice})`;
+  if(btnClick)  btnClick.textContent  = `${t.upgrade} (${clkPrice})`;
+
+  if(el("t_danceHint")) el("t_danceHint").textContent = t.dance;
+  if(el("t_startHint")) el("t_startHint").textContent = t.startHint;
+
+  localStorage.setItem("slavLang", lang);
+}
+
+function applyMusicEnabled(enabled){
+  localStorage.setItem("musicEnabled", enabled ? "1" : "0");
+  if(!bgMusic) return;
+
+  if(enabled){
+    bgMusic.muted = false;
+    bgMusic.volume = 0.35;
+    // play jen pokud už je user gesture (start/settings)
+    bgMusic.play().catch(()=>{});
+  }else{
+    bgMusic.pause();
+    bgMusic.currentTime = 0;
+  }
+}
+
+// ===== modal handlers =====
+btnSettings.addEventListener("click", () => {
+  settingsModal.classList.add("show");
+  settingsModal.setAttribute("aria-hidden","false");
+});
+
+btnCloseSettings.addEventListener("click", () => {
+  settingsModal.classList.remove("show");
+  settingsModal.setAttribute("aria-hidden","true");
+});
+
+settingsModal.addEventListener("click", (e) => {
+  if(e.target === settingsModal){
+    settingsModal.classList.remove("show");
+    settingsModal.setAttribute("aria-hidden","true");
+  }
+});
+
+// ===== controls =====
+musicToggle.addEventListener("change", () => applyMusicEnabled(musicToggle.checked));
+langSelect.addEventListener("change", () => applyLang(langSelect.value));
+
+// init
+const savedMusic = localStorage.getItem("musicEnabled");
+musicToggle.checked = (savedMusic !== "0");
+applyMusicEnabled(musicToggle.checked);
+
+const savedLang = localStorage.getItem("slavLang") || "cs";
+langSelect.value = savedLang;
+applyLang(savedLang);
+
+// ===== loading click starts game music =====
+loading.addEventListener("click", () => {
+  if(musicToggle.checked){
+    bgMusic.volume = 0.35;
+    bgMusic.play().catch(()=>{});
+  }
+  loading.style.display = "none";
+}, { once:true });
+
+
 function applyLang(lang){
   const t = i18n[lang] || i18n.cs;
 
@@ -663,6 +792,7 @@ window.addEventListener("load", () => {
 
 </body>
 </html>
+
 
 
 
