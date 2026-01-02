@@ -1489,48 +1489,12 @@ let playerXP = 0;
 let playerCoins = 0;
 let unlockedThemes = ['classic', 'neon'];
 let unlockedMaps = ['20x10', '18x12'];
+let currentUser = null;
 let totalGamesPlayed = 0;
 
 let activeEvent = null;
 let eventTimeout = null;
 let canRotate = true;
-
- function updateHappyHourDisplay() {
-    const display = document.getElementById('happyHourDisplay');
-    if (!display) return;
-    
-    if (isHappyHour()) {
-        display.textContent = '🎉 HAPPY HOUR! 2× MINCE! 🎉';
-        display.className = 'active';
-    } else {
-        const nextHour = getNextHappyHour();
-        const currentHour = new Date().getHours();
-        const hoursUntil = nextHour > currentHour ? nextHour - currentHour : (24 - currentHour) + nextHour;
-        
-        display.textContent = `⏰ Další Happy Hour za ${hoursUntil}h (${nextHour}:00)`;
-        display.className = 'countdown';
-    }
-}
-
-// Aktualizuj každou minutu
-setInterval(updateHappyHourDisplay, 60000);
-
- // Happy Hours system
-function isHappyHour() {
-    const hour = new Date().getHours();
-    return hour === 15 || hour === 20;
-}
-
-function getHappyHourMultiplier() {
-    return isHappyHour() ? 2.0 : 1.0;
-}
-
-function getNextHappyHour() {
-    const hour = new Date().getHours();
-    if (hour < 15) return 15;
-    if (hour < 20) return 20;
-    return 15; // Další den
-}
 
 function startPageLoading() {
     const loadingTime = 3000 + Math.random() * 3000;
@@ -1567,14 +1531,12 @@ function startPageLoading() {
     }, interval);
     
     setTimeout(() => {
-    document.getElementById('loadingScreen').style.display = 'none';
-    document.getElementById('mainMenu').style.display = 'flex';
-    loadingBar.style.width = '0%';
-    loadingText.textContent = 'Připravuji herní pole...';
-    
-    // ✅ PŘIDEJ TOTO:
-    updateHappyHourDisplay();
-}, loadingTime);
+        document.getElementById('loadingScreen').style.display = 'none';
+        document.getElementById('mainMenu').style.display = 'flex';
+        loadingBar.style.width = '0%';
+        loadingText.textContent = 'Připravuji herní pole...';
+    }, loadingTime);
+}
 
 // Spusť loading při načtení stránky
 window.addEventListener('DOMContentLoaded', () => {
@@ -1694,14 +1656,8 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.3'
 
 const SUPABASE_URL = 'https://bmmaijlbpwgzhrxzxphf.supabase.co'
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJtbWFpamxicHdnemhyeHp4cGhmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjY4NjQ5MDcsImV4cCI6MjA4MjQ0MDkwN30.s0YQVnAjMXFu1pSI1NXZ2naSab179N0vQPglsmy3Pgw'
-let currentUser = null;
+
 const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
-window.playerLevel = 1;
-window.playerXP = 0;
-window.playerCoins = 0;
-window.unlockedThemes = ['classic', 'neon'];
-window.unlockedMaps = ['20x10', '18x12'];
-window.totalGamesPlayed = 0;
 
 async function loadCurrentUser() {
     const savedUser = localStorage.getItem('currentUser')
@@ -1763,18 +1719,13 @@ async function loadUserData() {
             .single()
         
         if (data) {
-            window.playerCoins = data.coins || 0
-            window.playerLevel = data.level || 1
-            window.playerXP = data.xp || 0
-            window.unlockedThemes = data.unlocked_themes || ['classic', 'neon']
-            window.unlockedMaps = data.unlocked_maps || ['20x10', '18x12']
-            window.totalGamesPlayed = data.games_played || 0
-            console.log('Data načtena:', { 
-                playerCoins: window.playerCoins, 
-                playerLevel: window.playerLevel, 
-                playerXP: window.playerXP, 
-                totalGamesPlayed: window.totalGamesPlayed 
-            })
+            playerCoins = data.coins || 0
+            playerLevel = data.level || 1
+            playerXP = data.xp || 0
+            unlockedThemes = data.unlocked_themes || ['classic', 'neon']
+            unlockedMaps = data.unlocked_maps || ['20x10', '18x12']
+            totalGamesPlayed = data.games_played || 0
+            console.log('Data načtena:', { playerCoins, playerLevel, playerXP, totalGamesPlayed })
         } else {
             console.log('První spuštění - vytvářím nový záznam')
             await supabase
@@ -1805,11 +1756,11 @@ function loadLocalData() {
     const saved = localStorage.getItem('tetrisPlayerData')
     if (saved) {
         const data = JSON.parse(saved)
-        window.playerCoins = data.coins || 0
-        window.playerLevel = data.level || 1
-        window.playerXP = data.xp || 0
-        window.unlockedThemes = data.themes || ['classic', 'neon']
-        window.unlockedMaps = data.maps || ['20x10', '18x12']
+        playerCoins = data.coins || 0
+        playerLevel = data.level || 1
+        playerXP = data.xp || 0
+        unlockedThemes = data.themes || ['classic', 'neon']
+        unlockedMaps = data.maps || ['20x10', '18x12']
     }
     updateCoinsDisplay()
     updateLevelDisplay()
@@ -1819,11 +1770,11 @@ function loadLocalData() {
 async function saveUserData() {
     if (!currentUser || currentUser.is_guest) {
         const data = {
-            coins: window.playerCoins,
-            level: window.playerLevel,
-            xp: window.playerXP,
-            themes: window.unlockedThemes,
-            maps: window.unlockedMaps
+            coins: playerCoins,
+            level: playerLevel,
+            xp: playerXP,  // ✅ Toto musí být tady
+            themes: unlockedThemes,
+            maps: unlockedMaps
         }
         localStorage.setItem('tetrisPlayerData', JSON.stringify(data))
         return
@@ -1833,17 +1784,17 @@ async function saveUserData() {
         const { error } = await supabase
             .from('tetris_player_data')
             .update({
-                coins: window.playerCoins,
-                level: window.playerLevel,
-                xp: window.playerXP,
-                unlocked_themes: window.unlockedThemes,
-                unlocked_maps: window.unlockedMaps,
-                games_played: window.totalGamesPlayed
+                coins: playerCoins,
+                level: playerLevel,
+                xp: playerXP,  // ✅ A tady také
+                unlocked_themes: unlockedThemes,
+                unlocked_maps: unlockedMaps,
+                games_played: totalGamesPlayed
             })
             .eq('user_id', currentUser.id)
         
         if (error) throw error
-        console.log('✅ Data uložena do Supabase')
+        console.log('✅ Data uložena do Supabase')  // ✅ Přidej log
     } catch (error) {
         console.error('❌ Chyba při ukládání dat:', error)
     }
@@ -1852,27 +1803,19 @@ async function saveUserData() {
 async function updateAfterGame(finalScore) {
     totalGamesPlayed++;
     
-    const happyMultiplier = getHappyHourMultiplier();
-    
-    // Mince: každých 100 bodů = 5 mincí + bonus 10
-    const baseCoins = Math.floor(finalScore / 100) * 5 + 10;
-    const totalCoins = Math.floor(baseCoins * happyMultiplier);
-    
-    // XP: každých 1000 bodů = 10 XP (XP se nemění)
+    const coinsFromScore = Math.floor(finalScore / 100) * 5;
+    const totalCoins = coinsFromScore + 10;
     const earnedXP = Math.floor(finalScore / 1000) * 10;
     
     earnedCoinsThisGame = totalCoins;
     playerCoins += totalCoins;
     
-    await addXP(earnedXP);
-    
-    // ✅ NOVÝ: Zobraz Happy Hour info
-    if (happyMultiplier > 1) {
-        console.log(`🎉 HAPPY HOUR! Mince: ${baseCoins} × ${happyMultiplier} = ${totalCoins}!`);
-    }
+    await addXP(earnedXP);  // ✅ DŮLEŽITÉ: Musí být AWAIT!
     
     console.log(`Získané mince: ${totalCoins}, XP: ${earnedXP}`);
     console.log(`Celkem mincí: ${playerCoins}, Level: ${playerLevel}, XP: ${playerXP}`);
+    
+    // Zbytek funkce...
     
     if (!currentUser || currentUser.is_guest) {
         saveUserData()
@@ -2722,10 +2665,6 @@ async function gameOver() {
     clearTimeout(eventTimeout);
     
     const earnedXP = await updateAfterGame(score);
-
- const happyMultiplier = getHappyHourMultiplier();
-    const happyMessage = happyMultiplier > 1 ? 
-        '<div style="color: #ffd700; font-size: 24px; margin: 10px 0;">🎉 HAPPY HOUR BONUS! 2× MINCE! 🎉</div>' : '';
     
     if (currentUser && !currentUser.is_guest) {
         try {
@@ -2824,15 +2763,10 @@ function getDifficultyEmoji(difficulty) {
         default: return '❓'
     }
 }
-
-// Inicializace při načtení stránky
 await loadCurrentUser()
 </script>
 </body>
 </html>
-
-
-
 
 
 
