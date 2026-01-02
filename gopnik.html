@@ -209,7 +209,7 @@ small{ display:block; margin-top:10px; }
 <body>
 
 <audio id="clickSnd" src="click.mp3" preload="auto"></audio>
-<audio id="bgMusic" src="go.mp3" autoplay muted loop></audio>
+<audio id="bgMusic" src="go.mp3" preload="auto" loop></audio>
 
 
 <div class="wrap">
@@ -253,6 +253,7 @@ small{ display:block; margin-top:10px; }
 </div>
 
 <script>
+  
 const bgMusic = document.getElementById("bgMusic");
 let unmuted = false;
 
@@ -332,8 +333,18 @@ setInterval(() => { money += cps; render(); }, 1000);
 
 loadGame();
 render();
+window.addEventListener("load", () => {
+  if(bgMusic){
+    bgMusic.volume = 0.35;
+    bgMusic.play().catch(err => {
+      console.warn("Autoplay zablokován:", err);
+    });
+  }
+});
+
 </script>
 
 </body>
 </html>
+
 
