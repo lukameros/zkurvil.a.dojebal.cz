@@ -1499,13 +1499,36 @@ let activeEvent = null;
 let eventTimeout = null;
 let canRotate = true;
 
- function updateHappyHourIndicator() {
+function updateHappyHourIndicator() {
     const indicator = document.getElementById('happyHourIndicator');
-    if (indicator) {
-        indicator.style.display = isHappyHour() ? 'block' : 'none';
+    if (!indicator) return;
+    
+    if (isHappyHour()) {
+        // Aktivní Happy Hour - zelený
+        indicator.style.display = 'block';
+        indicator.style.background = 'linear-gradient(135deg, rgba(255, 215, 0, 0.95), rgba(255, 165, 0, 0.95))';
+        indicator.style.borderColor = 'gold';
+        indicator.innerHTML = '🎉 HAPPY HOUR AKTIVNÍ! 2× 🎉';
+    } else {
+        // Neaktivní - informace kdy bude
+        const now = new Date();
+        const currentHour = now.getHours();
+        let nextHappyHour;
+        
+        if (currentHour < 15) {
+            nextHappyHour = '15:00';
+        } else if (currentHour < 20) {
+            nextHappyHour = '20:00';
+        } else {
+            nextHappyHour = '15:00 (zítra)';
+        }
+        
+        indicator.style.display = 'block';
+        indicator.style.background = 'linear-gradient(135deg, rgba(100, 100, 100, 0.7), rgba(70, 70, 70, 0.7))';
+        indicator.style.borderColor = '#888';
+        indicator.innerHTML = `⏰ Další Happy Hour v ${nextHappyHour}`;
     }
 }
-
 // Aktualizuj indikátor každou minutu
 setInterval(updateHappyHourIndicator, 60000);
 
@@ -2844,6 +2867,7 @@ await loadCurrentUser()
 </script>
 </body>
 </html>
+
 
 
 
