@@ -1430,11 +1430,17 @@ body {
 <div id="tetrisGame" class="centered">
     <div class="game-container">
         <div class="side-panel">
-            <div class="info-box">
-                <h3>DALŠÍ</h3>
-                <div id="nextPiece"></div>
-            </div>
-        </div>
+  <div class="info-box">
+    <h3>DALŠÍ</h3>
+    <div id="nextPiece"></div>
+  </div>
+
+  <div class="info-box">
+    <h3>HOLD</h3>
+    <div id="holdPiece"></div>
+  </div>
+</div>
+
         <div>
             <div id="tetris"></div>
         </div>
@@ -1866,7 +1872,6 @@ function loadLocalData() {
 }
 
 async function saveUserData() {
- window.saveUserData = saveUserData;
     if (!currentUser || currentUser.is_guest) {
         const data = {
             coins: playerCoins,
@@ -1898,6 +1903,8 @@ async function saveUserData() {
     }
 }
 
+window.saveUserData = saveUserData;
+ 
 async function updateAfterGame(finalScore) {
     totalGamesPlayed++
     
@@ -2867,6 +2874,7 @@ await loadCurrentUser()
 </script>
 </body>
 </html>
+
 
 
 
