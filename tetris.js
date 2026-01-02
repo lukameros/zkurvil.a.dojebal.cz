@@ -396,6 +396,83 @@ window.closeUpdateModal = function() {
     }
 }
 
+// ===== CASINO VISUAL EFFECTS =====
+function createStars() {
+    const starsContainer = document.getElementById('stars')
+    if (!starsContainer) return
+    
+    for (let i = 0; i < 100; i++) {
+        const star = document.createElement('div')
+        star.className = 'star'
+        star.style.left = Math.random() * 100 + '%'
+        star.style.top = Math.random() * 100 + '%'
+        star.style.animationDelay = Math.random() * 3 + 's'
+        starsContainer.appendChild(star)
+    }
+}
+
+function createFallingCoins() {
+    for (let i = 0; i < 10; i++) {
+        setTimeout(() => {
+            const coin = document.createElement('div')
+            coin.className = 'falling-coin'
+            coin.textContent = '💰'
+            coin.style.left = Math.random() * 100 + '%'
+            coin.style.animationDelay = Math.random() * 0.5 + 's'
+            document.body.appendChild(coin)
+            
+            setTimeout(() => coin.remove(), 3000)
+        }, i * 200)
+    }
+}
+
+function createConfetti() {
+    const colors = ['#ffd700', '#ff6b6b', '#00ffff', '#ff00ff', '#00ff00']
+    
+    for (let i = 0; i < 50; i++) {
+        setTimeout(() => {
+            const confetti = document.createElement('div')
+            confetti.className = 'confetti'
+            confetti.style.left = Math.random() * 100 + '%'
+            confetti.style.background = colors[Math.floor(Math.random() * colors.length)]
+            confetti.style.animationDelay = Math.random() * 0.3 + 's'
+            document.body.appendChild(confetti)
+            
+            setTimeout(() => confetti.remove(), 3000)
+        }, i * 30)
+    }
+}
+
+function showJackpot() {
+    const jackpot = document.createElement('div')
+    jackpot.className = 'jackpot-flash'
+    jackpot.textContent = '💎 JACKPOT! 💎'
+    document.body.appendChild(jackpot)
+    
+    playSound('coin')
+    createFallingCoins()
+    
+    setTimeout(() => jackpot.remove(), 1000)
+}
+
+function toggleCasinoTheme() {
+    document.body.classList.toggle('casino-theme')
+    const isCasino = document.body.classList.contains('casino-theme')
+    localStorage.setItem('tetris_casino_theme', isCasino)
+}
+
+// Načti casino theme při startu
+if (localStorage.getItem('tetris_casino_theme') === 'true') {
+    document.body.classList.add('casino-theme')
+}
+
+// Inicializuj hvězdy
+window.addEventListener('DOMContentLoaded', () => {
+    createStars()
+    updateHappyHourIndicator()
+    loadSettings()
+    startPageLoading()
+})
 // ===== USER DATA MANAGEMENT =====
 // ===== INITIALIZE =====
 async function loadCurrentUser() {
@@ -593,7 +670,7 @@ function showLevelUpNotification() {
     }
     
     const notification = document.createElement('div')
-    notification.className = 'level-up-notification'
+    notification.className = 'level-up-notification neon-border'
     
     notification.innerHTML = `
         <h2>🎉 LEVEL UP! 🎉</h2>
@@ -604,6 +681,7 @@ function showLevelUpNotification() {
     
     document.body.appendChild(notification)
     playSound('levelup')
+    createConfetti()
 }
 
 window.closeLevelUpNotification = function(button) {
@@ -708,16 +786,13 @@ async function addCoins(amount) {
     updateCoinsDisplay()
     await saveUserData()
     
-    for (let i = 0; i < 5; i++) {
-        setTimeout(() => {
-            const coin = document.createElement('div')
-            coin.className = 'coin-particle'
-            coin.textContent = '💰'
-            coin.style.left = (window.innerWidth / 2 + Math.random() * 200 - 100) + 'px'
-            coin.style.top = (window.innerHeight / 2) + 'px'
-            document.body.appendChild(coin)
-            setTimeout(() => coin.remove(), 2000)
-        }, i * 100)
+    playSound('coin')
+    
+    // Jackpot při velkém zisku
+    if (amount >= 100) {
+        showJackpot()
+    } else {
+        createFallingCoins()
     }
 }
 
@@ -1126,6 +1201,7 @@ function togglePause() {
 
 function playSound(type) {
     if (!soundEnabled) return
+    
     const audioContext = new (window.AudioContext || window.webkitAudioContext)()
     const oscillator = audioContext.createOscillator()
     const gainNode = audioContext.createGain()
@@ -1133,38 +1209,87 @@ function playSound(type) {
     oscillator.connect(gainNode)
     gainNode.connect(audioContext.destination)
     
-    let duration = 0.1
+    let duration = 0.15
     
     switch(type) {
         case 'rotate':
-            oscillator.frequency.value = 400
-            gainNode.gain.value = 0.1
-            break
-        case 'drop':
-            oscillator.frequency.value = 200
-            gainNode.gain.value = 0.2
-            break
-        case 'clear':
-            oscillator.frequency.value = 800
-            gainNode.gain.value = 0.15
-            break
-        case 'hold':
+            // Melodický zvuk rotace
             oscillator.frequency.value = 600
-            gainNode.gain.value = 0.1
+            gainNode.gain.setValueAtTime(0.15, audioContext.currentTime)
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.1)
+            oscillator.type = 'sine'
             break
+            
+        case 'drop':
+            // Basový drop
+            oscillator.frequency.value = 150
+            gainNode.gain.setValueAtTime(0.3, audioContext.currentTime)
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.15)
+            oscillator.type = 'square'
+            break
+            
+        case 'clear':
+            // Úspěšný clear - vzestupný tón
+            oscillator.frequency.setValueAtTime(400, audioContext.currentTime)
+            oscillator.frequency.exponentialRampToValueAtTime(1200, audioContext.currentTime + 0.2)
+            gainNode.gain.setValueAtTime(0.2, audioContext.currentTime)
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.2)
+            oscillator.type = 'triangle'
+            duration = 0.2
+            break
+            
+        case 'hold':
+            // Soft hold zvuk
+            oscillator.frequency.value = 500
+            gainNode.gain.setValueAtTime(0.1, audioContext.currentTime)
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.12)
+            oscillator.type = 'sine'
+            duration = 0.12
+            break
+            
         case 'event':
-            oscillator.frequency.value = 1000
-            gainNode.gain.value = 0.3
+            // Dramatický event zvuk
+            oscillator.frequency.setValueAtTime(800, audioContext.currentTime)
+            oscillator.frequency.exponentialRampToValueAtTime(1600, audioContext.currentTime + 0.15)
+            oscillator.frequency.exponentialRampToValueAtTime(600, audioContext.currentTime + 0.3)
+            gainNode.gain.setValueAtTime(0.3, audioContext.currentTime)
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3)
+            oscillator.type = 'sawtooth'
             duration = 0.3
             break
+            
         case 'levelup':
-            oscillator.frequency.value = 1200
-            gainNode.gain.value = 0.3
+            // Slavnostní level up
+            const freq1 = 800
+            const freq2 = 1000
+            const freq3 = 1200
+            
+            oscillator.frequency.setValueAtTime(freq1, audioContext.currentTime)
+            oscillator.frequency.setValueAtTime(freq2, audioContext.currentTime + 0.15)
+            oscillator.frequency.setValueAtTime(freq3, audioContext.currentTime + 0.3)
+            gainNode.gain.setValueAtTime(0.3, audioContext.currentTime)
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5)
+            oscillator.type = 'triangle'
             duration = 0.5
             break
+            
         case 'error':
-            oscillator.frequency.value = 150
-            gainNode.gain.value = 0.2
+            // Chybový bzučák
+            oscillator.frequency.value = 100
+            gainNode.gain.setValueAtTime(0.2, audioContext.currentTime)
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.1)
+            oscillator.type = 'sawtooth'
+            duration = 0.1
+            break
+            
+        case 'coin':
+            // Casino coin sound
+            oscillator.frequency.setValueAtTime(1200, audioContext.currentTime)
+            oscillator.frequency.exponentialRampToValueAtTime(1800, audioContext.currentTime + 0.1)
+            gainNode.gain.setValueAtTime(0.25, audioContext.currentTime)
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.15)
+            oscillator.type = 'sine'
+            duration = 0.15
             break
     }
     
@@ -1494,4 +1619,5 @@ function startEventSystem() {
 
 // ===== INITIALIZE =====
 loadCurrentUser()
+
 
