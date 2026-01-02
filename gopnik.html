@@ -209,6 +209,8 @@ small{ display:block; margin-top:10px; }
 <body>
 
 <audio id="clickSnd" src="click.mp3" preload="auto"></audio>
+<audio id="bgMusic" src="go.mp3" autoplay muted loop></audio>
+
 
 <div class="wrap">
 
@@ -251,6 +253,9 @@ small{ display:block; margin-top:10px; }
 </div>
 
 <script>
+const bgMusic = document.getElementById("bgMusic");
+let unmuted = false;
+
 let money = 0, cpc = 1, cps = 0;
 
 const imgs = ["gopnik_A.png", "gopnik_B.png"];
@@ -261,6 +266,9 @@ const cpcEl    = document.getElementById("cpc");
 const cpsEl    = document.getElementById("cps");
 const gopnikImg= document.getElementById("gopnikImg");
 const clickSnd = document.getElementById("clickSnd");
+const bgMusic = document.getElementById("bgMusic");
+let musicStarted = false;
+
 
 const btnCursor = document.getElementById("buyCursor");
 const btnGranny = document.getElementById("buyGranny");
@@ -290,6 +298,15 @@ function render(){
   saveGame();
 }
 
+document.addEventListener("click", () => {
+  if(!unmuted && bgMusic){
+    bgMusic.muted = false;
+    bgMusic.volume = 0.35; // nastav hlasitost
+    unmuted = true;
+  }
+}, { once: true });
+  
+  
 document.getElementById("gopnik").onclick = () => {
   if(clickSnd){
     clickSnd.currentTime = 0;
@@ -319,3 +336,4 @@ render();
 
 </body>
 </html>
+
