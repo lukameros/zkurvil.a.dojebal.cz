@@ -47,6 +47,16 @@
     text-shadow: 0 0 10px rgba(0, 0, 0, 0.8);
 }
 
+@keyframes fadeIn {
+    from { opacity: 0; transform: scale(0.9); }
+    to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes fadeOut {
+    from { opacity: 1; transform: scale(1); }
+    to { opacity: 0; transform: scale(0.9); }
+}
+
 .event-timer {
     position: fixed;
     top: 80px;
@@ -1603,12 +1613,14 @@ function startPageLoading() {
     }, interval);
     
     setTimeout(() => {
-        document.getElementById('loadingScreen').style.display = 'none';
-        document.getElementById('mainMenu').style.display = 'flex';
-        loadingBar.style.width = '0%';
-        loadingText.textContent = 'Připravuji herní pole...';
-    }, loadingTime);
-}
+    document.getElementById('loadingScreen').style.display = 'none';
+    document.getElementById('mainMenu').style.display = 'flex';
+    loadingBar.style.width = '0%';
+    loadingText.textContent = 'Připravuji herní pole...';
+    
+    // Zobraz update modal po 500ms
+    setTimeout(() => showUpdateModal(), 500);
+}, loadingTime);
 
 // Spusť loading při načtení stránky
 window.addEventListener('DOMContentLoaded', () => {
@@ -1673,7 +1685,7 @@ async function addXP(amount) {
     updateLevelDisplay();
     
     console.log(`💎 XP přidáno: +${amount} | Level: ${playerLevel} | XP: ${playerXP}`);
-    await saveUserData();
+    await saveUserData(); // ✅ DŮLEŽITÉ - musí být await
     console.log('✅ Data uložena po XP změně');
 }
  
@@ -1684,10 +1696,14 @@ function showLevelUpNotification() {
         <h2>🎉 LEVEL UP! 🎉</h2>
         <p>Dosáhl jsi Level ${playerLevel}!</p>
         <p style="font-size: 20px; margin-top: 10px;">Nové položky odemčeny v shopu! 🛒</p>
+        <button class="menuBtn" onclick="this.parentElement.remove()" style="margin-top: 20px; min-width: 200px;">
+            ✅ Pokračovat
+        </button>
     `;
     document.body.appendChild(notification);
     
     playSound('levelup');
+}
     
     setTimeout(() => {
         notification.classList.add('hide');
@@ -1696,36 +1712,92 @@ function showLevelUpNotification() {
 }
 
 function showUpdateModal() {
-    if (!hasSeenUpdateModal) {
-        setTimeout(() => {
-            const modal = document.createElement('div');
-            modal.className = 'modal';
-            modal.id = 'updateModalContainer';
-            modal.style.display = 'flex';
-            modal.innerHTML = `
-                <div class="modal-content">
-                    <h2>🎉 NOVÁ AKTUALIZACE! 🎉</h2>
-                    <div style="color: #fff; font-size: 18px; text-align: left; margin: 20px 0;">
-                        <p style="margin: 10px 0;">✨ <strong>Nové funkce:</strong></p>
-                        <ul style="margin-left: 20px; line-height: 1.8;">
-                            <li>🎰 Výhry i se 2 stejnými symboly!</li>
-                            <li>🏆 20+ nových úspěchů</li>
-                            <li>📋 15 denních úkolů</li>
-                            <li>🎨 Vylepšené téma mění celou hru</li>
-                            <li>💰 Denní bonus 300 mincí každých 12h</li>
-                        </ul>
-                        <p style="margin: 15px 0; font-size: 16px; color: #00ffaa; text-align: center; padding: 10px; background: rgba(0,255,170,0.1); border-radius: 10px;">
-                            🎮 Hra je 100% ZDARMA, bez mikrotransakcí<br>
-                            👶 Vhodné pro hráče od 10 let
-                        </p>
-                    </div>
-                    <button class="modal-close" onclick="closeUpdateModal()">SUPER! ZAČNĚME HRÁT! 🎰</button>
+    const hasSeenUpdate = localStorage.getItem('tetris_update_v2.0_seen');
+    if (hasSeenUpdate) return; // Už viděl
+    
+    const modal = document.createElement('div');
+    modal.id = 'updateModal';
+    modal.style.cssText = `
+        display: flex;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.9);
+        justify-content: center;
+        align-items: center;
+        z-index: 10000;
+    `;
+    
+    modal.innerHTML = `
+        <div style="
+            background: linear-gradient(135deg, #1a1a2e, #2a2a4e);
+            padding: 40px;
+            border-radius: 20px;
+            border: 3px solid #00ffff;
+            box-shadow: 0 0 60px rgba(0, 255, 255, 0.6);
+            max-width: 600px;
+            text-align: center;
+            animation: fadeIn 0.5s ease-in;
+        ">
+            <h2 style="font-size: 48px; color: #00ffff; text-shadow: 0 0 20px #00ffff; margin-bottom: 20px;">
+                🎉 NOVÁ AKTUALIZACE! 🎉
+            </h2>
+            
+            <div style="text-align: left; margin: 30px 0; font-size: 18px; line-height: 1.8;">
+                <p style="color: #00ffff; font-weight: bold; margin-bottom: 15px;">✨ Co je nového:</p>
+                <ul style="color: #fff; margin-left: 25px;">
+                    <li>🎊 <strong>Happy Hours</strong> - 2× skóre a mince v 15:00 a 20:00!</li>
+                    <li>⭐ <strong>Level systém</strong> - získávej XP a odemykej obsah</li>
+                    <li>🎨 <strong>15 nových témat</strong> - od Fire po Galaxy!</li>
+                    <li>🗺️ <strong>16 různých map</strong> - od 10x25 po 25x25</li>
+                    <li>⚡ <strong>6 random eventů</strong> - Turbo Speed, Invisible Blocks...</li>
+                    <li>🏆 <strong>Online žebříček</strong> - konkuruj ostatním hráčům!</li>
+                    <li>💰 <strong>Coinový systém</strong> - nakupuj témata a mapy</li>
+                </ul>
+                
+                <div style="
+                    margin: 25px 0;
+                    padding: 20px;
+                    background: rgba(0, 255, 170, 0.1);
+                    border: 2px solid #00ffaa;
+                    border-radius: 15px;
+                    text-align: center;
+                ">
+                    <p style="color: #00ffaa; font-size: 20px; margin: 0;">
+                        🎮 Hra je 100% <strong>ZDARMA</strong>, bez reklam a mikrotransakcí
+                    </p>
+                    <p style="color: #00ffaa; font-size: 16px; margin-top: 10px;">
+                        👶 Vhodné pro hráče od <strong>10 let</strong>
+                    </p>
                 </div>
-            `;
-            document.body.appendChild(modal);
-        }, 3500);
+            </div>
+            
+            <button onclick="closeUpdateModal()" class="menuBtn" style="
+                margin-top: 20px;
+                font-size: 24px;
+                padding: 15px 50px;
+                background: linear-gradient(135deg, #00ffaa, #00cc88);
+                border: 3px solid #00ffaa;
+                box-shadow: 0 0 30px rgba(0, 255, 170, 0.5);
+            ">
+                🚀 ZAČÍT HRÁT! 🚀
+            </button>
+        </div>
+    `;
+    
+    document.body.appendChild(modal);
+}
+
+window.closeUpdateModal = function() {
+    localStorage.setItem('tetris_update_v2.0_seen', 'true');
+    const modal = document.getElementById('updateModal');
+    if (modal) {
+        modal.style.animation = 'fadeOut 0.3s ease-out';
+        setTimeout(() => modal.remove(), 300);
     }
-} 
+}
  
 </script>
 
@@ -1850,11 +1922,12 @@ async function saveUserData() {
         const data = {
             coins: playerCoins,
             level: playerLevel,
-            xp: playerXP,  // ✅ Toto musí být tady
+            xp: playerXP,
             themes: unlockedThemes,
             maps: unlockedMaps
         }
         localStorage.setItem('tetrisPlayerData', JSON.stringify(data))
+        console.log('💾 Uloženo lokálně:', data) // Debug log
         return
     }
     
@@ -1864,7 +1937,7 @@ async function saveUserData() {
             .update({
                 coins: playerCoins,
                 level: playerLevel,
-                xp: playerXP,  // ✅ A tady také
+                xp: playerXP,
                 unlocked_themes: unlockedThemes,
                 unlocked_maps: unlockedMaps,
                 games_played: totalGamesPlayed
@@ -1872,12 +1945,12 @@ async function saveUserData() {
             .eq('user_id', currentUser.id)
         
         if (error) throw error
-        console.log('✅ Data uložena do Supabase')  // ✅ Přidej log
+        console.log('✅ Data uložena do Supabase - Level:', playerLevel, 'XP:', playerXP)
     } catch (error) {
         console.error('❌ Chyba při ukládání dat:', error)
     }
 }
-
+ 
 async function updateAfterGame(finalScore) {
     totalGamesPlayed++;
     
@@ -2856,6 +2929,7 @@ await loadCurrentUser()
 </script>
 </body>
 </html>
+
 
 
 
