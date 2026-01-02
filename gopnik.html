@@ -532,11 +532,6 @@ settingsModal.addEventListener("click", (e) => {
 musicToggle.addEventListener("change", () => applyMusicEnabled(musicToggle.checked));
 langSelect.addEventListener("change", () => applyLang(langSelect.value));
 
-// init
-const savedMusic = localStorage.getItem("musicEnabled");
-musicToggle.checked = (savedMusic !== "0");
-applyMusicEnabled(musicToggle.checked);
-
 const savedLang = localStorage.getItem("slavLang") || "cs";
 langSelect.value = savedLang;
 applyLang(savedLang);
@@ -793,6 +788,7 @@ window.addEventListener("load", () => {
 
 </body>
 </html>
+
 
 
 
