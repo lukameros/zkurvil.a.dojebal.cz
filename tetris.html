@@ -2138,18 +2138,18 @@ async function saveUserData() {
         const { error } = await supabase
             .from('tetris_player_data')
             .update({
-                coins: playerCoins,
-                level: playerLevel,
-                xp: playerXP,
-                unlocked_themes: unlockedThemes,
-                unlocked_maps: unlockedMaps,
-                games_played: totalGamesPlayed
-                achievements: achievementsState,
-                missions: missionsState,
-                missions_last_reset: missionsLastReset,
-                lifetime_lines: lifetimeLines,
+  coins: playerCoins,
+  level: playerLevel,
+  xp: playerXP,
+  unlocked_themes: unlockedThemes,
+  unlocked_maps: unlockedMaps,
+  games_played: totalGamesPlayed,
+  achievements: achievementsState,
+  missions: missionsState,
+  missions_last_reset: missionsLastReset,
+  lifetime_lines: lifetimeLines
+})
 
-            })
             .eq('user_id', currentUser.id)
         
         if (error) throw error
@@ -3168,6 +3168,7 @@ await loadCurrentUser()
 </script>
 </body>
 </html>
+
 
 
 
