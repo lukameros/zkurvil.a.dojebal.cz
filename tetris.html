@@ -1598,6 +1598,8 @@ let activeEvent = null;
 let eventTimeout = null;
 let canRotate = true;
 let currentUser = null;
+let backgroundMusic = null;
+let isMusicPlaying = false;
 
 function updateHappyHourIndicator() {
     const indicator = document.getElementById('happyHourIndicator');
@@ -1680,6 +1682,79 @@ function loadSettings() {
     updateSettingsUI();
 }
 
+// ========================================
+// HUDEBNÍ SYSTÉM
+// ========================================
+function initBackgroundMusic() {
+    if (!soundEnabled) return;
+    
+    // Vytvoř hudbu pomocí Web Audio API
+    const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    
+    // Jednoduché melodie pro Tetris
+    const melodies = [
+        // Tetris Theme A (zjednodušeno)
+        [659, 494, 523, 587, 523, 494, 440, 440, 523, 659, 587, 523, 494, 494, 523, 587, 659, 523, 440, 440],
+        // Tetris Theme B
+        [587, 494, 523, 440, 392, 392, 440, 523, 494, 440, 392, 440, 523, 587, 659, 523, 440, 392, 392, 440]
+    ];
+    
+    let currentNote = 0;
+    let currentMelody = 0;
+    let musicInterval = null;
+    
+    window.startBackgroundMusic = function() {
+        if (!soundEnabled || isMusicPlaying) return;
+        
+        isMusicPlaying = true;
+        currentNote = 0;
+        currentMelody = Math.floor(Math.random() * melodies.length);
+        
+        musicInterval = setInterval(() => {
+            if (!soundEnabled || !isMusicPlaying) {
+                clearInterval(musicInterval);
+                return;
+            }
+            
+            const melody = melodies[currentMelody];
+            const frequency = melody[currentNote];
+            
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            
+            oscillator.frequency.value = frequency;
+            oscillator.type = 'square'; // Retro zvuk
+            gainNode.gain.value = 0.05; // Tichá hudba na pozadí
+            
+            oscillator.start(audioContext.currentTime);
+            oscillator.stop(audioContext.currentTime + 0.3);
+            
+            currentNote = (currentNote + 1) % melody.length;
+            
+            // Změň melodii po dokončení
+            if (currentNote === 0) {
+                currentMelody = (currentMelody + 1) % melodies.length;
+            }
+        }, 400);
+    };
+    
+    window.stopBackgroundMusic = function() {
+        isMusicPlaying = false;
+        if (musicInterval) {
+            clearInterval(musicInterval);
+            musicInterval = null;
+        }
+    };
+}
+
+// Spusť hudbu při startu hry
+window.addEventListener('DOMContentLoaded', () => {
+    initBackgroundMusic();
+});
+ 
 // Aktualizuj UI tlačítek
 function updateSettingsUI() {
     const soundOnBtn = document.getElementById('soundOn');
@@ -2332,6 +2407,322 @@ const themes = {
     crystal: ['#e0ffff', '#afeeee', '#add8e6', '#87ceeb', '#b0e0e6', '#d4f1f4', '#c0f0f5']
 }
 
+// ========================================
+// POKROČILÝ THEME SYSTÉM
+// ========================================
+const advancedThemes = {
+    classic: {
+        colors: ['cyan', 'yellow', 'purple', 'green', 'red', 'blue', 'orange'],
+        background: 'linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 50%, #0a0a0a 100%)',
+        gridBorder: '#00ffff',
+        cellBg: '#1a1a2e',
+        textColor: '#ffffff',
+        glowColor: '#ff00ff'
+    },
+    neon: {
+        colors: ['#00ffff', '#ff00ff', '#ffff00', '#00ff00', '#ff0080', '#0080ff', '#ff8000'],
+        background: 'linear-gradient(135deg, #000000 0%, #1a001a 50%, #001a1a 100%)',
+        gridBorder: '#ff00ff',
+        cellBg: '#0a0a0a',
+        textColor: '#00ffff',
+        glowColor: '#ff00ff'
+    },
+    fire: {
+        colors: ['#ff0000', '#ff4500', '#ff6347', '#ff7f50', '#ffa500', '#ffb84d', '#ff8c00'],
+        background: 'linear-gradient(135deg, #1a0000 0%, #330000 50%, #1a0000 100%)',
+        gridBorder: '#ff4500',
+        cellBg: '#220000',
+        textColor: '#ffaa00',
+        glowColor: '#ff0000',
+        particles: '🔥'
+    },
+    ice: {
+        colors: ['#00bfff', '#4169e1', '#1e90ff', '#87ceeb', '#add8e6', '#b0e0e6', '#87cefa'],
+        background: 'linear-gradient(135deg, #001a33 0%, #003366 50%, #001a33 100%)',
+        gridBorder: '#00bfff',
+        cellBg: '#001a2e',
+        textColor: '#87ceeb',
+        glowColor: '#00bfff',
+        particles: '❄️'
+    },
+    matrix: {
+        colors: ['#00ff00', '#00cc00', '#00aa00', '#008800', '#00ff41', '#33ff33', '#66ff66'],
+        background: 'linear-gradient(135deg, #000000 0%, #001a00 50%, #000000 100%)',
+        gridBorder: '#00ff00',
+        cellBg: '#001100',
+        textColor: '#00ff00',
+        glowColor: '#00ff00',
+        particles: '0',
+        font: 'Courier New, monospace'
+    },
+    galaxy: {
+        colors: ['#4b0082', '#8a2be2', '#9370db', '#9932cc', '#ba55d3', '#da70d6', '#ee82ee'],
+        background: 'radial-gradient(circle, #1a0033 0%, #000033 50%, #000000 100%)',
+        gridBorder: '#8a2be2',
+        cellBg: '#0a001a',
+        textColor: '#da70d6',
+        glowColor: '#8a2be2',
+        particles: '✨',
+        stars: true
+    },
+    rainbow: {
+        colors: ['#ff0000', '#ff7f00', '#ffff00', '#00ff00', '#0000ff', '#4b0082', '#9400d3'],
+        background: 'linear-gradient(135deg, #1a001a 0%, #001a1a 25%, #1a1a00 50%, #001a00 75%, #1a001a 100%)',
+        gridBorder: '#ffffff',
+        cellBg: '#0a0a0a',
+        textColor: '#ffffff',
+        glowColor: 'rainbow',
+        animated: true
+    },
+    gold: {
+        colors: ['#ffd700', '#ffdf00', '#ffb347', '#daa520', '#b8860b', '#cd853f', '#ff8c00'],
+        background: 'linear-gradient(135deg, #1a1300 0%, #332600 50%, #1a1300 100%)',
+        gridBorder: '#ffd700',
+        cellBg: '#221a00',
+        textColor: '#ffd700',
+        glowColor: '#ffd700',
+        particles: '💎',
+        shimmer: true
+    }
+};
+
+function applyThemeToGame() {
+    const theme = advancedThemes[currentTheme] || advancedThemes.classic;
+    
+    // Pozadí
+    document.body.style.background = theme.background;
+    
+    // Grid a buňky
+    const tetrisGrid = document.getElementById('tetris');
+    if (tetrisGrid) {
+        tetrisGrid.style.borderColor = theme.gridBorder;
+        tetrisGrid.style.boxShadow = `0 0 40px ${theme.gridBorder}`;
+    }
+    
+    // Všechny buňky
+    document.querySelectorAll('.cell').forEach(cell => {
+        if (!cell.classList.contains('filled')) {
+            cell.style.background = theme.cellBg;
+        }
+    });
+    
+    // Text barvy
+    document.querySelectorAll('h1, h2, h3').forEach(el => {
+        el.style.color = theme.textColor;
+        el.style.textShadow = `0 0 20px ${theme.glowColor}`;
+    });
+    
+    // Tlačítka
+    document.querySelectorAll('.menuBtn:not(.locked)').forEach(btn => {
+        btn.style.borderColor = theme.gridBorder;
+        btn.style.boxShadow = `0 0 20px ${theme.gridBorder}40`;
+    });
+    
+    // Info boxy
+    document.querySelectorAll('.info-box').forEach(box => {
+        box.style.borderColor = theme.gridBorder;
+        box.style.boxShadow = `0 0 20px ${theme.gridBorder}30`;
+    });
+    
+    // Speciální efekty
+    if (theme.stars) {
+        createStarfield();
+    }
+    
+    if (theme.animated) {
+        animateRainbowBackground();
+    }
+    
+    if (theme.shimmer) {
+        addShimmerEffect();
+    }
+    
+    // Font
+    if (theme.font) {
+        document.body.style.fontFamily = theme.font;
+    }
+}
+
+// Hvězdné pole pro Galaxy téma
+function createStarfield() {
+    const existing = document.getElementById('starfield');
+    if (existing) existing.remove();
+    
+    const starfield = document.createElement('div');
+    starfield.id = 'starfield';
+    starfield.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        z-index: -1;
+    `;
+    
+    for (let i = 0; i < 100; i++) {
+        const star = document.createElement('div');
+        star.style.cssText = `
+            position: absolute;
+            width: ${Math.random() * 3}px;
+            height: ${Math.random() * 3}px;
+            background: white;
+            border-radius: 50%;
+            top: ${Math.random() * 100}%;
+            left: ${Math.random() * 100}%;
+            animation: twinkle ${2 + Math.random() * 3}s infinite;
+            opacity: ${Math.random()};
+        `;
+        starfield.appendChild(star);
+    }
+    
+    document.body.appendChild(starfield);
+    
+    // Animace
+    const style = document.createElement('style');
+    style.textContent = `
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.2; }
+            50% { opacity: 1; }
+        }
+    `;
+    document.head.appendChild(style);
+}
+
+// Animovaná duha pro Rainbow téma
+function animateRainbowBackground() {
+    let hue = 0;
+    setInterval(() => {
+        hue = (hue + 1) % 360;
+        document.body.style.background = `linear-gradient(135deg, 
+            hsl(${hue}, 70%, 10%) 0%, 
+            hsl(${(hue + 60) % 360}, 70%, 15%) 50%, 
+            hsl(${(hue + 120) % 360}, 70%, 10%) 100%)`;
+    }, 50);
+}
+
+// Třpytivý efekt pro Gold téma
+function addShimmerEffect() {
+    const style = document.createElement('style');
+    style.textContent = `
+        @keyframes shimmer {
+            0% { background-position: -1000px 0; }
+            100% { background-position: 1000px 0; }
+        }
+        .cell.filled {
+            background-image: linear-gradient(90deg, 
+                transparent, 
+                rgba(255, 255, 255, 0.3), 
+                transparent);
+            background-size: 1000px 100%;
+            animation: shimmer 3s infinite;
+        }
+    `;
+    document.head.appendChild(style);
+}
+
+// Aplikuj téma při změně
+const originalSetTheme = window.setTheme;
+window.setTheme = function(theme) {
+    originalSetTheme(theme);
+    applyThemeToGame();
+};
+ 
+// ========================================
+// POWER-UPY SYSTÉM
+// ========================================
+const powerUps = [
+    {
+        name: '⚡ Slow Time',
+        emoji: '⏱️',
+        duration: 8000,
+        effect: () => {
+            dropInterval *= 2;
+            setTimeout(() => {
+                dropInterval /= 2;
+            }, 8000);
+        }
+    },
+    {
+        name: '💣 Clear Bottom',
+        emoji: '💣',
+        instant: true,
+        effect: () => {
+            // Vyčisti spodní 3 řádky
+            for (let i = 0; i < 3; i++) {
+                grid.splice(mapRows - 1, 1);
+                grid.unshift(Array(mapCols).fill(0));
+            }
+            score += 500;
+            createParticles(3);
+        }
+    },
+    {
+        name: '🎯 Perfect Drop',
+        emoji: '🎯',
+        duration: 15000,
+        effect: () => {
+            // Zobraz stín kam kostka dopadne
+            const style = document.createElement('style');
+            style.id = 'perfectDropStyle';
+            style.textContent = `
+                .cell.shadow {
+                    background: rgba(255, 255, 255, 0.2) !important;
+                    border: 2px dashed #ffffff;
+                }
+            `;
+            document.head.appendChild(style);
+            
+            setTimeout(() => {
+                const styleEl = document.getElementById('perfectDropStyle');
+                if (styleEl) styleEl.remove();
+            }, 15000);
+        }
+    },
+    {
+        name: '🌟 Score Boost',
+        emoji: '🌟',
+        duration: 10000,
+        multiplier: 3,
+        effect: () => {
+            // Score multiplier je už v eventTypes
+        }
+    }
+];
+
+function spawnPowerUp() {
+    if (Math.random() < 0.15) { // 15% šance
+        const powerUp = powerUps[Math.floor(Math.random() * powerUps.length)];
+        
+        const notification = document.createElement('div');
+        notification.className = 'event-notification';
+        notification.style.background = 'linear-gradient(135deg, rgba(0, 200, 255, 0.95), rgba(0, 100, 255, 0.95))';
+        notification.innerHTML = `
+            <h2>${powerUp.emoji} POWER-UP!</h2>
+            <p>${powerUp.name}</p>
+        `;
+        document.body.appendChild(notification);
+        
+        setTimeout(() => {
+            notification.classList.add('hide');
+            setTimeout(() => notification.remove(), 300);
+        }, 2000);
+        
+        powerUp.effect();
+        playSound('event');
+    }
+}
+
+// Přidej power-up spawn po vyčištění řádků
+const originalClearLines = clearLines;
+window.clearLines = function() {
+    const cleared = originalClearLines();
+    if (cleared >= 2) {
+        spawnPowerUp();
+    }
+    return cleared;
+};
+ 
 const eventTypes = [
     {
         name: '⚡ TURBO SPEED',
@@ -2580,6 +2971,7 @@ window.setTheme = function(theme) {
     }
     currentTheme = theme
     backToMainMenu()
+    stopBackgroundMusic();
 }
 
 const tetris = document.getElementById('tetris')
@@ -3037,6 +3429,7 @@ function gameLoop() {
 
 async function gameOver() {
     isGameOver = true;
+    stopBackgroundMusic();
     endEvent();
     clearTimeout(eventTimeout);
     
@@ -3139,10 +3532,13 @@ function getDifficultyEmoji(difficulty) {
         default: return '❓'
     }
 }
-await loadCurrentUser()
+(async function() {
+    await loadCurrentUser();
+})();
 </script>
 </body>
 </html>
+
 
 
 
