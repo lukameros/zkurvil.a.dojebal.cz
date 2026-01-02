@@ -43,6 +43,17 @@ document.addEventListener("DOMContentLoaded", async () => {
   const spGainEl = document.getElementById("spGain");
   const btnPrestige = document.getElementById("btnPrestige");
 
+  // ===== SAFE HELPERS =====
+const must = (el, name) => {
+  if(!el) console.warn(`Chybí element #${name}`);
+  return el;
+};
+const on = (el, ev, fn, opts) => {
+  if(!el) return;
+  el.addEventListener(ev, fn, opts);
+};
+
+
   // =========================
   // CONSTANTS
   // =========================
@@ -370,7 +381,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   // =========================
   // Prestige
   // =========================
-  btnPrestige.addEventListener("click", () => {
+  on(btnPrestige, "click", () => { ... });
     const gain = calcPrestigeGain(money);
     if(gain <= 0) return;
 
@@ -564,3 +575,4 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   });
 });
+
