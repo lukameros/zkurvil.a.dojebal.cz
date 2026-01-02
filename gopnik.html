@@ -1,0 +1,321 @@
+<!doctype html>
+<html lang="cs">
+<head>
+<meta charset="utf-8">
+<title>Slav Clicker</title>
+
+<style>
+/* ===== pozadí + STOP scroll ===== */
+html, body{
+  margin:0;
+  padding:0;
+  width:100%;
+  height:100%;
+  font-family: system-ui, sans-serif;
+  background-color:#1b1b1b;
+  overflow:hidden;
+}
+
+body{
+  background-image:url("background.jpg");
+  background-repeat:no-repeat;
+  background-position:center top;
+  background-size:cover;
+  background-attachment:fixed;
+}
+
+/* ✅ ladění pozice gopníka (desktop) */
+:root{
+  --gopnik-x: 160px; /* doprava */
+  --gopnik-y: 55%;   /* dolů */
+}
+
+/* layout */
+.wrap{
+  display:grid;
+  grid-template-columns:1fr 360px;
+  gap:40px;
+  padding:24px;
+  height:100vh;
+  box-sizing:border-box;
+  position:relative;
+  z-index:1;
+}
+
+/* levá část */
+.leftcol{
+  position:relative;
+  min-height:0;
+}
+
+/* logo */
+.logo{
+  font-size:48px;
+  font-weight:900;
+  text-shadow:0 6px 18px rgba(0,0,0,.45);
+  position:relative;
+  z-index:2;
+}
+.logo span{ color:#c40000; }
+
+/* ===== gopník klik oblast ===== */
+.ring{
+  width:min(364px,80vw);
+  aspect-ratio:1/1;
+  border-radius:999px;
+  border:none;
+  box-shadow:0 25px 60px rgba(0,0,0,.6);
+  display:grid;
+  place-items:center;
+  cursor:pointer;
+  overflow:hidden;
+
+  position:absolute;
+  left:50%;
+  top:50%;
+  transform:
+    translate(-50%,-50%)
+    translateX(var(--gopnik-x))
+    translateY(var(--gopnik-y));
+
+  z-index:5;
+}
+
+/* STOP modrý klik efekt */
+.ring,
+.ring *{
+  -webkit-tap-highlight-color:transparent !important;
+  user-select:none !important;
+}
+
+/* gopnik obrázek */
+#gopnikImg{
+  width:100%;
+  height:100%;
+  object-fit:contain;
+  object-position:50% 50%;
+  pointer-events:none;
+  filter:drop-shadow(0 18px 18px rgba(0,0,0,.55));
+  transition:transform 80ms ease;
+}
+
+/* =========================
+   🧶 KOBERCOVÝ PANEL (ČITELNÝ)
+   ========================= */
+.panel{
+  position: relative;
+  padding: 22px;
+  border-radius: 16px;
+  overflow: hidden;
+
+  background-image: url("rug_panel.png");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+
+  border: 10px solid #7a1f1f;
+  box-shadow:
+    inset 0 0 0 4px #e6c88f,
+    0 20px 40px rgba(0,0,0,.55);
+
+  isolation: isolate;       /* ✅ vrstvy jen uvnitř panelu */
+  color: #2b1a0f;
+  z-index:10;
+}
+
+/* světlý "papír" NAD kobercem, POD textem */
+.panel::before{
+  content:"";
+  position:absolute;
+  inset: 14px;
+  background: rgba(255, 248, 230, 0.96);
+  border-radius: 12px;
+  z-index:0;
+  pointer-events:none;
+}
+
+/* všechno uvnitř panelu nad papírem */
+.panel > *{
+  position:relative;
+  z-index:1;
+}
+
+/* nadpisy – štítek */
+.panel h2{
+  margin: 0 0 10px;
+  color: #3b1c0b;
+  text-shadow: 0 1px 0 rgba(255,255,255,.6);
+  background: rgba(255,255,255,.55);
+  display:inline-block;
+  padding:4px 10px;
+  border-radius:8px;
+  letter-spacing:.6px;
+}
+
+/* statistiky */
+.stat{
+  display:flex;
+  justify-content:space-between;
+  margin:6px 0;
+  color:#3b1c0b;
+  font-weight:600;
+}
+.stat b{
+  color:#2a130b;
+  font-weight:900;
+}
+
+/* položky obchodu */
+.item{
+  background: rgba(255,245,220,.95);
+  border: 2px solid #9b6a2f;
+  border-radius:10px;
+  padding:10px;
+  margin-top:10px;
+  box-shadow: inset 0 0 8px rgba(0,0,0,.18);
+}
+
+/* tlačítka */
+button{
+  background:#6d4b2a;
+  color:#fff;
+  border:none;
+  padding:6px 12px;
+  border-radius:6px;
+  cursor:pointer;
+}
+button:disabled{ opacity:.4; }
+
+small{ display:block; margin-top:10px; }
+
+/* ===== mobil ===== */
+@media (max-width:980px){
+  .wrap{
+    grid-template-columns:1fr;
+    gap:20px;
+    padding:18px;
+  }
+
+  /* na mobilu držíme střed */
+  .ring{
+    left:50%;
+    top:50%;
+    transform: translate(-50%,-50%) translateY(55%);
+  }
+}
+</style>
+</head>
+
+<body>
+
+<audio id="clickSnd" src="click.mp3" preload="auto"></audio>
+
+<div class="wrap">
+
+  <div class="leftcol">
+    <div class="logo">SLAV <span>CLICKER</span></div>
+
+    <div class="ring" id="gopnik">
+      <img id="gopnikImg" src="gopnik_A.png" alt="gopnik">
+    </div>
+  </div>
+
+  <div class="panel">
+    <h2>PENÍZE</h2>
+    <div class="stat"><span>Peníze:</span><b id="money">0</b></div>
+    <div class="stat"><span>Za klik:</span><b id="cpc">1</b></div>
+    <div class="stat"><span>Za sekundu:</span><b id="cps">0</b></div>
+
+    <h2 style="margin-top:15px">OBCHOD</h2>
+
+    <div class="item">
+      <b>Kurzor</b><br>
+      +0.1 / s<br>
+      <button id="buyCursor">Koupit (15)</button>
+    </div>
+
+    <div class="item">
+      <b>Babička</b><br>
+      +1 / s<br>
+      <button id="buyGranny">Koupit (100)</button>
+    </div>
+
+    <div class="item">
+      <b>Síla kliku</b><br>
+      <button id="buyClick">Vylepšit (50)</button>
+    </div>
+
+    <small>Tanec gopníka (A ↔ B)</small>
+  </div>
+
+</div>
+
+<script>
+let money = 0, cpc = 1, cps = 0;
+
+const imgs = ["gopnik_A.png", "gopnik_B.png"];
+let imgIndex = 0;
+
+const moneyEl  = document.getElementById("money");
+const cpcEl    = document.getElementById("cpc");
+const cpsEl    = document.getElementById("cps");
+const gopnikImg= document.getElementById("gopnikImg");
+const clickSnd = document.getElementById("clickSnd");
+
+const btnCursor = document.getElementById("buyCursor");
+const btnGranny = document.getElementById("buyGranny");
+const btnClick  = document.getElementById("buyClick");
+
+function saveGame(){
+  localStorage.setItem("slavClickerSave", JSON.stringify({ money, cpc, cps }));
+}
+function loadGame(){
+  const s = localStorage.getItem("slavClickerSave");
+  if(!s) return;
+  const d = JSON.parse(s);
+  money = d.money ?? 0;
+  cpc   = d.cpc ?? 1;
+  cps   = d.cps ?? 0;
+}
+
+function render(){
+  moneyEl.textContent = Math.floor(money);
+  cpcEl.textContent = cpc;
+  cpsEl.textContent = cps.toFixed(1);
+
+  btnCursor.disabled = money < 15;
+  btnGranny.disabled = money < 100;
+  btnClick.disabled  = money < 50;
+
+  saveGame();
+}
+
+document.getElementById("gopnik").onclick = () => {
+  if(clickSnd){
+    clickSnd.currentTime = 0;
+    clickSnd.play().catch(()=>{});
+  }
+
+  money += cpc;
+
+  imgIndex = (imgIndex + 1) % imgs.length;
+  gopnikImg.src = imgs[imgIndex];
+
+  gopnikImg.style.transform = "scale(1.05)";
+  setTimeout(() => gopnikImg.style.transform = "scale(1)", 80);
+
+  render();
+};
+
+btnCursor.onclick = () => { if(money >= 15){ money -= 15;  cps += 0.1; render(); } };
+btnGranny.onclick = () => { if(money >= 100){ money -= 100; cps += 1;   render(); } };
+btnClick.onclick  = () => { if(money >= 50){ money -= 50;  cpc++;       render(); } };
+
+setInterval(() => { money += cps; render(); }, 1000);
+
+loadGame();
+render();
+</script>
+
+</body>
+</html>
