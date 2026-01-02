@@ -1222,7 +1222,46 @@ body {
     .controls {
         display: none; /* Instrukce klávesnice na mobilu nepotřebujeme */
     }
+
+.card {
+  background: rgba(30, 30, 60, 0.7);
+  border: 2px solid #00ffff;
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
+  text-align: left;
 }
+
+.card h3 {
+  margin-bottom: 6px;
+  color: #00ffff;
+  text-shadow: 0 0 10px #00ffff;
+}
+
+.card p {
+  opacity: 0.9;
+  margin: 6px 0 12px;
+}
+
+.badge {
+  display:inline-block;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-weight: bold;
+  font-size: 13px;
+  border: 2px solid rgba(255,255,255,0.2);
+}
+
+.badge.ok { color: #00ff99; border-color:#00ff99; }
+.badge.no { color: #ff7777; border-color:#ff7777; }
+
+.reward {
+  margin-top: 10px;
+  font-weight: bold;
+  color: gold;
+  text-shadow: 0 0 10px rgba(255,215,0,0.6);
+}
+
 </style>
 </head>
 <body>
@@ -1246,8 +1285,9 @@ body {
     <button class="menuBtn" onclick="startTetris(selectedDifficulty)">🚀 Magicplay</button>
     <button class="menuBtn" onclick="window.location.href='tetrismulti.html'">🌐 Multiplayer</button>
     <button class="menuBtn" onclick="showDifficultyMenu()">⚙️ Nastavení</button>
-    <button class="menuBtn" onclick="showMapMenu()">📐 Mapy</button>
-    <button class="menuBtn" onclick="showThemeMenu()">🎨 Vzhled</button>
+    <button class="menuBtn" onclick="showShop()">🛒 Obchod</button>
+    <button class="menuBtn" onclick="showAchievements()">🏅 Úspěchy</button>
+     <button class="menuBtn" onclick="showMissions()">🧩 Mise</button>
     <button class="menuBtn" onclick="showLeaderboard()">🏆 Žebříček</button>
 </div>
 
@@ -1259,6 +1299,40 @@ body {
     <button class="menuBtn" onclick="setDifficulty('insane')">💀 Šílená</button>
     <button class="menuBtn" onclick="backToMainMenu()">⬅ Zpět</button>
 </div>
+
+ <div id="shopMenu" class="centered" style="display:none;">
+  <h1>🛒 Obchod</h1>
+
+  <div style="display:flex; gap:12px; flex-wrap:wrap; justify-content:center; margin-bottom:15px;">
+    <button class="menuBtn" style="min-width:220px;" onclick="shopTab('themes')">🎨 Vzhledy</button>
+    <button class="menuBtn" style="min-width:220px;" onclick="shopTab('maps')">📐 Mapy</button>
+  </div>
+
+  <!-- THEMES -->
+  <div id="shopThemes" class="menu-section">
+    <!-- Sem jen přesuň obsah původního #themeMenu .menu-section -->
+  </div>
+
+  <!-- MAPS -->
+  <div id="shopMaps" class="menu-section" style="display:none;">
+    <!-- Sem jen přesuň obsah původního #mapMenu .menu-section -->
+  </div>
+
+  <button class="menuBtn" onclick="backToMainMenu()">⬅ Zpět</button>
+</div>
+
+ <div id="achievementsMenu" class="centered" style="display:none;">
+  <h1>🏅 Úspěchy</h1>
+  <div id="achievementsList" class="menu-section" style="grid-template-columns: 1fr;"></div>
+  <button class="menuBtn" onclick="backToMainMenu()">⬅ Zpět</button>
+</div>
+
+ <div id="missionsMenu" class="centered" style="display:none;">
+  <h1>🧩 Mise</h1>
+  <div id="missionsList" class="menu-section" style="grid-template-columns: 1fr;"></div>
+  <button class="menuBtn" onclick="backToMainMenu()">⬅ Zpět</button>
+</div>
+
 
 <div id="themeMenu" class="centered" style="display:none;">
     <h1>Barevné téma</h1>
@@ -1559,6 +1633,27 @@ let totalGamesPlayed = 0;
 let activeEvent = null;
 let eventTimeout = null;
 let canRotate = true;
+ // ===== ÚSPĚCHY & MISE =====
+let achievementsState = {}   // { id: true/false }
+let missionsState = {}       // { id: { progress, done, claimed } }
+let missionsLastReset = null;
+
+const ACHIEVEMENTS = [
+  { id:'first_game', title:'První hra', desc:'Dohraj 1 hru.', rewardCoins:100, rewardXP:10 },
+  { id:'score_5k', title:'Skóre 5 000', desc:'Získej 5 000 bodů v jedné hře.', rewardCoins:150, rewardXP:15 },
+  { id:'tetris_1', title:'První TETRIS', desc:'Smaž 4 řady najednou aspoň jednou.', rewardCoins:200, rewardXP:20 },
+  { id:'lines_50', title:'50 řad', desc:'Celkem smaž 50 řad (napříč hrami).', rewardCoins:400, rewardXP:40 },
+];
+
+const DAILY_MISSIONS = [
+  { id:'m_score_2k', title:'Denní: 2 000 bodů', desc:'Získej 2 000 bodů v jedné hře.', goal:2000, type:'score_one_game', rewardCoins:120, rewardXP:12 },
+  { id:'m_lines_10', title:'Denní: 10 řad', desc:'Smaž 10 řad v jedné hře.', goal:10, type:'lines_one_game', rewardCoins:140, rewardXP:14 },
+  { id:'m_play_1', title:'Denní: 1 hra', desc:'Odehraj 1 hru.', goal:1, type:'games_played', rewardCoins:100, rewardXP:10 },
+];
+
+// statistiky napříč hrami
+let lifetimeLines = 0;
+
 
 function startPageLoading() {
     const loadingTime = 3000 + Math.random() * 3000;
@@ -1667,6 +1762,88 @@ async function addXP(amount) {
     return amount;
 }
 window.addXP = addXP;
+
+function renderAchievements() {
+  const el = document.getElementById('achievementsList')
+  if (!el) return;
+  el.innerHTML = ''
+
+  ACHIEVEMENTS.forEach(a => {
+    const done = !!achievementsState[a.id]
+    const card = document.createElement('div')
+    card.className = 'card'
+    card.innerHTML = `
+      <h3>${a.title} <span class="badge ${done?'ok':'no'}">${done?'SPLNĚNO':'NESPLNĚNO'}</span></h3>
+      <p>${a.desc}</p>
+      <div class="reward">🎁 Odměna: 💰 ${a.rewardCoins} + ⭐ ${a.rewardXP}</div>
+    `
+    el.appendChild(card)
+  })
+}
+
+function ensureDailyMissions() {
+  const today = new Date().toISOString().slice(0,10)
+  if (missionsLastReset !== today) {
+    missionsLastReset = today
+    missionsState = {}
+    DAILY_MISSIONS.forEach(m => {
+      missionsState[m.id] = { progress: 0, done: false, claimed: false }
+    })
+  }
+}
+
+function renderMissions() {
+  ensureDailyMissions()
+  const el = document.getElementById('missionsList')
+  if (!el) return;
+  el.innerHTML = ''
+
+  DAILY_MISSIONS.forEach(m => {
+    const s = missionsState[m.id] || { progress:0, done:false, claimed:false }
+    const done = !!s.done
+    const claimed = !!s.claimed
+
+    const card = document.createElement('div')
+    card.className = 'card'
+    card.innerHTML = `
+      <h3>${m.title}
+        <span class="badge ${done?'ok':'no'}">${done?'SPLNĚNO':'PROBÍHÁ'}</span>
+      </h3>
+      <p>${m.desc}</p>
+      <div>📊 Postup: <b>${Math.min(s.progress, m.goal)}</b> / <b>${m.goal}</b></div>
+      <div class="reward">🎁 Odměna: 💰 ${m.rewardCoins} + ⭐ ${m.rewardXP}</div>
+      <div style="margin-top:12px;">
+        <button class="menuBtn" style="min-width:220px;"
+          ${(!done || claimed) ? 'disabled class="menuBtn locked"' : ''}
+          onclick="claimMission('${m.id}')">
+          ${claimed ? '✅ Odměna vybrána' : '🎁 Vybrat odměnu'}
+        </button>
+      </div>
+    `
+    el.appendChild(card)
+  })
+}
+
+async function grantRewards(coins, xp) {
+  playerCoins += (coins || 0)
+  await addXP(xp || 0)
+  updateCoinsDisplay()
+  updateLevelDisplay()
+}
+
+window.claimMission = async function(id) {
+  const m = DAILY_MISSIONS.find(x => x.id === id)
+  if (!m) return
+
+  const s = missionsState[id]
+  if (!s || !s.done || s.claimed) return
+
+  s.claimed = true
+  await grantRewards(m.rewardCoins, m.rewardXP)
+  await safeSave()
+  renderMissions()
+}
+
 
 function showLevelUpNotification() {
     const notification = document.createElement('div');
@@ -1823,6 +2000,10 @@ async function loadUserData() {
             .single()
         
         if (data) {
+            achievementsState = data.achievements || {}
+            missionsState = data.missions || {}
+            missionsLastReset = data.missions_last_reset || null
+            lifetimeLines = data.lifetime_lines || 0
             playerCoins = data.coins || 0
             playerLevel = data.level || 1
             playerXP = data.xp || 0
@@ -1865,21 +2046,90 @@ function loadLocalData() {
         playerXP = data.xp || 0
         unlockedThemes = data.themes || ['classic', 'neon']
         unlockedMaps = data.maps || ['20x10', '18x12']
+     achievementsState = data.achievements || {}
+missionsState = data.missions || {}
+missionsLastReset = data.missionsLastReset || null
+lifetimeLines = data.lifetimeLines || 0
+
     }
     updateCoinsDisplay()
     updateLevelDisplay()
     updateUnlockedItems()
 }
 
+async function unlockAchievement(id) {
+  if (achievementsState[id]) return;
+  achievementsState[id] = true;
+
+  const a = ACHIEVEMENTS.find(x => x.id === id)
+  if (a) await grantRewards(a.rewardCoins, a.rewardXP)
+
+  await safeSave()
+}
+
+function addMissionProgress(id, amount, goal) {
+  const s = missionsState[id]
+  if (!s || s.done) return;
+  s.progress += amount
+  if (s.progress >= goal) {
+    s.done = true
+  }
+}
+
+function checkAchievementsAndMissions(evt) {
+  // --- Achievements ---
+  if (evt.type === 'game_over') {
+    unlockAchievement('first_game')
+    if (evt.score >= 5000) unlockAchievement('score_5k')
+    if (gotTetrisThisGame) unlockAchievement('tetris_1')
+    if (lifetimeLines >= 50) unlockAchievement('lines_50')
+  }
+  if (evt.type === 'lines_cleared') {
+    // průběžně sleduj lifetime
+    if (lifetimeLines >= 50) unlockAchievement('lines_50')
+  }
+
+  // --- Missions (daily) ---
+  ensureDailyMissions()
+
+  if (evt.type === 'game_over') {
+    // m_play_1: odehraná hra
+    addMissionProgress('m_play_1', 1, 1)
+
+    // score one game
+    const s1 = missionsState['m_score_2k']
+    if (s1 && !s1.done) {
+      s1.progress = Math.max(s1.progress, evt.score)
+      if (s1.progress >= 2000) s1.done = true
+    }
+
+    // lines one game
+    const s2 = missionsState['m_lines_10']
+    if (s2 && !s2.done) {
+      s2.progress = Math.max(s2.progress, evt.linesCleared)
+      if (s2.progress >= 10) s2.done = true
+    }
+
+    safeSave()
+    if (document.getElementById('missionsMenu')?.style.display === 'flex') renderMissions()
+  }
+}
+
 async function saveUserData() {
     if (!currentUser || currentUser.is_guest) {
         const data = {
-            coins: playerCoins,
-            level: playerLevel,
-            xp: playerXP,
-            themes: unlockedThemes,
-            maps: unlockedMaps
-        }
+  coins: playerCoins,
+  level: playerLevel,
+  xp: playerXP,
+  themes: unlockedThemes,
+  maps: unlockedMaps,
+
+  achievements: achievementsState,
+  missions: missionsState,
+  missionsLastReset,
+  lifetimeLines
+}
+
         localStorage.setItem('tetrisPlayerData', JSON.stringify(data))
         return
     }
@@ -1894,6 +2144,11 @@ async function saveUserData() {
                 unlocked_themes: unlockedThemes,
                 unlocked_maps: unlockedMaps,
                 games_played: totalGamesPlayed
+                achievements: achievementsState,
+                missions: missionsState,
+                missions_last_reset: missionsLastReset,
+                lifetime_lines: lifetimeLines,
+
             })
             .eq('user_id', currentUser.id)
         
@@ -1943,14 +2198,19 @@ async function updateAfterGame(finalScore) {
         const { error } = await supabase
             .from('tetris_player_data')
             .update({
-                coins: playerCoins,
-                level: playerLevel,
-                xp: playerXP,
-                games_played: totalGamesPlayed,
-                total_score: newTotalScore,
-                best_score: newBestScore,
-                last_played: new Date().toISOString()
-            })
+  coins: playerCoins,
+  level: playerLevel,
+  xp: playerXP,
+  unlocked_themes: unlockedThemes,
+  unlocked_maps: unlockedMaps,
+  games_played: totalGamesPlayed,
+  achievements: achievementsState,
+  missions: missionsState,
+  missions_last_reset: missionsLastReset,
+  lifetime_lines: lifetimeLines
+})
+
+
             .eq('user_id', currentUser.id)
         
         if (error) throw error
@@ -2258,29 +2518,54 @@ window.goToKlasika = function() {
 }
 
 window.backToMainMenu = function() {
-    document.getElementById('mainMenu').style.display = 'flex'
-    document.getElementById('difficultyMenu').style.display = 'none'
-    document.getElementById('themeMenu').style.display = 'none'
-    document.getElementById('mapMenu').style.display = 'none'
-    document.getElementById('leaderboard').style.display = 'none'
-    document.getElementById('tetrisGame').style.display = 'none'
-    document.getElementById('nameModal').style.display = 'none'
-    document.getElementById('pauseOverlay').style.display = 'none'
-    clearTimeout(dropTimeout)
-    
-    // Zastavit eventy
-    isGameOver = true  // Označí že hra skončila
-    endEvent()  // Ukončí aktivní event
-    clearTimeout(eventTimeout)  // Zruší naplánovaný event
-    
-    // Skrýt event timer
-    const timer = document.getElementById('eventTimer')
-    if (timer) timer.style.display = 'none'
-    
-    isPaused = false
-    activeEvent = null
+  document.getElementById('mainMenu').style.display = 'flex'
+  document.getElementById('difficultyMenu').style.display = 'none'
+  document.getElementById('leaderboard').style.display = 'none'
+  document.getElementById('tetrisGame').style.display = 'none'
+  document.getElementById('nameModal').style.display = 'none'
+  document.getElementById('pauseOverlay').style.display = 'none'
+
+  // NOVÉ
+  document.getElementById('shopMenu').style.display = 'none'
+  document.getElementById('achievementsMenu').style.display = 'none'
+  document.getElementById('missionsMenu').style.display = 'none'
+
+  clearTimeout(dropTimeout)
+
+  isGameOver = true
+  endEvent()
+  clearTimeout(eventTimeout)
+
+  const timer = document.getElementById('eventTimer')
+  if (timer) timer.style.display = 'none'
+
+  isPaused = false
+  activeEvent = null
 }
 
+window.showShop = function() {
+  document.getElementById('mainMenu').style.display = 'none'
+  document.getElementById('shopMenu').style.display = 'flex'
+  shopTab('themes')
+}
+
+window.shopTab = function(which) {
+  document.getElementById('shopThemes').style.display = (which === 'themes') ? 'grid' : 'none'
+  document.getElementById('shopMaps').style.display = (which === 'maps') ? 'grid' : 'none'
+}
+
+window.showAchievements = function() {
+  document.getElementById('mainMenu').style.display = 'none'
+  document.getElementById('achievementsMenu').style.display = 'flex'
+  renderAchievements()
+}
+
+window.showMissions = function() {
+  document.getElementById('mainMenu').style.display = 'none'
+  document.getElementById('missionsMenu').style.display = 'flex'
+  renderMissions()
+}
+ 
 window.showDifficultyMenu = function() {
     document.getElementById('mainMenu').style.display = 'none'
     document.getElementById('difficultyMenu').style.display = 'flex'
@@ -2509,6 +2794,7 @@ function freeze() {
     
     const cleared = clearLines()
     if (cleared > 0) {
+     gotTetrisThisGame = false
         createParticles(cleared)
         playSound('clear')
     }
@@ -2526,6 +2812,7 @@ function clearLines() {
     }
     
     if (cleared > 0) {
+     if (cleared === 4) gotTetrisThisGame = true;
         linesCleared += cleared
         combo++
         
@@ -2716,7 +3003,8 @@ document.addEventListener('keydown', e => {
     
     if (e.key === 'Escape') {
     backToMainMenu();
-    safeSave(); // bez await (listener není async)
+    await window.safeSave()
+    window.safeSave = safeSave
     return;
 }
 
@@ -2768,6 +3056,12 @@ function gameLoop() {
 
 async function gameOver() {
     isGameOver = true;
+ checkAchievementsAndMissions({
+  type: 'game_over',
+  score,
+  linesCleared,
+  gotTetrisThisGame: false // nastavíme v clearLines
+})
     endEvent();
     clearTimeout(eventTimeout);
     
@@ -2874,6 +3168,7 @@ await loadCurrentUser()
 </script>
 </body>
 </html>
+
 
 
 
