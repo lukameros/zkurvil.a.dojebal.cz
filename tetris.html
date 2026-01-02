@@ -1567,8 +1567,6 @@ function updateHappyHourIndicator() {
 setInterval(updateHappyHourIndicator, 60000);
 
 // Aktualizuj hned při načtení
-window.addEventListener('DOMContentLoaded', () => {
-    startPageLoading();
     updateHappyHourIndicator();
     loadSettings();// Přidej tenhle řádek
 });
@@ -1813,12 +1811,6 @@ function showLevelUpNotification() {
     playSound('levelup');
 }
     
-    setTimeout(() => {
-        notification.classList.add('hide');
-        setTimeout(() => notification.remove(), 300);
-    }, 4000);
-}
-
 function showUpdateModal() {
     const hasSeenUpdate = localStorage.getItem('tetris_update_v2.0_seen');
     if (hasSeenUpdate) return; // Už viděl
@@ -1926,40 +1918,20 @@ async function loadCurrentUser() {
             
             if (parsed && parsed.id && parsed.username) {
                 currentUser = parsed
-                console.log('Přihlášený uživatel (JSON):', currentUser.username, 'ID:', currentUser.id)
+                console.log('✅ Přihlášený uživatel:', currentUser.username, 'ID:', currentUser.id)
                 await loadUserData()
+                return // ✅ DŮLEŽITÉ - zastav zde!
             } else {
                 throw new Error('Neplatný formát')
             }
         } catch (e) {
-            console.log('currentUser je jen string:', savedUser)
-            
-            try {
-                const { data: user, error } = await supabase
-                    .from('users')
-                    .select('*')
-                    .eq('username', savedUser)
-                    .single()
-                
-                if (user && !error) {
-                    currentUser = user
-                    localStorage.setItem('currentUser', JSON.stringify(user))
-                    console.log('Uživatel načten z databáze:', user.username, 'ID:', user.id)
-                    await loadUserData()
-                } else {
-                    console.error('Uživatel nenalezen v databázi')
-                    currentUser = { username: savedUser, is_guest: true }
-                    loadLocalData()
-                }
-            } catch (error) {
-                console.error('Chyba při načítání uživatele:', error)
-                currentUser = { username: savedUser, is_guest: true }
-                loadLocalData()
-            }
+            console.log('⚠️ Nelze parsovat JSON, zkouším jako string')
+            currentUser = { username: savedUser, is_guest: true }
+            loadLocalData()
         }
     } else {
         currentUser = { username: 'Host', is_guest: true }
-        console.log('Host režim')
+        console.log('👤 Host režim')
         loadLocalData()
     }
 }
@@ -3039,6 +3011,7 @@ await loadCurrentUser()
 </script>
 </body>
 </html>
+
 
 
 
