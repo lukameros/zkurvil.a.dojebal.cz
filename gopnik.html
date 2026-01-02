@@ -13,7 +13,7 @@
   <div id="loading">
     <div class="loader">
       <div class="title">SLAV CLICKER</div>
-      <div class="hint" id="t_startHint">Klikni pro start</div>
+      <div class="hint" id="t_startHint">klikni pro start</div>
     </div>
   </div>
 
@@ -21,7 +21,7 @@
   <audio id="clickSnd" src="click.mp3" preload="auto"></audio>
   <audio id="bgMusic" src="go.mp3" preload="auto" loop></audio>
 
-  <!-- SETTINGS MODAL (bez loginu) -->
+  <!-- SETTINGS MODAL -->
   <div id="settingsModal" class="modal" aria-hidden="true">
     <div class="modalBox">
       <div class="modalHeader">
@@ -44,14 +44,30 @@
         </select>
       </div>
 
+      <!-- SUPABASE LOGIN -->
       <div class="modalRow">
-        <div class="cloudRow">
-          <b>Cloud save:</b>
-          <span id="cloudStatus">offline</span>
+        <div class="authTitle">Cloud Save (Supabase)</div>
+
+        <div class="authStatus" id="authStatus">Nepřihlášen</div>
+
+        <div class="authGrid">
+          <input id="authEmail" class="authInput" type="email" placeholder="email">
+          <input id="authPass" class="authInput" type="password" placeholder="heslo">
         </div>
-        <small class="cloudHint" id="cloudHint">
-          Login je v hry.html – tady se to jen automaticky chytí.
-        </small>
+
+        <div class="authBtns">
+          <button id="btnSignUp" class="tagBtn">Registrovat</button>
+          <button id="btnSignIn" class="tagBtn">Přihlásit</button>
+          <button id="btnSignOut" class="tagBtn" disabled>Odhlásit</button>
+        </div>
+
+        <div class="authBtns">
+          <button id="btnSync" class="tagBtn" disabled>Sync teď</button>
+        </div>
+
+        <div class="authHint" id="authHint">
+          Po přihlášení se hra ukládá i do cloudu.
+        </div>
       </div>
     </div>
   </div>
@@ -68,98 +84,80 @@
       </div>
     </div>
 
-    <!-- RIGHT MENU (style podle obrázku) -->
-    <aside class="menuRight">
+    <!-- RIGHT MENU (paper style) -->
+    <div class="panel paperMenu">
 
-      <button id="btnSettings" class="gearBtn" title="Nastavení">⚙️</button>
+      <div class="panelTop">
+        <button id="btnSettings" class="iconBtn" title="Nastavení">⚙️</button>
+      </div>
 
-      <!-- STATS board -->
-      <section class="board boardStats">
-        <div class="boardTitle">BABKI</div>
-
-        <div class="statLine">
-          <span id="t_moneyLabel">Peníze</span>
-          <b id="money">0</b>
-        </div>
-
-        <div class="statLine">
-          <span id="t_cpcLabel">Za klik</span>
-          <b id="cpc">1</b>
-        </div>
-
-        <div class="statLine">
-          <span id="t_cpsLabel">Za sek</span>
-          <b id="cps">0</b>
-        </div>
+      <section class="paperSheet paperStats">
+        <div class="paperTitle" id="t_moneyTitle">PENÍZE</div>
+        <div class="paperStatRow"><span id="t_moneyLabel">Peníze:</span><b id="money">0</b></div>
+        <div class="paperStatRow"><span id="t_cpcLabel">Za klik:</span><b id="cpc">1</b></div>
+        <div class="paperStatRow"><span id="t_cpsLabel">Za sekundu:</span><b id="cps">0</b></div>
       </section>
 
-      <!-- HUD board -->
-      <section class="board boardHud">
-        <div class="hudLine">
-          <span id="t_comboLabel">Combo</span>
-          <b id="combo">x1.00</b>
+      <section class="paperSheet paperHud">
+        <div class="paperStatRow"><span id="t_comboLabel">Combo:</span><b id="combo">x1.00</b></div>
+        <div class="paperStatRow"><span id="t_critLabel">Krit:</span><b id="crit">10%</b></div>
+        <div class="paperEvent" id="eventLine">—</div>
+      </section>
+
+      <section class="paperSheet paperHeader">
+        <div class="paperTitle" id="t_shopTitle">OBCHOD</div>
+      </section>
+
+      <section class="paperSheet shopItem">
+        <div class="shopTop">
+          <div class="shopName" id="t_itemCursor">Kurzor</div>
+          <button id="buyCursor" class="tagBtn">Koupit (15)</button>
         </div>
-        <div class="hudLine">
-          <span id="t_critLabel">Krit</span>
-          <b id="crit">10%</b>
+        <div class="shopDesc">+0.1 / s</div>
+      </section>
+
+      <section class="paperSheet shopItem">
+        <div class="shopTop">
+          <div class="shopName" id="t_itemGranny">Babička</div>
+          <button id="buyGranny" class="tagBtn">Koupit (100)</button>
         </div>
-
-        <div class="eventBox" id="eventLine">—</div>
+        <div class="shopDesc">+1 / s</div>
       </section>
 
-      <!-- SHOP header -->
-      <section class="board boardShopTitle">
-        <div class="shopTitle" id="t_shopTitle">OBCHOD</div>
-      </section>
-
-      <!-- ITEM strips -->
-      <section class="strip">
-        <div class="stripHead">
-          <div class="stripName" id="t_itemCursor">Kurzor</div>
-          <button id="buyCursor" class="priceBtn">Koupit (15)</button>
+      <section class="paperSheet shopItem">
+        <div class="shopTop">
+          <div class="shopName" id="t_itemClick">Síla kliku</div>
+          <button id="buyClick" class="tagBtn">Vylepšit (50)</button>
         </div>
-        <div class="stripDesc">Komputer klika za tebe • +0.1 / s</div>
+        <div class="shopDesc">+1 za klik</div>
       </section>
 
-      <section class="strip">
-        <div class="stripHead">
-          <div class="stripName" id="t_itemGranny">Babička</div>
-          <button id="buyGranny" class="priceBtn">Koupit (100)</button>
-        </div>
-        <div class="stripDesc">Peče bliny a vydělává • +1 / s</div>
+      <section class="paperSheet paperHeader">
+        <div class="paperTitle" id="t_prestigeTitle">PRESTIGE</div>
       </section>
 
-      <section class="strip">
-        <div class="stripHead">
-          <div class="stripName" id="t_itemClick">Síla kliku</div>
-          <button id="buyClick" class="priceBtn">Vylepšit (50)</button>
-        </div>
-        <div class="stripDesc">Tvrdší pěst • +1 za klik</div>
-      </section>
+      <section class="paperSheet paperPrestige">
+        <div class="paperStatRow"><span id="t_spLabel">Slav Points:</span><b id="sp">0</b></div>
+        <div class="paperStatRow"><span id="t_bonusLabel">Bonus celkem:</span><b id="bonus">+0%</b></div>
 
-      <!-- PRESTIGE header -->
-      <section class="board boardShopTitle">
-        <div class="shopTitle" id="t_prestigeTitle">PRESTIGE</div>
-      </section>
-
-      <!-- PRESTIGE strip -->
-      <section class="strip prestigeStrip">
-        <div class="prestRow"><span>Slav Points</span><b id="sp">0</b></div>
-        <div class="prestRow"><span>Bonus</span><b id="bonus">+0%</b></div>
-
-        <div class="gainBox">
-          Získáš: <b id="spGain">0</b>
+        <div class="paperGain">
+          <span id="t_gainLabel">Získáš při prestiži:</span> <b id="spGain">0</b>
         </div>
 
         <button id="btnPrestige" class="prestigeBtn" disabled>Prestige (reset)</button>
-        <div class="prestHint" id="t_prestigeHint">Resetuje peníze a upgradey, ale dá trvalý bonus.</div>
+
+        <div class="paperNote" id="t_prestigeHint">
+          Resetuje peníze a upgradey, ale dá trvalý bonus.
+        </div>
       </section>
 
-    </aside>
+    </div>
   </div>
 
-  <!-- Supabase (jen session + save, login je v hry.html) -->
+  <!-- Supabase JS (UMD) -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <!-- GAME JS -->
   <script src="gopnik.js"></script>
 </body>
 </html>
