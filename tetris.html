@@ -1696,6 +1696,12 @@ const SUPABASE_URL = 'https://bmmaijlbpwgzhrxzxphf.supabase.co'
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJtbWFpamxicHdnemhyeHp4cGhmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjY4NjQ5MDcsImV4cCI6MjA4MjQ0MDkwN30.s0YQVnAjMXFu1pSI1NXZ2naSab179N0vQPglsmy3Pgw'
 let currentUser = null;
 const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+window.playerLevel = 1;
+window.playerXP = 0;
+window.playerCoins = 0;
+window.unlockedThemes = ['classic', 'neon'];
+window.unlockedMaps = ['20x10', '18x12'];
+window.totalGamesPlayed = 0;
 
 async function loadCurrentUser() {
     const savedUser = localStorage.getItem('currentUser')
@@ -1757,13 +1763,18 @@ async function loadUserData() {
             .single()
         
         if (data) {
-            playerCoins = data.coins || 0
-            playerLevel = data.level || 1
-            playerXP = data.xp || 0
-            unlockedThemes = data.unlocked_themes || ['classic', 'neon']
-            unlockedMaps = data.unlocked_maps || ['20x10', '18x12']
-            totalGamesPlayed = data.games_played || 0
-            console.log('Data načtena:', { playerCoins, playerLevel, playerXP, totalGamesPlayed })
+            window.playerCoins = data.coins || 0
+            window.playerLevel = data.level || 1
+            window.playerXP = data.xp || 0
+            window.unlockedThemes = data.unlocked_themes || ['classic', 'neon']
+            window.unlockedMaps = data.unlocked_maps || ['20x10', '18x12']
+            window.totalGamesPlayed = data.games_played || 0
+            console.log('Data načtena:', { 
+                playerCoins: window.playerCoins, 
+                playerLevel: window.playerLevel, 
+                playerXP: window.playerXP, 
+                totalGamesPlayed: window.totalGamesPlayed 
+            })
         } else {
             console.log('První spuštění - vytvářím nový záznam')
             await supabase
@@ -1794,11 +1805,11 @@ function loadLocalData() {
     const saved = localStorage.getItem('tetrisPlayerData')
     if (saved) {
         const data = JSON.parse(saved)
-        playerCoins = data.coins || 0
-        playerLevel = data.level || 1
-        playerXP = data.xp || 0
-        unlockedThemes = data.themes || ['classic', 'neon']
-        unlockedMaps = data.maps || ['20x10', '18x12']
+        window.playerCoins = data.coins || 0
+        window.playerLevel = data.level || 1
+        window.playerXP = data.xp || 0
+        window.unlockedThemes = data.themes || ['classic', 'neon']
+        window.unlockedMaps = data.maps || ['20x10', '18x12']
     }
     updateCoinsDisplay()
     updateLevelDisplay()
@@ -1808,11 +1819,11 @@ function loadLocalData() {
 async function saveUserData() {
     if (!currentUser || currentUser.is_guest) {
         const data = {
-            coins: playerCoins,
-            level: playerLevel,
-            xp: playerXP,  // ✅ Toto musí být tady
-            themes: unlockedThemes,
-            maps: unlockedMaps
+            coins: window.playerCoins,
+            level: window.playerLevel,
+            xp: window.playerXP,
+            themes: window.unlockedThemes,
+            maps: window.unlockedMaps
         }
         localStorage.setItem('tetrisPlayerData', JSON.stringify(data))
         return
@@ -1822,17 +1833,17 @@ async function saveUserData() {
         const { error } = await supabase
             .from('tetris_player_data')
             .update({
-                coins: playerCoins,
-                level: playerLevel,
-                xp: playerXP,  // ✅ A tady také
-                unlocked_themes: unlockedThemes,
-                unlocked_maps: unlockedMaps,
-                games_played: totalGamesPlayed
+                coins: window.playerCoins,
+                level: window.playerLevel,
+                xp: window.playerXP,
+                unlocked_themes: window.unlockedThemes,
+                unlocked_maps: window.unlockedMaps,
+                games_played: window.totalGamesPlayed
             })
             .eq('user_id', currentUser.id)
         
         if (error) throw error
-        console.log('✅ Data uložena do Supabase')  // ✅ Přidej log
+        console.log('✅ Data uložena do Supabase')
     } catch (error) {
         console.error('❌ Chyba při ukládání dat:', error)
     }
@@ -2819,6 +2830,7 @@ await loadCurrentUser()
 </script>
 </body>
 </html>
+
 
 
 
