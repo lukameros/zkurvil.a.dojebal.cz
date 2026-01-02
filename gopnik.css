@@ -64,18 +64,20 @@ body{
 }
 
 /* ===== layout ===== */
+/* 3 sloupce: S&F sidebar + hra + panel */
 .wrap{
   display:grid;
-  grid-template-columns:1fr 360px;
-  gap:40px;
-  padding:24px;
+  grid-template-columns: 260px 1fr 360px;
+  gap:28px;
+  padding:18px;
   height:100vh;
   position:relative;
   z-index:1;
 }
+
 .leftcol{ position:relative; min-height:0; }
 
-/* logo */
+/* logo v herní části */
 .logo{
   font-size:48px;
   font-weight:900;
@@ -84,6 +86,140 @@ body{
   z-index:2;
 }
 .logo span{ color:#c40000; }
+
+/* ===== S&F sidebar ===== */
+.sfSide{
+  position:relative;
+  border-radius:16px;
+  overflow:hidden;
+
+  background: linear-gradient(180deg, rgba(12,40,52,.92), rgba(8,22,32,.92));
+  border: 5px solid rgba(200,165,70,.92);
+
+  box-shadow:
+    0 22px 55px rgba(0,0,0,.55),
+    inset 0 0 0 3px rgba(50,25,10,.75);
+
+  display:flex;
+  flex-direction:column;
+  padding:14px;
+}
+
+.sfSideTop{
+  padding:6px 6px 12px;
+  border-bottom:2px solid rgba(200,165,70,.35);
+}
+
+.sfSideLogo{
+  font-weight:1000;
+  letter-spacing:1px;
+  font-size:22px;
+  color:#f3e7c4;
+  text-shadow: 0 6px 18px rgba(0,0,0,.65);
+}
+.sfSideLogo span{ color:#ffcf5a; }
+
+.sfSideStats{
+  padding:12px 6px;
+  border-bottom:2px solid rgba(200,165,70,.18);
+}
+.sfStatLine{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  color:rgba(243,231,196,.92);
+  font-weight:900;
+  margin:6px 0;
+}
+.sfStatLine b{
+  color:#ffcf5a;
+  text-shadow: 0 2px 0 rgba(0,0,0,.35);
+}
+
+.sfSideNav{
+  padding:10px 0;
+  flex:1;
+  overflow:auto;
+}
+
+/* S&F tlačítko */
+.sfBtn{
+  width:100%;
+  display:block;
+  text-align:left;
+  padding:12px 12px;
+  margin:10px 0;
+
+  border-radius:12px;
+  border:2px solid rgba(255,206,90,.88);
+  background: linear-gradient(180deg, rgba(36,88,108,.92), rgba(10,30,44,.92));
+  color:#f3e7c4;
+
+  font-weight:1000;
+  letter-spacing:.6px;
+  text-transform:uppercase;
+  cursor:pointer;
+
+  box-shadow:
+    0 12px 26px rgba(0,0,0,.45),
+    inset 0 2px 0 rgba(255,255,255,.18),
+    inset 0 -4px 0 rgba(0,0,0,.35);
+
+  transition: transform .08s ease, filter .12s ease, box-shadow .12s ease;
+}
+.sfBtn:hover{
+  filter: brightness(1.12);
+  box-shadow:
+    0 14px 32px rgba(0,0,0,.55),
+    0 0 18px rgba(255,206,90,.18),
+    inset 0 2px 0 rgba(255,255,255,.20),
+    inset 0 -4px 0 rgba(0,0,0,.35);
+}
+.sfBtn:active{
+  transform: translateY(2px);
+  box-shadow:
+    0 8px 18px rgba(0,0,0,.55),
+    inset 0 1px 0 rgba(255,255,255,.14),
+    inset 0 -2px 0 rgba(0,0,0,.35);
+}
+
+/* ikonová tlačítka (kovová) */
+.sfSideBottom{
+  display:flex;
+  justify-content:flex-start;
+  padding-top:10px;
+  border-top:2px solid rgba(200,165,70,.18);
+}
+
+.sfIconBtn{
+  width:44px;
+  height:44px;
+  border-radius:12px;
+  cursor:pointer;
+  font-weight:900;
+  color:#fff;
+  border:2px solid rgba(255,206,90,.85);
+  background: linear-gradient(180deg, rgba(40,70,90,.9), rgba(12,30,44,.9));
+  box-shadow:
+    0 10px 22px rgba(0,0,0,.45),
+    inset 0 2px 0 rgba(255,255,255,.18),
+    inset 0 -3px 0 rgba(0,0,0,.35);
+}
+.sfIconBtn:hover{
+  filter: brightness(1.08);
+  box-shadow:
+    0 12px 28px rgba(0,0,0,.55),
+    0 0 18px rgba(255,206,90,.22),
+    inset 0 2px 0 rgba(255,255,255,.18),
+    inset 0 -3px 0 rgba(0,0,0,.35);
+}
+.sfIconBtn:active{
+  transform: translateY(2px);
+  box-shadow:
+    0 7px 16px rgba(0,0,0,.55),
+    inset 0 1px 0 rgba(255,255,255,.12),
+    inset 0 -2px 0 rgba(0,0,0,.35);
+}
 
 /* ===== gopnik klik ===== */
 .ring{
@@ -140,6 +276,10 @@ body{
   isolation: isolate;
   color: #2b1a0f;
   z-index:10;
+
+  /* aby šlo scrollovat uvnitř panelu, když je malá obrazovka */
+  max-height: calc(100vh - 36px);
+  overflow:auto;
 }
 .panel::before{
   content:"";
@@ -194,7 +334,7 @@ body{
   box-shadow: inset 0 0 8px rgba(0,0,0,.18);
 }
 
-/* buttons */
+/* buttons (default pro pravý panel) */
 button{
   background:#6d4b2a;
   color:#fff;
@@ -405,242 +545,19 @@ small{ display:block; margin-top:10px; }
 
 /* ===== mobile ===== */
 @media (max-width:980px){
+  html, body{ overflow:auto; }
   .wrap{
     grid-template-columns:1fr;
-    gap:20px;
-    padding:18px;
+    gap:16px;
+    padding:14px;
+    height:auto;
   }
+  .sfSide{ order:1; }
+  .leftcol{ order:2; min-height:420px; }
+  .panel{ order:3; max-height:none; overflow:visible; }
   .ring{
     left:50%;
     top:50%;
     transform: translate(-50%,-50%) translateY(55%);
   }
-}
-
-/* ==========================================
-   S&F STYLE MAIN MENU (overlay + left nav)
-   ========================================== */
-
-.mainMenu{
-  position:fixed;
-  inset:0;
-  display:none;
-  place-items:center;
-  z-index:11000;
-}
-.mainMenu.show{ display:grid; }
-.mainMenu::before{
-  content:"";
-  position:absolute;
-  inset:0;
-  background:rgba(0,0,0,.55);
-  backdrop-filter: blur(2px);
-}
-
-/* hlavní rám */
-.sfFrame{
-  position:relative;
-  width:min(980px, 94vw);
-  height:min(640px, 92vh);
-  border-radius:18px;
-  overflow:hidden;
-
-  background: linear-gradient(180deg, rgba(12,40,52,.92), rgba(8,22,32,.92));
-  border: 6px solid rgba(200,165,70,.9);
-  box-shadow:
-    0 28px 90px rgba(0,0,0,.65),
-    inset 0 0 0 3px rgba(50,25,10,.75);
-
-  isolation:isolate;
-}
-
-/* “kovové” rohy/ornament (bez obrázků) */
-.sfFrame::before{
-  content:"";
-  position:absolute;
-  inset:0;
-  background:
-    radial-gradient(circle at 18px 18px, rgba(255,220,120,.45), transparent 35%),
-    radial-gradient(circle at calc(100% - 18px) 18px, rgba(255,220,120,.45), transparent 35%),
-    radial-gradient(circle at 18px calc(100% - 18px), rgba(255,220,120,.25), transparent 35%),
-    radial-gradient(circle at calc(100% - 18px) calc(100% - 18px), rgba(255,220,120,.25), transparent 35%);
-  pointer-events:none;
-  opacity:.9;
-  z-index:0;
-}
-
-.sfTopBar{
-  position:relative;
-  z-index:1;
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  padding:14px 16px;
-  border-bottom: 2px solid rgba(200,165,70,.45);
-  background: linear-gradient(180deg, rgba(0,0,0,.22), rgba(0,0,0,.04));
-}
-
-.sfLogo{
-  font-weight:1000;
-  letter-spacing:1px;
-  font-size:28px;
-  color:#f3e7c4;
-  text-shadow: 0 6px 18px rgba(0,0,0,.65);
-}
-.sfLogo span{
-  color:#ffcf5a;
-}
-
-.sfTopBtns{
-  display:flex;
-  gap:10px;
-}
-
-/* ikonová tlačítka (kovová) */
-.sfIconBtn{
-  width:42px;
-  height:42px;
-  border-radius:12px;
-  cursor:pointer;
-  font-weight:900;
-  color:#fff;
-  border:2px solid rgba(255,206,90,.85);
-  background: linear-gradient(180deg, rgba(40,70,90,.9), rgba(12,30,44,.9));
-  box-shadow:
-    0 10px 22px rgba(0,0,0,.45),
-    inset 0 2px 0 rgba(255,255,255,.18),
-    inset 0 -3px 0 rgba(0,0,0,.35);
-}
-.sfIconBtn:hover{
-  filter: brightness(1.08);
-  box-shadow:
-    0 12px 28px rgba(0,0,0,.55),
-    0 0 18px rgba(255,206,90,.22),
-    inset 0 2px 0 rgba(255,255,255,.18),
-    inset 0 -3px 0 rgba(0,0,0,.35);
-}
-.sfIconBtn:active{
-  transform: translateY(2px);
-  box-shadow:
-    0 7px 16px rgba(0,0,0,.55),
-    inset 0 1px 0 rgba(255,255,255,.12),
-    inset 0 -2px 0 rgba(0,0,0,.35);
-}
-
-.sfBody{
-  position:relative;
-  z-index:1;
-  display:grid;
-  grid-template-columns: 320px 1fr;
-  height: calc(100% - 64px);
-}
-
-/* levý menu sloupec */
-.sfNav{
-  padding:18px 16px;
-  border-right: 2px solid rgba(200,165,70,.25);
-  background: linear-gradient(180deg, rgba(8,28,38,.75), rgba(6,18,26,.75));
-}
-
-/* hlavní “S&F” tlačítka */
-.sfBtn{
-  width:100%;
-  display:block;
-  text-align:left;
-  padding:14px 14px;
-  margin:10px 0;
-
-  border-radius:12px;
-  border:2px solid rgba(255,206,90,.85);
-  background: linear-gradient(180deg, rgba(36,88,108,.92), rgba(10,30,44,.92));
-  color:#f3e7c4;
-
-  font-weight:1000;
-  letter-spacing:.8px;
-  text-transform:uppercase;
-  cursor:pointer;
-
-  box-shadow:
-    0 12px 26px rgba(0,0,0,.45),
-    inset 0 2px 0 rgba(255,255,255,.18),
-    inset 0 -4px 0 rgba(0,0,0,.35);
-
-  transition: transform .08s ease, filter .12s ease, box-shadow .12s ease;
-}
-
-.sfBtn:hover{
-  filter: brightness(1.12);
-  box-shadow:
-    0 14px 32px rgba(0,0,0,.55),
-    0 0 18px rgba(255,206,90,.18),
-    inset 0 2px 0 rgba(255,255,255,.20),
-    inset 0 -4px 0 rgba(0,0,0,.35);
-}
-
-.sfBtn:active{
-  transform: translateY(2px);
-  box-shadow:
-    0 8px 18px rgba(0,0,0,.55),
-    inset 0 1px 0 rgba(255,255,255,.14),
-    inset 0 -2px 0 rgba(0,0,0,.35);
-}
-
-/* pravá část menu (preview) */
-.sfPreview{
-  padding:18px;
-  display:grid;
-  place-items:center;
-}
-.sfPreviewBox{
-  width:min(520px, 92%);
-  border-radius:16px;
-  padding:18px;
-  border:2px solid rgba(255,206,90,.55);
-  background: rgba(255,248,230,.94);
-  color:#2b1a0f;
-  box-shadow:
-    0 18px 40px rgba(0,0,0,.45),
-    inset 0 0 0 3px rgba(120,50,15,.18);
-}
-.sfPreviewTitle{
-  font-weight:1000;
-  font-size:20px;
-  margin-bottom:10px;
-  color:#3b1c0b;
-}
-.sfPreviewText{
-  font-weight:800;
-  line-height:1.35;
-}
-.sfPreviewHint{
-  margin-top:12px;
-  font-weight:700;
-  opacity:.75;
-}
-
-.sfFooter{
-  position:absolute;
-  left:0; right:0; bottom:0;
-  padding:10px 14px;
-  font-weight:800;
-  color:rgba(243,231,196,.85);
-  border-top: 2px solid rgba(200,165,70,.25);
-  background: linear-gradient(180deg, rgba(0,0,0,.04), rgba(0,0,0,.22));
-}
-
-/* menu mobile */
-@media (max-width:860px){
-  .sfFrame{
-    width:min(720px, 96vw);
-    height:min(720px, 94vh);
-  }
-  .sfBody{
-    grid-template-columns: 1fr;
-    grid-template-rows: auto 1fr;
-  }
-  .sfNav{
-    border-right:none;
-    border-bottom: 2px solid rgba(200,165,70,.25);
-  }
-  .sfBtn{ text-align:center; }
 }
