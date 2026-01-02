@@ -17,6 +17,49 @@
     </div>
   </div>
 
+  <!-- MAIN MENU (S&F style) -->
+  <div id="mainMenu" class="mainMenu" aria-hidden="true">
+    <div class="sfFrame">
+      <div class="sfTopBar">
+        <div class="sfLogo">
+          SLAV <span>CLICKER</span>
+        </div>
+
+        <div class="sfTopBtns">
+          <button id="mmBtnSettings" class="sfIconBtn" title="Nastavení">⚙️</button>
+          <button id="mmBtnClose" class="sfIconBtn" title="Zavřít">✖</button>
+        </div>
+      </div>
+
+      <div class="sfBody">
+        <aside class="sfNav">
+          <button id="mmPlay" class="sfBtn sfBtn--nav">▶ PLAY</button>
+          <button id="mmShop" class="sfBtn sfBtn--nav">🛒 SHOP</button>
+          <button id="mmUpgrades" class="sfBtn sfBtn--nav">⚔ UPGRADES</button>
+          <button id="mmPrestige" class="sfBtn sfBtn--nav">👑 PRESTIGE</button>
+        </aside>
+
+        <main class="sfPreview">
+          <div class="sfPreviewBox">
+            <div class="sfPreviewTitle">WELCOME, BRAT.</div>
+            <div class="sfPreviewText">
+              Všechno se ukládá do <b>localStorage</b>.<br>
+              Klikni <b>PLAY</b> a jedeš.
+            </div>
+
+            <div class="sfPreviewHint">
+              (Tady později dáme artwork / charakter / animace.)
+            </div>
+          </div>
+        </main>
+      </div>
+
+      <div class="sfFooter">
+        World 1 • build v0.1
+      </div>
+    </div>
+  </div>
+
   <!-- AUDIO -->
   <audio id="clickSnd" src="click.mp3" preload="auto"></audio>
   <audio id="bgMusic" src="go.mp3" preload="auto" loop></audio>
@@ -70,7 +113,7 @@
       <div class="stat"><span id="t_cpcLabel">Za klik:</span><b id="cpc">1</b></div>
       <div class="stat"><span id="t_cpsLabel">Za sekundu:</span><b id="cps">0</b></div>
 
-      <!-- NEW: HUD + EVENTS -->
+      <!-- HUD + EVENTS -->
       <div class="hud">
         <div class="hudLine"><span id="t_comboLabel">Combo:</span> <b id="combo">x1.00</b></div>
         <div class="hudLine"><span id="t_critLabel">Krit:</span> <b id="crit">10%</b></div>
