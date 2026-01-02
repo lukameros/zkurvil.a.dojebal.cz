@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Slav Clicker</title>
- <link rel="stylesheet" href="gopnik.css">
+  <link rel="stylesheet" href="gopnik.css">
 </head>
 
 <body>
@@ -66,9 +66,16 @@
       </div>
 
       <h2 id="t_moneyTitle">PENÍZE</h2>
-      <div class="stat"><span>Peníze:</span><b id="money">0</b></div>
-      <div class="stat"><span>Za klik:</span><b id="cpc">1</b></div>
-      <div class="stat"><span>Za sekundu:</span><b id="cps">0</b></div>
+      <div class="stat"><span id="t_moneyLabel">Peníze:</span><b id="money">0</b></div>
+      <div class="stat"><span id="t_cpcLabel">Za klik:</span><b id="cpc">1</b></div>
+      <div class="stat"><span id="t_cpsLabel">Za sekundu:</span><b id="cps">0</b></div>
+
+      <!-- NEW: HUD + EVENTS -->
+      <div class="hud">
+        <div class="hudLine"><span id="t_comboLabel">Combo:</span> <b id="combo">x1.00</b></div>
+        <div class="hudLine"><span id="t_critLabel">Krit:</span> <b id="crit">10%</b></div>
+        <div class="hudLine hudEvent" id="eventLine">—</div>
+      </div>
 
       <h2 id="t_shopTitle" style="margin-top:15px">OBCHOD</h2>
 
@@ -92,11 +99,11 @@
       <h2 id="t_prestigeTitle" style="margin-top:15px">PRESTIGE</h2>
 
       <div class="item prestigeBox">
-        <div class="prestigeStat"><span>Slav Points:</span><b id="sp">0</b></div>
-        <div class="prestigeStat"><span>Bonus celkem:</span><b id="bonus">+0%</b></div>
+        <div class="prestigeStat"><span id="t_spLabel">Slav Points:</span><b id="sp">0</b></div>
+        <div class="prestigeStat"><span id="t_bonusLabel">Bonus celkem:</span><b id="bonus">+0%</b></div>
 
         <div class="prestigeBonus">
-          Získáš při prestiži: <b id="spGain">0</b>
+          <span id="t_gainLabel">Získáš při prestiži:</span> <b id="spGain">0</b>
         </div>
 
         <button id="btnPrestige" class="prestigeBtn" disabled>Prestige (reset)</button>
@@ -105,6 +112,7 @@
           Resetuje peníze a upgradey, ale dá trvalý bonus.
         </small>
       </div>
+
     </div>
   </div>
 
@@ -112,6 +120,3 @@
   <script src="gopnik.js"></script>
 </body>
 </html>
-
-
-
