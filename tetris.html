@@ -1197,9 +1197,6 @@ body {
 <button id="backBtn" onclick="window.location.href='hry.html'">⬅ Zpět</button>
 
 <div id="playerStats">
-   <div id="happyHourIndicator" style="position: fixed; top: 20px; left: 50%; transform: translateX(-50%); padding: 10px 25px; background: linear-gradient(135deg, rgba(255, 215, 0, 0.95), rgba(255, 165, 0, 0.95)); border: 3px solid gold; border-radius: 12px; font-size: 20px; font-weight: bold; color: #fff; text-shadow: 0 0 15px rgba(255, 215, 0, 0.9); box-shadow: 0 0 30px rgba(255, 215, 0, 0.7); animation: coinPulse 2s ease-in-out infinite; z-index: 100;">
-    ⏰ Načítání...
-</div>
     <div id="levelDisplay">
         ⭐ Level <span id="playerLevel">1</span>
         <div class="xp-bar-container">
@@ -1208,6 +1205,9 @@ body {
         <div class="xp-text" id="xpText">0 / 50 XP</div>
     </div>
     <div id="coinsDisplay">💰 <span id="coinCount">0</span></div>
+    <div id="happyHourIndicator" style="padding: 8px 15px; background: rgba(100, 100, 100, 0.5); border: 2px solid #666; border-radius: 8px; font-size: 14px; font-weight: bold; color: #aaa; text-align: center;">
+        ⏰ Happy Hour v 15:00
+    </div>
 </div>
 
 <div id="mainMenu" class="centered" style="display:none;">
@@ -1504,29 +1504,18 @@ function updateHappyHourIndicator() {
     if (!indicator) return;
     
     if (isHappyHour()) {
-        // Aktivní Happy Hour - zelený
-        indicator.style.display = 'block';
-        indicator.style.background = 'linear-gradient(135deg, rgba(255, 215, 0, 0.95), rgba(255, 165, 0, 0.95))';
+        indicator.style.background = 'linear-gradient(135deg, rgba(255, 215, 0, 0.4), rgba(255, 165, 0, 0.4))';
         indicator.style.borderColor = 'gold';
-        indicator.innerHTML = '🎉 HAPPY HOUR AKTIVNÍ! 2× 🎉';
+        indicator.style.color = 'gold';
+        indicator.textContent = '🎉 Happy Hour 2×';
     } else {
-        // Neaktivní - informace kdy bude
-        const now = new Date();
-        const currentHour = now.getHours();
-        let nextHappyHour;
+        const hour = new Date().getHours();
+        const next = hour < 15 ? '15:00' : hour < 20 ? '20:00' : '15:00';
         
-        if (currentHour < 15) {
-            nextHappyHour = '15:00';
-        } else if (currentHour < 20) {
-            nextHappyHour = '20:00';
-        } else {
-            nextHappyHour = '15:00 (zítra)';
-        }
-        
-        indicator.style.display = 'block';
-        indicator.style.background = 'linear-gradient(135deg, rgba(100, 100, 100, 0.7), rgba(70, 70, 70, 0.7))';
-        indicator.style.borderColor = '#888';
-        indicator.innerHTML = `⏰ Další Happy Hour v ${nextHappyHour}`;
+        indicator.style.background = 'rgba(100, 100, 100, 0.5)';
+        indicator.style.borderColor = '#666';
+        indicator.style.color = '#aaa';
+        indicator.textContent = `⏰ Happy Hour v ${next}`;
     }
 }
 // Aktualizuj indikátor každou minutu
@@ -2867,6 +2856,7 @@ await loadCurrentUser()
 </script>
 </body>
 </html>
+
 
 
 
