@@ -566,13 +566,6 @@ button.menuBtn.locked::after {
     gap: 15px;
 }
 
-.level-up-notification .menuBtn {
-    margin-top: 20px;
-    min-width: 250px;
-    z-index: 201;
-}
-
-
 .level-up-notification h2 {
     font-size: 56px;
     margin-bottom: 15px;
@@ -586,6 +579,12 @@ button.menuBtn.locked::after {
     color: white;
     text-shadow: 0 0 10px rgba(0, 0, 0, 0.8);
     margin: 10px 0;
+}
+
+.level-up-notification .menuBtn {
+    margin-top: 20px;
+    min-width: 250px;
+    z-index: 201;
 }
 
 /* Loading Screen */
@@ -1091,5 +1090,4 @@ button.menuBtn.locked::after {
         font-size: 26px;
     }
     
-
     .event-notification, .level
