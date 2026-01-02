@@ -1724,15 +1724,13 @@ function startPageLoading() {
         loadingBar.style.width = '0%';
         loadingText.textContent = 'Připravuji herní pole...';
         
-        // Zobraz update modal po 500ms
-        setTimeout(() => showUpdateModal(), 500);
+        // ✅ OPRAVENO - zobraz modal jen JEDNOU
+        if (!localStorage.getItem('tetris_update_v2.0_seen')) {
+            setTimeout(() => showUpdateModal(), 500);
+        }
     }, loadingTime);
 }
 
-// Spusť loading při načtení stránky
-window.addEventListener('DOMContentLoaded', () => {
-    startPageLoading();
-});
 // XP requirements for each level (progresivní)
 const xpRequirements = [
     0,    // Level 1
@@ -1778,15 +1776,9 @@ async function addXP(amount) {
     const oldLevel = playerLevel;
     playerXP += amount;
     
-    // Kontrola level upu
+    // Kontrola level upu - OPRAVENO
     while (playerLevel < 10 && playerXP >= xpRequirements[playerLevel]) {
         playerLevel++;
-    }
-    
-    // Zobraz notifikaci jen pokud se level změnil
-    if (playerLevel > oldLevel) {
-        showLevelUpNotification();
-        updateUnlockedItems();
     }
     
     updateLevelDisplay();
@@ -1794,6 +1786,12 @@ async function addXP(amount) {
     console.log(`💎 XP přidáno: +${amount} | Level: ${playerLevel} | XP: ${playerXP}`);
     await saveUserData(); // ✅ DŮLEŽITÉ - musí být await
     console.log('✅ Data uložena po XP změně');
+    
+    // Zobraz notifikaci JEN JEDNOU na konci
+    if (playerLevel > oldLevel) {
+        showLevelUpNotification();
+        updateUnlockedItems();
+    }
 }
  
 function showLevelUpNotification() {
@@ -1803,13 +1801,21 @@ function showLevelUpNotification() {
         <h2>🎉 LEVEL UP! 🎉</h2>
         <p>Dosáhl jsi Level ${playerLevel}!</p>
         <p style="font-size: 20px; margin-top: 10px;">Nové položky odemčeny v shopu! 🛒</p>
-        <button class="menuBtn" onclick="this.parentElement.remove()" style="margin-top: 20px; min-width: 200px;">
+        <button class="menuBtn" onclick="closeLevelUpNotification(this)" style="margin-top: 20px; min-width: 200px;">
             ✅ Pokračovat
         </button>
     `;
     document.body.appendChild(notification);
     
     playSound('levelup');
+}
+
+window.closeLevelUpNotification = function(button) {
+    const notification = button.closest('.level-up-notification');
+    if (notification) {
+        notification.classList.add('hide');
+        setTimeout(() => notification.remove(), 300);
+    }
 }
     
 function showUpdateModal() {
@@ -3012,6 +3018,7 @@ await loadCurrentUser()
 </script>
 </body>
 </html>
+
 
 
 
