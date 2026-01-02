@@ -48,7 +48,7 @@ window.addEventListener('orientationchange', checkOrientation);
 // ============================================
 let hasSeenUpdateModal = false;
 let currentGame = 'slot';
-let currentBet = 10;
+let currentBet = 50;
 let spinning = false;
 let wheelSpinning = false;
 let autoRotating = true;
@@ -2143,6 +2143,7 @@ autoRotate();
         }
     }, 3500);
 });
+
 
 
 
