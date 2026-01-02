@@ -1794,6 +1794,40 @@ button, .game-btn, .bet-btn {
     }
 }
 
+#happyHourDisplay {
+    position: fixed;
+    top: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: linear-gradient(135deg, rgba(255, 215, 0, 0.9), rgba(255, 140, 0, 0.9));
+    border: 3px solid #ffd700;
+    border-radius: 15px;
+    padding: 12px 30px;
+    font-size: 20px;
+    font-weight: bold;
+    color: #000;
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
+    box-shadow: 0 0 30px rgba(255, 215, 0, 0.8);
+    z-index: 100;
+    display: none;
+    animation: happyPulse 2s ease-in-out infinite;
+}
+
+@keyframes happyPulse {
+    0%, 100% { transform: translateX(-50%) scale(1); }
+    50% { transform: translateX(-50%) scale(1.05); }
+}
+
+#happyHourDisplay.active {
+    display: block;
+}
+
+#happyHourDisplay.countdown {
+    background: linear-gradient(135deg, rgba(100, 100, 100, 0.8), rgba(60, 60, 60, 0.8));
+    border-color: #888;
+    color: #fff;
+    animation: none;
+}
 
 
 
