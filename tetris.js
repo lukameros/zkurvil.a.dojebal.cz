@@ -397,6 +397,7 @@ window.closeUpdateModal = function() {
 }
 
 // ===== USER DATA MANAGEMENT =====
+// ===== INITIALIZE =====
 async function loadCurrentUser() {
     const savedUser = localStorage.getItem('currentUser')
     
@@ -423,6 +424,9 @@ async function loadCurrentUser() {
         loadLocalData()
     }
 }
+
+// Spusť při načtení
+loadCurrentUser()
 
 async function loadUserData() {
     if (!currentUser || currentUser.is_guest) return
@@ -1490,3 +1494,4 @@ function startEventSystem() {
 
 // ===== INITIALIZE =====
 loadCurrentUser()
+
