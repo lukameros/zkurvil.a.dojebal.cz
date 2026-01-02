@@ -754,18 +754,21 @@
     </div>
 
     <div class="game-card" data-game="hobo3" onclick="playGame('hobo3', goHobo3)">
-        <div class="game-image-container">
-            <img src="hobo3-image.jpg" alt="Hobo 3" class="game-image"
-                 onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'">
-            <div class="game-image-placeholder" style="display:none;">🥊</div>
+    <div class="game-image-container">
+        <img src="hobo3-image.jpg" alt="Hobo 3" class="game-image"
+             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'">
+        <div class="game-image-placeholder" style="display:none;">🥊</div>
+    </div>
+    <div class="game-content">
+        <div class="game-title">
+            <span class="game-icon">🥊</span>
+            <span>Hobo 3</span>
         </div>
-        <div class="game-content">
-            <div class="game-title">
-                <span class="game-icon">🥊</span>
-                <span>Hobo 3</span>
-            </div>
-            <button class="play-btn" onclick="event.stopPropagation(); playGame('hobo3', goHobo3);">Hrát hru</button>
-        <div class="game-card" data-game="gopnik" onclick="playGame('gopnik', goGopnik)">
+        <button class="play-btn" onclick="event.stopPropagation(); playGame('hobo3', goHobo3);">Hrát hru</button>
+    </div>
+</div>
+
+<div class="game-card" data-game="gopnik" onclick="playGame('gopnik', goGopnik)">
     <div class="game-image-container">
         <img src="gopnik-image.jpg" alt="Gopnik Clicker" class="game-image"
              onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'">
@@ -1250,6 +1253,7 @@ window.addEventListener('DOMContentLoaded', async function() {
 
 </body>
 </html>
+
 
 
 
