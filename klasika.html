@@ -512,24 +512,6 @@ async function goToMenu() {
 window.goToMenu = goToMenu;
 
     
-async function goToMenu() {
-    try {
-        // pauzni loop, ať se nic nehýbe při odchodu
-        isPaused = true
-        clearTimeout(dropTimeout)
-
-        // pokud existuje saveUserData (z modulu), ulož
-        if (typeof window.saveUserData === 'function') {
-            await window.saveUserData()
-        }
-    } catch (e) {
-        console.error('Chyba při ukládání před návratem do menu:', e)
-    }
-
-    window.location.href = 'tetris.html'
-}
-window.goToMenu = goToMenu
-
 // Načtení nastavení z URL parametrů
 const urlParams = new URLSearchParams(window.location.search);
 const savedDifficulty = urlParams.get('difficulty') || 'medium';
@@ -627,11 +609,6 @@ async function addXP(amount) {
 
     if (leveledUp) {
         showLevelUpNotification();
-    }
-
-    // ✅ DŮLEŽITÉ: okamžitě persistni změny (Supabase / localStorage)
-    if (typeof window.saveUserData === 'function') {
-        await window.saveUserData();
     }
 
     return amount;
@@ -838,11 +815,6 @@ async function updateAfterGame(finalScore) {
     return earnedXP
 }
 
-if (typeof window.saveUserData === 'function') {
-    await window.saveUserData();
-}
-
-    
 // Barevná témata
 const themes = {
     classic: ['cyan', 'yellow', 'purple', 'green', 'red', 'blue', 'orange'],
@@ -1271,17 +1243,48 @@ async function gameOver() {
 }
 
 async function loadCurrentUser() {
-    const { data, error } = await supabase.auth.getUser()
+    const savedUser = localStorage.getItem('currentUser')
 
-    if (data && data.user) {
-        currentUser = {
-            id: data.user.id,
-            username: data.user.user_metadata?.username || data.user.email,
-            is_guest: false
+    if (savedUser) {
+        try {
+            const parsed = JSON.parse(savedUser)
+
+            if (parsed && parsed.id && parsed.username) {
+                currentUser = parsed
+                console.log('Přihlášený uživatel (JSON):', currentUser.username, 'ID:', currentUser.id)
+                await loadUserData()
+            } else {
+                throw new Error('Neplatný formát')
+            }
+        } catch (e) {
+            console.log('currentUser je jen string:', savedUser)
+
+            try {
+                const { data: user, error } = await supabase
+                    .from('users')
+                    .select('*')
+                    .eq('username', savedUser)
+                    .single()
+
+                if (user && !error) {
+                    currentUser = user
+                    localStorage.setItem('currentUser', JSON.stringify(user))
+                    console.log('Uživatel načten z databáze:', user.username, 'ID:', user.id)
+                    await loadUserData()
+                } else {
+                    console.error('Uživatel nenalezen v databázi')
+                    currentUser = { username: savedUser, is_guest: true }
+                    loadLocalData()
+                }
+            } catch (error) {
+                console.error('Chyba při načítání uživatele:', error)
+                currentUser = { username: savedUser, is_guest: true }
+                loadLocalData()
+            }
         }
-        await loadUserData()
     } else {
-        currentUser = { is_guest: true }
+        currentUser = { username: 'Host', is_guest: true }
+        console.log('Host režim')
         loadLocalData()
     }
 
@@ -1298,6 +1301,7 @@ setTimeout(() => {
 </script>
 </body>
 </html>
+
 
 
 
