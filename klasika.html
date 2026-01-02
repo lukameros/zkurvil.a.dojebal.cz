@@ -570,19 +570,31 @@ function updateLevelDisplay() {
     document.getElementById('xpText').textContent = `${currentProgress} / ${xpNeeded} XP`;
 }
 
-function addXP(amount) {
-    if (playerLevel >= 10) return;
+async function addXP(amount) {
+    if (playerLevel >= 10) return amount;
     
+    console.log(`⭐ Přidávám ${amount} XP... (aktuálně: ${playerXP})`);
     playerXP += amount;
+    
+    let leveledUp = false;
     
     while (playerLevel < 10 && playerXP >= xpRequirements[playerLevel]) {
         playerLevel++;
+        leveledUp = true;
+        console.log(`🎉 LEVEL UP! Nový level: ${playerLevel}`);
+    }
+    
+    console.log(`💎 Po přidání: Level ${playerLevel}, XP ${playerXP}`);
+    
+    updateLevelDisplay();
+    
+    if (leveledUp) {
         showLevelUpNotification();
     }
     
-    updateLevelDisplay();
+    return amount;
 }
-
+    
 function showLevelUpNotification() {
     const notification = document.createElement('div');
     notification.className = 'level-up-notification';
@@ -611,51 +623,66 @@ const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
 const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
 
 // Načtení přihlášeného uživatele
-async function loadCurrentUser() {
-    const savedUser = localStorage.getItem('currentUser')
+// ===== EXPORT FUNKCÍ NA WINDOW =====
+window.supabase = supabase
+window.currentUser = currentUser
+window.playerLevel = playerLevel
+window.playerXP = playerXP
+window.playerCoins = playerCoins
+window.updateCoinsDisplay = updateCoinsDisplay
+window.updateLevelDisplay = updateLevelDisplay
+window.addXP = addXP
+window.saveUserData = saveUserData
     
-    if (savedUser) {
-        try {
-            const parsed = JSON.parse(savedUser)
-            
-            if (parsed && parsed.id && parsed.username) {
-                currentUser = parsed
-                console.log('Přihlášený uživatel:', currentUser.username, 'ID:', currentUser.id)
-                await loadUserData()
-            } else {
-                throw new Error('Neplatný formát')
-            }
-        } catch (e) {
-            console.log('currentUser string:', savedUser)
-            
-            try {
-                const { data: user, error } = await supabase
-                    .from('users')
-                    .select('*')
-                    .eq('username', savedUser)
-                    .single()
-                
-                if (user && !error) {
-                    currentUser = user
-                    localStorage.setItem('currentUser', JSON.stringify(user))
-                    console.log('Uživatel načten z databáze:', user.username, 'ID:', user.id)
-                    await loadUserData()
-                } else {
-                    console.error('Uživatel nenalezen')
-                    currentUser = { username: savedUser, is_guest: true }
-                    loadLocalData()
-                }
-            } catch (error) {
-                console.error('Chyba při načítání uživatele:', error)
-                currentUser = { username: savedUser, is_guest: true }
-                loadLocalData()
-            }
+async function loadUserData() {
+    if (!currentUser || currentUser.is_guest) return
+    
+    console.log('Načítám data pro uživatele:', currentUser.username, 'ID:', currentUser.id)
+    
+    try {
+        const { data, error } = await supabase
+            .from('tetris_player_data')
+            .select('*')
+            .eq('user_id', currentUser.id)
+            .single()
+        
+        if (data) {
+            playerCoins = data.coins || 0
+            playerLevel = data.level || 1
+            playerXP = data.xp || 0
+            unlockedThemes = data.unlocked_themes || ['classic', 'neon']
+            unlockedMaps = data.unlocked_maps || ['20x10', '18x12']
+            totalGamesPlayed = data.games_played || 0
+            console.log('Data načtena:', { playerCoins, playerLevel, playerXP, totalGamesPlayed })
+        } else {
+            console.log('První spuštění - vytvářím nový záznam')
+            await supabase
+                .from('tetris_player_data')
+                .insert([{
+                    user_id: currentUser.id,
+                    username: currentUser.username,
+                    coins: 0,
+                    level: 1,
+                    xp: 0,
+                    unlocked_themes: ['classic', 'neon'],
+                    unlocked_maps: ['20x10', '18x12'],
+                    games_played: 0,
+                    total_score: 0,
+                    best_score: 0
+                }])
         }
-    } else {
-        currentUser = { username: 'Host', is_guest: true }
-        console.log('Host režim')
-        loadLocalData()
+    } catch (error) {
+        console.error('Chyba při načítání dat:', error)
     }
+    
+    // ✅ PŘIDÁNO - aktualizace globálních proměnných
+    window.currentUser = currentUser
+    window.playerLevel = playerLevel
+    window.playerXP = playerXP
+    window.playerCoins = playerCoins
+    
+    updateCoinsDisplay()
+    updateLevelDisplay()
 }
 
 // Načtení dat uživatele ze Supabase
@@ -765,7 +792,7 @@ async function updateAfterGame(finalScore) {
     earnedCoinsThisGame = totalCoins
     playerCoins += totalCoins
     
-    addXP(earnedXP)
+    await addXP(earnedXP)
     
     console.log(`Získané mince: ${totalCoins}, XP: ${earnedXP}`)
     console.log(`Celkem mincí: ${playerCoins}, Level: ${playerLevel}, XP: ${playerXP}`)
@@ -1255,3 +1282,4 @@ setTimeout(() => {
 </script>
 </body>
 </html>
+
