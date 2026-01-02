@@ -1,7 +1,3 @@
-/* =========================================
-   SLAV CLICKER – KOMPLET CSS
-   ========================================= */
-
 /* ===== reset ===== */
 *{ box-sizing:border-box; }
 html, body{
@@ -25,13 +21,11 @@ body{
 
 /* ✅ ladění pozice gopníka (desktop) */
 :root{
-  --gopnik-x: 160px; /* doprava */
-  --gopnik-y: 55%;   /* dolů */
+  --gopnik-x: 160px;
+  --gopnik-y: 55%;
 }
 
-/* =========================================
-   LOADING OVERLAY
-   ========================================= */
+/* ===== LOADING ===== */
 #loading{
   position:fixed;
   inset:0;
@@ -69,9 +63,7 @@ body{
   opacity:.85;
 }
 
-/* =========================================
-   LAYOUT
-   ========================================= */
+/* ===== layout ===== */
 .wrap{
   display:grid;
   grid-template-columns:1fr 360px;
@@ -81,10 +73,7 @@ body{
   position:relative;
   z-index:1;
 }
-.leftcol{
-  position:relative;
-  min-height:0;
-}
+.leftcol{ position:relative; min-height:0; }
 
 /* logo */
 .logo{
@@ -96,9 +85,7 @@ body{
 }
 .logo span{ color:#c40000; }
 
-/* =========================================
-   GOPNIK CLICK AREA
-   ========================================= */
+/* ===== gopnik klik ===== */
 .ring{
   width:min(364px,80vw);
   aspect-ratio:1/1;
@@ -119,14 +106,10 @@ body{
     translateY(var(--gopnik-y));
   z-index:5;
 }
-
-/* STOP modrý klik efekt */
 .ring, .ring *{
   -webkit-tap-highlight-color:transparent !important;
   user-select:none !important;
 }
-
-/* gopnik obrázek */
 #gopnikImg{
   width:100%;
   height:100%;
@@ -137,9 +120,7 @@ body{
   transition:transform 80ms ease;
 }
 
-/* =========================================
-   KOBERCOVÝ PANEL
-   ========================================= */
+/* ===== panel ===== */
 .panel{
   position: relative;
   padding: 22px;
@@ -169,19 +150,16 @@ body{
   z-index:0;
   pointer-events:none;
 }
-.panel > *{
-  position:relative;
-  z-index:1;
-}
+.panel > *{ position:relative; z-index:1; }
 
-/* panel top (settings button) */
+/* top */
 .panelTop{
   display:flex;
   justify-content:flex-end;
   margin-bottom:8px;
 }
 
-/* nadpisy */
+/* headings */
 .panel h2{
   margin: 0 0 10px;
   color: #3b1c0b;
@@ -193,7 +171,7 @@ body{
   letter-spacing:.6px;
 }
 
-/* statistiky */
+/* stats */
 .stat{
   display:flex;
   justify-content:space-between;
@@ -206,7 +184,7 @@ body{
   font-weight:900;
 }
 
-/* položky obchodu */
+/* items */
 .item{
   background: rgba(255,245,220,.95);
   border: 2px solid #9b6a2f;
@@ -216,9 +194,7 @@ body{
   box-shadow: inset 0 0 8px rgba(0,0,0,.18);
 }
 
-/* =========================================
-   BUTTONS
-   ========================================= */
+/* buttons */
 button{
   background:#6d4b2a;
   color:#fff;
@@ -228,8 +204,6 @@ button{
   cursor:pointer;
 }
 button:disabled{ opacity:.4; cursor:not-allowed; }
-
-/* icon button */
 .iconBtn{
   background:#6d4b2a;
   color:#fff;
@@ -244,9 +218,37 @@ button:disabled{ opacity:.4; cursor:not-allowed; }
 
 small{ display:block; margin-top:10px; }
 
-/* =========================================
-   SETTINGS MODAL
-   ========================================= */
+/* ===== HUD (combo/crit/event) ===== */
+.hud{
+  margin-top:10px;
+  padding:10px;
+  border-radius:12px;
+  border:2px solid rgba(155,106,47,.7);
+  background: rgba(255,255,255,.45);
+  box-shadow: inset 0 0 8px rgba(0,0,0,.12);
+}
+.hudLine{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  font-weight:900;
+  color:#3b1c0b;
+  margin:6px 0;
+}
+.hudLine b{
+  color:#7a1f1f;
+}
+.hudEvent{
+  justify-content:flex-start;
+  font-weight:800;
+  background: rgba(255,245,220,.9);
+  border:2px solid #9b6a2f;
+  border-radius:10px;
+  padding:8px 10px;
+  box-shadow: inset 0 0 8px rgba(0,0,0,.15);
+}
+
+/* ===== modal ===== */
 .modal{
   position:fixed;
   inset:0;
@@ -290,7 +292,6 @@ small{ display:block; margin-top:10px; }
   z-index:0;
 }
 .modalBox > *{ position:relative; z-index:1; color:#2b1a0f; }
-
 .modalHeader{
   display:flex;
   align-items:center;
@@ -329,9 +330,7 @@ small{ display:block; margin-top:10px; }
   font-weight:700;
 }
 
-/* =========================================
-   PRESTIGE
-   ========================================= */
+/* ===== prestige ===== */
 .prestigeBox{
   background: rgba(255,235,200,.95);
   border: 3px solid #7a1f1f;
@@ -404,9 +403,7 @@ small{ display:block; margin-top:10px; }
   text-align:center;
 }
 
-/* =========================================
-   MOBILE
-   ========================================= */
+/* ===== mobile ===== */
 @media (max-width:980px){
   .wrap{
     grid-template-columns:1fr;
