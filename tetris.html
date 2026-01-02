@@ -47,16 +47,6 @@
     text-shadow: 0 0 10px rgba(0, 0, 0, 0.8);
 }
 
-@keyframes fadeIn {
-    from { opacity: 0; transform: scale(0.9); }
-    to { opacity: 1; transform: scale(1); }
-}
-
-@keyframes fadeOut {
-    from { opacity: 1; transform: scale(1); }
-    to { opacity: 0; transform: scale(0.9); }
-}
-
 .event-timer {
     position: fixed;
     top: 80px;
@@ -1215,9 +1205,6 @@ body {
         <div class="xp-text" id="xpText">0 / 50 XP</div>
     </div>
     <div id="coinsDisplay">💰 <span id="coinCount">0</span></div>
-    <div id="happyHourIndicator" style="padding: 8px 15px; background: rgba(100, 100, 100, 0.5); border: 2px solid #666; border-radius: 8px; font-size: 14px; font-weight: bold; color: #aaa; text-align: center;">
-        ⏰ Happy Hour v 15:00
-    </div>
 </div>
 
 <div id="mainMenu" class="centered" style="display:none;">
@@ -1225,47 +1212,12 @@ body {
     <button class="menuBtn" onclick="goToKlasika()">🕹️ Classicplay</button>
     <button class="menuBtn" onclick="startTetris(selectedDifficulty)">🚀 Magicplay</button>
     <button class="menuBtn" onclick="window.location.href='tetrismulti.html'">🌐 Multiplayer</button>
-    <button class="menuBtn" onclick="showSettingsMenu()">⚙️ Nastavení</button>
-    <button class="menuBtn" onclick="showDifficultyMenu()">🎚️ Obtížnost</button>
+    <button class="menuBtn" onclick="showDifficultyMenu()">⚙️ Nastavení</button>
     <button class="menuBtn" onclick="showMapMenu()">📐 Mapy</button>
     <button class="menuBtn" onclick="showThemeMenu()">🎨 Vzhled</button>
     <button class="menuBtn" onclick="showLeaderboard()">🏆 Žebříček</button>
 </div>
 
-<div id="settingsMenu" class="centered" style="display:none;">
-    <h1>⚙️ Nastavení</h1>
-    <div style="display: flex; flex-direction: column; gap: 20px; align-items: center;">
-        
-        <!-- Zvuk -->
-        <div style="background: rgba(30, 30, 60, 0.7); padding: 25px; border-radius: 12px; border: 2px solid #00ffff; min-width: 400px;">
-            <h3 style="color: #00ffff; margin-bottom: 15px; text-align: center;">🔊 Zvuk</h3>
-            <div style="display: flex; justify-content: center; gap: 15px;">
-                <button class="menuBtn" id="soundOn" onclick="setSoundEnabled(true)" style="min-width: 150px;">
-                    🔊 Zapnuto
-                </button>
-                <button class="menuBtn" id="soundOff" onclick="setSoundEnabled(false)" style="min-width: 150px;">
-                    🔇 Vypnuto
-                </button>
-            </div>
-        </div>
-        
-        <!-- Jazyk -->
-        <div style="background: rgba(30, 30, 60, 0.7); padding: 25px; border-radius: 12px; border: 2px solid #00ffff; min-width: 400px;">
-            <h3 style="color: #00ffff; margin-bottom: 15px; text-align: center;">🌍 Jazyk</h3>
-            <div style="display: flex; justify-content: center; gap: 15px;">
-                <button class="menuBtn" id="langCs" onclick="setLanguage('cs')" style="min-width: 150px;">
-                    🇨🇿 Čeština
-                </button>
-                <button class="menuBtn" id="langEn" onclick="setLanguage('en')" style="min-width: 150px;">
-                    🇬🇧 English
-                </button>
-            </div>
-        </div>
-        
-    </div>
-    <button class="menuBtn" onclick="backToMainMenu()" style="margin-top: 30px;">⬅ Zpět</button>
-</div>
- 
 <div id="difficultyMenu" class="centered" style="display:none;">
     <h1>Obtížnost</h1>
     <button class="menuBtn" onclick="setDifficulty('easy')">😊 Snadná</button>
@@ -1544,146 +1496,6 @@ let activeEvent = null;
 let eventTimeout = null;
 let canRotate = true;
 
-function updateHappyHourIndicator() {
-    const indicator = document.getElementById('happyHourIndicator');
-    if (!indicator) return;
-    
-    if (isHappyHour()) {
-        indicator.style.background = 'linear-gradient(135deg, rgba(255, 215, 0, 0.4), rgba(255, 165, 0, 0.4))';
-        indicator.style.borderColor = 'gold';
-        indicator.style.color = 'gold';
-        indicator.textContent = '🎉 Happy Hour 2×';
-    } else {
-        const hour = new Date().getHours();
-        const next = hour < 15 ? '15:00' : hour < 20 ? '20:00' : '15:00';
-        
-        indicator.style.background = 'rgba(100, 100, 100, 0.5)';
-        indicator.style.borderColor = '#666';
-        indicator.style.color = '#aaa';
-        indicator.textContent = `⏰ Play Hour v ${next}`;
-    }
-}
-// Aktualizuj indikátor každou minutu
-setInterval(updateHappyHourIndicator, 60000);
-
-// Aktualizuj hned při načtení
-    updateHappyHourIndicator();
-    loadSettings();// Přidej tenhle řádek
-});
-
- // Happy Hours system
-const HAPPY_HOURS = [15, 20]; // 15:00 a 20:00
-
-function isHappyHour() {
-    const now = new Date();
-    const hour = now.getHours();
-    // Zobrazí se od 15:00 do 15:59 a od 20:00 do 20:59
-    return hour === 15 || hour === 20;
-}
-
-function getHappyHourMultiplier() {
-    return isHappyHour() ? 2 : 1;
-}
-
-function showHappyHourNotification() {
-    if (!isHappyHour()) return;
-    
-    const notification = document.createElement('div');
-    notification.className = 'event-notification';
-    notification.style.background = 'linear-gradient(135deg, rgba(255, 215, 0, 0.95), rgba(255, 165, 0, 0.95))';
-    notification.innerHTML = `
-        <h2>🎉 HAPPY HOUR! 🎉</h2>
-        <p>2× SKÓRE & 2× MINCE!</p>
-        <p style="font-size: 18px; margin-top: 10px;">Aktivní do ${HAPPY_HOURS[HAPPY_HOURS.indexOf(new Date().getHours())] + 1}:00</p>
-    `;
-    document.body.appendChild(notification);
-    
-    setTimeout(() => {
-        notification.classList.add('hide');
-        setTimeout(() => notification.remove(), 300);
-    }, 5000);
-}
-
-// Kontrola Happy Hour každou minutu
-setInterval(() => {
-    const now = new Date();
-    if (now.getMinutes() === 0 && isHappyHour()) {
-        showHappyHourNotification();
-    }
-}, 60000);
-
-// Nastavení
-let soundEnabled = true;
-let currentLanguage = 'cs';
-
-// Načti nastavení
-function loadSettings() {
-    soundEnabled = localStorage.getItem('tetris_sound') !== 'false';
-    currentLanguage = localStorage.getItem('tetris_language') || 'cs';
-    updateSettingsUI();
-}
-
-// Aktualizuj UI tlačítek
-function updateSettingsUI() {
-    const soundOnBtn = document.getElementById('soundOn');
-    const soundOffBtn = document.getElementById('soundOff');
-    const langCsBtn = document.getElementById('langCs');
-    const langEnBtn = document.getElementById('langEn');
-    
-    if (soundOnBtn && soundOffBtn) {
-        if (soundEnabled) {
-            soundOnBtn.style.background = 'linear-gradient(135deg, rgba(0, 255, 0, 0.5), rgba(0, 200, 0, 0.5))';
-            soundOnBtn.style.borderColor = '#00ff00';
-            soundOffBtn.style.background = '';
-            soundOffBtn.style.borderColor = '';
-        } else {
-            soundOffBtn.style.background = 'linear-gradient(135deg, rgba(255, 0, 0, 0.5), rgba(200, 0, 0, 0.5))';
-            soundOffBtn.style.borderColor = '#ff0000';
-            soundOnBtn.style.background = '';
-            soundOnBtn.style.borderColor = '';
-        }
-    }
-    
-    if (langCsBtn && langEnBtn) {
-        if (currentLanguage === 'cs') {
-            langCsBtn.style.background = 'linear-gradient(135deg, rgba(0, 150, 255, 0.6), rgba(150, 0, 255, 0.6))';
-            langCsBtn.style.borderColor = '#00ffff';
-            langEnBtn.style.background = '';
-            langEnBtn.style.borderColor = '';
-        } else {
-            langEnBtn.style.background = 'linear-gradient(135deg, rgba(0, 150, 255, 0.6), rgba(150, 0, 255, 0.6))';
-            langEnBtn.style.borderColor = '#00ffff';
-            langCsBtn.style.background = '';
-            langCsBtn.style.borderColor = '';
-        }
-    }
-}
-
-window.showSettingsMenu = function() {
-    document.getElementById('mainMenu').style.display = 'none';
-    document.getElementById('settingsMenu').style.display = 'flex';
-    updateSettingsUI();
-}
-
-window.setSoundEnabled = function(enabled) {
-    soundEnabled = enabled;
-    localStorage.setItem('tetris_sound', enabled);
-    updateSettingsUI();
-    
-    // Zahraj testovací zvuk
-    if (enabled) {
-        playSound('rotate');
-    }
-}
-
-window.setLanguage = function(lang) {
-    currentLanguage = lang;
-    localStorage.setItem('tetris_language', lang);
-    updateSettingsUI();
-    alert(lang === 'cs' ? 'Jazyk změněn na češtinu!' : 'Language changed to English!');
-    // Tady později můžeš přeložit celé UI
-}
- 
 function startPageLoading() {
     const loadingTime = 3000 + Math.random() * 3000;
     const loadingBar = document.getElementById('loadingBar');
@@ -1723,9 +1535,6 @@ function startPageLoading() {
         document.getElementById('mainMenu').style.display = 'flex';
         loadingBar.style.width = '0%';
         loadingText.textContent = 'Připravuji herní pole...';
-        
-        // Zobraz update modal po 500ms
-        setTimeout(() => showUpdateModal(), 500);
     }, loadingTime);
 }
 
@@ -1772,30 +1581,20 @@ function updateLevelDisplay() {
     document.getElementById('xpText').textContent = `${currentProgress} / ${xpNeeded} XP`;
 }
 
-async function addXP(amount) {
+function addXP(amount) {
     if (playerLevel >= 10) return;
     
-    const oldLevel = playerLevel;
     playerXP += amount;
     
-    // Kontrola level upu
     while (playerLevel < 10 && playerXP >= xpRequirements[playerLevel]) {
         playerLevel++;
-    }
-    
-    // Zobraz notifikaci jen pokud se level změnil
-    if (playerLevel > oldLevel) {
         showLevelUpNotification();
         updateUnlockedItems();
     }
     
     updateLevelDisplay();
-    
-    console.log(`💎 XP přidáno: +${amount} | Level: ${playerLevel} | XP: ${playerXP}`);
-    await saveUserData(); // ✅ DŮLEŽITÉ - musí být await
-    console.log('✅ Data uložena po XP změně');
 }
- 
+
 function showLevelUpNotification() {
     const notification = document.createElement('div');
     notification.className = 'level-up-notification';
@@ -1803,102 +1602,48 @@ function showLevelUpNotification() {
         <h2>🎉 LEVEL UP! 🎉</h2>
         <p>Dosáhl jsi Level ${playerLevel}!</p>
         <p style="font-size: 20px; margin-top: 10px;">Nové položky odemčeny v shopu! 🛒</p>
-        <button class="menuBtn" onclick="this.parentElement.remove()" style="margin-top: 20px; min-width: 200px;">
-            ✅ Pokračovat
-        </button>
     `;
     document.body.appendChild(notification);
     
     playSound('levelup');
-}
     
-function showUpdateModal() {
-    const hasSeenUpdate = localStorage.getItem('tetris_update_v2.0_seen');
-    if (hasSeenUpdate) return; // Už viděl
-    
-    const modal = document.createElement('div');
-    modal.id = 'updateModal';
-    modal.style.cssText = `
-        display: flex;
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0, 0, 0, 0.9);
-        justify-content: center;
-        align-items: center;
-        z-index: 10000;
-    `;
-    
-    modal.innerHTML = `
-        <div style="
-            background: linear-gradient(135deg, #1a1a2e, #2a2a4e);
-            padding: 40px;
-            border-radius: 20px;
-            border: 3px solid #00ffff;
-            box-shadow: 0 0 60px rgba(0, 255, 255, 0.6);
-            max-width: 600px;
-            text-align: center;
-            animation: fadeIn 0.5s ease-in;
-        ">
-            <h2 style="font-size: 48px; color: #00ffff; text-shadow: 0 0 20px #00ffff; margin-bottom: 20px;">
-                🎉 NOVÁ AKTUALIZACE! 🎉
-            </h2>
-            
-            <div style="text-align: left; margin: 30px 0; font-size: 18px; line-height: 1.8;">
-                <p style="color: #00ffff; font-weight: bold; margin-bottom: 15px;">✨ Co je nového:</p>
-                <ul style="color: #fff; margin-left: 25px;">
-                    <li>🎊 <strong>Happy Hours</strong> - 2× skóre a mince v 15:00 a 20:00!</li>
-                    <li>⭐ <strong>Level systém</strong> - získávej XP a odemykej obsah</li>
-                    <li>🎨 <strong>15 nových témat</strong> - od Fire po Galaxy!</li>
-                    <li>🗺️ <strong>16 různých map</strong> - od 10x25 po 25x25</li>
-                    <li>⚡ <strong>6 random eventů</strong> - Turbo Speed, Invisible Blocks...</li>
-                    <li>🏆 <strong>Online žebříček</strong> - konkuruj ostatním hráčům!</li>
-                    <li>💰 <strong>Coinový systém</strong> - nakupuj témata a mapy</li>
-                </ul>
-                
-                <div style="
-                    margin: 25px 0;
-                    padding: 20px;
-                    background: rgba(0, 255, 170, 0.1);
-                    border: 2px solid #00ffaa;
-                    border-radius: 15px;
-                    text-align: center;
-                ">
-                    <p style="color: #00ffaa; font-size: 20px; margin: 0;">
-                        🎮 Hra je 100% <strong>ZDARMA</strong>, bez reklam a mikrotransakcí
-                    </p>
-                    <p style="color: #00ffaa; font-size: 16px; margin-top: 10px;">
-                        👶 Vhodné pro hráče od <strong>10 let</strong>
-                    </p>
-                </div>
-            </div>
-            
-            <button onclick="closeUpdateModal()" class="menuBtn" style="
-                margin-top: 20px;
-                font-size: 24px;
-                padding: 15px 50px;
-                background: linear-gradient(135deg, #00ffaa, #00cc88);
-                border: 3px solid #00ffaa;
-                box-shadow: 0 0 30px rgba(0, 255, 170, 0.5);
-            ">
-                🚀 ZAČÍT HRÁT! 🚀
-            </button>
-        </div>
-    `;
-    
-    document.body.appendChild(modal);
+    setTimeout(() => {
+        notification.classList.add('hide');
+        setTimeout(() => notification.remove(), 300);
+    }, 4000);
 }
 
-window.closeUpdateModal = function() {
-    localStorage.setItem('tetris_update_v2.0_seen', 'true');
-    const modal = document.getElementById('updateModal');
-    if (modal) {
-        modal.style.animation = 'fadeOut 0.3s ease-out';
-        setTimeout(() => modal.remove(), 300);
+function showUpdateModal() {
+    if (!hasSeenUpdateModal) {
+        setTimeout(() => {
+            const modal = document.createElement('div');
+            modal.className = 'modal';
+            modal.id = 'updateModalContainer';
+            modal.style.display = 'flex';
+            modal.innerHTML = `
+                <div class="modal-content">
+                    <h2>🎉 NOVÁ AKTUALIZACE! 🎉</h2>
+                    <div style="color: #fff; font-size: 18px; text-align: left; margin: 20px 0;">
+                        <p style="margin: 10px 0;">✨ <strong>Nové funkce:</strong></p>
+                        <ul style="margin-left: 20px; line-height: 1.8;">
+                            <li>🎰 Výhry i se 2 stejnými symboly!</li>
+                            <li>🏆 20+ nových úspěchů</li>
+                            <li>📋 15 denních úkolů</li>
+                            <li>🎨 Vylepšené téma mění celou hru</li>
+                            <li>💰 Denní bonus 300 mincí každých 12h</li>
+                        </ul>
+                        <p style="margin: 15px 0; font-size: 16px; color: #00ffaa; text-align: center; padding: 10px; background: rgba(0,255,170,0.1); border-radius: 10px;">
+                            🎮 Hra je 100% ZDARMA, bez mikrotransakcí<br>
+                            👶 Vhodné pro hráče od 10 let
+                        </p>
+                    </div>
+                    <button class="modal-close" onclick="closeUpdateModal()">SUPER! ZAČNĚME HRÁT! 🎰</button>
+                </div>
+            `;
+            document.body.appendChild(modal);
+        }, 3500);
     }
-}
+} 
  
 </script>
 
@@ -1919,20 +1664,40 @@ async function loadCurrentUser() {
             
             if (parsed && parsed.id && parsed.username) {
                 currentUser = parsed
-                console.log('✅ Přihlášený uživatel:', currentUser.username, 'ID:', currentUser.id)
+                console.log('Přihlášený uživatel (JSON):', currentUser.username, 'ID:', currentUser.id)
                 await loadUserData()
-                return // ✅ DŮLEŽITÉ - zastav zde!
             } else {
                 throw new Error('Neplatný formát')
             }
         } catch (e) {
-            console.log('⚠️ Nelze parsovat JSON, zkouším jako string')
-            currentUser = { username: savedUser, is_guest: true }
-            loadLocalData()
+            console.log('currentUser je jen string:', savedUser)
+            
+            try {
+                const { data: user, error } = await supabase
+                    .from('users')
+                    .select('*')
+                    .eq('username', savedUser)
+                    .single()
+                
+                if (user && !error) {
+                    currentUser = user
+                    localStorage.setItem('currentUser', JSON.stringify(user))
+                    console.log('Uživatel načten z databáze:', user.username, 'ID:', user.id)
+                    await loadUserData()
+                } else {
+                    console.error('Uživatel nenalezen v databázi')
+                    currentUser = { username: savedUser, is_guest: true }
+                    loadLocalData()
+                }
+            } catch (error) {
+                console.error('Chyba při načítání uživatele:', error)
+                currentUser = { username: savedUser, is_guest: true }
+                loadLocalData()
+            }
         }
     } else {
         currentUser = { username: 'Host', is_guest: true }
-        console.log('👤 Host režim')
+        console.log('Host režim')
         loadLocalData()
     }
 }
@@ -2008,7 +1773,6 @@ async function saveUserData() {
             maps: unlockedMaps
         }
         localStorage.setItem('tetrisPlayerData', JSON.stringify(data))
-        console.log('💾 Uloženo lokálně:', data) // Debug log
         return
     }
     
@@ -2026,30 +1790,28 @@ async function saveUserData() {
             .eq('user_id', currentUser.id)
         
         if (error) throw error
-        console.log('✅ Data uložena do Supabase - Level:', playerLevel, 'XP:', playerXP)
     } catch (error) {
-        console.error('❌ Chyba při ukládání dat:', error)
+        console.error('Chyba při ukládání dat:', error)
     }
 }
- 
+
 async function updateAfterGame(finalScore) {
-    totalGamesPlayed++;
+    totalGamesPlayed++
     
-    const baseCoinsFromScore = Math.floor(finalScore / 100) * 5;
-    const baseCoins = baseCoinsFromScore + 10;
+    // Mince: každých 100 bodů = 5 mincí + bonus 10
+    const coinsFromScore = Math.floor(finalScore / 100) * 5
+    const totalCoins = coinsFromScore + 10
     
-    // Happy Hour multiplier na mince
-    const totalCoins = baseCoins * getHappyHourMultiplier();
+    // XP: každých 1000 bodů = 10 XP
+    const earnedXP = Math.floor(finalScore / 1000) * 10
     
-    const earnedXP = Math.floor(finalScore / 1000) * 10;
+    earnedCoinsThisGame = totalCoins
+    playerCoins += totalCoins
     
-    earnedCoinsThisGame = totalCoins;
-    playerCoins += totalCoins;
+    addXP(earnedXP)
     
-    await addXP(earnedXP);
-    
-    console.log(`💰 Získané mince: ${totalCoins}${isHappyHour() ? ' (HAPPY HOUR!)' : ''}, XP: ${earnedXP}`);
-    console.log(`📊 Celkem mincí: ${playerCoins}, Level: ${playerLevel}, XP: ${playerXP}`);
+    console.log(`Získané mince: ${totalCoins}, XP: ${earnedXP}`)
+    console.log(`Celkem mincí: ${playerCoins}, Level: ${playerLevel}, XP: ${playerXP}`)
     
     if (!currentUser || currentUser.is_guest) {
         saveUserData()
@@ -2083,10 +1845,10 @@ async function updateAfterGame(finalScore) {
         
         if (error) throw error
         
-        console.log('✅ Data úspěšně uložena do Supabase')
+        console.log('Data úspěšně uložena do Supabase')
         
     } catch (error) {
-        console.error('❌ Chyba při aktualizaci dat:', error)
+        console.error('Chyba při aktualizaci dat:', error)
     }
     
     await saveUserData()
@@ -2388,7 +2150,6 @@ window.goToKlasika = function() {
 window.backToMainMenu = function() {
     document.getElementById('mainMenu').style.display = 'flex'
     document.getElementById('difficultyMenu').style.display = 'none'
-    document.getElementById('settingsMenu').style.display = 'none'
     document.getElementById('themeMenu').style.display = 'none'
     document.getElementById('mapMenu').style.display = 'none'
     document.getElementById('leaderboard').style.display = 'none'
@@ -2491,35 +2252,30 @@ function initGrid() {
 }
 
 window.startTetris = function(difficulty) {
-    document.getElementById('mainMenu').style.display = 'none'
-    document.getElementById('tetrisGame').style.display = 'flex'
-    
-    score = 0
-    level = 1
-    linesCleared = 0
-    combo = 0
-    canHold = true
-    isPaused = false
-    isGameOver = false
-    holdPiece = null
-    earnedCoinsThisGame = 0
-    activeEvent = null
-    
-    dropInterval = difficulty === 'easy' ? 800 : 
-                   difficulty === 'medium' ? 600 : 
-                   difficulty === 'hard' ? 400 : 200
-    
-    initGrid()
-    nextPiece = randomTetromino()
-    newTetromino()
-    updateDisplay()
-    gameLoop()
-    startEventSystem()
-    
-    // Zobraz Happy Hour notifikaci pokud je aktivní
-    if (isHappyHour()) {
-        setTimeout(() => showHappyHourNotification(), 1000);
-    }
+document.getElementById('mainMenu').style.display = 'none'
+document.getElementById('tetrisGame').style.display = 'flex'
+        
+        score = 0
+        level = 1
+        linesCleared = 0
+        combo = 0
+        canHold = true
+        isPaused = false
+        isGameOver = false
+        holdPiece = null
+        earnedCoinsThisGame = 0
+        activeEvent = null
+        
+        dropInterval = difficulty === 'easy' ? 800 : 
+                       difficulty === 'medium' ? 600 : 
+                       difficulty === 'hard' ? 400 : 200
+        
+        initGrid()
+        nextPiece = randomTetromino()
+        newTetromino()
+        updateDisplay()
+        gameLoop()
+        startEventSystem()
 }
 
 function randomTetromino() {
@@ -2667,13 +2423,9 @@ function clearLines() {
         if (cleared === 4) points *= 2;
         points += combo * 50;
         
-        // Event multiplier
         if (activeEvent && activeEvent.multiplier) {
             points *= activeEvent.multiplier;
         }
-        
-        // Happy Hour multiplier
-        points *= getHappyHourMultiplier();
         
         score += points;
         level = Math.floor(linesCleared / 10) + 1
@@ -2799,8 +2551,6 @@ function togglePause() {
 }
 
 function playSound(type) {
- if (!soundEnabled) return;
-    const audioContext = new (window.AudioContext || window.webkitAudioContext)();
     const oscillator = audioContext.createOscillator();
     const gainNode = audioContext.createGain();
     
@@ -2842,10 +2592,10 @@ function playSound(type) {
             break;
     }
     
-    oscillator.start(audioContext.currentTime || 0);
-    oscillator.stop((audioContext.currentTime || 0) + duration);
+    oscillator.start(audioContext.currentTime);
+    oscillator.stop(audioContext.currentTime + duration);
 }
- 
+
 document.addEventListener('keydown', e => {
     if (isGameOver) return;
     
