@@ -5,6 +5,52 @@
 <title>Slav Clicker</title>
 
 <style>
+
+  /* ===== LOADING OVERLAY ===== */
+#loading{
+  position:fixed;
+  inset:0;
+  background-image:url("background.jpg");
+  background-repeat:no-repeat;
+  background-position:center top;
+  background-size:cover;
+  z-index:9999;
+
+  display:grid;
+  place-items:center;
+  cursor:pointer;
+}
+
+/* ztmavení + lehký blur */
+#loading::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  background:rgba(0,0,0,.55);
+  backdrop-filter: blur(2px);
+}
+
+/* obsah nad tmavením */
+#loading .loader{
+  position:relative;
+  text-align:center;
+  color:#fff;
+  z-index:1;
+}
+
+#loading .title{
+  font-size:46px;
+  font-weight:900;
+  letter-spacing:2px;
+  text-shadow:0 6px 20px rgba(0,0,0,.8);
+}
+
+#loading .hint{
+  margin-top:14px;
+  font-size:18px;
+  opacity:.8;
+}
+
 /* ===== pozadí + STOP scroll ===== */
 html, body{
   margin:0;
@@ -207,6 +253,13 @@ small{ display:block; margin-top:10px; }
 </head>
 
 <body>
+<div id="loading">
+  <div class="loader">
+    <div class="title">SLAV CLICKER</div>
+    <div class="hint">klikni pro start</div>
+  </div>
+</div>
+
 
 <audio id="clickSnd" src="click.mp3" preload="auto"></audio>
 <audio id="bgMusic" src="go.mp3" preload="auto" loop></audio>
@@ -253,6 +306,15 @@ small{ display:block; margin-top:10px; }
 </div>
 
 <script>
+const loading = document.getElementById("loading");
+const bgMusic = document.getElementById("bgMusic");
+
+loading.addEventListener("click", () => {
+  bgMusic.volume = 0.35;
+  bgMusic.play().catch(()=>{});
+  loading.style.display = "none";
+}, { once:true });
+
   
 let unmuted = false;
 
@@ -266,7 +328,6 @@ const cpcEl    = document.getElementById("cpc");
 const cpsEl    = document.getElementById("cps");
 const gopnikImg= document.getElementById("gopnikImg");
 const clickSnd = document.getElementById("clickSnd");
-const bgMusic = document.getElementById("bgMusic");
 let musicStarted = false;
 
 
@@ -345,6 +406,7 @@ window.addEventListener("load", () => {
 
 </body>
 </html>
+
 
 
 
