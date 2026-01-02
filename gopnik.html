@@ -623,10 +623,6 @@ const savedLang = localStorage.getItem("slavLang") || "cs";
 langSelect.value = savedLang;
 applyLang(savedLang);
 
-  
-const loading = document.getElementById("loading");
-const bgMusic = document.getElementById("bgMusic");
-
 loading.addEventListener("click", () => {
   if(musicToggle.checked){
     bgMusic.volume = 0.35;
@@ -785,6 +781,7 @@ window.addEventListener("load", () => {
 
 </body>
 </html>
+
 
 
 
