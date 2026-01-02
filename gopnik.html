@@ -420,341 +420,226 @@ small{ display:block; margin-top:10px; }
 </div>
 
 <script>
-
 window.addEventListener("DOMContentLoaded", () => {
+
   // ===== DOM refs =====
-const loading = document.getElementById("loading");
-const bgMusic = document.getElementById("bgMusic");
+  const loading = document.getElementById("loading");
+  const bgMusic = document.getElementById("bgMusic");
+  const clickSnd = document.getElementById("clickSnd");
 
-const settingsModal = document.getElementById("settingsModal");
-const btnSettings = document.getElementById("btnSettings");
-const btnCloseSettings = document.getElementById("btnCloseSettings");
-const musicToggle = document.getElementById("musicToggle");
-const langSelect = document.getElementById("langSelect");
+  const settingsModal = document.getElementById("settingsModal");
+  const btnSettings = document.getElementById("btnSettings");
+  const btnCloseSettings = document.getElementById("btnCloseSettings");
+  const musicToggle = document.getElementById("musicToggle");
+  const langSelect = document.getElementById("langSelect");
 
-// shop button refs (už existují i pro render())
-const btnCursor = document.getElementById("buyCursor");
-const btnGranny = document.getElementById("buyGranny");
-const btnClick  = document.getElementById("buyClick");
+  const btnCursor = document.getElementById("buyCursor");
+  const btnGranny = document.getElementById("buyGranny");
+  const btnClick  = document.getElementById("buyClick");
 
-// ===== i18n =====
-const i18n = {
-  cs: {
-    settingsTitle: "Nastavení",
-    music: "Hudba",
-    lang: "Jazyk",
-    moneyTitle: "PENÍZE",
-    shopTitle: "OBCHOD",
-    cursor: "Kurzor",
-    granny: "Babička",
-    clickPower: "Síla kliku",
-    buy: "Koupit",
-    upgrade: "Vylepšit",
-    dance: "Tanec gopníka (A ↔ B)",
-    startHint: "klikni pro start"
-  },
-  en: {
-    settingsTitle: "Settings",
-    music: "Music",
-    lang: "Language",
-    moneyTitle: "MONEY",
-    shopTitle: "SHOP",
-    cursor: "Cursor",
-    granny: "Grandma",
-    clickPower: "Click power",
-    buy: "Buy",
-    upgrade: "Upgrade",
-    dance: "Gopnik dance (A ↔ B)",
-    startHint: "click to start"
-  }
-};
+  const moneyEl   = document.getElementById("money");
+  const cpcEl     = document.getElementById("cpc");
+  const cpsEl     = document.getElementById("cps");
+  const gopnikImg = document.getElementById("gopnikImg");
+  const gopnikBtn = document.getElementById("gopnik");
 
-function applyLang(lang){
-  const t = i18n[lang] || i18n.cs;
-  const el = (id) => document.getElementById(id);
+  // ===== i18n =====
+  const i18n = {
+    cs: {
+      settingsTitle: "Nastavení",
+      music: "Hudba",
+      lang: "Jazyk",
+      moneyTitle: "PENÍZE",
+      shopTitle: "OBCHOD",
+      cursor: "Kurzor",
+      granny: "Babička",
+      clickPower: "Síla kliku",
+      buy: "Koupit",
+      upgrade: "Vylepšit",
+      dance: "Tanec gopníka (A ↔ B)",
+      startHint: "klikni pro start",
+      moneyLabel: "Peníze:",
+      cpcLabel: "Za klik:",
+      cpsLabel: "Za sekundu:"
+    },
+    en: {
+      settingsTitle: "Settings",
+      music: "Music",
+      lang: "Language",
+      moneyTitle: "MONEY",
+      shopTitle: "SHOP",
+      cursor: "Cursor",
+      granny: "Grandma",
+      clickPower: "Click power",
+      buy: "Buy",
+      upgrade: "Upgrade",
+      dance: "Gopnik dance (A ↔ B)",
+      startHint: "click to start",
+      moneyLabel: "Money:",
+      cpcLabel: "Per click:",
+      cpsLabel: "Per second:"
+    }
+  };
 
-  if(el("t_settingsTitle")) el("t_settingsTitle").textContent = t.settingsTitle;
-  if(el("t_musicLabel")) el("t_musicLabel").textContent = t.music;
-  if(el("t_langLabel")) el("t_langLabel").textContent = t.lang;
+  function applyLang(lang){
+    const t = i18n[lang] || i18n.cs;
+    const el = (id) => document.getElementById(id);
 
-  if(el("t_moneyTitle")) el("t_moneyTitle").textContent = t.moneyTitle;
-  if(el("t_shopTitle")) el("t_shopTitle").textContent = t.shopTitle;
+    if(el("t_settingsTitle")) el("t_settingsTitle").textContent = t.settingsTitle;
+    if(el("t_musicLabel")) el("t_musicLabel").textContent = t.music;
+    if(el("t_langLabel")) el("t_langLabel").textContent = t.lang;
 
-  if(el("t_itemCursor")) el("t_itemCursor").textContent = t.cursor;
-  if(el("t_itemGranny")) el("t_itemGranny").textContent = t.granny;
-  if(el("t_itemClick"))  el("t_itemClick").textContent  = t.clickPower;
+    if(el("t_moneyTitle")) el("t_moneyTitle").textContent = t.moneyTitle;
+    if(el("t_shopTitle")) el("t_shopTitle").textContent = t.shopTitle;
 
-  const curPrice = 15, graPrice = 100, clkPrice = 50;
-  if(btnCursor) btnCursor.textContent = `${t.buy} (${curPrice})`;
-  if(btnGranny) btnGranny.textContent = `${t.buy} (${graPrice})`;
-  if(btnClick)  btnClick.textContent  = `${t.upgrade} (${clkPrice})`;
+    if(el("t_itemCursor")) el("t_itemCursor").textContent = t.cursor;
+    if(el("t_itemGranny")) el("t_itemGranny").textContent = t.granny;
+    if(el("t_itemClick"))  el("t_itemClick").textContent  = t.clickPower;
 
-  if(el("t_danceHint")) el("t_danceHint").textContent = t.dance;
-  if(el("t_startHint")) el("t_startHint").textContent = t.startHint;
+    const curPrice = 15, graPrice = 100, clkPrice = 50;
+    if(btnCursor) btnCursor.textContent = `${t.buy} (${curPrice})`;
+    if(btnGranny) btnGranny.textContent = `${t.buy} (${graPrice})`;
+    if(btnClick)  btnClick.textContent  = `${t.upgrade} (${clkPrice})`;
 
-  localStorage.setItem("slavLang", lang);
-}
+    if(el("t_danceHint")) el("t_danceHint").textContent = t.dance;
+    if(el("t_startHint")) el("t_startHint").textContent = t.startHint;
 
-function applyMusicEnabled(enabled){
-  localStorage.setItem("musicEnabled", enabled ? "1" : "0");
-  if(!bgMusic) return;
-
-  if(enabled){
-    bgMusic.muted = false;
-    bgMusic.volume = 0.35;
-    // play jen pokud už je user gesture (start/settings)
-    bgMusic.play().catch(()=>{});
-  }else{
-    bgMusic.pause();
-    bgMusic.currentTime = 0;
-  }
-}
-
-// ===== modal handlers =====
-btnSettings.addEventListener("click", () => {
-  settingsModal.classList.add("show");
-  settingsModal.setAttribute("aria-hidden","false");
-});
-
-btnCloseSettings.addEventListener("click", () => {
-  settingsModal.classList.remove("show");
-  settingsModal.setAttribute("aria-hidden","true");
-});
-
-settingsModal.addEventListener("click", (e) => {
-  if(e.target === settingsModal){
-    settingsModal.classList.remove("show");
-    settingsModal.setAttribute("aria-hidden","true");
-  }
-});
-
-// ===== controls =====
-musicToggle.addEventListener("change", () => applyMusicEnabled(musicToggle.checked));
-langSelect.addEventListener("change", () => applyLang(langSelect.value));
-
-
-// ===== loading click starts game music =====
-loading.addEventListener("click", () => {
-  if(musicToggle.checked){
-    bgMusic.volume = 0.35;
-    bgMusic.play().catch(()=>{});
-  }
-  loading.style.display = "none";
-}, { once:true });
-
-
-function applyLang(lang){
-  const t = i18n[lang] || i18n.cs;
-
-  const el = (id) => document.getElementById(id);
-
-  if(el("t_settingsTitle")) el("t_settingsTitle").textContent = t.settingsTitle;
-  if(el("t_musicLabel")) el("t_musicLabel").textContent = t.music;
-  if(el("t_langLabel")) el("t_langLabel").textContent = t.lang;
-
-  if(el("t_moneyTitle")) el("t_moneyTitle").textContent = t.moneyTitle;
-  if(el("t_shopTitle")) el("t_shopTitle").textContent = t.shopTitle;
-
-  if(el("t_itemCursor")) el("t_itemCursor").textContent = t.cursor;
-  if(el("t_itemGranny")) el("t_itemGranny").textContent = t.granny;
-  if(el("t_itemClick")) el("t_itemClick").textContent = t.clickPower;
-
-  // přepíš text tlačítek, ale zachovej ceny
-  const curPrice = 15, graPrice = 100, clkPrice = 50;
-  if(btnCursor) btnCursor.textContent = `${t.buy} (${curPrice})`;
-  if(btnGranny) btnGranny.textContent = `${t.buy} (${graPrice})`;
-  if(btnClick)  btnClick.textContent  = `${t.upgrade} (${clkPrice})`;
-
-  if(el("t_danceHint")) el("t_danceHint").textContent = t.dance;
-  if(el("t_startHint")) el("t_startHint").textContent = t.startHint;
-
-  localStorage.setItem("slavLang", lang);
-}
-
-function applyMusicEnabled(enabled){
-  localStorage.setItem("musicEnabled", enabled ? "1" : "0");
-
-  if(!bgMusic) return;
-
-  if(enabled){
-    bgMusic.muted = false;
-    bgMusic.volume = 0.35;
-
-    // pokus o play – pokud už jsi kliknul start/otevřel settings, je to user gesture a projde
-    bgMusic.play().catch(()=>{});
-  }else{
-    bgMusic.pause();
-    bgMusic.currentTime = 0;
-  }
-}
-
-btnSettings.addEventListener("click", () => {
-  settingsModal.classList.add("show");
-  settingsModal.setAttribute("aria-hidden","false");
-});
-
-btnCloseSettings.addEventListener("click", () => {
-  settingsModal.classList.remove("show");
-  settingsModal.setAttribute("aria-hidden","true");
-});
-
-// klik mimo box zavře
-settingsModal.addEventListener("click", (e) => {
-  if(e.target === settingsModal){
-    settingsModal.classList.remove("show");
-    settingsModal.setAttribute("aria-hidden","true");
-  }
-});
-
-musicToggle.addEventListener("change", () => {
-  applyMusicEnabled(musicToggle.checked);
-});
-
-langSelect.addEventListener("change", () => {
-  applyLang(langSelect.value);
-});
-
-// init z localStorage
-const savedMusic = localStorage.getItem("musicEnabled");
-musicToggle.checked = (savedMusic !== "0"); // default ON
-applyMusicEnabled(musicToggle.checked);
-
-const savedLang = localStorage.getItem("slavLang") || "cs";
-langSelect.value = savedLang;
-applyLang(savedLang);
-
-loading.addEventListener("click", () => {
-  if(musicToggle.checked){
-    bgMusic.volume = 0.35;
-    bgMusic.play().catch(()=>{});
-  }
-  loading.style.display = "none";
-}, { once:true });
-
-// ===== SETTINGS UI =====
-const settingsModal = document.getElementById("settingsModal");
-const btnSettings = document.getElementById("btnSettings");
-const btnCloseSettings = document.getElementById("btnCloseSettings");
-const musicToggle = document.getElementById("musicToggle");
-const langSelect = document.getElementById("langSelect");
-
-// texty (minimální i18n)
-const i18n = {
-  cs: {
-    settingsTitle: "Nastavení",
-    music: "Hudba",
-    lang: "Jazyk",
-    moneyTitle: "PENÍZE",
-    shopTitle: "OBCHOD",
-    cursor: "Kurzor",
-    granny: "Babička",
-    clickPower: "Síla kliku",
-    buy: "Koupit",
-    upgrade: "Vylepšit",
-    dance: "Tanec gopníka (A ↔ B)",
-    startHint: "klikni pro start"
-  },
-  en: {
-    settingsTitle: "Settings",
-    music: "Music",
-    lang: "Language",
-    moneyTitle: "MONEY",
-    shopTitle: "SHOP",
-    cursor: "Cursor",
-    granny: "Grandma",
-    clickPower: "Click power",
-    buy: "Buy",
-    upgrade: "Upgrade",
-    dance: "Gopnik dance (A ↔ B)",
-    startHint: "click to start"
-  }
-};
-
-
-let money = 0, cpc = 1, cps = 0;
-
-const imgs = ["gopnik_A.png", "gopnik_B.png"];
-let imgIndex = 0;
-
-const moneyEl  = document.getElementById("money");
-const cpcEl    = document.getElementById("cpc");
-const cpsEl    = document.getElementById("cps");
-const gopnikImg= document.getElementById("gopnikImg");
-const clickSnd = document.getElementById("clickSnd");
-
-
-const btnCursor = document.getElementById("buyCursor");
-const btnGranny = document.getElementById("buyGranny");
-const btnClick  = document.getElementById("buyClick");
-
-function saveGame(){
-  localStorage.setItem("slavClickerSave", JSON.stringify({ money, cpc, cps }));
-}
-function loadGame(){
-  const s = localStorage.getItem("slavClickerSave");
-  if(!s) return;
-  const d = JSON.parse(s);
-  money = d.money ?? 0;
-  cpc   = d.cpc ?? 1;
-  cps   = d.cps ?? 0;
-}
-
-function render(){
-  moneyEl.textContent = Math.floor(money);
-  cpcEl.textContent = cpc;
-  cpsEl.textContent = cps.toFixed(1);
-
-  btnCursor.disabled = money < 15;
-  btnGranny.disabled = money < 100;
-  btnClick.disabled  = money < 50;
-
-  saveGame();
-}
-
-document.addEventListener("click", () => {
-  if(!unmuted && bgMusic){
-    bgMusic.muted = false;
-    bgMusic.volume = 0.35; // nastav hlasitost
-    unmuted = true;
-  }
-}, { once: true });
-  
-  
-document.getElementById("gopnik").onclick = () => {
-  if(clickSnd){
-    clickSnd.currentTime = 0;
-    clickSnd.play().catch(()=>{});
+    localStorage.setItem("slavLang", lang);
   }
 
-  money += cpc;
+  function applyMusicEnabled(enabled){
+    localStorage.setItem("musicEnabled", enabled ? "1" : "0");
+    if(!bgMusic) return;
 
-  imgIndex = (imgIndex + 1) % imgs.length;
-  gopnikImg.src = imgs[imgIndex];
+    if(enabled){
+      bgMusic.muted = false;
+      bgMusic.volume = 0.35;
+      // play jen pokud už je user gesture (start/settings) – když ne, tak to prostě ignorujeme
+      bgMusic.play().catch(()=>{});
+    }else{
+      bgMusic.pause();
+      bgMusic.currentTime = 0;
+    }
+  }
 
-  gopnikImg.style.transform = "scale(1.05)";
-  setTimeout(() => gopnikImg.style.transform = "scale(1)", 80);
-
-  render();
-};
-
-btnCursor.onclick = () => { if(money >= 15){ money -= 15;  cps += 0.1; render(); } };
-btnGranny.onclick = () => { if(money >= 100){ money -= 100; cps += 1;   render(); } };
-btnClick.onclick  = () => { if(money >= 50){ money -= 50;  cpc++;       render(); } };
-
-setInterval(() => { money += cps; render(); }, 1000);
-
-loadGame();
-render();
-window.addEventListener("load", () => {
-  if(bgMusic){
-    bgMusic.volume = 0.35;
-    bgMusic.play().catch(err => {
-      console.warn("Autoplay zablokován:", err);
+  // ===== modal open/close =====
+  if(btnSettings && settingsModal){
+    btnSettings.addEventListener("click", () => {
+      settingsModal.classList.add("show");
+      settingsModal.setAttribute("aria-hidden","false");
     });
   }
-});
 
+  if(btnCloseSettings && settingsModal){
+    btnCloseSettings.addEventListener("click", () => {
+      settingsModal.classList.remove("show");
+      settingsModal.setAttribute("aria-hidden","true");
+    });
+
+    settingsModal.addEventListener("click", (e) => {
+      if(e.target === settingsModal){
+        settingsModal.classList.remove("show");
+        settingsModal.setAttribute("aria-hidden","true");
+      }
+    });
+  }
+
+  // ===== controls =====
+  if(musicToggle){
+    musicToggle.addEventListener("change", () => applyMusicEnabled(musicToggle.checked));
+  }
+  if(langSelect){
+    langSelect.addEventListener("change", () => applyLang(langSelect.value));
+  }
+
+  // ===== init settings =====
+  const savedMusic = localStorage.getItem("musicEnabled");
+  if(musicToggle){
+    musicToggle.checked = (savedMusic !== "0");
+    // nevoláme play hned, jen nastavíme stav (play se udělá po Start)
+    if(!musicToggle.checked && bgMusic){
+      bgMusic.pause();
+      bgMusic.currentTime = 0;
+    }
+  }
+
+  const savedLang = localStorage.getItem("slavLang") || "cs";
+  if(langSelect) langSelect.value = savedLang;
+  applyLang(savedLang);
+
+  // ===== GAME STATE =====
+  let money = 0, cpc = 1, cps = 0;
+  const imgs = ["gopnik_A.png", "gopnik_B.png"];
+  let imgIndex = 0;
+
+  function saveGame(){
+    localStorage.setItem("slavClickerSave", JSON.stringify({ money, cpc, cps }));
+  }
+  function loadGame(){
+    const s = localStorage.getItem("slavClickerSave");
+    if(!s) return;
+    const d = JSON.parse(s);
+    money = d.money ?? 0;
+    cpc   = d.cpc ?? 1;
+    cps   = d.cps ?? 0;
+  }
+
+  function render(){
+    moneyEl.textContent = Math.floor(money);
+    cpcEl.textContent = cpc;
+    cpsEl.textContent = cps.toFixed(1);
+
+    btnCursor.disabled = money < 15;
+    btnGranny.disabled = money < 100;
+    btnClick.disabled  = money < 50;
+
+    saveGame();
+  }
+
+  // ===== loading click = start =====
+  if(loading){
+    loading.addEventListener("click", () => {
+      if(musicToggle && musicToggle.checked){
+        applyMusicEnabled(true); // spustí hudbu (po user gesture to projde)
+      }
+      loading.style.display = "none";
+    }, { once:true });
+  }
+
+  // ===== gopnik click =====
+  if(gopnikBtn){
+    gopnikBtn.addEventListener("click", () => {
+      if(clickSnd){
+        clickSnd.currentTime = 0;
+        clickSnd.play().catch(()=>{});
+      }
+
+      money += cpc;
+
+      imgIndex = (imgIndex + 1) % imgs.length;
+      if(gopnikImg) gopnikImg.src = imgs[imgIndex];
+
+      if(gopnikImg){
+        gopnikImg.style.transform = "scale(1.05)";
+        setTimeout(() => gopnikImg.style.transform = "scale(1)", 80);
+      }
+
+      render();
+    });
+  }
+
+  // shop
+  if(btnCursor) btnCursor.addEventListener("click", () => { if(money >= 15){ money -= 15;  cps += 0.1; render(); } });
+  if(btnGranny) btnGranny.addEventListener("click", () => { if(money >= 100){ money -= 100; cps += 1;   render(); } });
+  if(btnClick)  btnClick.addEventListener("click",  () => { if(money >= 50){ money -= 50;  cpc++;       render(); } });
+
+  setInterval(() => { money += cps; render(); }, 1000);
+
+  loadGame();
+  render();
+});
 </script>
+
 <div id="settingsModal" class="modal" aria-hidden="true">
   <div class="modalBox">
     <div class="modalHeader">
@@ -781,6 +666,7 @@ window.addEventListener("load", () => {
 
 </body>
 </html>
+
 
 
 
