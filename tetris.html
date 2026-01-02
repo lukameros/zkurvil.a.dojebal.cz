@@ -1499,11 +1499,15 @@ body {
 <div id="tetrisGame" class="centered">
     <div class="game-container">
         <div class="side-panel">
-            <div class="info-box">
-                <h3>DALŠÍ</h3>
-                <div id="nextPiece"></div>
-            </div>
-        </div>
+    <div class="info-box">
+        <h3>DALŠÍ</h3>
+        <div id="nextPiece"></div>
+    </div>
+    <div class="info-box">
+        <h3>HOLD</h3>
+        <div id="holdPiece"></div>
+    </div>
+</div>
         <div>
             <div id="tetris"></div>
         </div>
@@ -1939,6 +1943,15 @@ function showUpdateModal() {
     console.log('Update modal zobrazen');
 }
 
+window.closeUpdateModal = function() {
+    localStorage.setItem('tetris_update_v2.0_seen', 'true');
+    const modal = document.getElementById('updateModal');
+    if (modal) {
+        modal.style.animation = 'fadeOut 0.3s ease-out';
+        setTimeout(() => modal.remove(), 300);
+    }
+    console.log('Update modal zavřen a uložen do localStorage');
+}
 window.closeUpdateModal = function() {
     localStorage.setItem('tetris_update_v2.0_seen', 'true');
     const modal = document.getElementById('updateModal');
@@ -3081,6 +3094,7 @@ await loadCurrentUser()
 </script>
 </body>
 </html>
+
 
 
 
