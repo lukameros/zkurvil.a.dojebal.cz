@@ -656,6 +656,10 @@
         <span>🥊 Hobo 3</span>
         <button class="admin-toggle-btn active" data-game="hobo3" onclick="toggleGameStatus('hobo3')">AKTIVNÍ</button>
     </div>
+    <div class="admin-game-toggle">
+    <span>🧢 Gopnik Clicker</span>
+    <button class="admin-toggle-btn active" data-game="gopnik" onclick="toggleGameStatus('gopnik')">AKTIVNÍ</button>
+    </div>
 </div>
 
 <div id="gamesContainer">
@@ -761,8 +765,21 @@
                 <span>Hobo 3</span>
             </div>
             <button class="play-btn" onclick="event.stopPropagation(); playGame('hobo3', goHobo3);">Hrát hru</button>
-        </div>
+        <div class="game-card" data-game="gopnik" onclick="playGame('gopnik', goGopnik)">
+    <div class="game-image-container">
+        <img src="gopnik-image.jpg" alt="Gopnik Clicker" class="game-image"
+             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'">
+        <div class="game-image-placeholder" style="display:none;">🧢</div>
     </div>
+    <div class="game-content">
+        <div class="game-title">
+            <span class="game-icon">🧢</span>
+            <span>Gopnik Clicker</span>
+        </div>
+        <button class="play-btn" onclick="event.stopPropagation(); playGame('gopnik', goGopnik);">Hrát hru</button>
+    </div>
+</div>
+
 </div>
 
 <!-- Login Modal -->
@@ -814,7 +831,9 @@ function goSWF() { window.location.href = "project_madness_1.html"; }
 function goHappyWheels() { window.location.href = "happy_wheels.html"; }
 function goHobo1() { window.location.href = "hobo1.html"; }
 function goHobo2() { window.location.href = "hobo2.html"; }
-function goHobo3() { window.location.href = "hobo3.html"; }
+function goHobo3() { window.location.href = "hobo3.html"; }    
+function goGopnik() { window.location.href = "gopnik.html"; }
+
 
 function showLogin() { document.getElementById("loginModal").style.display = "flex"; }
 function closeLogin() { document.getElementById("loginModal").style.display = "none"; }
@@ -1231,6 +1250,7 @@ window.addEventListener('DOMContentLoaded', async function() {
 
 </body>
 </html>
+
 
 
 
