@@ -559,20 +559,10 @@ button.menuBtn.locked::after {
     text-align: center;
     box-shadow: 0 0 60px rgba(218, 112, 214, 0.8);
     animation: levelUpPop 0.5s ease-out forwards;
-}
-
-@keyframes levelUpPop {
-    0% { transform: translate(-50%, -50%) scale(0); }
-    50% { transform: translate(-50%, -50%) scale(1.2); }
-    100% { transform: translate(-50%, -50%) scale(1); }
-}
-
-.level-up-notification.hide {
-    animation: levelUpFadeOut 0.3s ease-out forwards;
-}
-
-@keyframes levelUpFadeOut {
-    to { transform: translate(-50%, -50%) scale(0); opacity: 0; }
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
 }
 
 .level-up-notification h2 {
@@ -580,12 +570,20 @@ button.menuBtn.locked::after {
     margin-bottom: 15px;
     color: #da70d6;
     text-shadow: 0 0 30px #da70d6;
+    margin: 0;
 }
 
 .level-up-notification p {
     font-size: 28px;
     color: white;
     text-shadow: 0 0 10px rgba(0, 0, 0, 0.8);
+    margin: 10px 0;
+}
+
+.level-up-notification .menuBtn {
+    margin-top: 20px;
+    min-width: 250px;
+    z-index: 201;
 }
 
 /* Loading screen */
@@ -1809,7 +1807,10 @@ function getXPForNextLevel(currentLevel) {
 }
 
 function updateLevelDisplay() {
-    document.getElementById('playerLevel').textContent = playerLevel;
+    const levelElement = document.getElementById('playerLevel');
+    if (levelElement) {
+        levelElement.textContent = playerLevel;
+    }
     
     if (playerLevel >= 10) {
         document.getElementById('xpText').textContent = 'MAX LEVEL';
@@ -1822,23 +1823,16 @@ function updateLevelDisplay() {
     const xpNeeded = nextLevelXP - currentLevelXP;
     const currentProgress = playerXP - currentLevelXP;
     
-    const percentage = Math.min(100, (currentProgress / xpNeeded) * 100);
+    const percentage = Math.min(100, Math.max(0, (currentProgress / xpNeeded) * 100));
     
-    document.getElementById('xpBar').style.width = percentage + '%';
-    document.getElementById('xpText').textContent = `${currentProgress} / ${xpNeeded} XP`;
+    const xpBar = document.getElementById('xpBar');
+    const xpText = document.getElementById('xpText');
+    
+    if (xpBar) xpBar.style.width = percentage + '%';
+    if (xpText) xpText.textContent = `${currentProgress} / ${xpNeeded} XP`;
+    
+    console.log(`📊 Level display: ${playerLevel} | ${currentProgress}/${xpNeeded} XP (${percentage.toFixed(1)}%)`);
 }
-
-async function addXP(amount) {
-    if (playerLevel >= 10) {
-        console.log('Max level dosažen');
-        return;
-    }
-    
-    const oldLevel = playerLevel;
-    playerXP += amount;
-    
-    console.log(`💎 Před kontrolou: Level ${playerLevel}, XP ${playerXP}/${xpRequirements[playerLevel]}`);
-    
     // Level up kontrola
     let leveledUp = false;
     while (playerLevel < 10 && playerXP >= xpRequirements[playerLevel]) {
@@ -1864,28 +1858,46 @@ async function addXP(amount) {
 }
  
 function showLevelUpNotification() {
+    // Zkontroluj jestli už notifikace neexistuje
+    const existing = document.querySelector('.level-up-notification');
+    if (existing) {
+        existing.remove();
+    }
+    
     const notification = document.createElement('div');
     notification.className = 'level-up-notification';
-    notification.innerHTML = `
-        <h2>🎉 LEVEL UP! 🎉</h2>
-        <p>Dosáhl jsi Level ${playerLevel}!</p>
-        <p style="font-size: 20px; margin-top: 10px;">Nové položky odemčeny v shopu! 🛒</p>
-    `;
+    
+    const title = document.createElement('h2');
+    title.textContent = '🎉 LEVEL UP! 🎉';
+    
+    const levelText = document.createElement('p');
+    levelText.textContent = `Dosáhl jsi Level ${playerLevel}!`;
+    levelText.style.fontSize = '32px';
+    
+    const shopText = document.createElement('p');
+    shopText.textContent = 'Nové položky odemčeny v shopu! 🛒';
+    shopText.style.fontSize = '20px';
     
     const continueBtn = document.createElement('button');
     continueBtn.className = 'menuBtn';
     continueBtn.textContent = '✅ Pokračovat';
-    continueBtn.style.marginTop = '20px';
-    continueBtn.style.minWidth = '200px';
     continueBtn.onclick = function() {
         notification.classList.add('hide');
-        setTimeout(() => notification.remove(), 300);
+        setTimeout(() => {
+            notification.remove();
+        }, 300);
     };
     
+    notification.appendChild(title);
+    notification.appendChild(levelText);
+    notification.appendChild(shopText);
     notification.appendChild(continueBtn);
+    
     document.body.appendChild(notification);
     
     playSound('levelup');
+    
+    console.log('✅ Level up notifikace zobrazena');
 }
 
 window.closeLevelUpNotification = function(button) {
@@ -2081,6 +2093,8 @@ function loadLocalData() {
 }
 
 async function saveUserData() {
+    console.log('💾 Ukládám data...', { playerLevel, playerXP, playerCoins });
+    
     if (!currentUser || currentUser.is_guest) {
         const data = {
             coins: playerCoins,
@@ -2088,29 +2102,37 @@ async function saveUserData() {
             xp: playerXP,
             themes: unlockedThemes,
             maps: unlockedMaps
-        }
-        localStorage.setItem('tetrisPlayerData', JSON.stringify(data))
-        console.log('💾 Uloženo lokálně:', data) // Debug log
-        return
+        };
+        localStorage.setItem('tetrisPlayerData', JSON.stringify(data));
+        console.log('💾 Uloženo lokálně:', data);
+        return;
     }
     
     try {
-        const { error } = await supabase
-            .from('tetris_player_data')
-            .update({
-                coins: playerCoins,
-                level: playerLevel,
-                xp: playerXP,
-                unlocked_themes: unlockedThemes,
-                unlocked_maps: unlockedMaps,
-                games_played: totalGamesPlayed
-            })
-            .eq('user_id', currentUser.id)
+        const updateData = {
+            coins: playerCoins,
+            level: playerLevel,
+            xp: playerXP,
+            unlocked_themes: unlockedThemes,
+            unlocked_maps: unlockedMaps,
+            games_played: totalGamesPlayed,
+            last_played: new Date().toISOString()
+        };
         
-        if (error) throw error
-        console.log('✅ Data uložena do Supabase - Level:', playerLevel, 'XP:', playerXP)
+        console.log('💾 Ukládám do Supabase:', updateData);
+        
+        const { data, error } = await supabase
+            .from('tetris_player_data')
+            .update(updateData)
+            .eq('user_id', currentUser.id)
+            .select();
+        
+        if (error) throw error;
+        
+        console.log('✅ Data úspěšně uložena do Supabase:', data);
+        
     } catch (error) {
-        console.error('❌ Chyba při ukládání dat:', error)
+        console.error('❌ Chyba při ukládání dat:', error);
     }
 }
  
@@ -3121,6 +3143,7 @@ await loadCurrentUser()
 </script>
 </body>
 </html>
+
 
 
 
