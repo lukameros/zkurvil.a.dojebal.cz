@@ -1,439 +1,55 @@
 <!DOCTYPE html>
 <html lang="cs">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Tetris - Classic</title>
-<style>
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tetris - Classic</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            margin: 0;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 50%, #0a0a0a 100%);
+            font-family: "Segoe UI", sans-serif;
+            color: white;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+        .centered { display: flex; flex-direction: column; align-items: center; justify-content: center; animation: fadeIn 0.5s ease-in; }
+        @keyframes fadeIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+        
+        #playerStats { position: absolute; top: 20px; right: 20px; display: flex; flex-direction: column; gap: 10px; z-index: 10; }
+        #coinsDisplay { padding: 12px 25px; background: rgba(255, 215, 0, 0.1); border: 3px solid gold; border-radius: 12px; font-size: 24px; color: gold; text-shadow: 0 0 15px gold; }
+        #levelDisplay { padding: 12px 25px; background: rgba(138, 43, 226, 0.1); border: 3px solid #9370db; border-radius: 12px; font-size: 24px; color: #da70d6; }
+        
+        .xp-bar-container { width: 100%; height: 8px; background: rgba(0, 0, 0, 0.5); border-radius: 4px; margin-top: 8px; }
+        .xp-bar { height: 100%; background: linear-gradient(90deg, #9370db, #da70d6); width: 0%; transition: width 0.3s; }
 
-body {
-    margin: 0;
-    background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 50%, #0a0a0a 100%);
-    font-family: "Segoe UI", sans-serif;
-    color: white;
-    min-height: 100vh;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    overflow-x: hidden;
-}
+        #tetrisGame { display: flex; position: relative; gap: 30px; }
+        .game-container { display: flex; gap: 30px; align-items: flex-start; }
+        .info-box { background: rgba(30, 30, 60, 0.7); border: 2px solid #00ffff; border-radius: 12px; padding: 20px; min-width: 150px; text-align: center; }
+        #tetris { display: grid; background: rgba(17, 17, 34, 0.9); border: 3px solid #00ffff; border-radius: 8px; box-shadow: 0 0 40px rgba(0, 255, 255, 0.5); }
+        .cell { width: 30px; height: 30px; border: 1px solid rgba(255,255,255,0.05); }
+        
+        #nextPiece { width: 120px; height: 120px; display: grid; grid-template-columns: repeat(4, 30px); grid-template-rows: repeat(4, 30px); margin: 10px auto; background: #111; }
+        .preview-cell { width: 30px; height: 30px; }
 
-.centered {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    animation: fadeIn 0.5s ease-in;
-}
-
-@keyframes fadeIn {
-    from { opacity: 0; transform: scale(0.95); }
-    to { opacity: 1; transform: scale(1); }
-}
-
-h1 {
-    margin-bottom: 30px;
-    font-size: 56px;
-    text-align: center;
-    text-shadow: 0 0 20px #ff00ff, 0 0 40px #ff00ff;
-    animation: glow 2s ease-in-out infinite;
-}
-
-@keyframes glow {
-    0%, 100% { text-shadow: 0 0 20px #ff00ff, 0 0 40px #ff00ff; }
-    50% { text-shadow: 0 0 30px #00ffff, 0 0 60px #00ffff; }
-}
-
-#backBtn {
-    position: absolute;
-    top: 20px;
-    left: 20px;
-    padding: 12px 24px;
-    border-radius: 8px;
-    border: 2px solid #ff00ff;
-    background: rgba(180, 0, 180, 0.3);
-    color: white;
-    font-weight: bold;
-    cursor: pointer;
-    box-shadow: 0 0 15px rgba(255, 0, 255, 0.5);
-    z-index: 10;
-    transition: all 0.3s;
-}
-
-#backBtn:hover {
-    background: rgba(255, 0, 255, 0.5);
-    box-shadow: 0 0 25px rgba(255, 0, 255, 0.8);
-    transform: translateY(-2px);
-}
-
-/* Level & Coins display */
-#playerStats {
-    position: absolute;
-    top: 20px;
-    right: 20px;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    z-index: 10;
-}
-
-#coinsDisplay {
-    padding: 12px 25px;
-    background: linear-gradient(135deg, rgba(255, 215, 0, 0.3), rgba(255, 165, 0, 0.3));
-    border: 3px solid gold;
-    border-radius: 12px;
-    font-size: 24px;
-    font-weight: bold;
-    color: gold;
-    text-shadow: 0 0 15px rgba(255, 215, 0, 0.9);
-    box-shadow: 0 0 25px rgba(255, 215, 0, 0.5);
-    animation: coinPulse 2s ease-in-out infinite;
-}
-
-#levelDisplay {
-    padding: 12px 25px;
-    background: linear-gradient(135deg, rgba(138, 43, 226, 0.3), rgba(75, 0, 130, 0.3));
-    border: 3px solid #9370db;
-    border-radius: 12px;
-    font-size: 24px;
-    font-weight: bold;
-    color: #da70d6;
-    text-shadow: 0 0 15px rgba(218, 112, 214, 0.9);
-    box-shadow: 0 0 25px rgba(147, 112, 219, 0.5);
-    animation: levelPulse 2s ease-in-out infinite;
-}
-
-.xp-bar-container {
-    width: 100%;
-    height: 8px;
-    background: rgba(0, 0, 0, 0.5);
-    border-radius: 4px;
-    margin-top: 8px;
-    overflow: hidden;
-}
-
-.xp-bar {
-    height: 100%;
-    background: linear-gradient(90deg, #9370db, #da70d6);
-    border-radius: 4px;
-    transition: width 0.3s ease;
-    box-shadow: 0 0 10px #da70d6;
-}
-
-.xp-text {
-    font-size: 14px;
-    text-align: center;
-    margin-top: 5px;
-    color: #da70d6;
-}
-
-@keyframes coinPulse {
-    0%, 100% { transform: scale(1); }
-    50% { transform: scale(1.05); }
-}
-
-@keyframes levelPulse {
-    0%, 100% { transform: scale(1); }
-    50% { transform: scale(1.03); }
-}
-
-button.menuBtn {
-    padding: 16px 48px;
-    margin: 12px 0;
-    font-size: 22px;
-    border: 2px solid #00ffff;
-    border-radius: 12px;
-    cursor: pointer;
-    font-weight: bold;
-    background: linear-gradient(135deg, rgba(0, 100, 200, 0.4), rgba(100, 0, 200, 0.4));
-    color: white;
-    box-shadow: 0 0 20px rgba(0, 255, 255, 0.4);
-    transition: all 0.3s;
-    min-width: 280px;
-    position: relative;
-}
-
-button.menuBtn:hover {
-    transform: scale(1.08) translateY(-3px);
-    box-shadow: 0 0 35px rgba(0, 255, 255, 0.8);
-    background: linear-gradient(135deg, rgba(0, 150, 255, 0.6), rgba(150, 0, 255, 0.6));
-}
-
-button.menuBtn:active {
-    transform: scale(1.03);
-}
-
-#tetrisGame {
-    display: flex;
-    position: relative;
-    gap: 30px;
-    flex-direction: row;
-}
-
-.game-container {
-    display: flex;
-    gap: 30px;
-    align-items: flex-start;
-}
-
-.side-panel {
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-}
-
-.info-box {
-    background: rgba(30, 30, 60, 0.7);
-    border: 2px solid #00ffff;
-    border-radius: 12px;
-    padding: 20px;
-    box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
-    min-width: 180px;
-}
-
-.info-box h3 {
-    text-align: center;
-    margin-bottom: 15px;
-    color: #00ffff;
-    text-shadow: 0 0 10px #00ffff;
-}
-
-#score {
-    font-size: 32px;
-    font-weight: bold;
-    text-align: center;
-    color: #fff;
-    text-shadow: 0 0 10px #ff00ff;
-}
-
-#nextPiece {
-    width: 120px;
-    height: 120px;
-    display: grid;
-    grid-template-columns: repeat(4, 30px);
-    grid-template-rows: repeat(4, 30px);
-    gap: 1px;
-    background: #111;
-    margin: 0 auto;
-}
-
-.preview-cell {
-    width: 28px;
-    height: 28px;
-    background: #222;
-    border-radius: 3px;
-}
-
-#tetris {
-    display: grid;
-    gap: 1px;
-    background: rgba(17, 17, 34, 0.9);
-    border: 3px solid #00ffff;
-    border-radius: 8px;
-    box-shadow: 0 0 40px rgba(0, 255, 255, 0.5);
-    padding: 3px;
-}
-
-.cell {
-    width: 30px;
-    height: 30px;
-    background: #1a1a2e;
-    border: 1px solid #111;
-    border-radius: 3px;
-    transition: all 0.1s;
-}
-
-.cell.filled {
-    box-shadow: inset 0 0 10px rgba(255, 255, 255, 0.3);
-}
-
-.particle {
-    position: fixed;
-    width: 10px;
-    height: 10px;
-    border-radius: 50%;
-    pointer-events: none;
-    animation: particleFall 1s ease-out forwards;
-    z-index: 1000;
-}
-
-@keyframes particleFall {
-    0% { transform: translateY(0) scale(1); opacity: 1; }
-    100% { transform: translateY(200px) scale(0); opacity: 0; }
-}
-
-.coin-particle {
-    position: fixed;
-    font-size: 32px;
-    pointer-events: none;
-    animation: coinFloat 2s ease-out forwards;
-    z-index: 1000;
-}
-
-@keyframes coinFloat {
-    0% { transform: translateY(0) scale(1); opacity: 1; }
-    100% { transform: translateY(-200px) scale(1.5); opacity: 0; }
-}
-
-.controls {
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
-    background: rgba(30, 30, 60, 0.8);
-    border: 2px solid #00ffff;
-    border-radius: 8px;
-    padding: 15px;
-    font-size: 14px;
-    box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
-}
-
-.controls h4 {
-    color: #00ffff;
-    margin-bottom: 8px;
-}
-
-.controls div {
-    margin: 4px 0;
-}
-
-#nameModal {
-    display: none;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.8);
-    justify-content: center;
-    align-items: center;
-    z-index: 100;
-}
-
-.modal-content {
-    background: linear-gradient(135deg, #1a1a2e, #2a2a4e);
-    padding: 40px;
-    border-radius: 16px;
-    border: 2px solid #00ffff;
-    box-shadow: 0 0 50px rgba(0, 255, 255, 0.5);
-    text-align: center;
-}
-
-.modal-content h2 {
-    margin-bottom: 20px;
-    color: #00ffff;
-    text-shadow: 0 0 15px #00ffff;
-}
-
-.modal-content .coin-reward {
-    font-size: 48px;
-    margin: 20px 0;
-    color: gold;
-    text-shadow: 0 0 20px gold;
-}
-
-.modal-content .xp-reward {
-    font-size: 36px;
-    margin: 10px 0;
-    color: #da70d6;
-    text-shadow: 0 0 20px #da70d6;
-}
-
-.pause-overlay {
-    display: none;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.7);
-    justify-content: center;
-    align-items: center;
-    z-index: 50;
-}
-
-.pause-text {
-    font-size: 72px;
-    color: #00ffff;
-    text-shadow: 0 0 30px #00ffff;
-    animation: pulse 1.5s ease-in-out infinite;
-}
-
-@keyframes pulse {
-    0%, 100% { transform: scale(1); }
-    50% { transform: scale(1.1); }
-}
-
-.level-up-notification {
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%) scale(0);
-    background: linear-gradient(135deg, rgba(138, 43, 226, 0.95), rgba(75, 0, 130, 0.95));
-    border: 4px solid #da70d6;
-    border-radius: 20px;
-    padding: 40px 60px;
-    z-index: 200;
-    text-align: center;
-    box-shadow: 0 0 60px rgba(218, 112, 214, 0.8);
-    animation: levelUpPop 0.5s ease-out forwards;
-}
-
-@keyframes levelUpPop {
-    0% { transform: translate(-50%, -50%) scale(0); }
-    50% { transform: translate(-50%, -50%) scale(1.2); }
-    100% { transform: translate(-50%, -50%) scale(1); }
-}
-
-.level-up-notification.hide {
-    animation: levelUpFadeOut 0.3s ease-out forwards;
-}
-
-@keyframes levelUpFadeOut {
-    to { transform: translate(-50%, -50%) scale(0); opacity: 0; }
-}
-
-.level-up-notification h2 {
-    font-size: 56px;
-    margin-bottom: 15px;
-    color: #da70d6;
-    text-shadow: 0 0 30px #da70d6;
-}
-
-.level-up-notification p {
-    font-size: 28px;
-    color: white;
-    text-shadow: 0 0 10px rgba(0, 0, 0, 0.8);
-}
-
-@media (max-width: 1024px) {
-    .game-container {
-        flex-direction: column;
-        align-items: center;
-    }
-    
-    .controls {
-        position: static;
-        margin-top: 20px;
-    }
-}
-</style>
+        #nameModal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 1000; justify-content: center; align-items: center; }
+        .modal-content { background: #1a1a2e; padding: 40px; border-radius: 20px; border: 2px solid #00ffff; text-align: center; }
+        .menuBtn { padding: 15px 30px; font-size: 20px; cursor: pointer; background: #00ffff; border: none; color: #000; font-weight: bold; border-radius: 10px; margin-top: 20px; }
+        
+        .pause-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 100; justify-content: center; align-items: center; font-size: 50px; color: #00ffff; }
+    </style>
 </head>
 <body>
-
-<button id="backBtn" onclick="window.location.href='tetris.html'">⬅ Zpět</button>
 
 <div id="playerStats">
     <div id="levelDisplay">
         ⭐ Level <span id="playerLevel">1</span>
-        <div class="xp-bar-container">
-            <div class="xp-bar" id="xpBar"></div>
-        </div>
-        <div class="xp-text" id="xpText">0 / 50 XP</div>
+        <div class="xp-bar-container"><div class="xp-bar" id="xpBar"></div></div>
+        <div style="font-size: 12px;" id="xpText">0 / 50 XP</div>
     </div>
     <div id="coinsDisplay">💰 <span id="coinCount">0</span></div>
 </div>
@@ -446,10 +62,7 @@ button.menuBtn:active {
                 <div id="nextPiece"></div>
             </div>
         </div>
-        <div>
-            <div id="tetris"></div>
-        </div>
-        
+        <div id="tetris"></div>
         <div class="side-panel">
             <div class="info-box">
                 <h3>SKÓRE</h3>
@@ -457,784 +70,259 @@ button.menuBtn:active {
             </div>
         </div>
     </div>
-    
-    <div class="controls">
-        <h4>OVLÁDÁNÍ:</h4>
-        <div>⬅️➡️ - Pohyb</div>
-        <div>⬆️ - Rotace</div>
-        <div>⬇️ - Rychlejší pád</div>
-        <div>MEZERNÍK - Okamžité umístění</div>
-        <div>P - Pauza</div>
-        <div>ESC - Menu</div>
-    </div>
 </div>
 
-<div class="pause-overlay" id="pauseOverlay">
-    <div class="pause-text">PAUZA</div>
-</div>
+<div id="pauseOverlay" class="pause-overlay">PAUZA</div>
 
 <div id="nameModal">
     <div class="modal-content">
-        <h2>🎉 Skvělá hra! 🎉</h2>
-        <p style="font-size: 24px; margin-bottom: 10px;">Tvoje skóre: <span id="finalScore">0</span></p>
-        <div class="coin-reward">
-            💰 +<span id="earnedCoins">0</span> mincí!
-        </div>
-        <div class="xp-reward">
-            ⭐ +<span id="earnedXP">0</span> XP
-        </div>
-        <p id="saveMessage" style="font-size: 18px; color: #00ff00; margin: 20px 0;">
-            ✅ Skóre automaticky uloženo!
-        </p>
-        <button class="menuBtn" onclick="window.location.href='tetris.html'">🏠 Zpět do menu</button>
+        <h2>🎉 KONEC HRY 🎉</h2>
+        <p>Skóre: <span id="finalScore">0</span></p>
+        <div style="color: gold; font-size: 24px; margin: 10px;">💰 +<span id="earnedCoins">0</span></div>
+        <div style="color: #da70d6;">⭐ +<span id="earnedXP">0</span> XP</div>
+        <button class="menuBtn" onclick="location.reload()">Hrát znovu</button>
     </div>
 </div>
 
 <script>
-// Načtení nastavení z URL parametrů
-const urlParams = new URLSearchParams(window.location.search);
-const savedDifficulty = urlParams.get('difficulty') || 'medium';
-const savedRows = parseInt(urlParams.get('rows')) || 20;
-const savedCols = parseInt(urlParams.get('cols')) || 10;
-const savedTheme = urlParams.get('theme') || 'classic';
+    // Globální stav (přístupný i pro moduly)
+    window.gameState = {
+        score: 0,
+        level: 1,
+        playerLevel: 1,
+        playerXP: 0,
+        playerCoins: 0,
+        isPaused: false,
+        isGameOver: false,
+        dropInterval: 500,
+        mapRows: 20,
+        mapCols: 10,
+        currentTheme: 'classic'
+    };
 
-// Nastav hodnoty
-let selectedDifficulty = savedDifficulty;
-let mapRows = savedRows;
-let mapCols = savedCols;
-let currentTheme = savedTheme;
+    const xpRequirements = [0, 50, 150, 300, 500, 750, 1050, 1400, 1800, 2250];
 
-console.log('Načteno:', { selectedDifficulty, mapRows, mapCols, currentTheme });
-
-let score = 0;
-let level = 1;
-let linesCleared = 0;
-let combo = 0;
-let dropInterval = 500;
-let dropTimeout;
-let isPaused = false;
-let isGameOver = false;
-let canHold = true;
-let earnedCoinsThisGame = 0;
-
-let grid = [];
-let current = null;
-let nextPiece = null;
-let holdPiece = null;
-
-// Level system
-let playerLevel = 1;
-let playerXP = 0;
-let playerCoins = 0;
-let unlockedThemes = ['classic', 'neon'];
-let unlockedMaps = ['20x10', '18x12'];
-let currentUser = null;
-let totalGamesPlayed = 0;
-
-// XP requirements for each level
-const xpRequirements = [
-    0,    // Level 1
-    50,   // Level 2
-    150,  // Level 3 (50 + 100)
-    300,  // Level 4 (150 + 150)
-    500,  // Level 5 (300 + 200)
-    750,  // Level 6 (500 + 250)
-    1050, // Level 7 (750 + 300)
-    1400, // Level 8 (1050 + 350)
-    1800, // Level 9 (1400 + 400)
-    2250  // Level 10 (1800 + 450)
-];
-
-function getXPForNextLevel(currentLevel) {
-    if (currentLevel >= 10) return 0;
-    return xpRequirements[currentLevel];
-}
-
-function updateLevelDisplay() {
-    document.getElementById('playerLevel').textContent = playerLevel;
-    
-    if (playerLevel >= 10) {
-        document.getElementById('xpText').textContent = 'MAX LEVEL';
-        document.getElementById('xpBar').style.width = '100%';
-        return;
+    function updateLevelUI() {
+        document.getElementById('playerLevel').textContent = window.gameState.playerLevel;
+        document.getElementById('coinCount').textContent = window.gameState.playerCoins;
+        
+        const lvl = window.gameState.playerLevel;
+        const xp = window.gameState.playerXP;
+        const currentReq = xpRequirements[lvl - 1];
+        const nextReq = xpRequirements[lvl] || xp;
+        const progress = ((xp - currentReq) / (nextReq - currentReq)) * 100;
+        
+        document.getElementById('xpBar').style.width = Math.min(100, progress) + '%';
+        document.getElementById('xpText').textContent = `${xp - currentReq} / ${nextReq - currentReq} XP`;
     }
-    
-    const currentLevelXP = xpRequirements[playerLevel - 1];
-    const nextLevelXP = xpRequirements[playerLevel];
-    const xpNeeded = nextLevelXP - currentLevelXP;
-    const currentProgress = playerXP - currentLevelXP;
-    
-    const percentage = Math.min(100, (currentProgress / xpNeeded) * 100);
-    
-    document.getElementById('xpBar').style.width = percentage + '%';
-    document.getElementById('xpText').textContent = `${currentProgress} / ${xpNeeded} XP`;
-}
-
-async function addXP(amount) {
-    if (playerLevel >= 10) return amount;
-    
-    console.log(`⭐ Přidávám ${amount} XP... (aktuálně: ${playerXP})`);
-    playerXP += amount;
-    
-    let leveledUp = false;
-    
-    while (playerLevel < 10 && playerXP >= xpRequirements[playerLevel]) {
-        playerLevel++;
-        leveledUp = true;
-        console.log(`🎉 LEVEL UP! Nový level: ${playerLevel}`);
-    }
-    
-    console.log(`💎 Po přidání: Level ${playerLevel}, XP ${playerXP}`);
-    
-    updateLevelDisplay();
-    
-    if (leveledUp) {
-        showLevelUpNotification();
-    }
-    
-    return amount;
-}
-    
-function showLevelUpNotification() {
-    const notification = document.createElement('div');
-    notification.className = 'level-up-notification';
-    notification.innerHTML = `
-        <h2>🎉 LEVEL UP! 🎉</h2>
-        <p>Dosáhl jsi Level ${playerLevel}!</p>
-        <p style="font-size: 20px; margin-top: 10px;">Nové položky odemčeny v shopu! 🛒</p>
-    `;
-    document.body.appendChild(notification);
-    
-    playSound('levelup');
-    
-    setTimeout(() => {
-        notification.classList.add('hide');
-        setTimeout(() => notification.remove(), 300);
-    }, 4000);
-}
 </script>
 
 <script type="module">
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.3'
+    import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.3'
 
-const SUPABASE_URL = 'https://bmmaijlbpwgzhrxzxphf.supabase.co'
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJtbWFpamxicHdnemhyeHp4cGhmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjY4NjQ5MDcsImV4cCI6MjA4MjQ0MDkwN30.s0YQVnAjMXFu1pSI1NXZ2naSab179N0vQPglsmy3Pgw'
+    const SUPABASE_URL = 'https://bmmaijlbpwgzhrxzxphf.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJtbWFpamxicHdnemhyeHp4cGhmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjY4NjQ5MDcsImV4cCI6MjA4MjQ0MDkwN30.s0YQVnAjMXFu1pSI1NXZ2naSab179N0vQPglsmy3Pgw';
+    const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+    // Tetris Logika
+    const tetrisEl = document.getElementById('tetris');
+    const shapes = [
+        {shape: [[1,1,1,1]], color: '#00ffff'}, // I
+        {shape: [[1,1],[1,1]], color: '#ffff00'}, // O
+        {shape: [[0,1,0],[1,1,1]], color: '#ff00ff'}, // T
+        {shape: [[0,1,1],[1,1,0]], color: '#00ff00'}, // S
+        {shape: [[1,1,0],[0,1,1]], color: '#ff0000'}, // Z
+        {shape: [[1,0,0],[1,1,1]], color: '#0000ff'}, // J
+        {shape: [[0,0,1],[1,1,1]], color: '#ff8000'}  // L
+    ];
 
-// Načtení přihlášeného uživatele
-// ===== EXPORT FUNKCÍ NA WINDOW =====
-window.supabase = supabase
-window.currentUser = currentUser
-window.playerLevel = playerLevel
-window.playerXP = playerXP
-window.playerCoins = playerCoins
-window.updateCoinsDisplay = updateCoinsDisplay
-window.updateLevelDisplay = updateLevelDisplay
-window.addXP = addXP
-window.saveUserData = saveUserData
-    
-async function loadUserData() {
-    if (!currentUser || currentUser.is_guest) return
-    
-    console.log('Načítám data pro uživatele:', currentUser.username, 'ID:', currentUser.id)
-    
-    try {
-        const { data, error } = await supabase
-            .from('tetris_player_data')
-            .select('*')
-            .eq('user_id', currentUser.id)
-            .single()
+    let grid = [];
+    let currentPiece = null;
+    let nextPiece = null;
+    let gameTimer = null;
+
+    function init() {
+        grid = Array(window.gameState.mapRows).fill().map(() => Array(window.gameState.mapCols).fill(0));
+        tetrisEl.style.gridTemplateColumns = `repeat(${window.gameState.mapCols}, 30px)`;
         
-        if (data) {
-            playerCoins = data.coins || 0
-            playerLevel = data.level || 1
-            playerXP = data.xp || 0
-            unlockedThemes = data.unlocked_themes || ['classic', 'neon']
-            unlockedMaps = data.unlocked_maps || ['20x10', '18x12']
-            totalGamesPlayed = data.games_played || 0
-            console.log('Data načtena:', { playerCoins, playerLevel, playerXP, totalGamesPlayed })
-        } else {
-            console.log('První spuštění - vytvářím nový záznam')
-            await supabase
-                .from('tetris_player_data')
-                .insert([{
-                    user_id: currentUser.id,
-                    username: currentUser.username,
-                    coins: 0,
-                    level: 1,
-                    xp: 0,
-                    unlocked_themes: ['classic', 'neon'],
-                    unlocked_maps: ['20x10', '18x12'],
-                    games_played: 0,
-                    total_score: 0,
-                    best_score: 0
-                }])
+        for(let i=0; i < window.gameState.mapRows * window.gameState.mapCols; i++) {
+            const cell = document.createElement('div');
+            cell.className = 'cell';
+            tetrisEl.appendChild(cell);
         }
-    } catch (error) {
-        console.error('Chyba při načítání dat:', error)
-    }
-    
-    // ✅ PŘIDÁNO - aktualizace globálních proměnných
-    window.currentUser = currentUser
-    window.playerLevel = playerLevel
-    window.playerXP = playerXP
-    window.playerCoins = playerCoins
-    
-    updateCoinsDisplay()
-    updateLevelDisplay()
-}
-
-// Načtení lokálních dat pro host
-function loadLocalData() {
-    const saved = localStorage.getItem('tetrisPlayerData')
-    if (saved) {
-        const data = JSON.parse(saved)
-        playerCoins = data.coins || 0
-        playerLevel = data.level || 1
-        playerXP = data.xp || 0
-        unlockedThemes = data.themes || ['classic', 'neon']
-        unlockedMaps = data.maps || ['20x10', '18x12']
-    }
-    updateCoinsDisplay()
-    updateLevelDisplay()
-}
-
-// Uložení dat do Supabase
-async function saveUserData() {
-    if (!currentUser || currentUser.is_guest) {
-        const data = {
-            coins: playerCoins,
-            level: playerLevel,
-            xp: playerXP,
-            themes: unlockedThemes,
-            maps: unlockedMaps
-        }
-        localStorage.setItem('tetrisPlayerData', JSON.stringify(data))
-        return
-    }
-    
-    try {
-        const { error } = await supabase
-            .from('tetris_player_data')
-            .update({
-                coins: playerCoins,
-                level: playerLevel,
-                xp: playerXP,
-                unlocked_themes: unlockedThemes,
-                unlocked_maps: unlockedMaps,
-                games_played: totalGamesPlayed
-            })
-            .eq('user_id', currentUser.id)
         
-        if (error) throw error
-    } catch (error) {
-        console.error('Chyba při ukládání dat:', error)
+        nextPiece = getRandomPiece();
+        spawnPiece();
+        updateLevelUI();
+        gameLoop();
     }
-}
 
-// Aktualizace dat po hře
-async function updateAfterGame(finalScore) {
-    totalGamesPlayed++
-    
-    const coinsFromScore = Math.floor(finalScore / 100) * 5
-    const totalCoins = coinsFromScore + 10
-    
-    // XP: každých 1000 bodů = 10 XP
-    const earnedXP = Math.floor(finalScore / 1000) * 10
-    
-    earnedCoinsThisGame = totalCoins
-    playerCoins += totalCoins
-    
-    await addXP(earnedXP)
-    
-    console.log(`Získané mince: ${totalCoins}, XP: ${earnedXP}`)
-    console.log(`Celkem mincí: ${playerCoins}, Level: ${playerLevel}, XP: ${playerXP}`)
-    
-    if (!currentUser || currentUser.is_guest) {
-        saveUserData()
-        updateCoinsDisplay()
-        updateLevelDisplay()
-        return earnedXP
+    function getRandomPiece() {
+        const piece = shapes[Math.floor(Math.random() * shapes.length)];
+        return { ...piece, x: Math.floor(window.gameState.mapCols/2) - 1, y: 0 };
     }
-    
-    try {
-        const { data: current } = await supabase
-            .from('tetris_player_data')
-            .select('*')
-            .eq('user_id', currentUser.id)
-            .single()
-        
-        const newTotalScore = (current?.total_score || 0) + finalScore
-        const newBestScore = Math.max(current?.best_score || 0, finalScore)
-        
-        const { error } = await supabase
-            .from('tetris_player_data')
-            .update({
-                coins: playerCoins,
-                level: playerLevel,
-                xp: playerXP,
-                games_played: totalGamesPlayed,
-                total_score: newTotalScore,
-                best_score: newBestScore,
-                last_played: new Date().toISOString()
-            })
-            .eq('user_id', currentUser.id)
-        
-        if (error) throw error
-        
-        console.log('Data úspěšně uložena do Supabase')
-        
-    } catch (error) {
-        console.error('Chyba při aktualizaci dat:', error)
-    }
-    
-    await saveUserData()
-    updateCoinsDisplay()
-    updateLevelDisplay()
-    return earnedXP
-}
 
-window.updateCoinsDisplay = function() {
-    document.getElementById('coinCount').textContent = playerCoins
-}
-
-// Barevná témata
-const themes = {
-    classic: ['cyan', 'yellow', 'purple', 'green', 'red', 'blue', 'orange'],
-    neon: ['#00ffff', '#ff00ff', '#ffff00', '#00ff00', '#ff0080', '#0080ff', '#ff8000'],
-    fire: ['#ff0000', '#ff4500', '#ff6347', '#ff7f50', '#ffa500', '#ffb84d', '#ff8c00'],
-    ice: ['#00bfff', '#4169e1', '#1e90ff', '#87ceeb', '#add8e6', '#b0e0e6', '#87cefa'],
-    forest: ['#228b22', '#32cd32', '#3cb371', '#2e8b57', '#00fa9a', '#90ee90', '#98fb98'],
-    sunset: ['#ff6347', '#ff7f50', '#ffa500', '#ff8c00', '#ff4500', '#ff69b4', '#ff1493'], 
-    ocean: ['#006994', '#0080b3', '#0099cc', '#00b3e6', '#33ccff', '#66d9ff', '#99e6ff'],
-    candy: ['#ff69b4', '#ffb6c1', '#ff1493', '#ff82ab', '#ffc0cb', '#ffaec9', '#ff4da6'],
-    galaxy: ['#4b0082', '#8a2be2', '#9370db', '#9932cc', '#ba55d3', '#da70d6', '#ee82ee'],
-    toxic: ['#7fff00', '#adff2f', '#00ff00', '#32cd32', '#39ff14', '#98fb98', '#ccff00'],
-    rainbow: ['#ff0000', '#ff7f00', '#ffff00', '#00ff00', '#0000ff', '#4b0082', '#9400d3'],
-    gold: ['#ffd700', '#ffdf00', '#ffb347', '#daa520', '#b8860b', '#cd853f', '#ff8c00'],
-    matrix: ['#00ff00', '#00cc00', '#00aa00', '#008800', '#00ff41', '#33ff33', '#66ff66'],
-    lava: ['#8b0000', '#b22222', '#dc143c', '#ff4500', '#ff6347', '#ff7f50', '#ffa07a'],
-    midnight: ['#191970', '#000080', '#00008b', '#0000cd', '#4169e1', '#6495ed', '#1e3a8a'],
-    crystal: ['#e0ffff', '#afeeee', '#add8e6', '#87ceeb', '#b0e0e6', '#d4f1f4', '#c0f0f5']
-}
-
-// Tetris engine
-const tetris = document.getElementById('tetris')
-const scoreDisplay = document.getElementById('score')
-const nextPieceDisplay = document.getElementById('nextPiece')
-
-const audioContext = new (window.AudioContext || window.webkitAudioContext)()
-
-const shapes = [
-    {shape: [[1,1,1,1]], name: 'I'},
-    {shape: [[1,1],[1,1]], name: 'O'},
-    {shape: [[0,1,0],[1,1,1]], name: 'T'},
-    {shape: [[0,1,1],[1,1,0]], name: 'S'},
-    {shape: [[1,1,0],[0,1,1]], name: 'Z'},
-    {shape: [[1,0,0],[1,1,1]], name: 'J'},
-    {shape: [[0,0,1],[1,1,1]], name: 'L'}
-]
-
-function getColor(shapeIndex) {
-    const colorPalette = themes[currentTheme]
-    return colorPalette[shapeIndex % colorPalette.length]
-}
-
-function initGrid() {
-    tetris.innerHTML = ''
-    grid.length = 0
-    tetris.style.gridTemplateRows = `repeat(${mapRows}, 30px)`
-    tetris.style.gridTemplateColumns = `repeat(${mapCols}, 30px)`
-    
-    for (let r = 0; r < mapRows; r++) {
-        grid[r] = []
-        for (let c = 0; c < mapCols; c++) {
-            const cell = document.createElement('div')
-            cell.classList.add('cell')
-            tetris.appendChild(cell)
-            grid[r][c] = 0
+    function spawnPiece() {
+        currentPiece = nextPiece;
+        nextPiece = getRandomPiece();
+        drawPreview();
+        if (checkCollision(0, 0)) {
+            gameOver();
         }
     }
-}
 
-window.startTetris = function(difficulty) {
-    score = 0
-    level = 1
-    linesCleared = 0
-    combo = 0
-    canHold = true
-    isPaused = false
-    isGameOver = false
-    holdPiece = null
-    earnedCoinsThisGame = 0
-    
-    dropInterval = difficulty === 'easy' ? 800 : 
-                   difficulty === 'medium' ? 600 : 
-                   difficulty === 'hard' ? 400 : 200
-    
-    initGrid()
-    nextPiece = randomTetromino()
-    newTetromino()
-    updateDisplay()
-    gameLoop()
-}
-
-function randomTetromino() {
-    const index = Math.floor(Math.random() * shapes.length)
-    return {
-        shape: shapes[index].shape.map(r => r.slice()),
-        color: getColor(index),
-        name: shapes[index].name
-    }
-}
-
-function newTetromino() {
-    current = nextPiece
-    current.x = Math.floor(mapCols / 2) - Math.floor(current.shape[0].length / 2)
-    current.y = 0
-    
-    nextPiece = randomTetromino()
-    drawPreview(nextPiece, nextPieceDisplay)
-    canHold = true
-    
-    if (collision()) {
-        gameOver()
-    }
-}
-
-function drawPreview(piece, container) {
-    container.innerHTML = ''
-    for (let i = 0; i < 16; i++) {
-        const cell = document.createElement('div')
-        cell.classList.add('preview-cell')
-        container.appendChild(cell)
-    }
-    
-    const offsetX = Math.floor((4 - piece.shape[0].length) / 2)
-    const offsetY = Math.floor((4 - piece.shape.length) / 2)
-    
-    for (let r = 0; r < piece.shape.length; r++) {
-        for (let c = 0; c < piece.shape[r].length; c++) {
-            if (piece.shape[r][c]) {
-                const index = (offsetY + r) * 4 + (offsetX + c)
-                container.children[index].style.background = piece.color
-                container.children[index].style.boxShadow = `0 0 10px ${piece.color}`
-            }
-        }
-    }
-}
-
-function draw() {
-    document.querySelectorAll('.cell').forEach(cell => {
-        cell.style.background = '#1a1a2e'
-        cell.classList.remove('filled')
-    })
-    
-    for (let r = 0; r < mapRows; r++) {
-        for (let c = 0; c < mapCols; c++) {
-            if (grid[r][c]) {
-                const cell = tetris.children[r * mapCols + c]
-                cell.style.background = grid[r][c]
-                cell.style.boxShadow = `0 0 10px ${grid[r][c]}`
-                cell.classList.add('filled')
-            }
-        }
-    }
-    
-    for (let r = 0; r < current.shape.length; r++) {
-        for (let c = 0; c < current.shape[r].length; c++) {
-            if (current.shape[r][c]) {
-                const index = (current.y + r) * mapCols + (current.x + c)
-                if (index >= 0 && index < mapRows * mapCols) {
-                    tetris.children[index].style.background = current.color
-                    tetris.children[index].style.boxShadow = `0 0 15px ${current.color}`
-                    tetris.children[index].classList.add('filled')
+    function checkCollision(dx, dy, newShape = currentPiece.shape) {
+        for (let y = 0; y < newShape.length; y++) {
+            for (let x = 0; x < newShape[y].length; x++) {
+                if (newShape[y][x]) {
+                    let nx = currentPiece.x + x + dx;
+                    let ny = currentPiece.y + y + dy;
+                    if (nx < 0 || nx >= window.gameState.mapCols || ny >= window.gameState.mapRows || (ny >= 0 && grid[ny][nx])) {
+                        return true;
+                    }
                 }
             }
         }
+        return false;
     }
-}
 
-function moveDown() {
-    if (isPaused || isGameOver) return
-    
-    current.y++
-    if (collision()) {
-        current.y--
-        freeze()
-        newTetromino()
+    function rotate() {
+        const r = currentPiece.shape[0].map((_, i) => currentPiece.shape.map(row => row[i]).reverse());
+        if (!checkCollision(0, 0, r)) currentPiece.shape = r;
+        draw();
     }
-    draw()
-}
 
-function collision() {
-    return collisionAt(current.x, current.y)
-}
+    function move(dx, dy) {
+        if (!checkCollision(dx, dy)) {
+            currentPiece.x += dx;
+            currentPiece.y += dy;
+            draw();
+            return true;
+        }
+        if (dy > 0) {
+            lockPiece();
+            spawnPiece();
+        }
+        return false;
+    }
 
-function collisionAt(x, y) {
-    for (let r = 0; r < current.shape.length; r++) {
-        for (let c = 0; c < current.shape[r].length; c++) {
-            if (current.shape[r][c]) {
-                let newY = y + r
-                let newX = x + c
-                if (newY >= mapRows || newX < 0 || newX >= mapCols) return true
-                if (newY >= 0 && grid[newY][newX]) return true
+    function lockPiece() {
+        currentPiece.shape.forEach((row, y) => {
+            row.forEach((value, x) => {
+                if (value) {
+                    const ny = currentPiece.y + y;
+                    if (ny >= 0) grid[ny][currentPiece.x + x] = currentPiece.color;
+                }
+            });
+        });
+        clearLines();
+    }
+
+    function clearLines() {
+        let lines = 0;
+        for (let y = window.gameState.mapRows - 1; y >= 0; y--) {
+            if (grid[y].every(cell => cell !== 0)) {
+                grid.splice(y, 1);
+                grid.unshift(Array(window.gameState.mapCols).fill(0));
+                lines++;
+                y++;
             }
         }
-    }
-    return false
-}
-
-function freeze() {
-    for (let r = 0; r < current.shape.length; r++) {
-        for (let c = 0; c < current.shape[r].length; c++) {
-            if (current.shape[r][c]) {
-                grid[current.y + r][current.x + c] = current.color
-            }
+        if (lines > 0) {
+            window.gameState.score += lines * 100;
+            document.getElementById('score').textContent = window.gameState.score;
         }
     }
-    
-    const cleared = clearLines()
-    if (cleared > 0) {
-        createParticles(cleared)
-        playSound('clear')
-    }
-}
 
-function clearLines() {
-    let cleared = 0
-    for (let r = mapRows - 1; r >= 0; r--) {
-        if (grid[r].every(cell => cell !== 0)) {
-            grid.splice(r, 1)
-            grid.unshift(Array(mapCols).fill(0))
-            cleared++
-            r++
+    function draw() {
+        const cells = tetrisEl.getElementsByClassName('cell');
+        // Reset
+        for (let i = 0; i < cells.length; i++) {
+            cells[i].style.backgroundColor = '';
+            cells[i].style.boxShadow = '';
         }
+        // Grid
+        grid.forEach((row, y) => {
+            row.forEach((color, x) => {
+                if (color) {
+                    const idx = y * window.gameState.mapCols + x;
+                    cells[idx].style.backgroundColor = color;
+                }
+            });
+        });
+        // Current
+        currentPiece.shape.forEach((row, y) => {
+            row.forEach((value, x) => {
+                if (value) {
+                    const nx = currentPiece.x + x;
+                    const ny = currentPiece.y + y;
+                    if (ny >= 0) {
+                        const idx = ny * window.gameState.mapCols + nx;
+                        cells[idx].style.backgroundColor = currentPiece.color;
+                        cells[idx].style.boxShadow = `inset 0 0 10px white`;
+                    }
+                }
+            });
+        });
     }
-    
-    if (cleared > 0) {
-        linesCleared += cleared
-        combo++
-        
-        let points = cleared * 100 * level
-        if (cleared === 4) points *= 2
-        points += combo * 50
-        
-        score += points
-        level = Math.floor(linesCleared / 10) + 1
-        
-        const baseSpeed = selectedDifficulty === 'easy' ? 800 : 
-                         selectedDifficulty === 'medium' ? 600 : 
-                         selectedDifficulty === 'hard' ? 400 : 250
-        
-        const minSpeed = selectedDifficulty === 'easy' ? 200 : 
-                        selectedDifficulty === 'medium' ? 150 : 
-                        selectedDifficulty === 'hard' ? 100 : 80
-        
-        const speedMultiplier = Math.max(0.25, 1 - (Math.floor(score / 1000) * 0.08))
-        dropInterval = Math.max(minSpeed, Math.floor(baseSpeed * speedMultiplier))
-    } else {
-        combo = 0
-    }
-    
-    updateDisplay()
-    return cleared
-}
 
-function createParticles(count) {
-    for (let i = 0; i < count * 20; i++) {
-        const particle = document.createElement('div')
-        particle.classList.add('particle')
-        particle.style.left = (window.innerWidth / 2 + Math.random() * 400 - 200) + 'px'
-        particle.style.top = (window.innerHeight / 2 + Math.random() * 200 - 100) + 'px'
-        particle.style.background = themes[currentTheme][Math.floor(Math.random() * themes[currentTheme].length)]
-        document.body.appendChild(particle)
+    function drawPreview() {
+        const nextEl = document.getElementById('nextPiece');
+        nextEl.innerHTML = '';
+        for(let i=0; i<16; i++) nextEl.appendChild(document.createElement('div'));
         
-        setTimeout(() => particle.remove(), 1000)
+        nextPiece.shape.forEach((row, y) => {
+            row.forEach((val, x) => {
+                if(val) {
+                    const idx = y * 4 + x;
+                    nextEl.children[idx].style.backgroundColor = nextPiece.color;
+                    nextEl.children[idx].className = 'preview-cell';
+                }
+            });
+        });
     }
-}
 
-function rotate() {
-    const shape = current.shape
-    const N = shape.length
-    const M = shape[0].length
-    const rotated = []
-    
-    for (let y = 0; y < M; y++) {
-        rotated[y] = []
-        for (let x = 0; x < N; x++) {
-            rotated[y][x] = shape[N - 1 - x][y] || 0
+    function gameLoop() {
+        if (!window.gameState.isPaused && !window.gameState.isGameOver) {
+            move(0, 1);
         }
+        gameTimer = setTimeout(gameLoop, window.gameState.dropInterval);
     }
-    
-    const oldShape = current.shape
-    current.shape = rotated
-    
-    if (collision()) {
-        current.x++
-        if (collision()) {
-            current.x -= 2
-            if (collision()) {
-                current.x++
-                current.shape = oldShape
-            }
+
+    async function gameOver() {
+        window.gameState.isGameOver = true;
+        clearTimeout(gameTimer);
+        
+        const earnedCoins = Math.floor(window.gameState.score / 10);
+        const earnedXP = Math.floor(window.gameState.score / 5);
+        
+        document.getElementById('finalScore').textContent = window.gameState.score;
+        document.getElementById('earnedCoins').textContent = earnedCoins;
+        document.getElementById('earnedXP').textContent = earnedXP;
+        document.getElementById('nameModal').style.display = 'flex';
+
+        // Tady by šlo volání Supabase pro uložení
+        console.log("Game Over. Saving stats...");
+    }
+
+    // Input
+    window.addEventListener('keydown', e => {
+        if (window.gameState.isGameOver) return;
+        if (e.key === 'p') {
+            window.gameState.isPaused = !window.gameState.isPaused;
+            document.getElementById('pauseOverlay').style.display = window.gameState.isPaused ? 'flex' : 'none';
         }
-    }
-    
-    playSound('rotate')
-}
+        if (window.gameState.isPaused) return;
+        
+        if (e.key === 'ArrowLeft') move(-1, 0);
+        if (e.key === 'ArrowRight') move(1, 0);
+        if (e.key === 'ArrowDown') move(0, 1);
+        if (e.key === 'ArrowUp') rotate();
+        if (e.key === ' ') { while(move(0,1)); }
+    });
 
-function hardDrop() {
-    while (!collision()) {
-        current.y++
-    }
-    current.y--
-    freeze()
-    newTetromino()
-    score += 10
-    updateDisplay()
-    playSound('drop')
-}
-
-function updateDisplay() {
-    scoreDisplay.textContent = score
-    updateCoinsDisplay()
-}
-
-function togglePause() {
-    isPaused = !isPaused
-    document.getElementById('pauseOverlay').style.display = isPaused ? 'flex' : 'none'
-    if (!isPaused) {
-        gameLoop()
-    }
-}
-
-function playSound(type) {
-    const oscillator = audioContext.createOscillator()
-    const gainNode = audioContext.createGain()
-    
-    oscillator.connect(gainNode)
-    gainNode.connect(audioContext.destination)
-    
-    let duration = 0.1
-    
-    switch(type) {
-        case 'rotate':
-            oscillator.frequency.value = 400
-            gainNode.gain.value = 0.1
-            break
-        case 'drop':
-            oscillator.frequency.value = 200
-            gainNode.gain.value = 0.2
-            break
-        case 'clear':
-            oscillator.frequency.value = 800
-            gainNode.gain.value = 0.15
-            break
-        case 'levelup':
-            oscillator.frequency.value = 1200
-            gainNode.gain.value = 0.3
-            duration = 0.5
-            break
-    }
-    
-    oscillator.start(audioContext.currentTime)
-    oscillator.stop(audioContext.currentTime + duration)
-}
-
-document.addEventListener('keydown', e => {
-    if (isGameOver) return
-    
-    if (e.key === 'p' || e.key === 'P') {
-        togglePause()
-        return
-    }
-    
-    if (e.key === 'Escape') {
-        window.location.href = 'tetris.html'
-        return
-    }
-    
-    if (isPaused) return
-    
-    if (e.key === 'ArrowLeft') {
-        current.x--
-        if (collision()) current.x++
-    }
-    if (e.key === 'ArrowRight') {
-        current.x++
-        if (collision()) current.x--
-    }
-    if (e.key === 'ArrowDown') {
-        moveDown()
-    }
-    if (e.key === 'ArrowUp') {
-        rotate()
-    }
-    if (e.key === ' ') {
-        e.preventDefault()
-        hardDrop()
-    }
-    
-    draw()
-})
-
-function gameLoop() {
-    if (isPaused || isGameOver) return
-    moveDown()
-    dropTimeout = setTimeout(gameLoop, dropInterval)
-}
-
-async function gameOver() {
-    isGameOver = true
-    
-    const earnedXP = await updateAfterGame(score)
-    
-    if (currentUser && !currentUser.is_guest) {
-        try {
-            await supabase
-                .from('tetris_scores')
-                .insert([{
-                    user_id: currentUser.id,
-                    username: currentUser.username,
-                    score: score,
-                    difficulty: selectedDifficulty,
-                    lines_cleared: linesCleared,
-                    level_reached: level,
-                    timestamp: new Date().toISOString()
-                }])
-            console.log('Skóre uloženo do žebříčku!')
-        } catch (error) {
-            console.error('Chyba při ukládání skóre:', error)
-        }
-    }
-    
-    document.getElementById('finalScore').textContent = score
-    document.getElementById('earnedCoins').textContent = earnedCoinsThisGame
-    document.getElementById('earnedXP').textContent = earnedXP
-    
-    const saveMsg = document.getElementById('saveMessage')
-    if (currentUser && !currentUser.is_guest) {
-        saveMsg.textContent = '✅ Skóre automaticky uloženo do žebříčku!'
-        saveMsg.style.color = '#00ff00'
-    } else {
-        saveMsg.textContent = '⚠️ Pro uložení do žebříčku se musíš přihlásit'
-        saveMsg.style.color = '#ffaa00'
-    }
-    
-    document.getElementById('nameModal').style.display = 'flex'
-}
-
-// Inicializace
-await loadCurrentUser()
-
-// Automaticky spusť hru po načtení
-setTimeout(() => {
-    startTetris(selectedDifficulty)
-}, 500)
+    init();
 </script>
+
 </body>
 </html>
-
-
