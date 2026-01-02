@@ -8,6 +8,14 @@
 </head>
 <body>
 
+<video id="bg-video" autoplay loop muted playsinline>
+    <source src="tetris.mp4" type="video/mp4">
+</video>
+<div id="bg-overlay"></div>
+
+<!-- Animované hvězdy -->
+<div class="stars" id="stars"></div>
+    
 <button id="backBtn" onclick="window.location.href='hry.html'">⬅ Zpět</button>
 
 <div id="playerStats">
@@ -320,3 +328,4 @@
 <script type="module" src="tetris.js"></script>
 </body>
 </html>
+
