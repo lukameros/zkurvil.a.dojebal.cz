@@ -425,7 +425,7 @@ button.menuBtn:active {
 </head>
 <body>
 
-<button id="backBtn" onclick="window.location.href='tetris.html'">⬅ Zpět</button>
+<button id="backBtn" onclick="goToMenu()">⬅ Zpět do menu</button>
 
 <div id="playerStats">
     <div id="levelDisplay">
@@ -486,7 +486,7 @@ button.menuBtn:active {
         <p id="saveMessage" style="font-size: 18px; color: #00ff00; margin: 20px 0;">
             ✅ Skóre automaticky uloženo!
         </p>
-        <button class="menuBtn" onclick="window.location.href='tetris.html'">🏠 Zpět do menu</button>
+        <button class="menuBtn" onclick="goToMenu()">🏠 Zpět do menu</button>
     </div>
 </div>
 
@@ -496,6 +496,23 @@ function updateCoinsDisplay() {
     document.getElementById('coinCount').textContent = playerCoins
 }
 
+async function goToMenu() {
+    try {
+        // pauzni loop, ať se nic nehýbe při odchodu
+        isPaused = true
+        clearTimeout(dropTimeout)
+
+        // pokud existuje saveUserData (z modulu), ulož
+        if (typeof window.saveUserData === 'function') {
+            await window.saveUserData()
+        }
+    } catch (e) {
+        console.error('Chyba při ukládání před návratem do menu:', e)
+    }
+
+    window.location.href = 'tetris.html'
+}
+window.goToMenu = goToMenu
 
 // Načtení nastavení z URL parametrů
 const urlParams = new URLSearchParams(window.location.search);
@@ -578,28 +595,32 @@ function updateLevelDisplay() {
 
 async function addXP(amount) {
     if (playerLevel >= 10) return amount;
-    
+
     console.log(`⭐ Přidávám ${amount} XP... (aktuálně: ${playerXP})`);
     playerXP += amount;
-    
+
     let leveledUp = false;
-    
+
     while (playerLevel < 10 && playerXP >= xpRequirements[playerLevel]) {
         playerLevel++;
         leveledUp = true;
         console.log(`🎉 LEVEL UP! Nový level: ${playerLevel}`);
     }
-    
-    console.log(`💎 Po přidání: Level ${playerLevel}, XP ${playerXP}`);
-    
+
     updateLevelDisplay();
-    
+
     if (leveledUp) {
         showLevelUpNotification();
     }
-    
+
+    // ✅ DŮLEŽITÉ: okamžitě persistni změny (Supabase / localStorage)
+    if (typeof window.saveUserData === 'function') {
+        await window.saveUserData();
+    }
+
     return amount;
 }
+
     
 function showLevelUpNotification() {
     const notification = document.createElement('div');
@@ -1153,10 +1174,10 @@ document.addEventListener('keydown', e => {
         return
     }
     
-    if (e.key === 'Escape') {
-        window.location.href = 'tetris.html'
-        return
-    }
+   if (e.key === 'Escape') {
+    goToMenu()
+    return
+}
     
     if (isPaused) return
     
@@ -1256,6 +1277,7 @@ setTimeout(() => {
 </script>
 </body>
 </html>
+
 
 
 
