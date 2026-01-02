@@ -395,24 +395,24 @@ document.addEventListener("DOMContentLoaded", async () => {
   // Prestige (FIX)
   // =========================
   on(btnPrestige, "click", () => {
-    const gain = calcPrestigeGain(money);
-    if(gain <= 0) return;
+  const gain = calcPrestigeGain(money);
+  if (gain <= 0) return;
 
-    if(!confirm(t().prestigeConfirm(gain))) return;
+  if (!confirm(t().prestigeConfirm(gain))) return;
 
-    slavPoints += gain;
-    money = 0;
-    cpc = 1;
-    cps = 0;
+  slavPoints += gain;
+  money = 0;
+  cpc = 1;
+  cps = 0;
 
-    combo = 1.0;
-    lastClickAt = 0;
+  combo = 1.0;
+  lastClickAt = 0;
 
-    activeEvent = null;
-    eventEndsAt = 0;
+  activeEvent = null;
+  eventEndsAt = 0;
 
-    render();
-  });
+  render();
+});
 
   // =========================
   // Shop (safe)
@@ -598,3 +598,4 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   });
 });
+
