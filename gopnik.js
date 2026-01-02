@@ -4,6 +4,15 @@ document.addEventListener("DOMContentLoaded", () => {
   const bgMusic   = document.getElementById("bgMusic");
   const clickSnd  = document.getElementById("clickSnd");
 
+  // MAIN MENU refs
+  const mainMenu      = document.getElementById("mainMenu");
+  const mmPlay        = document.getElementById("mmPlay");
+  const mmShop        = document.getElementById("mmShop");
+  const mmUpgrades    = document.getElementById("mmUpgrades");
+  const mmPrestige    = document.getElementById("mmPrestige");
+  const mmBtnSettings = document.getElementById("mmBtnSettings");
+  const mmBtnClose    = document.getElementById("mmBtnClose");
+
   const settingsModal     = document.getElementById("settingsModal");
   const btnSettings       = document.getElementById("btnSettings");
   const btnCloseSettings  = document.getElementById("btnCloseSettings");
@@ -145,7 +154,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if(el("t_comboLabel")) el("t_comboLabel").textContent = tr.combo;
     if(el("t_critLabel")) el("t_critLabel").textContent = tr.crit;
 
-    renderEventLine(); // přepíše event text do správného jazyka
+    renderEventLine();
   }
 
   function applyMusicEnabled(enabled){
@@ -162,29 +171,77 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // ===== modal =====
-  if(btnSettings && settingsModal){
-    btnSettings.addEventListener("click", () => {
-      settingsModal.classList.add("show");
-      settingsModal.setAttribute("aria-hidden","false");
-      // user gesture → když je hudba povolená, zkus ji rozjet
-      if(musicToggle?.checked) applyMusicEnabled(true);
-    });
+  // ===== modal helpers =====
+  function openSettings(){
+    if(!settingsModal) return;
+    settingsModal.classList.add("show");
+    settingsModal.setAttribute("aria-hidden","false");
+    if(musicToggle?.checked) applyMusicEnabled(true);
   }
-  if(btnCloseSettings && settingsModal){
-    btnCloseSettings.addEventListener("click", () => {
-      settingsModal.classList.remove("show");
-      settingsModal.setAttribute("aria-hidden","true");
-    });
+  function closeSettings(){
+    if(!settingsModal) return;
+    settingsModal.classList.remove("show");
+    settingsModal.setAttribute("aria-hidden","true");
+  }
+
+  // ===== main menu helpers =====
+  function showMainMenu(){
+    if(!mainMenu) return;
+    mainMenu.classList.add("show");
+    mainMenu.setAttribute("aria-hidden","false");
+  }
+  function hideMainMenu(){
+    if(!mainMenu) return;
+    mainMenu.classList.remove("show");
+    mainMenu.setAttribute("aria-hidden","true");
+  }
+
+  // ===== modal events =====
+  if(btnSettings){
+    btnSettings.addEventListener("click", openSettings);
+  }
+  if(btnCloseSettings){
+    btnCloseSettings.addEventListener("click", closeSettings);
+  }
+  if(settingsModal){
     settingsModal.addEventListener("click", (e) => {
-      if(e.target === settingsModal){
-        settingsModal.classList.remove("show");
-        settingsModal.setAttribute("aria-hidden","true");
-      }
+      if(e.target === settingsModal) closeSettings();
     });
   }
   musicToggle?.addEventListener("change", () => applyMusicEnabled(musicToggle.checked));
   langSelect?.addEventListener("change", () => applyLang(langSelect.value));
+
+  // ===== MAIN MENU events =====
+  mmPlay?.addEventListener("click", () => {
+    hideMainMenu();
+  });
+
+  mmBtnSettings?.addEventListener("click", openSettings);
+
+  mmBtnClose?.addEventListener("click", () => {
+    // “X” jen schová menu (uživatel může hrát)
+    hideMainMenu();
+  });
+
+  // Zatím jen placeholder chování:
+  mmShop?.addEventListener("click", () => {
+    hideMainMenu();
+    // jemný hint: scroll panel do shop části (nemusí být vidět, ale nevadí)
+    const shopTitle = document.getElementById("t_shopTitle");
+    shopTitle?.scrollIntoView?.({ behavior: "smooth", block: "start" });
+  });
+
+  mmUpgrades?.addEventListener("click", () => {
+    hideMainMenu();
+    const shopTitle = document.getElementById("t_shopTitle");
+    shopTitle?.scrollIntoView?.({ behavior: "smooth", block: "start" });
+  });
+
+  mmPrestige?.addEventListener("click", () => {
+    hideMainMenu();
+    const pTitle = document.getElementById("t_prestigeTitle");
+    pTitle?.scrollIntoView?.({ behavior: "smooth", block: "start" });
+  });
 
   // ===== GAME STATE =====
   let money = 0, cpc = 1, cps = 0;
@@ -213,19 +270,15 @@ document.addEventListener("DOMContentLoaded", () => {
     return activeEvent === name && Date.now() < eventEndsAt;
   }
   function clickEventMultiplier(){
-    // vodka: +50% klik
     if(isEventActive("vodka")) return 1.5;
-    // raid: klik x2
     if(isEventActive("raid")) return 2.0;
     return 1.0;
   }
   function cpsEventMultiplier(){
-    // raid: cps -50% (police raid)
     if(isEventActive("raid")) return 0.5;
     return 1.0;
   }
   function shopDiscountMultiplier(){
-    // market: -30% ceny
     if(isEventActive("market")) return 0.70;
     return 1.0;
   }
@@ -263,7 +316,6 @@ document.addEventListener("DOMContentLoaded", () => {
     const tr = t();
     if(!eventLine) return;
 
-    // pokud event doběhl, vypni
     if(activeEvent && Date.now() >= eventEndsAt){
       activeEvent = null;
       eventEndsAt = 0;
@@ -289,19 +341,16 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if(moneyEl) moneyEl.textContent = Math.floor(money);
 
-    // CPC: ukážeme efektivní klik s prestige + combo + event (bez crit, protože je random)
     const effClick = cpc * prestigeMult * combo * clickEventMultiplier();
     if(cpcEl) cpcEl.textContent = `${cpc} (≈ ${Math.floor(effClick)})`;
 
     const effCps = cps * cpsMult;
     if(cpsEl) cpsEl.textContent = effCps.toFixed(1);
 
-    // HUD
     if(comboEl) comboEl.textContent = `x${combo.toFixed(2)}`;
     if(critEl) critEl.textContent = `${Math.round(CRIT_CHANCE * 100)}%`;
     renderEventLine();
 
-    // shop buttons availability (s event slevou)
     const cCost = effectiveCost(CURSOR_COST);
     const gCost = effectiveCost(GRANNY_COST);
     const kCost = effectiveCost(CLICK_COST);
@@ -319,7 +368,6 @@ document.addEventListener("DOMContentLoaded", () => {
       btnClick.textContent = `${t().upgrade} (${kCost})`;
     }
 
-    // prestige
     const gain = calcPrestigeGain(money);
     if(spEl) spEl.textContent = String(slavPoints);
     if(bonusEl) bonusEl.textContent = `+${Math.round((prestigeMult - 1) * 100)}%`;
@@ -339,12 +387,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
     slavPoints += gain;
 
-    // reset run
     money = 0;
     cpc = 1;
     cps = 0;
 
-    // reset combo + event
     combo = 1.0;
     lastClickAt = 0;
     activeEvent = null;
@@ -378,7 +424,8 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   // ===== combo + click gain =====
-  const imgs = ["gopnik_A.png", "gopnik_B.png"];
+  // ✅ A → B → C → A
+  const imgs = ["gopnik_A.png", "gopnik_B.png", "gopnik_C.png"];
   let imgIndex = 0;
 
   function updateComboOnClick(){
@@ -396,35 +443,31 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   gopnikBtn?.addEventListener("click", () => {
-    // click sound
     if(clickSnd){
       clickSnd.currentTime = 0;
       clickSnd.play().catch(()=>{});
     }
 
-    // combo
     updateComboOnClick();
 
-    // base gain
     const prestigeMult = totalPrestigeMultiplier();
     let gain = cpc * prestigeMult * combo * clickEventMultiplier();
 
-    // crit
     if(rollCrit()){
       gain *= CRIT_MULT;
-      // malá vizuální nápověda přes eventLine na 1s
       if(eventLine){
         const old = eventLine.textContent;
         eventLine.textContent = `💥 CRIT! +${Math.floor(gain)}`;
         setTimeout(() => renderEventLine(), 900);
+        setTimeout(() => { if(eventLine && eventLine.textContent === `💥 CRIT! +${Math.floor(gain)}`) eventLine.textContent = old; }, 901);
       }
     }
 
     money += gain;
 
-    // gopnik swap + pop
     imgIndex = (imgIndex + 1) % imgs.length;
     if(gopnikImg) gopnikImg.src = imgs[imgIndex];
+
     if(gopnikImg){
       gopnikImg.style.transform = "scale(1.05)";
       setTimeout(() => gopnikImg.style.transform = "scale(1)", 80);
@@ -433,7 +476,7 @@ document.addEventListener("DOMContentLoaded", () => {
     render();
   });
 
-  // combo decay (když neklikáš, spadne zpět)
+  // combo decay
   setInterval(() => {
     if(!lastClickAt) return;
     const idle = Date.now() - lastClickAt;
@@ -459,7 +502,6 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function startRandomEvent(){
-    // pokud už běží event, jen naplánuj další
     if(activeEvent && Date.now() < eventEndsAt){
       scheduleNextEvent();
       return;
@@ -468,16 +510,13 @@ document.addEventListener("DOMContentLoaded", () => {
     const pool = ["vodka", "raid", "market"];
     activeEvent = pool[Math.floor(Math.random() * pool.length)];
 
-    let dur = 15; // default vodka 15s
+    let dur = 15;
     if(activeEvent === "raid") dur = 10;
     if(activeEvent === "market") dur = 20;
 
     eventEndsAt = Date.now() + dur * 1000;
-
-    // aby se hned promítly slevy / multiplikátory do UI
     render();
 
-    // po skončení znovu naplánuj
     setTimeout(() => {
       if(Date.now() >= eventEndsAt){
         activeEvent = null;
@@ -489,7 +528,6 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // ===== init =====
-  // music toggle default
   const savedMusic = localStorage.getItem("musicEnabled");
   if(musicToggle){
     musicToggle.checked = (savedMusic !== "0");
@@ -499,18 +537,17 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // language init
   if(langSelect) langSelect.value = lang;
   applyLang(lang);
 
-  // load save
   loadGame();
   render();
 
-  // loading click starts music (allowed user gesture)
+  // LOADING click => start music + show main menu
   loading?.addEventListener("click", () => {
     if(musicToggle?.checked) applyMusicEnabled(true);
     loading.style.display = "none";
+    showMainMenu();
   }, { once:true });
 
   // start event loop
