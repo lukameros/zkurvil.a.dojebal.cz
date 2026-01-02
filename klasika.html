@@ -425,7 +425,7 @@ button.menuBtn:active {
 </head>
 <body>
 
-<button id="backBtn" onclick="goToMenu()">⬅ Zpět do menu</button>
+<button id="backBtn" onclick="goToMenu()">⬅ Zpět</button>
 
 <div id="playerStats">
     <div id="levelDisplay">
@@ -496,6 +496,22 @@ function updateCoinsDisplay() {
     document.getElementById('coinCount').textContent = playerCoins
 }
 
+async function goToMenu() {
+    try {
+        clearTimeout(dropTimeout);
+        isPaused = true;
+
+        if (typeof window.saveUserData === 'function') {
+            await window.saveUserData();
+        }
+    } catch (e) {
+        console.error('Chyba při ukládání před menu:', e);
+    }
+    window.location.href = 'tetris.html';
+}
+window.goToMenu = goToMenu;
+
+    
 async function goToMenu() {
     try {
         // pauzni loop, ať se nic nehýbe při odchodu
@@ -822,6 +838,11 @@ async function updateAfterGame(finalScore) {
     return earnedXP
 }
 
+if (typeof window.saveUserData === 'function') {
+    await window.saveUserData();
+}
+
+    
 // Barevná témata
 const themes = {
     classic: ['cyan', 'yellow', 'purple', 'green', 'red', 'blue', 'orange'],
@@ -1175,8 +1196,8 @@ document.addEventListener('keydown', e => {
     }
     
    if (e.key === 'Escape') {
-    goToMenu()
-    return
+    goToMenu(); // uloží a přepne
+    return;
 }
     
     if (isPaused) return
@@ -1277,6 +1298,7 @@ setTimeout(() => {
 </script>
 </body>
 </html>
+
 
 
 
