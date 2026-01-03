@@ -4,17 +4,9 @@
   <meta charset="utf-8">
   <title>Postava</title>
   <link rel="stylesheet" href="postava.css">
-
-<script>
-    if (sessionStorage.getItem("skipLoadingOnce") === "1") {
-      sessionStorage.removeItem("skipLoadingOnce");
-    } else {
-      window.location.replace("loading.html?next=postava.html");
-    }
-  </script>
 </head>
 <body>
-  
+<audio id="bgMusic" src="go.mp3" loop preload="auto"></audio>
 <div class="layout">
 
   <!-- LEVÝ PANEL - GOPNIK STYL -->
@@ -142,9 +134,28 @@
 </div>
 
 <script src="postava.js"></script>
+<script>
+const music = document.getElementById("bgMusic");
+
+if (localStorage.getItem("musicPlaying") === "true") {
+  music.currentTime = parseFloat(localStorage.getItem("musicTime")) || 0;
+  music.volume = 0.4;
+  music.play();
+}
+
+document.addEventListener("click", () => {
+  if (music.paused) {
+    music.play();
+    localStorage.setItem("musicPlaying", "true");
+  }
+}, { once: true });
+
+setInterval(() => {
+  if (!music.paused) {
+    localStorage.setItem("musicTime", music.currentTime);
+  }
+}, 500);
+</script>
 
 </body>
-
 </html>
-
-
