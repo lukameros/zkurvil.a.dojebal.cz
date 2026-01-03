@@ -1,0 +1,294 @@
+<!doctype html>
+<html lang="cs">
+<head>
+  <meta charset="utf-8">
+  <title>Shop</title>
+  <link rel="stylesheet" href="shop.css">
+</head>
+<body>
+
+<div class="layout">
+
+  <!-- LEVÉ PANEL - GOPNIK STYL -->
+  <aside class="left-panel">
+    
+    <!-- TOP: Avatar + Stats -->
+    <div class="menu-top">
+      <div class="avatar-box">
+        <img src="avatar.jpg" alt="avatar">
+        <div class="level-pill">
+          <div class="level-number">1</div>
+        </div>
+      </div>
+
+      <div class="currency-col">
+        <div class="currency-line">
+          <span class="cur-icon">₽</span>
+          <b id="money">3,170</b>
+        </div>
+        <div class="currency-line">
+          <span class="cur-icon">🚬</span>
+          <b id="cigarettes">42</b>
+        </div>
+      </div>
+    </div>
+
+    <!-- NAV BUTTONS - 10 TLAČÍTEK -->
+    <div class="menu-frame">
+      <a href="postava.html" class="sf-btn" data-icon="🏺">POSTAVA</a>
+      <a href="arena.html" class="sf-btn" data-icon="⚔️">ARENA</a>
+     <button class="sf-btn active" data-icon="🗡️">SHOP</button>
+      <button class="sf-btn" data-icon="🔮">MAGIC SHOP</button>
+      <button class="sf-btn" data-icon="🏴">STABLE</button>
+      
+      <div class="divider"></div>
+      
+      <button class="sf-btn" data-icon="👥">GUILD</button>
+      <button class="sf-btn" data-icon="✉️">MAIL</button>
+      <button class="sf-btn" data-icon="🏆">HALL OF FAME</button>
+      <button class="sf-btn" data-icon="🧙">DR. ABAWUWU</button>
+      
+      <a href="gopnik.html" class="sf-btn sf-btn--last" data-icon="🎮">SLAV CLICKER</a>
+    </div>
+
+    <!-- BOTTOM GEAR -->
+    <div class="menu-bottom">
+      <button class="gear-btn">⚙️</button>
+    </div>
+
+  </aside>
+
+  <!-- STŘED - SHOP -->
+  <main class="shop-area">
+
+    <!-- NÁZEV SHOPU -->
+    <div class="shop-title">⚔️ SHOP ⚔️</div>
+
+    <div class="shop-container">
+
+      <!-- LEVÁ ČÁST - SHOP -->
+      <div class="shop-section">
+        <div class="section-header">
+          <h2>🛒 OBCHOD</h2>
+          <div class="shop-tabs">
+            <button class="tab-btn active">Zbraně</button>
+            <button class="tab-btn">Brnění</button>
+            <button class="tab-btn">Lektvary</button>
+          </div>
+        </div>
+
+        <div class="shop-grid">
+
+          <div class="shop-item">
+            <div class="item-icon">
+              <img src="https://via.placeholder.com/60/C0C0C0/333?text=⚔️" alt="meč">
+            </div>
+            <div class="item-details">
+              <h3>Železný meč</h3>
+              <p class="item-desc">+15 Damage, +2 Síla</p>
+              <div class="item-price">
+                <span class="price">250₽</span>
+                <button class="buy-btn">Koupit</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="shop-item">
+            <div class="item-icon">
+              <img src="https://via.placeholder.com/60/FFD700/333?text=⚔️" alt="meč">
+            </div>
+            <div class="item-details">
+              <h3>Zlatý meč</h3>
+              <p class="item-desc">+35 Damage, +5 Síla</p>
+              <div class="item-price">
+                <span class="price">850₽</span>
+                <button class="buy-btn">Koupit</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="shop-item">
+            <div class="item-icon">
+              <img src="https://via.placeholder.com/60/8B0000/FFF?text=⚔️" alt="meč">
+            </div>
+            <div class="item-details">
+              <h3>Krvavý meč</h3>
+              <p class="item-desc">+60 Damage, +8 SÍL, Upír</p>
+              <div class="item-price">
+                <span class="price">1,500₽</span>
+                <button class="buy-btn disabled" disabled>Zamčeno</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="shop-item">
+            <div class="item-icon">
+              <img src="https://via.placeholder.com/60/4169E1/FFF?text=🗡️" alt="dýka">
+            </div>
+            <div class="item-details">
+              <h3>Rychlá dýka</h3>
+              <p class="item-desc">+10 DMG, +5 OBR, Rychlý útok</p>
+              <div class="item-price">
+                <span class="price">400₽</span>
+                <button class="buy-btn">Koupit</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="shop-item">
+            <div class="item-icon">
+              <img src="https://via.placeholder.com/60/8B4513/FFF?text=🪓" alt="sekera">
+            </div>
+            <div class="item-details">
+              <h3>Válečná sekera</h3>
+              <p class="item-desc">+25 DMG, +3 SÍL, Sekaná</p>
+              <div class="item-price">
+                <span class="price">600₽</span>
+                <button class="buy-btn">Koupit</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="shop-item">
+            <div class="item-icon">
+              <img src="https://via.placeholder.com/60/9400D3/FFF?text=🔮" alt="hůl">
+            </div>
+            <div class="item-details">
+              <h3>Kouzelná hůl</h3>
+              <p class="item-desc">+20 Magie DMG, +4 INT</p>
+              <div class="item-price">
+                <span class="price">950₽</span>
+                <button class="buy-btn">Koupit</button>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- PROSTŘEDNÍ ČÁST - INVENTÁŘ S AVATAREM -->
+      <div class="inventory-section">
+        
+        <!-- AVATAR S RÁMEM -->
+        <div class="inventory-avatar">
+          <div class="character-name-shop">BORIS GOPNIKOV</div>
+          
+          <div class="character-frame-shop">
+            <div class="slots-shop">
+              <div class="slot-shop">🗡️</div>
+              <div class="slot-shop">🛡️</div>
+              <div class="slot-shop">💍</div>
+              <div class="slot-shop">🎒</div>
+            </div>
+
+            <div class="character-shop">
+              <img src="avatar.jpg" alt="character">
+              <div class="level-shop">Level 1</div>
+            </div>
+
+            <div class="slots-shop">
+              <div class="slot-shop">🎩</div>
+              <div class="slot-shop">👕</div>
+              <div class="slot-shop">👢</div>
+              <div class="slot-shop">🧤</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- INVENTÁŘ -->
+        <div class="section-header">
+          <h2>🎒 INVENTÁŘ</h2>
+          <span class="item-count">12 / 24</span>
+        </div>
+
+        <div class="inventory-grid">
+          <div class="inv-slot filled" data-item="sword">
+            <img src="https://via.placeholder.com/50/8B4513/FFF?text=⚔️" alt="meč">
+            <div class="item-info">
+              <span class="item-name">Rezavý meč</span>
+              <span class="item-stats">+5 DMG</span>
+            </div>
+          </div>
+
+          <div class="inv-slot filled" data-item="shield">
+            <img src="https://via.placeholder.com/50/708090/FFF?text=🛡️" alt="štít">
+            <div class="item-info">
+              <span class="item-name">Dřevěný štít</span>
+              <span class="item-stats">+3 DEF</span>
+            </div>
+          </div>
+
+          <div class="inv-slot filled" data-item="potion">
+            <img src="https://via.placeholder.com/50/DC143C/FFF?text=🧪" alt="lektvar">
+            <div class="item-info">
+              <span class="item-name">Lektvar zdraví</span>
+              <span class="item-stats">+50 HP</span>
+            </div>
+          </div>
+
+          <div class="inv-slot filled" data-item="ring">
+            <img src="https://via.placeholder.com/50/FFD700/333?text=💍" alt="prsten">
+            <div class="item-info">
+              <span class="item-name">Prsten štěstí</span>
+              <span class="item-stats">+2 ŠTĚSTÍ</span>
+            </div>
+          </div>
+
+          <div class="inv-slot"></div>
+          <div class="inv-slot"></div>
+          <div class="inv-slot"></div>
+          <div class="inv-slot"></div>
+        </div>
+      </div>
+
+      <!-- PRAVÁ ČÁST - CHARACTER STATS -->
+      <div class="character-stats-section">
+        <div class="character-name-shop">ATRIBUTY</div>
+
+        <div class="stat">
+          <span>⚔️ Strength</span>
+          <b>18</b>
+          <button>+</button>
+        </div>
+
+        <div class="stat">
+          <span>🛡️ Defense</span>
+          <b>14</b>
+          <button>+</button>
+        </div>
+
+        <div class="stat">
+          <span>🎯 Dexterity</span>
+          <b>11</b>
+          <button>+</button>
+        </div>
+
+        <div class="stat">
+          <span>🧠 Intelligence</span>
+          <b>11</b>
+          <button>+</button>
+        </div>
+
+        <div class="stat">
+          <span>💪 Constitution</span>
+          <b>16</b>
+          <button>+</button>
+        </div>
+
+        <div class="stat">
+          <span>🍀 Luck</span>
+          <b>9</b>
+          <button>+</button>
+        </div>
+      </div>
+
+    </div>
+
+  </main>
+
+</div>
+
+<script src="shop.js"></script>
+
+</body>
+</html>

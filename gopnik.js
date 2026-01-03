@@ -1,5 +1,4 @@
 document.addEventListener("DOMContentLoaded", () => {
-  // ===== DOM refs =====
   const loading   = document.getElementById("loading");
   const bgMusic   = document.getElementById("bgMusic");
   const clickSnd  = document.getElementById("clickSnd");
@@ -10,18 +9,15 @@ document.addEventListener("DOMContentLoaded", () => {
   const musicToggle       = document.getElementById("musicToggle");
   const langSelect        = document.getElementById("langSelect");
 
-  // left panel
   const coinsEl     = document.getElementById("coins");
   const mushEl      = document.getElementById("mushrooms");
   const levelEl     = document.getElementById("sfLevel");
   const navSettings = document.getElementById("navSettings");
 
-  // shop buttons
   const btnCursor = document.getElementById("buyCursor");
   const btnGranny = document.getElementById("buyGranny");
   const btnClick  = document.getElementById("buyClick");
 
-  // right stats
   const moneyEl   = document.getElementById("money");
   const cpcEl     = document.getElementById("cpc");
   const cpsEl     = document.getElementById("cps");
@@ -33,34 +29,37 @@ document.addEventListener("DOMContentLoaded", () => {
   const gopnikImg = document.getElementById("gopnikImg");
   const gopnikBtn = document.getElementById("gopnik");
 
-  // prestige
   const spEl        = document.getElementById("sp");
   const bonusEl     = document.getElementById("bonus");
   const spGainEl    = document.getElementById("spGain");
   const btnPrestige = document.getElementById("btnPrestige");
 
-  // ===== constants =====
-  const CURSOR_COST  = 15;
-  const GRANNY_COST  = 100;
-  const CLICK_COST   = 50;
+  // ===== BALANCE (upraveno) =====
+  const CURSOR_COST  = 25;
+  const GRANNY_COST  = 150;
+  const CLICK_COST   = 80;
 
-  const PRESTIGE_MIN = 100000;
-  const SP_BONUS_PER_POINT = 0.02;
+  const CURSOR_GAIN_CPS = 0.2;
+  const GRANNY_GAIN_CPS = 2.0;
+  const CLICK_GAIN_CPC  = 1;
 
-  // Combo
-  const COMBO_WINDOW_MS = 900;
-  const COMBO_ADD = 0.06;
-  const COMBO_MAX = 3.00;
+  const PRESTIGE_MIN = 150000;          // později než dřív (aby to nebyl cheat)
+  const SP_BONUS_PER_POINT = 0.005;     // 0.5% za bod (dřív 2%)
+
+  // Combo (mírnější)
+  const COMBO_WINDOW_MS = 850;
+  const COMBO_ADD = 0.04;
+  const COMBO_MAX = 2.20;
 
   // Crit
   const CRIT_CHANCE = 0.10;
-  const CRIT_MULT   = 3.0;
+  const CRIT_MULT   = 2.5;              // mírnější než 3x
 
   // Events
   const EVENT_MIN_MS = 45000;
   const EVENT_MAX_MS = 90000;
 
-  // ===== i18n (min) =====
+  // ===== i18n =====
   const i18n = {
     cs: {
       settingsTitle: "Nastavení",
@@ -134,7 +133,6 @@ document.addEventListener("DOMContentLoaded", () => {
       bgMusic.currentTime = 0;
     }
   }
-
   function openSettings(){
     if(!settingsModal) return;
     settingsModal.classList.add("show");
@@ -146,17 +144,14 @@ document.addEventListener("DOMContentLoaded", () => {
     settingsModal.classList.remove("show");
     settingsModal.setAttribute("aria-hidden","true");
   }
-
   btnSettings?.addEventListener("click", openSettings);
   navSettings?.addEventListener("click", openSettings);
   btnCloseSettings?.addEventListener("click", closeSettings);
-  settingsModal?.addEventListener("click", (e) => {
-    if(e.target === settingsModal) closeSettings();
-  });
+  settingsModal?.addEventListener("click", (e) => { if(e.target === settingsModal) closeSettings(); });
 
   // ===== game state =====
-  let money = 0, cpc = 1, cps = 0; // money = coins
-  let mushrooms = 0;              // druhá měna (zatím 0)
+  let money = 0, cpc = 1, cps = 0;
+  let mushrooms = 0;
   let slavPoints = 0;
 
   let combo = 1.0;
@@ -178,16 +173,16 @@ document.addEventListener("DOMContentLoaded", () => {
     return activeEvent === name && Date.now() < eventEndsAt;
   }
   function clickEventMultiplier(){
-    if(isEventActive("vodka")) return 1.5;
-    if(isEventActive("raid")) return 2.0;
+    if(isEventActive("vodka")) return 1.25;
+    if(isEventActive("raid")) return 1.6;
     return 1.0;
   }
   function cpsEventMultiplier(){
-    if(isEventActive("raid")) return 0.5;
+    if(isEventActive("raid")) return 0.75;
     return 1.0;
   }
   function shopDiscountMultiplier(){
-    if(isEventActive("market")) return 0.70;
+    if(isEventActive("market")) return 0.80;
     return 1.0;
   }
   function effectiveCost(base){
@@ -196,13 +191,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // save/load
   function getSave(){
-    return {
-      version: 3,
-      money, cpc, cps,
-      mushrooms,
-      slavPoints,
-      updatedAt: Date.now()
-    };
+    return { version: 4, money, cpc, cps, mushrooms, slavPoints, updatedAt: Date.now() };
   }
   function applySave(d){
     money = d?.money ?? 0;
@@ -211,9 +200,7 @@ document.addEventListener("DOMContentLoaded", () => {
     mushrooms = d?.mushrooms ?? 0;
     slavPoints = d?.slavPoints ?? 0;
   }
-  function saveGame(){
-    localStorage.setItem("slavClickerSave", JSON.stringify(getSave()));
-  }
+  function saveGame(){ localStorage.setItem("slavClickerSave", JSON.stringify(getSave())); }
   function loadGame(){
     const s = localStorage.getItem("slavClickerSave");
     if(!s) return;
@@ -284,9 +271,9 @@ document.addEventListener("DOMContentLoaded", () => {
     const prestigeMult = totalPrestigeMultiplier();
     const cpsMult = prestigeMult * cpsEventMultiplier();
 
-    // right panel
     if(moneyEl) moneyEl.textContent = Math.floor(money);
 
+    // effective click (ale zobrazujeme i base)
     const effClick = cpc * prestigeMult * combo * clickEventMultiplier();
     if(cpcEl) cpcEl.textContent = `${cpc} (≈ ${Math.floor(effClick)})`;
 
@@ -357,25 +344,25 @@ document.addEventListener("DOMContentLoaded", () => {
     const cost = effectiveCost(CURSOR_COST);
     if(money < cost) return;
     money -= cost;
-    cps += 0.1;
+    cps += CURSOR_GAIN_CPS;
     render();
   });
   btnGranny?.addEventListener("click", () => {
     const cost = effectiveCost(GRANNY_COST);
     if(money < cost) return;
     money -= cost;
-    cps += 1;
+    cps += GRANNY_GAIN_CPS;
     render();
   });
   btnClick?.addEventListener("click", () => {
     const cost = effectiveCost(CLICK_COST);
     if(money < cost) return;
     money -= cost;
-    cpc += 1;
+    cpc += CLICK_GAIN_CPC;
     render();
   });
 
-  // click (✅ jen A ↔ B, žádný gopnik_C)
+  // click anim (A ↔ B)
   const imgs = ["gopnik_A.png", "gopnik_B.png"];
   let imgIndex = 0;
 
@@ -399,13 +386,15 @@ document.addEventListener("DOMContentLoaded", () => {
     updateComboOnClick();
 
     const prestigeMult = totalPrestigeMultiplier();
-    let gain = cpc * prestigeMult * combo * clickEventMultiplier();
+
+    // ✅ hlavní oprava: žádný mikro zisk, základ je aspoň 1+
+    let gain = Math.max(1, Math.floor(cpc * prestigeMult * combo * clickEventMultiplier()));
 
     if(rollCrit()){
-      gain *= CRIT_MULT;
+      gain = Math.floor(gain * CRIT_MULT);
       if(eventLine){
-        eventLine.textContent = `💥 CRIT! +${Math.floor(gain)}`;
-        setTimeout(() => renderEventLine(), 900);
+        eventLine.textContent = `💥 KRIT! +${gain}`;
+        setTimeout(() => renderEventLine(), 800);
       }
     }
 
@@ -455,9 +444,9 @@ document.addEventListener("DOMContentLoaded", () => {
     const pool = ["vodka", "raid", "market"];
     activeEvent = pool[Math.floor(Math.random() * pool.length)];
 
-    let dur = 15;
+    let dur = 14;
     if(activeEvent === "raid") dur = 10;
-    if(activeEvent === "market") dur = 20;
+    if(activeEvent === "market") dur = 18;
 
     eventEndsAt = Date.now() + dur * 1000;
     render();

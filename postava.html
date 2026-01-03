@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="cs">
+<head>
+  <meta charset="utf-8">
+  <title>Postava</title>
+  <link rel="stylesheet" href="postava.css">
+</head>
+<body>
+
+<div class="layout">
+
+  <!-- LEVÝ PANEL - GOPNIK STYL -->
+  <aside class="left-panel">
+    
+    <!-- TOP: Avatar + Stats -->
+    <div class="menu-top">
+      <div class="avatar-box">
+        <img src="avatar.jpg" alt="avatar">
+        <div class="level-pill">
+          <div class="level-number">1</div>
+        </div>
+      </div>
+
+      <div class="currency-col">
+        <div class="currency-line">
+          <span class="cur-icon">₽</span>
+          <b id="money">3,170</b>
+        </div>
+        <div class="currency-line">
+          <span class="cur-icon">🚬</span>
+          <b id="cigarettes">42</b>
+        </div>
+      </div>
+    </div>
+
+    <!-- NAV BUTTONS - 10 TLAČÍTEK -->
+    <div class="menu-frame">
+      <button class="sf-btn active" data-icon="🍺">POSTAVA</button>
+      <a href="arena.html" class="sf-btn" data-icon="⚔️">ARENA</a>
+      <a href="shop.html" class="sf-btn" data-icon="🗡️">SHOP</a>
+      <button class="sf-btn" data-icon="🔮">MAGIC SHOP</button>
+      <button class="sf-btn" data-icon="🐴">STABLE</button>
+      
+      <div class="divider"></div>
+      
+      <button class="sf-btn" data-icon="👥">GUILD</button>
+      <button class="sf-btn" data-icon="✉️">MAIL</button>
+      <button class="sf-btn" data-icon="🏆">HALL OF FAME</button>
+      <button class="sf-btn" data-icon="🧙">DR. ABAWUWU</button>
+      
+      <a href="gopnik.html" class="sf-btn sf-btn--last" data-icon="🎮">SLAV CLICKER</a>
+    </div>
+
+    <!-- BOTTOM GEAR -->
+    <div class="menu-bottom">
+      <button class="gear-btn">⚙️</button>
+    </div>
+
+  </aside>
+
+  <!-- STŘED - POSTAVA -->
+  <main class="character-area">
+
+    <!-- JMÉNO POSTAVY -->
+    <div class="character-name">BORIS GOPNIKOV</div>
+
+    <!-- POSTAVA + SLOTY -->
+    <div class="character-frame">
+
+      <div class="slots">
+        <div class="slot">🗡️</div>
+        <div class="slot">🛡️</div>
+        <div class="slot">💍</div>
+        <div class="slot">🎒</div>
+      </div>
+
+      <div class="character">
+        <img src="avatar.jpg" alt="character">
+        <div class="level">Level 1</div>
+      </div>
+
+      <div class="slots">
+        <div class="slot">🎩</div>
+        <div class="slot">👕</div>
+        <div class="slot">👢</div>
+        <div class="slot">🧤</div>
+      </div>
+
+    </div>
+
+    <!-- ATRIBUTY -->
+    <div class="stats-frame">
+
+      <div class="stat">
+        <span>⚔️ Strength</span>
+        <b>18</b>
+        <button>+</button>
+      </div>
+
+      <div class="stat">
+        <span>🛡️ Defense</span>
+        <b>14</b>
+        <button>+</button>
+      </div>
+
+      <div class="stat">
+        <span>🎯 Dexterity</span>
+        <b>11</b>
+        <button>+</button>
+      </div>
+
+      <div class="stat">
+        <span>🧠 Intelligence</span>
+        <b>11</b>
+        <button>+</button>
+      </div>
+
+      <div class="stat">
+        <span>💪 Constitution</span>
+        <b>16</b>
+        <button>+</button>
+      </div>
+
+      <div class="stat">
+        <span>🍀 Luck</span>
+        <b>9</b>
+        <button>+</button>
+      </div>
+
+    </div>
+
+  </main>
+
+</div>
+
+<script src="postava.js"></script>
+
+</body>
+</html>

@@ -6,33 +6,104 @@ html, body{
   width:100%;
   height:100%;
   font-family: system-ui, sans-serif;
-  background-color:#1b1b1b;
+  background:#1b1b1b;
   overflow:hidden;
 }
 
-/* background */
+:root{
+  --pageBg: url("background.jpg");
+
+  /* ===== LEVÝ PANEL ===== */
+  --menuBg: url("panel_bg.jpg");
+  --menuBgFallback: linear-gradient(165deg, #2d1810 0%, #1a0f08 100%);
+  --menuBorder: rgba(255, 215, 100, 0.3);
+  --menuBorderWidth: 3px;
+  --menuShadow: 0 25px 60px rgba(0, 0, 0, 0.7);
+  --menuRadius: 16px;
+  --menuPadding: 10px;
+  --menuGap: 8px;
+  
+  /* horní box */
+  --moneyHudBg: url("pozadi_penez.jpg");
+  --moneyHudFallback: linear-gradient(135deg, rgba(60,40,25,0.95), rgba(35,22,14,0.98));
+  --moneyHudBorder: rgba(0,0,0,.3);
+  --moneyHudRadius: 14px;
+  --moneyHudShadow: inset 0 3px 15px rgba(0,0,0,.3), 0 2px 8px rgba(0,0,0,.2);
+  --moneyHudPadding: 10px;
+  
+  /* tlačítka navigace */
+  --navBtnHeight: 42px;
+  --navBtnRadius: 13px;
+  --navBtnColor: #ffffff;
+  --navBtnShadow: 0 4px 15px rgba(0,0,0,.4);
+  --navBtnSpacing: 4px;
+  --navBtnFontSize: 12px;
+  --navBtnLetterSpacing: 0.6px;
+  
+  /* avatar */
+  --avatarSize: 100px;
+  --avatarBorder: rgba(0,0,0,.3);
+  --avatarBorderWidth: 3px;
+  --avatarRadius: 12px;
+  --avatarShadow: 0 4px 12px rgba(0,0,0,.3);
+  
+  /* currency lines */
+  --currencyBg: rgba(255, 255, 255, 0.2);
+  --currencyBorder: rgba(0, 0, 0, 0.15);
+  --currencyRadius: 11px;
+  --currencyColor: #ffffff;
+  --currencyShadow: 0 3px 10px rgba(0,0,0,.2);
+  --currencyPadding: 6px 10px;
+  --currencyFontSize: 15px;
+  
+  /* level pill */
+  --levelBg: linear-gradient(180deg, rgba(30,160,60,.96), rgba(10,110,40,.96));
+  --levelColor: #eaffff;
+  --levelBorder: rgba(0,0,0,.4);
+  --levelRadius: 8px;
+  --levelShadow: 0 3px 8px rgba(0,0,0,.4);
+  
+  /* divider */
+  --dividerColor: rgba(255,255,255,.22);
+  --dividerHeight: 1px;
+  --dividerMargin: 6px 0;
+
+  /* PRAVÝ PANEL */
+  --panelBg: url("panel_bg.jpg");
+  
+  /* Nadpisy */
+  --titleMoneyBg: none;
+  --titleShopBg: none;
+  --titlePrestigeBg: none;
+  
+  /* Položky */
+  --itemCursorBg: none;
+  --itemGrannyBg: none;
+  --itemClickBg: none;
+  
+  /* Boxy */
+  --statBoxBg: none;
+  --hudBoxBg: none;
+  --prestigeBoxBg: none;
+
+  /* posun panáka */
+  --gopnik-x: 10px;
+  --gopnik-y: 210px;
+}
+
 body{
-  background-image:url("background.jpg");
+  background-image:var(--pageBg);
   background-repeat:no-repeat;
   background-position:center top;
   background-size:cover;
   background-attachment:fixed;
 }
 
-/* gopnik position */
-:root{
-  --gopnik-x: 160px;
-  --gopnik-y: 190px;
-}
-
 /* ===== LOADING ===== */
 #loading{
-  position:fixed;
-  inset:0;
-  background-image:url("background.jpg");
-  background-repeat:no-repeat;
-  background-position:center top;
-  background-size:cover;
+  position:fixed; inset:0;
+  background-image:var(--pageBg);
+  background-repeat:no-repeat; background-position:center top; background-size:cover;
   z-index:9999;
   display:grid;
   place-items:center;
@@ -40,33 +111,18 @@ body{
 }
 #loading::before{
   content:"";
-  position:absolute;
-  inset:0;
+  position:absolute; inset:0;
   background:rgba(0,0,0,.55);
   backdrop-filter: blur(2px);
 }
-#loading .loader{
-  position:relative;
-  text-align:center;
-  color:#fff;
-  z-index:1;
-}
-#loading .title{
-  font-size:46px;
-  font-weight:900;
-  letter-spacing:2px;
-  text-shadow:0 6px 20px rgba(0,0,0,.8);
-}
-#loading .hint{
-  margin-top:14px;
-  font-size:18px;
-  opacity:.85;
-}
+#loading .loader{ position:relative; text-align:center; color:#fff; z-index:1; }
+#loading .title{ font-size:46px; font-weight:900; letter-spacing:2px; text-shadow:0 6px 20px rgba(0,0,0,.8); }
+#loading .hint{ margin-top:14px; font-size:18px; opacity:.85; }
 
 /* ===== layout ===== */
 .wrap{
   display:grid;
-  grid-template-columns: 250px 1fr 360px;
+  grid-template-columns: 220px 1fr 360px;
   gap:22px;
   padding:16px;
   height:100vh;
@@ -75,248 +131,375 @@ body{
 }
 .leftcol{ position:relative; height:100%; }
 
-/* ===== LEFT S&F PANEL ===== */
+/* ===== LEVÝ PANEL - STEJNÉ JAKO SHOP ===== */
 .sfSide{
-  border-radius:14px;
+  border-radius: var(--menuRadius);
   overflow:hidden;
 
-  background: linear-gradient(180deg, rgba(20,70,92,.92), rgba(8,28,38,.92));
-  border: 3px solid rgba(190,150,55,.95);
+  background-image: var(--menuBg);
+  background-size: cover;
+  background-position: center;
+  background-repeat:no-repeat;
+  background-color: var(--menuBgFallback);
 
-  box-shadow:
-    0 20px 50px rgba(0,0,0,.55),
-    inset 0 0 0 2px rgba(35,18,8,.65);
+  border: var(--menuBorderWidth) solid var(--menuBorder);
+  box-shadow: var(--menuShadow);
 
   display:flex;
   flex-direction:column;
-  padding:10px;
+  padding: var(--menuPadding);
+  gap: var(--menuGap);
+  
+  transition: all 0.3s ease;
 }
 
-/* top header area */
+/* top header - jako shop */
 .sfTop{
-  display:grid;
-  grid-template-columns: 64px 1fr;
-  gap:10px;
-  align-items:center;
+  display:flex;
+  flex-direction:column;
+  gap:8px;
 
-  padding:6px;
-  border-radius:10px;
-  border:2px solid rgba(190,150,55,.55);
-  background: rgba(0,0,0,.18);
-  box-shadow: inset 0 0 12px rgba(0,0,0,.25);
+  padding: var(--moneyHudPadding);
+  border-radius: var(--moneyHudRadius);
+
+  background-image: url('tlacitko.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat:no-repeat;
+
+  border:2px solid var(--moneyHudBorder);
+  box-shadow: var(--moneyHudShadow);
+  image-rendering: -webkit-optimize-contrast;
+  image-rendering: crisp-edges;
+  position: relative;
+}
+
+/* PLUS TLAČÍTKO V ROHU BOXU (STEJNÉ JAKO SHOP) */
+.sfTop::after {
+  content: '+';
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 28px;
+  height: 28px;
+  background: rgba(0,0,0,0.4);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  font-weight: 900;
+  color: rgba(255,255,255,0.8);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 6px rgba(0,0,0,.3);
 }
 
 .sfAvatarBox{
   position:relative;
-  width:64px;
-  height:64px;
-  border-radius:10px;
+  width: var(--avatarSize); 
+  height: var(--avatarSize);
+  border-radius: var(--avatarRadius);
   overflow:hidden;
-  border:2px solid rgba(190,150,55,.75);
-  background: rgba(0,0,0,.25);
-  box-shadow: inset 0 0 10px rgba(0,0,0,.35);
+  border: var(--avatarBorderWidth) solid var(--avatarBorder);
+  background: rgba(0,0,0,.2);
+  box-shadow: var(--avatarShadow);
+  margin: 0 auto;
 }
-.sfAvatar{
-  width:100%;
-  height:100%;
-  object-fit:cover;
-  display:block;
+.sfAvatar{ 
+  width:100%; 
+  height:100%; 
+  object-fit:cover; 
+  display:block; 
 }
-.sfAvatarFallback{
-  width:100%;
-  height:100%;
-  display:grid;
-  place-items:center;
-  font-size:30px;
-  color:#fff;
-  background: rgba(0,0,0,.35);
+.sfAvatarFallback{ 
+  width:100%; 
+  height:100%; 
+  display:grid; 
+  place-items:center; 
+  font-size:40px; 
+  color:#fff; 
+  background: rgba(0,0,0,.3); 
 }
 
+/* LEVEL PILL - MALÝ ZELENÝ ČTVEREČEK */
 .sfLevelPill{
   position:absolute;
-  left:6px;
-  bottom:6px;
-  min-width:28px;
-  padding:2px 7px;
-  border-radius:10px;
-  font-weight:1000;
-  color:#eaffff;
-  font-size:12px;
-  background: linear-gradient(180deg, rgba(30,160,60,.95), rgba(10,110,40,.95));
-  border:1px solid rgba(0,0,0,.35);
-  box-shadow: 0 6px 14px rgba(0,0,0,.35);
+  right:4px; 
+  bottom:4px;
+  padding:4px 6px;
+  border-radius:4px;
+  font-weight:900;
+  color: var(--levelColor);
+  background: var(--levelBg);
+  border:1px solid var(--levelBorder);
+  box-shadow: var(--levelShadow);
+  text-align:center;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  line-height:1;
+  min-width:24px;
+  font-size:14px;
 }
 
 .sfCurrencyCol{
-  display:grid;
-  grid-template-columns: 1fr 36px;
-  grid-template-rows: auto auto;
-  gap:6px 8px;
-  align-items:center;
+  display:flex;
+  flex-direction:column;
+  gap:6px;
 }
+
 .sfCurrencyLine{
   display:flex;
   align-items:center;
-  gap:8px;
-  padding:6px 8px;
-  border-radius:10px;
-
-  background: rgba(0,0,0,.18);
-  border:1px solid rgba(255,255,255,.08);
-  box-shadow: inset 0 0 10px rgba(0,0,0,.25);
-
-  color:#e9f2ff;
-  font-weight:1000;
+  gap:10px;
+  padding: var(--currencyPadding);
+  border-radius: var(--currencyRadius);
+  background: var(--currencyBg);
+  border:1px solid var(--currencyBorder);
+  color: var(--currencyColor);
+  font-weight:900;
+  font-size: var(--currencyFontSize);
+  box-shadow: var(--currencyShadow);
+  transition: all 0.2s ease;
+}
+.sfCurrencyLine:hover{
+  background: rgba(255, 255, 255, 0.25);
+  transform: translateY(-1px);
 }
 .sfCurrencyLine b{
   margin-left:auto;
-  color:#ffffff;
-  text-shadow: 0 2px 0 rgba(0,0,0,.35);
+  margin-right:4px;
+  font-variant-numeric: tabular-nums;
+}
+.sfCurIcon{
+  width:28px;
+  display:inline-block;
+  text-align:center;
+  font-size:22px;
+  line-height:1;
+  filter: drop-shadow(0 2px 0 rgba(0,0,0,.3));
 }
 
-/* simple CSS “icons” */
-.sfCoinIcon{
-  width:18px; height:18px; border-radius:999px;
-  background: radial-gradient(circle at 30% 30%, #fff4a6, #d4a600);
-  border:1px solid rgba(0,0,0,.35);
-  box-shadow: 0 2px 0 rgba(0,0,0,.25);
-}
-.sfMushIcon{
-  width:18px; height:18px; border-radius:6px;
-  background: radial-gradient(circle at 40% 30%, #ffb4b4, #b02525);
-  border:1px solid rgba(0,0,0,.35);
-  box-shadow: 0 2px 0 rgba(0,0,0,.25);
-}
-
-.sfPlusBtn{
-  grid-column:2;
-  grid-row:1 / span 2;
-  width:36px;
-  height:36px;
-  border-radius:10px;
-  cursor:pointer;
-
-  font-weight:1100;
-  font-size:18px;
+/* obecný skin pro tlačítka */
+.skinBtn{
+  background-color:transparent;
+  background-repeat:no-repeat;
+  background-position:center;
+  background-size:100% 100%;
+  border:0;
   color:#fff;
-
-  border:2px solid rgba(190,150,55,.75);
-  background: linear-gradient(180deg, rgba(45,115,150,.95), rgba(15,45,70,.95));
-  box-shadow:
-    0 10px 22px rgba(0,0,0,.45),
-    inset 0 2px 0 rgba(255,255,255,.18),
-    inset 0 -3px 0 rgba(0,0,0,.35);
+  font-weight:900;
+  cursor:pointer;
+  transition: all 0.15s ease;
+  image-rendering: -webkit-optimize-contrast;
+  image-rendering: crisp-edges;
 }
-.sfPlusBtn:hover{ filter: brightness(1.08); }
-.sfPlusBtn:active{ transform: translateY(2px); }
+
+/* plus button - menší */
+.sfPlusBtn{
+  width:100%;
+  height:38px;
+  border-radius:12px;
+  background: rgba(0,0,0,.3);
+  box-shadow: 0 4px 12px rgba(0,0,0,.3), inset 0 2px 0 rgba(255,255,255,.15);
+  font-size: 18px;
+  transition: all 0.15s ease;
+}
+.sfPlusBtn:hover{
+  background: rgba(0,0,0,.4);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0,0,0,.4);
+}
+.sfPlusBtn:active{ 
+  transform: translateY(1px);
+  box-shadow: 0 2px 8px rgba(0,0,0,.3);
+}
 
 /* nav list */
 .sfNav{
-  margin-top:10px;
+  margin-top:2px;
   padding:4px 2px;
   flex:1;
-  overflow:auto;
+  overflow-y:auto;
+  overflow-x:hidden;
 }
 
+.sfNav::-webkit-scrollbar{
+  width:8px;
+}
+.sfNav::-webkit-scrollbar-track{
+  background: rgba(0,0,0,.2);
+  border-radius:10px;
+}
+.sfNav::-webkit-scrollbar-thumb{
+  background: rgba(255,255,255,.3);
+  border-radius:10px;
+}
+.sfNav::-webkit-scrollbar-thumb:hover{
+  background: rgba(255,255,255,.4);
+}
+
+/* Tlačítka navigace - STEJNÉ JAKO SHOP */
 .sfNavBtn{
   width:100%;
   text-align:left;
-  padding:10px 12px;
-  margin:8px 0;
+  padding:0 14px;
+  margin: var(--navBtnSpacing) 0;
 
-  border-radius:10px;
+  height: var(--navBtnHeight);
+  display:flex;
+  align-items:center;
+  gap:12px;
+
+  border-radius: var(--navBtnRadius);
+  border:0;
   cursor:pointer;
-  font-weight:1100;
-  letter-spacing:.6px;
-  color:#f3e7c4;
 
-  border:2px solid rgba(190,150,55,.85);
-  background: linear-gradient(180deg, rgba(35,105,140,.95), rgba(12,35,52,.95));
-  box-shadow:
-    0 12px 22px rgba(0,0,0,.45),
-    inset 0 2px 0 rgba(255,255,255,.18),
-    inset 0 -4px 0 rgba(0,0,0,.35);
+  font-weight:900;
+  font-size: var(--navBtnFontSize);
+  letter-spacing: var(--navBtnLetterSpacing);
+  color: var(--navBtnColor);
+  text-transform:uppercase;
+  text-shadow: 0 2px 4px rgba(0,0,0,.5);
 
-  transition: transform .08s ease, filter .12s ease, box-shadow .12s ease;
+  background-repeat:no-repeat;
+  background-position:center;
+  background-size: 100% 100%;
+  
+  box-shadow: var(--navBtnShadow);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+  text-decoration:none;
+  
+  image-rendering: -webkit-optimize-contrast;
+  image-rendering: crisp-edges;
 }
-.sfNavBtn:hover{
-  filter: brightness(1.12);
-  box-shadow:
-    0 14px 28px rgba(0,0,0,.55),
-    0 0 16px rgba(255,206,90,.16),
-    inset 0 2px 0 rgba(255,255,255,.20),
-    inset 0 -4px 0 rgba(0,0,0,.35);
+
+/* Ikonky před tlačítky */
+.sfNavBtn::before{
+  content: attr(data-icon);
+  font-size: 20px;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  background: rgba(0,0,0,0.2);
+  border-radius: 8px;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
 }
-.sfNavBtn:active{
-  transform: translateY(2px);
-  box-shadow:
-    0 8px 18px rgba(0,0,0,.55),
-    inset 0 1px 0 rgba(255,255,255,.14),
-    inset 0 -2px 0 rgba(0,0,0,.35);
+
+.sfNavBtn:hover{ 
+  filter: brightness(1.1);
+  transform: translateX(4px);
+  box-shadow: 0 6px 20px rgba(0,0,0,.5);
+}
+
+.sfNavBtn:active{ 
+  transform: translateY(2px) translateX(4px);
+  filter: brightness(0.9);
+  box-shadow: 0 2px 10px rgba(0,0,0,.4);
+}
+
+.sfNavBtn.active{
+  filter: brightness(1.2);
+  border: 2px solid rgba(255,215,0,0.6);
 }
 
 .sfDivider{
-  height:2px;
-  margin:10px 0;
-  background: rgba(190,150,55,.35);
+  height: var(--dividerHeight);
+  margin: var(--dividerMargin);
+  background: var(--dividerColor);
   border-radius:999px;
+  box-shadow: 0 1px 3px rgba(0,0,0,.2);
 }
 
-/* last button */
 .sfNavBtn--last{
-  margin-top:12px;
   text-align:center;
-  letter-spacing:1px;
-  background: linear-gradient(180deg, rgba(25,85,115,.95), rgba(8,26,38,.95));
+  justify-content:center;
+  background-image:url("tlacitko.jpg") !important;
+  border: 2px solid rgba(255,215,0,0.3);
+}
+
+.sfNavBtn--last:hover{
+  background-image:url("tlacitko.jpg") !important;
+  filter: brightness(1.15);
+  border-color: rgba(255,215,0,0.5);
 }
 
 /* bottom gear */
 .sfBottom{
   display:flex;
   justify-content:flex-start;
-  padding-top:8px;
-  border-top:2px solid rgba(190,150,55,.18);
+  padding-top:10px;
+  border-top:2px solid rgba(255,255,255,.15);
+  box-shadow: 0 -1px 3px rgba(0,0,0,.1);
 }
 .sfGearBtn{
-  width:44px;
-  height:44px;
-  border-radius:12px;
+  width:48px; 
+  height:48px;
+  border-radius:13px;
+  border:0;
+  background: rgba(0,0,0,.3);
+  box-shadow: 0 4px 12px rgba(0,0,0,.3), inset 0 2px 0 rgba(255,255,255,.15);
+  font-size: 20px;
   cursor:pointer;
-  font-weight:900;
-  color:#fff;
-
-  border:2px solid rgba(190,150,55,.85);
-  background: linear-gradient(180deg, rgba(40,70,90,.9), rgba(12,30,44,.9));
-  box-shadow:
-    0 10px 22px rgba(0,0,0,.45),
-    inset 0 2px 0 rgba(255,255,255,.18),
-    inset 0 -3px 0 rgba(0,0,0,.35);
+  transition: all 0.15s ease;
 }
-.sfGearBtn:hover{ filter: brightness(1.08); }
-.sfGearBtn:active{ transform: translateY(2px); }
+.sfGearBtn:hover{
+  background: rgba(0,0,0,.4);
+  transform: translateY(-2px) rotate(45deg);
+  box-shadow: 0 6px 16px rgba(0,0,0,.4);
+}
+.sfGearBtn:active{ 
+  transform: translateY(1px) rotate(90deg);
+  box-shadow: 0 2px 8px rgba(0,0,0,.3);
+}
+
+/* ===== MAPOVÁNÍ LEVÝCH TLAČÍTEK ===== */
+.sfNav > :nth-child(1){  background-image:url("tlacitko1.jpg"); }
+.sfNav > :nth-child(2){  background-image:url("tlacitko2.jpg"); }
+.sfNav > :nth-child(3){  background-image:url("tlacitko3.jpg"); }
+.sfNav > :nth-child(4){  background-image:url("tlacitko4.jpg"); }
+.sfNav > :nth-child(5){  background-image:url("tlacitko5.jpg"); }
+.sfNav > :nth-child(7){  background-image:url("tlacitko6.jpg"); }
+.sfNav > :nth-child(8){  background-image:url("tlacitko7.jpg"); }
+.sfNav > :nth-child(9){  background-image:url("tlacitko8.jpg"); }
+.sfNav > :nth-child(10){ background-image:url("tlacitko9.jpg"); }
+.sfNav > :nth-child(11){ background-image:url("tlacitko10.jpg"); }
 
 /* ===== gopnik click ===== */
 .ring{
-  width:min(420px,70vw);
+  width:min(350px,60vw);
   aspect-ratio:1/1;
-  border-radius:999px;
+  border-radius:0;
   border:none;
-  box-shadow:0 25px 60px rgba(0,0,0,.6);
+  box-shadow:none;
   display:grid;
   place-items:center;
   cursor:pointer;
-  overflow:hidden;
+  overflow:visible;
+  background:transparent;
 
   position:absolute;
   left:50%;
   top:50%;
   transform: translate(-50%,-50%) translate(var(--gopnik-x), var(--gopnik-y));
   z-index:5;
+  transition: transform 0.1s ease;
 }
-.ring, .ring *{
-  -webkit-tap-highlight-color:transparent !important;
-  user-select:none !important;
+
+.ring:hover{
+  transform: translate(-50%,-50%) translate(var(--gopnik-x), var(--gopnik-y)) scale(1.02);
 }
+
+.ring:active{
+  transform: translate(-50%,-50%) translate(var(--gopnik-x), var(--gopnik-y)) scale(0.98);
+}
+
 #gopnikImg{
   width:100%;
   height:100%;
@@ -327,131 +510,242 @@ body{
   transition:transform 80ms ease;
 }
 
-/* ===== RIGHT PANEL (ponecháno) ===== */
+/* ===== RIGHT PANEL ===== */
 .panel{
   position: relative;
-  padding: 22px;
+  padding: 12px;
   border-radius: 16px;
   overflow: hidden;
 
-  background-image: url("rug_panel.png");
+  background-image: var(--panelBg);
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
 
-  border: 10px solid #7a1f1f;
-  box-shadow:
-    inset 0 0 0 4px #e6c88f,
-    0 20px 40px rgba(0,0,0,.55);
+  border: 3px solid rgba(0,0,0,.35);
+  box-shadow: 0 20px 40px rgba(0,0,0,.55);
 
-  isolation: isolate;
   color: #2b1a0f;
   z-index:10;
 
   max-height: calc(100vh - 32px);
   overflow:auto;
 }
-.panel::before{
-  content:"";
-  position:absolute;
-  inset: 14px;
-  background: rgba(255, 248, 230, 0.96);
-  border-radius: 12px;
-  z-index:0;
-  pointer-events:none;
-}
-.panel > *{ position:relative; z-index:1; }
 
-.panelTop{
-  display:flex;
-  justify-content:flex-end;
-  margin-bottom:8px;
-}
+.panel::before{ content:none; }
+
+/* SKRYTÍ TLAČÍTKA SETTINGS */
+.panelTop{ display:none; }
 
 .panel h2{
-  margin: 0 0 10px;
-  color: #3b1c0b;
-  text-shadow: 0 1px 0 rgba(255,255,255,.6);
-  background: rgba(255,255,255,.55);
+  margin: 0 0 6px;
+  color: #2b1a0f;
+  background: rgba(255,255,255,.65);
   display:inline-block;
-  padding:4px 10px;
+  padding:3px 8px;
   border-radius:8px;
   letter-spacing:.6px;
+  font-size: 16px;
+  
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: center;
+  min-height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
+#t_moneyTitle { background-image: var(--titleMoneyBg); }
+#t_shopTitle { background-image: var(--titleShopBg); }
+#t_prestigeTitle { background-image: var(--titlePrestigeBg); }
+
+.panel h2[style*="background-image: url"] { color: transparent; }
+
+/* SPOLEČNÁ TEXTURA PRO PENÍZE A OBCHOD */
 .stat{
   display:flex;
   justify-content:space-between;
-  margin:6px 0;
-  color:#3b1c0b;
-  font-weight:600;
+  margin:4px 0;
+  color:#2b1a0f;
+  font-weight:800;
+  font-size: 14px;
+  padding: 8px;
+  border-radius: 10px;
+  border: 2px solid rgba(0,0,0,.15);
+  background-image: url("pozadi_menu.jpg");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-color: rgba(255,255,255,.65);
+  background-blend-mode: lighten;
 }
-.stat b{
-  color:#2a130b;
-  font-weight:900;
-}
+.stat b{ font-weight:1000; }
 
 .item{
-  background: rgba(255,245,220,.95);
-  border: 2px solid #9b6a2f;
-  border-radius:10px;
-  padding:10px;
-  margin-top:10px;
-  box-shadow: inset 0 0 8px rgba(0,0,0,.18);
+  background: rgba(255,255,255,.65);
+  border: 2px solid rgba(0,0,0,.15);
+  border-radius:12px;
+  padding:8px;
+  margin-top:8px;
+  font-size: 14px;
+  
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center;
+  min-height: 70px;
+  
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
 }
+
+.item:nth-of-type(1) { background-image: var(--itemCursorBg); }
+.item:nth-of-type(2) { background-image: var(--itemGrannyBg); }
+.item:nth-of-type(3) { background-image: var(--itemClickBg); }
+
+.statsBox { background-image: var(--statBoxBg); }
 
 button{
   background:#6d4b2a;
   color:#fff;
   border:none;
-  padding:6px 12px;
-  border-radius:6px;
-  cursor:pointer;
-}
-button:disabled{ opacity:.4; cursor:not-allowed; }
-
-.iconBtn{
-  background:#6d4b2a;
-  color:#fff;
-  border:none;
-  padding:6px 10px;
-  border-radius:8px;
+  padding:7px 10px;
+  border-radius:10px;
   cursor:pointer;
   font-weight:900;
-  box-shadow:0 10px 25px rgba(0,0,0,.25);
+  font-size: 13px;
+  transition: all 0.15s ease;
 }
-.iconBtn:active{ transform: translateY(1px); }
+button:hover{
+  background:#8a5e35;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0,0,0,.3);
+}
+button:active{ transform: translateY(1px); }
+button:disabled{ opacity:.4; cursor:not-allowed; transform: none; }
+button:disabled:hover{ transform: none; background:#6d4b2a; }
 
-small{ display:block; margin-top:10px; }
-
-.hud{
-  margin-top:10px;
-  padding:10px;
+.iconBtn{
+  width:40px;
+  height:40px;
   border-radius:12px;
-  border:2px solid rgba(155,106,47,.7);
-  background: rgba(255,255,255,.45);
-  box-shadow: inset 0 0 8px rgba(0,0,0,.12);
+  padding:0;
+  display:grid;
+  place-items:center;
+}
+
+/* SPOLEČNÁ TEXTURA PRO HUD */
+.hud{
+  margin-top:8px;
+  padding:8px;
+  border-radius:12px;
+  border:2px solid rgba(0,0,0,.12);
+  background: rgba(255,255,255,.55);
+  background-image: url("pozadi_menu.jpg");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-blend-mode: lighten;
 }
 .hudLine{
   display:flex;
   justify-content:space-between;
   align-items:center;
   font-weight:900;
-  color:#3b1c0b;
-  margin:6px 0;
+  color:#2b1a0f;
+  margin:4px 0;
+  font-size: 14px;
 }
-.hudLine b{ color:#7a1f1f; }
 .hudEvent{
   justify-content:flex-start;
-  font-weight:800;
-  background: rgba(255,245,220,.9);
-  border:2px solid #9b6a2f;
+  font-weight:900;
+  background: rgba(255,255,255,.55);
+  border:2px solid rgba(0,0,0,.12);
   border-radius:10px;
   padding:8px 10px;
-  box-shadow: inset 0 0 8px rgba(0,0,0,.15);
 }
 
-/* modal */
+.prestigeBox{
+  background: rgba(255,255,255,.7);
+  border: 2px solid rgba(0,0,0,.2);
+  background-image: var(--prestigeBoxBg);
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center;
+}
+.prestigeStat{
+  display:flex;
+  justify-content:space-between;
+  margin:4px 0;
+  font-weight:900;
+  font-size: 14px;
+}
+.prestigeBonus{
+  margin:8px 0;
+  padding:6px;
+  background: rgba(255,215,0,.25);
+  border-radius:8px;
+  font-weight:900;
+  font-size: 13px;
+}
+.prestigeBtn{
+  width:100%;
+  margin-top:6px;
+  padding:8px;
+}
+.prestigeHint{
+  display:block;
+  margin-top:6px;
+  opacity:.7;
+  font-size:11px;
+}
+
+/* OSTRÉ OBRÁZKY NA TLAČÍTKÁCH */
+#buyCursor{ 
+  background-image:url("tlacitko13.jpg"); 
+  background-size:100% 100%;
+  image-rendering: -webkit-optimize-contrast;
+  image-rendering: crisp-edges;
+}
+#buyGranny{ 
+  background-image:url("tlacitko14.jpg"); 
+  background-size:100% 100%;
+  image-rendering: -webkit-optimize-contrast;
+  image-rendering: crisp-edges;
+}
+#buyClick{ 
+  background-image:url("tlacitko15.jpg"); 
+  background-size:100% 100%;
+  image-rendering: -webkit-optimize-contrast;
+  image-rendering: crisp-edges;
+}
+#btnPrestige{ 
+  background-image:url("tlacitko16.jpg"); 
+  background-size:100% 100%;
+  image-rendering: -webkit-optimize-contrast;
+  image-rendering: crisp-edges;
+}
+#btnSettings{ 
+  background-image:url("tlacitko17.jpg"); 
+  background-size:100% 100%;
+  image-rendering: -webkit-optimize-contrast;
+  image-rendering: crisp-edges;
+}
+#navSettings{ 
+  background-image:url("tlacitko18.jpg"); 
+  background-size:100% 100%;
+  image-rendering: -webkit-optimize-contrast;
+  image-rendering: crisp-edges;
+}
+#btnPlus{ 
+  background-image:url("tlacitko19.jpg"); 
+  background-size:100% 100%;
+  image-rendering: -webkit-optimize-contrast;
+  image-rendering: crisp-edges;
+}
+
 .modal{
   position:fixed;
   inset:0;
@@ -472,76 +766,63 @@ small{ display:block; margin-top:10px; }
   width:min(420px, 92vw);
   padding:18px;
   border-radius:16px;
-  overflow:hidden;
-
-  background-image: url("rug_panel.png");
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-
-  border: 10px solid #7a1f1f;
-  box-shadow:
-    inset 0 0 0 4px #e6c88f,
-    0 20px 40px rgba(0,0,0,.55);
-
-  isolation:isolate;
+  background: rgba(255,255,255,.92);
+  border: 2px solid rgba(0,0,0,.18);
 }
-.modalBox::before{
-  content:"";
-  position:absolute;
-  inset: 14px;
-  background: rgba(255, 248, 230, 0.96);
-  border-radius: 12px;
-  z-index:0;
+.modalHeader{ 
+  display:flex; 
+  align-items:center; 
+  justify-content:space-between; 
+  margin-bottom:10px; 
 }
-.modalBox > *{ position:relative; z-index:1; color:#2b1a0f; }
-.modalHeader{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  margin-bottom:10px;
-}
-.modalTitle{
-  font-weight:900;
-  font-size:22px;
-  background: rgba(255,255,255,.55);
-  display:inline-block;
-  padding:4px 10px;
-  border-radius:8px;
-}
+.modalTitle{ font-weight:900; font-size:22px; }
 .modalRow{
   margin-top:10px;
-  background: rgba(255,245,220,.95);
-  border: 2px solid #9b6a2f;
+  background: rgba(255,255,255,.85);
+  border: 2px solid rgba(0,0,0,.12);
   border-radius:10px;
   padding:10px;
-  box-shadow: inset 0 0 8px rgba(0,0,0,.18);
 }
-.switchRow{
-  display:flex;
-  align-items:center;
-  gap:10px;
-  font-weight:800;
-}
+.switchRow{ display:flex; align-items:center; gap:10px; font-weight:800; }
 .select{
   width:100%;
   margin-top:6px;
   padding:8px 10px;
   border-radius:8px;
-  border:2px solid #9b6a2f;
-  background: rgba(255,255,255,.85);
+  border:2px solid rgba(0,0,0,.12);
+  background: rgba(255,255,255,.95);
   font-weight:700;
+  cursor:pointer;
 }
 
-/* mobile */
+.panel::-webkit-scrollbar{ width:8px; }
+.panel::-webkit-scrollbar-track{ background: rgba(0,0,0,.2); border-radius:10px; }
+.panel::-webkit-scrollbar-thumb{ background: rgba(255,255,255,.3); border-radius:10px; }
+.panel::-webkit-scrollbar-thumb:hover{ background: rgba(255,255,255,.4); }
+
 @media (max-width:980px){
   html, body{ overflow:auto; }
-  .wrap{
-    grid-template-columns:1fr;
-    gap:16px;
-    padding:14px;
-    height:auto;
-  }
+  .wrap{ grid-template-columns:1fr; gap:16px; padding:14px; height:auto; }
+  .sfSide{ max-width:100%; }
   .panel{ max-height:none; overflow:visible; }
-  :root{ --gopnik-x: 0px; --gopnik-y: 220px; }
+  :root{ --gopnik-x: 0px; --gopnik-y: 320px; }
 }
+
+.hide-text-for-jpg { font-size: 0; color: transparent; text-indent: -9999px; }
+.item-with-jpg { background-color: transparent !important; background-blend-mode: normal; }
+.item-with-jpg * { position: relative; z-index: 1; }
+.text-over-jpg {
+  text-shadow: 0 2px 4px rgba(0,0,0,.8), 0 0 10px rgba(0,0,0,.6), 0 0 20px rgba(0,0,0,.4);
+  font-weight: 900;
+  color: #fff;
+}
+
+
+/* kdyby to nebyl button, ale div/anchor se stejným ID */
+#btnPlus{
+  height: 0 !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  border: 0 !important;
+}
+

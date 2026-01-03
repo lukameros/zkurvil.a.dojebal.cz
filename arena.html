@@ -1,0 +1,190 @@
+<!doctype html>
+<html lang="cs">
+<head>
+  <meta charset="utf-8">
+  <title>Arena</title>
+  <link rel="stylesheet" href="arena.css">
+</head>
+<body>
+
+<div class="layout">
+
+  <!-- LEVÉ PANEL - GOPNIK STYL -->
+  <aside class="left-panel">
+    
+    <!-- TOP: Avatar + Stats -->
+    <div class="menu-top">
+      <div class="avatar-box">
+        <img src="avatar.jpg" alt="avatar">
+        <div class="level-pill">
+          <div class="level-number">1</div>
+        </div>
+      </div>
+
+      <div class="currency-col">
+        <div class="currency-line">
+          <span class="cur-icon">₽</span>
+          <b id="money">3,170</b>
+        </div>
+        <div class="currency-line">
+          <span class="cur-icon">🚬</span>
+          <b id="cigarettes">42</b>
+        </div>
+      </div>
+    </div>
+
+    <!-- NAV BUTTONS - 10 TLAČÍTEK -->
+    <div class="menu-frame">
+      <a href="postava.html" class="sf-btn" data-icon="🏺">POSTAVA</a>
+      <button class="sf-btn active" data-icon="⚔️">ARENA</button>
+      <a href="shop.html" class="sf-btn" data-icon="🗡️">SHOP</a>
+      <button class="sf-btn" data-icon="🔮">MAGIC SHOP</button>
+      <button class="sf-btn" data-icon="🏴">STABLE</button>
+      
+      <div class="divider"></div>
+      
+      <button class="sf-btn" data-icon="👥">GUILD</button>
+      <button class="sf-btn" data-icon="✉️">MAIL</button>
+      <button class="sf-btn" data-icon="🏆">HALL OF FAME</button>
+      <button class="sf-btn" data-icon="🧙">DR. ABAWUWU</button>
+      
+      <a href="gopnik.html" class="sf-btn sf-btn--last" data-icon="🎮">SLAV CLICKER</a>
+    </div>
+
+    <!-- BOTTOM GEAR -->
+    <div class="menu-bottom">
+      <button class="gear-btn">⚙️</button>
+    </div>
+
+  </aside>
+
+  <!-- STŘED - ARENA -->
+  <main class="arena-area">
+
+    <!-- NÁZEV -->
+    <div class="arena-title">⚔️ ARENA ⚔️</div>
+
+    <div class="arena-container">
+
+      <!-- LEVÝ HRÁČ -->
+      <div class="player-section">
+        <div class="character-name-arena">BORIS GOPNIKOV</div>
+        
+        <div class="character-frame-arena">
+          <div class="character-arena">
+            <!-- HEALTH BAR -->
+            <div class="health-bar">
+              <div class="health-fill" style="width: 85%"></div>
+              <span class="health-text">850 / 1000</span>
+            </div>
+            
+            <img src="avatar.jpg" alt="character">
+            <div class="level-arena">Level 1</div>
+          </div>
+        </div>
+
+        <!-- ATRIBUTY LEVÉHO HRÁČE -->
+        <div class="stats-section-arena">
+          <div class="stat-arena">
+            <span>⚔️ Strength</span>
+            <b>18</b>
+          </div>
+
+          <div class="stat-arena">
+            <span>🛡️ Defense</span>
+            <b>14</b>
+          </div>
+
+          <div class="stat-arena">
+            <span>🎯 Dexterity</span>
+            <b>11</b>
+          </div>
+
+          <div class="stat-arena">
+            <span>🧠 Intelligence</span>
+            <b>11</b>
+          </div>
+
+          <div class="stat-arena">
+            <span>💪 Constitution</span>
+            <b>16</b>
+          </div>
+
+          <div class="stat-arena">
+            <span>🍀 Luck</span>
+            <b>9</b>
+          </div>
+        </div>
+      </div>
+
+      <!-- PRAVÝ NEPŘÍTEL -->
+      <div class="player-section">
+        <div class="character-name-arena enemy">IVAN DESTROYER</div>
+        
+        <div class="character-frame-arena">
+          <div class="slots-arena">
+            <div class="slot-arena">🗡️</div>
+            <div class="slot-arena">🛡️</div>
+          </div>
+
+          <div class="character-arena">
+            <!-- HEALTH BAR -->
+            <div class="health-bar enemy">
+              <div class="health-fill" style="width: 65%"></div>
+              <span class="health-text">650 / 1000</span>
+            </div>
+            
+            <img src="avatar.jpg" alt="enemy">
+            <div class="level-arena enemy">Level 3</div>
+          </div>
+
+          <div class="slots-arena">
+            <div class="slot-arena">🗡️</div>
+            <div class="slot-arena">🛡️</div>
+          </div>
+        </div>
+
+        <!-- ATRIBUTY PRAVÉHO NEPŘÍTELE -->
+        <div class="stats-section-arena">
+          <div class="stat-arena enemy">
+            <span>⚔️ Strength</span>
+            <b>24</b>
+          </div>
+
+          <div class="stat-arena enemy">
+            <span>🛡️ Defense</span>
+            <b>19</b>
+          </div>
+
+          <div class="stat-arena enemy">
+            <span>🎯 Dexterity</span>
+            <b>15</b>
+          </div>
+
+          <div class="stat-arena enemy">
+            <span>🧠 Intelligence</span>
+            <b>8</b>
+          </div>
+
+          <div class="stat-arena enemy">
+            <span>💪 Constitution</span>
+            <b>22</b>
+          </div>
+
+          <div class="stat-arena enemy">
+            <span>🍀 Luck</span>
+            <b>6</b>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  </main>
+
+</div>
+
+<script src="arena.js"></script>
+
+</body>
+</html>

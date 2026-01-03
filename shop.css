@@ -1,0 +1,1104 @@
+/* ===== RESET ===== */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: system-ui, -apple-system, sans-serif;
+  background: #0f1418;
+  background-image: url('pozadi.jpg');
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+  background-repeat: no-repeat;
+  color: #fff;
+  overflow: hidden;
+}
+
+:root {
+  /* Levé menu */
+  --menuBg: url('panel_bg.jpg');
+  --menuBgFallback: linear-gradient(165deg, #2d1810 0%, #1a0f08 100%);
+  --menuBorder: rgba(255, 215, 100, 0.3);
+  --menuBorderWidth: 3px;
+  --menuShadow: 0 25px 60px rgba(0, 0, 0, 0.7);
+  --menuRadius: 16px;
+  --menuPadding: 10px;
+  --menuGap: 8px;
+  
+  /* Horní box */
+  --moneyHudBg: url('pozadi_menu.jpg');
+  --moneyHudFallback: linear-gradient(135deg, rgba(60,40,25,0.95), rgba(35,22,14,0.98));
+  --moneyHudBorder: rgba(0,0,0,.3);
+  --moneyHudRadius: 14px;
+  --moneyHudShadow: inset 0 3px 15px rgba(0,0,0,.3), 0 2px 8px rgba(0,0,0,.2);
+  --moneyHudPadding: 10px;
+  
+  /* Navigační tlačítka */
+  --navBtnHeight: 42px;
+  --navBtnRadius: 13px;
+  --navBtnColor: #ffffff;
+  --navBtnShadow: 0 4px 15px rgba(0,0,0,.4);
+  --navBtnSpacing: 4px;
+  --navBtnFontSize: 12px;
+  --navBtnLetterSpacing: 0.6px;
+  
+  /* Avatar */
+  --avatarSize: 100px;
+  --avatarBorder: rgba(0,0,0,.3);
+  --avatarBorderWidth: 3px;
+  --avatarRadius: 12px;
+  --avatarShadow: 0 4px 12px rgba(0,0,0,.3);
+  
+  /* Currency lines */
+  --currencyBg: rgba(255, 255, 255, 0.2);
+  --currencyBorder: rgba(0, 0, 0, 0.15);
+  --currencyRadius: 11px;
+  --currencyColor: #ffffff;
+  --currencyShadow: 0 3px 10px rgba(0,0,0,.2);
+  --currencyPadding: 6px 10px;
+  --currencyFontSize: 15px;
+  
+  /* Level pill */
+  --levelBg: linear-gradient(180deg, rgba(30,160,60,.96), rgba(10,110,40,.96));
+  --levelColor: #eaffff;
+  --levelBorder: rgba(0,0,0,.4);
+  --levelRadius: 8px;
+  --levelShadow: 0 3px 8px rgba(0,0,0,.4);
+  
+  /* Divider */
+  --dividerColor: rgba(255,255,255,.22);
+  --dividerHeight: 1px;
+  --dividerMargin: 6px 0;
+}
+
+.layout {
+  display: grid;
+  grid-template-columns: 220px 1fr;
+  height: 100vh;
+  gap: 22px;
+  padding: 16px;
+}
+
+/* ===== LEVÉ PANEL ===== */
+.left-panel {
+  border-radius: var(--menuRadius);
+  overflow: hidden;
+  background-image: var(--menuBg);
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-color: var(--menuBgFallback);
+  border: var(--menuBorderWidth) solid var(--menuBorder);
+  box-shadow: var(--menuShadow);
+  display: flex;
+  flex-direction: column;
+  padding: var(--menuPadding);
+  gap: var(--menuGap);
+  transition: all 0.3s ease;
+}
+
+.menu-top {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: var(--moneyHudPadding);
+  border-radius: var(--moneyHudRadius);
+  background-image: url('tlacitko.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  border: 2px solid var(--moneyHudBorder);
+  box-shadow: var(--moneyHudShadow);
+  image-rendering: -webkit-optimize-contrast;
+  image-rendering: crisp-edges;
+  position: relative;
+}
+
+.menu-top::after {
+  content: '+';
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 28px;
+  height: 28px;
+  background: rgba(0,0,0,0.4);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  font-weight: 900;
+  color: rgba(255,255,255,0.8);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 6px rgba(0,0,0,.3);
+}
+
+.menu-top:hover::after {
+  background: rgba(0,0,0,0.5);
+  color: rgba(255,255,255,1);
+  transform: scale(1.1);
+}
+
+.avatar-box {
+  position: relative;
+  width: var(--avatarSize);
+  height: var(--avatarSize);
+  border-radius: var(--avatarRadius);
+  overflow: hidden;
+  border: var(--avatarBorderWidth) solid var(--avatarBorder);
+  background: rgba(0,0,0,.2);
+  box-shadow: var(--avatarShadow);
+  margin: 0 auto;
+}
+
+.avatar-box img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.level-pill {
+  position: absolute;
+  right: 4px;
+  bottom: 4px;
+  padding: 4px 6px;
+  border-radius: 4px;
+  font-weight: 900;
+  color: var(--levelColor);
+  background: var(--levelBg);
+  border: 1px solid var(--levelBorder);
+  box-shadow: var(--levelShadow);
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  line-height: 1;
+  min-width: 24px;
+}
+
+.level-number {
+  font-size: 14px;
+  font-weight: 900;
+  margin-top: 1px;
+}
+
+.currency-col {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.currency-line {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: var(--currencyPadding);
+  border-radius: var(--currencyRadius);
+  background: var(--currencyBg);
+  border: 1px solid var(--currencyBorder);
+  color: var(--currencyColor);
+  font-weight: 900;
+  font-size: var(--currencyFontSize);
+  box-shadow: var(--currencyShadow);
+  transition: all 0.2s ease;
+}
+
+.currency-line:hover {
+  background: rgba(255, 255, 255, 0.25);
+  transform: translateY(-1px);
+}
+
+.currency-line b {
+  margin-left: auto;
+  margin-right: 4px;
+  font-variant-numeric: tabular-nums;
+}
+
+.cur-icon {
+  width: 28px;
+  display: inline-block;
+  text-align: center;
+  font-size: 22px;
+  line-height: 1;
+  filter: drop-shadow(0 2px 0 rgba(0,0,0,.3));
+}
+
+.menu-frame {
+  margin-top: 2px;
+  padding: 4px 2px;
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.menu-frame::-webkit-scrollbar {
+  width: 8px;
+}
+
+.menu-frame::-webkit-scrollbar-track {
+  background: rgba(0,0,0,.2);
+  border-radius: 10px;
+}
+
+.menu-frame::-webkit-scrollbar-thumb {
+  background: rgba(255,255,255,.3);
+  border-radius: 10px;
+}
+
+.menu-frame::-webkit-scrollbar-thumb:hover {
+  background: rgba(255,255,255,.4);
+}
+
+.sf-btn {
+  width: 100%;
+  text-align: left;
+  padding: 0 14px;
+  margin: var(--navBtnSpacing) 0;
+  height: var(--navBtnHeight);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  border-radius: var(--navBtnRadius);
+  border: 0;
+  cursor: pointer;
+  font-weight: 900;
+  font-size: var(--navBtnFontSize);
+  letter-spacing: var(--navBtnLetterSpacing);
+  color: var(--navBtnColor);
+  text-transform: uppercase;
+  text-shadow: 0 2px 4px rgba(0,0,0,.5);
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+  background-position: center;
+  box-shadow: var(--navBtnShadow);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+  image-rendering: -webkit-optimize-contrast;
+  image-rendering: crisp-edges;
+  text-decoration: none;
+}
+
+.sf-btn::before {
+  content: attr(data-icon);
+  font-size: 20px;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  background: rgba(0,0,0,0.2);
+  border-radius: 8px;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+}
+
+.sf-btn:hover {
+  filter: brightness(1.1);
+  transform: translateX(4px);
+  box-shadow: 0 6px 20px rgba(0,0,0,.5);
+}
+
+.sf-btn:active {
+  transform: translateY(2px) translateX(4px);
+  filter: brightness(0.9);
+  box-shadow: 0 2px 10px rgba(0,0,0,.4);
+}
+
+.sf-btn.active {
+  filter: brightness(1.2);
+  border: 2px solid rgba(255,215,0,0.6);
+}
+
+.sf-btn--last {
+  text-align: center;
+  justify-content: center;
+  border: 2px solid rgba(255,215,0,0.3);
+}
+
+.menu-frame > .sf-btn:nth-child(1)  { background-image: url('tlacitko1.jpg'); }
+.menu-frame > .sf-btn:nth-child(2)  { background-image: url('tlacitko2.jpg'); }
+.menu-frame > .sf-btn:nth-child(3)  { background-image: url('tlacitko3.jpg'); }
+.menu-frame > .sf-btn:nth-child(4)  { background-image: url('tlacitko4.jpg'); }
+.menu-frame > .sf-btn:nth-child(5)  { background-image: url('tlacitko5.jpg'); }
+.menu-frame > .sf-btn:nth-child(7)  { background-image: url('tlacitko6.jpg'); }
+.menu-frame > .sf-btn:nth-child(8)  { background-image: url('tlacitko7.jpg'); }
+.menu-frame > .sf-btn:nth-child(9)  { background-image: url('tlacitko8.jpg'); }
+.menu-frame > .sf-btn:nth-child(10) { background-image: url('tlacitko9.jpg'); }
+.menu-frame > .sf-btn:nth-child(11) { background-image: url('tlacitko10.jpg'); }
+
+.divider {
+  height: var(--dividerHeight);
+  margin: var(--dividerMargin);
+  background: var(--dividerColor);
+  border-radius: 999px;
+  box-shadow: 0 1px 3px rgba(0,0,0,.2);
+}
+
+.menu-bottom {
+  display: flex;
+  justify-content: flex-start;
+  padding-top: 10px;
+  border-top: 2px solid rgba(255,255,255,.15);
+  box-shadow: 0 -1px 3px rgba(0,0,0,.1);
+}
+
+.gear-btn {
+  width: 48px;
+  height: 48px;
+  border-radius: 13px;
+  border: 0;
+  background: rgba(0,0,0,.3);
+  box-shadow: 0 4px 12px rgba(0,0,0,.3), inset 0 2px 0 rgba(255,255,255,.15);
+  font-size: 20px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.gear-btn:hover {
+  background: rgba(0,0,0,.4);
+  transform: translateY(-2px) rotate(45deg);
+  box-shadow: 0 6px 16px rgba(0,0,0,.4);
+}
+
+.gear-btn:active {
+  transform: translateY(1px) rotate(90deg);
+  box-shadow: 0 2px 8px rgba(0,0,0,.3);
+}
+
+/* ===== SHOP AREA ===== */
+.shop-area {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 10px 0;
+  height: 100%;
+  overflow: hidden;
+}
+
+.shop-area::-webkit-scrollbar {
+  width: 10px;
+}
+
+.shop-area::-webkit-scrollbar-track {
+  background: rgba(0,0,0,.2);
+  border-radius: 10px;
+}
+
+.shop-area::-webkit-scrollbar-thumb {
+  background: rgba(255,255,255,.3);
+  border-radius: 10px;
+}
+
+.shop-title {
+  font-size: 32px;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 4px;
+  color: #fff;
+  text-shadow: 
+    0 0 20px rgba(255, 215, 100, 0.8),
+    0 0 40px rgba(255, 215, 100, 0.5),
+    0 4px 15px rgba(0,0,0,1),
+    0 8px 25px rgba(0,0,0,0.8);
+  padding: 10px 32px;
+  background: 
+    linear-gradient(135deg, 
+      rgba(139, 69, 19, 0.95) 0%,
+      rgba(101, 67, 33, 0.98) 50%,
+      rgba(139, 69, 19, 0.95) 100%);
+  border: 4px solid;
+  border-image: linear-gradient(135deg, #f1d27a, #c9a44a, #f1d27a) 1;
+  border-radius: 16px;
+  box-shadow: 
+    0 12px 40px rgba(0,0,0,.8),
+    inset 0 -4px 20px rgba(0,0,0,0.5),
+    inset 0 4px 20px rgba(255,215,100,0.2);
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.shop-title::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 215, 100, 0.3),
+    transparent
+  );
+  animation: shine 3s infinite;
+}
+
+@keyframes shine {
+  0% { left: -100%; }
+  50%, 100% { left: 100%; }
+}
+
+.shop-container {
+  display: grid;
+  grid-template-columns: 1fr 600px 420px;
+  gap: 20px;
+  align-items: start;
+  flex: 1;
+  overflow: hidden;
+}
+
+/* ===== SHOP SECTION (TEĎKA VLEVO) ===== */
+.shop-section {
+  background: 
+    linear-gradient(135deg, rgba(30,36,42,0.97), rgba(18,22,26,0.99)),
+    url('pozadi_menu.jpg');
+  background-size: cover;
+  background-position: center;
+  background-blend-mode: overlay;
+  border: 4px solid;
+  border-image: linear-gradient(135deg, #7a5a23, #c9a44a, #7a5a23) 1;
+  border-radius: 14px;
+  padding: 18px;
+  box-shadow: 
+    0 15px 45px rgba(0,0,0,.8),
+    inset 0 2px 10px rgba(255,215,100,0.1);
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 14px;
+  padding-bottom: 10px;
+  border-bottom: 2px solid rgba(255,215,100,0.3);
+}
+
+.section-header h2 {
+  font-size: 20px;
+  font-weight: 900;
+  color: #f1d27a;
+  text-shadow: 0 2px 6px rgba(0,0,0,.8);
+}
+
+.shop-tabs {
+  display: flex;
+  gap: 8px;
+}
+
+.tab-btn {
+  padding: 6px 14px;
+  background: rgba(0,0,0,0.4);
+  border: 2px solid #7a5a23;
+  border-radius: 8px;
+  color: #c9a44a;
+  font-weight: 900;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-transform: uppercase;
+}
+
+.tab-btn:hover {
+  background: rgba(0,0,0,0.6);
+  border-color: #c9a44a;
+}
+
+.tab-btn.active {
+  background: linear-gradient(135deg, #c9a44a, #7a5a23);
+  color: #2b1a0f;
+  border-color: #f1d27a;
+}
+
+.shop-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+  margin-top: 14px;
+  overflow-y: auto;
+  padding-right: 8px;
+}
+
+.shop-grid::-webkit-scrollbar {
+  width: 8px;
+}
+
+.shop-grid::-webkit-scrollbar-track {
+  background: rgba(0,0,0,.2);
+  border-radius: 10px;
+}
+
+.shop-grid::-webkit-scrollbar-thumb {
+  background: rgba(255,255,255,.3);
+  border-radius: 10px;
+}
+
+.shop-grid::-webkit-scrollbar-thumb:hover {
+  background: rgba(255,255,255,.4);
+}
+
+.shop-item {
+  background: 
+    url('tlacitko_shop.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  border: 3px solid #5a4520;
+  border-radius: 12px;
+  padding: 14px;
+  display: flex;
+  gap: 14px;
+  transition: all 0.3s ease;
+  box-shadow: 
+    0 5px 15px rgba(0,0,0,.5),
+    inset 0 2px 8px rgba(0,0,0,0.3);
+  position: relative;
+  overflow: hidden;
+  image-rendering: -webkit-optimize-contrast;
+  image-rendering: crisp-edges;
+}
+
+.shop-item::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 215, 100, 0.15),
+    transparent
+  );
+  transition: left 0.5s ease;
+}
+
+.shop-item:hover::before {
+  left: 100%;
+}
+
+.shop-item:hover {
+  transform: translateY(-5px) scale(1.02);
+  border-color: #c9a44a;
+  box-shadow: 
+    0 10px 30px rgba(0,0,0,.7),
+    0 0 25px rgba(241, 210, 122, 0.3),
+    inset 0 2px 12px rgba(255,215,100,0.2);
+}
+
+.item-icon {
+  flex-shrink: 0;
+  width: 64px;
+  height: 64px;
+  background: 
+    radial-gradient(circle at center, rgba(80,85,92,0.95), rgba(40,45,50,0.98)),
+    url('tlacitko.jpg');
+  background-size: cover;
+  background-position: center;
+  background-blend-mode: overlay;
+  border: 3px solid #c9a44a;
+  border-radius: 10px;
+  display: grid;
+  place-items: center;
+  box-shadow: 
+    inset 0 0 15px rgba(0,0,0,.4),
+    0 4px 12px rgba(0,0,0,.5);
+  position: relative;
+}
+
+.item-icon::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 8px;
+  background: linear-gradient(135deg, transparent, rgba(255,215,100,0.2));
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.shop-item:hover .item-icon::after {
+  opacity: 1;
+}
+
+.item-icon img {
+  width: 50px;
+  height: 50px;
+  object-fit: contain;
+}
+
+.item-details {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.item-details h3 {
+  font-size: 15px;
+  font-weight: 900;
+  color: #f1d27a;
+  text-shadow: 0 2px 4px rgba(0,0,0,.8);
+}
+
+.item-desc {
+  font-size: 11px;
+  color: #c9a44a;
+  margin-bottom: auto;
+}
+
+.item-price {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+}
+
+.price {
+  font-weight: 900;
+  font-size: 15px;
+  color: #f1d27a;
+  text-shadow: 0 2px 4px rgba(0,0,0,.8);
+}
+
+.buy-btn {
+  padding: 6px 16px;
+  background-image: url('tlacitko_shopik.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  border: 3px solid rgba(255, 215, 100, 0.6);
+  border-radius: 8px;
+  color: #f1d27a;
+  font-weight: 900;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-transform: uppercase;
+  box-shadow: 
+    0 4px 10px rgba(0,0,0,.5),
+    inset 0 2px 5px rgba(255,215,100,0.15);
+  image-rendering: -webkit-optimize-contrast;
+  image-rendering: crisp-edges;
+  position: relative;
+  overflow: hidden;
+}
+
+.buy-btn::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(255,215,100,0.3) 0%, transparent 70%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.buy-btn:hover::before {
+  opacity: 1;
+}
+
+.buy-btn:hover {
+  filter: brightness(1.2);
+  transform: translateY(-3px);
+  border-color: #f1d27a;
+  box-shadow: 
+    0 6px 20px rgba(0,0,0,.6),
+    0 0 20px rgba(241, 210, 122, 0.4),
+    inset 0 2px 8px rgba(255,215,100,0.25);
+}
+
+.buy-btn:active {
+  transform: translateY(0);
+  filter: brightness(0.95);
+  box-shadow: 
+    0 2px 8px rgba(0,0,0,.5),
+    inset 0 3px 10px rgba(0,0,0,0.4);
+}
+
+.buy-btn.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  filter: grayscale(0.5);
+}
+
+.buy-btn.disabled:hover {
+  transform: none;
+  filter: grayscale(0.5);
+}
+
+/* ===== INVENTORY SECTION - VPRAVO S AVATAREM ===== */
+.inventory-section {
+  background: 
+    linear-gradient(135deg, rgba(30,36,42,0.97), rgba(18,22,26,0.99)),
+    url('pozadi_menu.jpg');
+  background-size: cover;
+  background-position: center;
+  background-blend-mode: overlay;
+  border: 4px solid;
+  border-image: linear-gradient(135deg, #7a5a23, #c9a44a, #7a5a23) 1;
+  border-radius: 14px;
+  padding: 18px;
+  box-shadow: 
+    0 15px 45px rgba(0,0,0,.8),
+    inset 0 2px 10px rgba(255,215,100,0.1);
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  height: 100%;
+  overflow: hidden;
+}
+
+/* AVATAR V INVENTÁŘI */
+.inventory-avatar {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.character-frame-shop {
+  display: grid;
+  grid-template-columns: auto 220px auto;
+  gap: 14px;
+  padding: 16px;
+  background: linear-gradient(135deg, rgba(30,36,42,0.9), rgba(18,22,26,0.95));
+  border: 4px solid #7a5a23;
+  border-radius: 12px;
+  box-shadow: 0 12px 35px rgba(0,0,0,.6);
+  flex-shrink: 0;
+}
+
+.character-shop {
+  position: relative;
+  width: 220px;
+  height: 300px;
+  background: radial-gradient(circle at center, rgba(44,47,52,0.8), rgba(15,17,20,0.95));
+  border: 4px solid #c9a44a;
+  border-radius: 8px;
+  box-shadow: inset 0 0 30px rgba(0,0,0,.4);
+}
+
+.character-shop img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.level-shop {
+  position: absolute;
+  bottom: 6px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 4px 12px;
+  background: linear-gradient(135deg, #f1d27a, #b8862b);
+  color: #2b1a0f;
+  font-weight: 900;
+  font-size: 12px;
+  border-radius: 6px;
+  box-shadow: 0 4px 12px rgba(0,0,0,.4);
+  border: 2px solid #fff0b0;
+  text-align: center;
+  min-width: 80px;
+}
+
+.slots-shop {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  justify-content: center;
+}
+
+.slot-shop {
+  width: 50px;
+  height: 50px;
+  display: grid;
+  place-items: center;
+  font-size: 24px;
+  background: radial-gradient(circle at center, rgba(58,63,70,0.9), rgba(26,31,36,0.95));
+  border: 3px solid #c9a44a;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+  box-shadow: inset 0 0 15px rgba(0,0,0,.3), 0 4px 8px rgba(0,0,0,.3);
+}
+
+.slot-shop:hover {
+  transform: scale(1.08);
+  border-color: #f1d27a;
+  box-shadow: 0 0 20px rgba(241, 210, 122, 0.4);
+}
+
+/* INVENTÁŘ GRIDY */
+.item-count {
+  font-size: 14px;
+  font-weight: 900;
+  color: #c9a44a;
+  background: rgba(0,0,0,0.4);
+  padding: 4px 10px;
+  border-radius: 8px;
+}
+
+.inventory-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.inv-slot {
+  aspect-ratio: 1/1;
+  background: 
+    radial-gradient(circle at center, rgba(58,63,70,0.95), rgba(26,31,36,0.98)),
+    url('panel_bg.jpg');
+  background-size: cover;
+  background-position: center;
+  background-blend-mode: overlay;
+  border: 3px solid #5a4520;
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  transition: all 0.3s ease;
+  box-shadow: 
+    inset 0 0 20px rgba(0,0,0,.5),
+    0 4px 10px rgba(0,0,0,.5);
+  cursor: pointer;
+}
+
+.inv-slot::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 10px;
+  background: linear-gradient(135deg, transparent 40%, rgba(255,215,100,0.1) 100%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.inv-slot:hover::after {
+  opacity: 1;
+}
+
+.inv-slot:hover {
+  transform: translateY(-5px) scale(1.05);
+  border-color: #f1d27a;
+  box-shadow: 
+    0 0 30px rgba(241, 210, 122, 0.6),
+    0 8px 20px rgba(0,0,0,.7);
+}
+
+.inv-slot.filled {
+  background: 
+    radial-gradient(circle at center, rgba(80,85,92,0.95), rgba(45,50,56,0.98)),
+    url('tlacitko.jpg');
+  background-size: cover;
+  background-position: center;
+  background-blend-mode: overlay;
+  border-color: #7a5a23;
+}
+
+.inv-slot img {
+  width: 50px;
+  height: 50px;
+  object-fit: contain;
+  margin-bottom: 4px;
+}
+
+.item-info {
+  display: none;
+  position: absolute;
+  bottom: -80px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: linear-gradient(135deg, rgba(30,36,42,0.98), rgba(18,22,26,0.99));
+  border: 2px solid #c9a44a;
+  border-radius: 8px;
+  padding: 8px 12px;
+  min-width: 150px;
+  text-align: center;
+  z-index: 100;
+  box-shadow: 0 8px 20px rgba(0,0,0,.8);
+}
+
+.inv-slot:hover .item-info {
+  display: block;
+}
+
+.item-name {
+  display: block;
+  font-weight: 900;
+  font-size: 13px;
+  color: #f1d27a;
+  margin-bottom: 4px;
+}
+
+.item-stats {
+  display: block;
+  font-size: 11px;
+  color: #c9a44a;
+}
+
+/* ===== CHARACTER STATS SECTION ===== */
+.character-stats-section {
+  background: 
+    linear-gradient(135deg, rgba(30,36,42,0.97), rgba(18,22,26,0.99)),
+    url('pozadi_menu.jpg');
+  background-size: cover;
+  background-position: center;
+  background-blend-mode: overlay;
+  border: 4px solid;
+  border-image: linear-gradient(135deg, #7a5a23, #c9a44a, #7a5a23) 1;
+  border-radius: 14px;
+  padding: 18px;
+  box-shadow: 
+    0 15px 45px rgba(0,0,0,.8),
+    inset 0 2px 10px rgba(255,215,100,0.1);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  height: 100%;
+  overflow: hidden;
+}
+
+.character-name-shop {
+  font-size: 24px;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: #f1d27a;
+  text-shadow: 
+    0 0 10px rgba(241, 210, 122, 0.5),
+    0 0 20px rgba(241, 210, 122, 0.3),
+    0 4px 8px rgba(0,0,0,.8);
+  padding: 8px 16px;
+  background: linear-gradient(135deg, rgba(60,40,25,0.7), rgba(35,22,14,0.8));
+  border: 2px solid rgba(255, 215, 100, 0.4);
+  border-radius: 12px;
+  box-shadow: 0 8px 20px rgba(0,0,0,.5);
+  text-align: center;
+}
+
+.stat {
+  display: grid;
+  grid-template-columns: 1fr 50px 32px;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  background-image: url('tlacitko.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  border: 2px solid #c9a44a;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+  box-shadow:
+    0 3px 8px rgba(0,0,0,.3),
+    inset 0 2px 0 rgba(255,255,255,.15);
+}
+
+.stat:hover {
+  transform: translateX(3px);
+  border-color: #f1d27a;
+  box-shadow: 0 4px 12px rgba(0,0,0,.4);
+}
+
+.stat b {
+  text-align: center;
+  font-size: 16px;
+  font-weight: 900;
+  color: #f1d27a;
+  text-shadow: 0 2px 4px rgba(0,0,0,.8);
+}
+
+.stat span {
+  color: #ffffff;
+  font-weight: 900;
+  font-size: 13px;
+  text-shadow: 0 2px 4px rgba(0,0,0,.5);
+}
+
+.stat button {
+  height: 28px;
+  width: 28px;
+  font-weight: 900;
+  font-size: 15px;
+  background-image: url('panel_bg.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  border: 2px solid rgba(255, 215, 100, 0.5);
+  border-radius: 8px;
+  cursor: pointer;
+  color: #f1d27a;
+  text-shadow: 0 2px 4px rgba(0,0,0,.8);
+  box-shadow:
+    0 3px 8px rgba(0,0,0,.45),
+    inset 0 1px 0 rgba(255,255,255,.15);
+  transition: all 0.15s ease;
+  image-rendering: crisp-edges;
+}
+
+.stat button:hover {
+  filter: brightness(1.12);
+  transform: translateY(-2px);
+  box-shadow:
+    0 6px 16px rgba(0,0,0,.55),
+    inset 0 1px 0 rgba(255,255,255,.25);
+}
+
+.stat button:active {
+  transform: translateY(0);
+  filter: brightness(0.9);
+  box-shadow:
+    0 2px 6px rgba(0,0,0,.4),
+    inset 0 2px 4px rgba(0,0,0,.5);
+}
+
+@media (max-width: 1400px) {
+  .shop-container {
+    grid-template-columns: 1fr 600px;
+  }
+  
+  .character-stats-section {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 1200px) {
+  .shop-container {
+    grid-template-columns: 1fr;
+  }
+  
+  .shop-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .inventory-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 980px) {
+  .layout {
+    grid-template-columns: 1fr;
+  }
+  
+  .shop-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}

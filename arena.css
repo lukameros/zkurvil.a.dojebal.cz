@@ -1,0 +1,680 @@
+/* ===== RESET ===== */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: system-ui, -apple-system, sans-serif;
+  background: #0f1418;
+  background-image: url('pozadi.jpg');
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+  background-repeat: no-repeat;
+  color: #fff;
+  overflow: hidden;
+}
+
+:root {
+  /* Levé menu */
+  --menuBg: url('panel_bg.jpg');
+  --menuBgFallback: linear-gradient(165deg, #2d1810 0%, #1a0f08 100%);
+  --menuBorder: rgba(255, 215, 100, 0.3);
+  --menuBorderWidth: 3px;
+  --menuShadow: 0 25px 60px rgba(0, 0, 0, 0.7);
+  --menuRadius: 16px;
+  --menuPadding: 10px;
+  --menuGap: 8px;
+  
+  /* Horní box */
+  --moneyHudBg: url('pozadi_menu.jpg');
+  --moneyHudFallback: linear-gradient(135deg, rgba(60,40,25,0.95), rgba(35,22,14,0.98));
+  --moneyHudBorder: rgba(0,0,0,.3);
+  --moneyHudRadius: 14px;
+  --moneyHudShadow: inset 0 3px 15px rgba(0,0,0,.3), 0 2px 8px rgba(0,0,0,.2);
+  --moneyHudPadding: 10px;
+  
+  /* Navigační tlačítka */
+  --navBtnHeight: 42px;
+  --navBtnRadius: 13px;
+  --navBtnColor: #ffffff;
+  --navBtnShadow: 0 4px 15px rgba(0,0,0,.4);
+  --navBtnSpacing: 4px;
+  --navBtnFontSize: 12px;
+  --navBtnLetterSpacing: 0.6px;
+  
+  /* Avatar */
+  --avatarSize: 100px;
+  --avatarBorder: rgba(0,0,0,.3);
+  --avatarBorderWidth: 3px;
+  --avatarRadius: 12px;
+  --avatarShadow: 0 4px 12px rgba(0,0,0,.3);
+  
+  /* Currency lines */
+  --currencyBg: rgba(255, 255, 255, 0.2);
+  --currencyBorder: rgba(0, 0, 0, 0.15);
+  --currencyRadius: 11px;
+  --currencyColor: #ffffff;
+  --currencyShadow: 0 3px 10px rgba(0,0,0,.2);
+  --currencyPadding: 6px 10px;
+  --currencyFontSize: 15px;
+  
+  /* Level pill */
+  --levelBg: linear-gradient(180deg, rgba(30,160,60,.96), rgba(10,110,40,.96));
+  --levelColor: #eaffff;
+  --levelBorder: rgba(0,0,0,.4);
+  --levelRadius: 8px;
+  --levelShadow: 0 3px 8px rgba(0,0,0,.4);
+  
+  /* Divider */
+  --dividerColor: rgba(255,255,255,.22);
+  --dividerHeight: 1px;
+  --dividerMargin: 6px 0;
+}
+
+.layout {
+  display: grid;
+  grid-template-columns: 220px 1fr;
+  height: 100vh;
+  gap: 22px;
+  padding: 16px;
+}
+
+/* ===== LEVÉ PANEL ===== */
+.left-panel {
+  border-radius: var(--menuRadius);
+  overflow: hidden;
+  background-image: var(--menuBg);
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-color: var(--menuBgFallback);
+  border: var(--menuBorderWidth) solid var(--menuBorder);
+  box-shadow: var(--menuShadow);
+  display: flex;
+  flex-direction: column;
+  padding: var(--menuPadding);
+  gap: var(--menuGap);
+  transition: all 0.3s ease;
+}
+
+.menu-top {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: var(--moneyHudPadding);
+  border-radius: var(--moneyHudRadius);
+  background-image: url('tlacitko.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  border: 2px solid var(--moneyHudBorder);
+  box-shadow: var(--moneyHudShadow);
+  image-rendering: -webkit-optimize-contrast;
+  image-rendering: crisp-edges;
+  position: relative;
+}
+
+.menu-top::after {
+  content: '+';
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 28px;
+  height: 28px;
+  background: rgba(0,0,0,0.4);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  font-weight: 900;
+  color: rgba(255,255,255,0.8);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 6px rgba(0,0,0,.3);
+}
+
+.menu-top:hover::after {
+  background: rgba(0,0,0,0.5);
+  color: rgba(255,255,255,1);
+  transform: scale(1.1);
+}
+
+.avatar-box {
+  position: relative;
+  width: var(--avatarSize);
+  height: var(--avatarSize);
+  border-radius: var(--avatarRadius);
+  overflow: hidden;
+  border: var(--avatarBorderWidth) solid var(--avatarBorder);
+  background: rgba(0,0,0,.2);
+  box-shadow: var(--avatarShadow);
+  margin: 0 auto;
+}
+
+.avatar-box img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.level-pill {
+  position: absolute;
+  right: 4px;
+  bottom: 4px;
+  padding: 4px 6px;
+  border-radius: 4px;
+  font-weight: 900;
+  color: var(--levelColor);
+  background: var(--levelBg);
+  border: 1px solid var(--levelBorder);
+  box-shadow: var(--levelShadow);
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  line-height: 1;
+  min-width: 24px;
+}
+
+.level-number {
+  font-size: 14px;
+  font-weight: 900;
+  margin-top: 1px;
+}
+
+.currency-col {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.currency-line {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: var(--currencyPadding);
+  border-radius: var(--currencyRadius);
+  background: var(--currencyBg);
+  border: 1px solid var(--currencyBorder);
+  color: var(--currencyColor);
+  font-weight: 900;
+  font-size: var(--currencyFontSize);
+  box-shadow: var(--currencyShadow);
+  transition: all 0.2s ease;
+}
+
+.currency-line:hover {
+  background: rgba(255, 255, 255, 0.25);
+  transform: translateY(-1px);
+}
+
+.currency-line b {
+  margin-left: auto;
+  margin-right: 4px;
+  font-variant-numeric: tabular-nums;
+}
+
+.cur-icon {
+  width: 28px;
+  display: inline-block;
+  text-align: center;
+  font-size: 22px;
+  line-height: 1;
+  filter: drop-shadow(0 2px 0 rgba(0,0,0,.3));
+}
+
+.menu-frame {
+  margin-top: 2px;
+  padding: 4px 2px;
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.menu-frame::-webkit-scrollbar {
+  width: 8px;
+}
+
+.menu-frame::-webkit-scrollbar-track {
+  background: rgba(0,0,0,.2);
+  border-radius: 10px;
+}
+
+.menu-frame::-webkit-scrollbar-thumb {
+  background: rgba(255,255,255,.3);
+  border-radius: 10px;
+}
+
+.menu-frame::-webkit-scrollbar-thumb:hover {
+  background: rgba(255,255,255,.4);
+}
+
+.sf-btn {
+  width: 100%;
+  text-align: left;
+  padding: 0 14px;
+  margin: var(--navBtnSpacing) 0;
+  height: var(--navBtnHeight);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  border-radius: var(--navBtnRadius);
+  border: 0;
+  cursor: pointer;
+  font-weight: 900;
+  font-size: var(--navBtnFontSize);
+  letter-spacing: var(--navBtnLetterSpacing);
+  color: var(--navBtnColor);
+  text-transform: uppercase;
+  text-shadow: 0 2px 4px rgba(0,0,0,.5);
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+  background-position: center;
+  box-shadow: var(--navBtnShadow);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+  image-rendering: -webkit-optimize-contrast;
+  image-rendering: crisp-edges;
+  text-decoration: none;
+}
+
+.sf-btn::before {
+  content: attr(data-icon);
+  font-size: 20px;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  background: rgba(0,0,0,0.2);
+  border-radius: 8px;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+}
+
+.sf-btn:hover {
+  filter: brightness(1.1);
+  transform: translateX(4px);
+  box-shadow: 0 6px 20px rgba(0,0,0,.5);
+}
+
+.sf-btn:active {
+  transform: translateY(2px) translateX(4px);
+  filter: brightness(0.9);
+  box-shadow: 0 2px 10px rgba(0,0,0,.4);
+}
+
+.sf-btn.active {
+  filter: brightness(1.2);
+  border: 2px solid rgba(255,215,0,0.6);
+}
+
+.sf-btn--last {
+  text-align: center;
+  justify-content: center;
+  border: 2px solid rgba(255,215,0,0.3);
+}
+
+.menu-frame > .sf-btn:nth-child(1)  { background-image: url('tlacitko1.jpg'); }
+.menu-frame > .sf-btn:nth-child(2)  { background-image: url('tlacitko2.jpg'); }
+.menu-frame > .sf-btn:nth-child(3)  { background-image: url('tlacitko3.jpg'); }
+.menu-frame > .sf-btn:nth-child(4)  { background-image: url('tlacitko4.jpg'); }
+.menu-frame > .sf-btn:nth-child(5)  { background-image: url('tlacitko5.jpg'); }
+.menu-frame > .sf-btn:nth-child(7)  { background-image: url('tlacitko6.jpg'); }
+.menu-frame > .sf-btn:nth-child(8)  { background-image: url('tlacitko7.jpg'); }
+.menu-frame > .sf-btn:nth-child(9)  { background-image: url('tlacitko8.jpg'); }
+.menu-frame > .sf-btn:nth-child(10) { background-image: url('tlacitko9.jpg'); }
+.menu-frame > .sf-btn:nth-child(11) { background-image: url('tlacitko10.jpg'); }
+
+.divider {
+  height: var(--dividerHeight);
+  margin: var(--dividerMargin);
+  background: var(--dividerColor);
+  border-radius: 999px;
+  box-shadow: 0 1px 3px rgba(0,0,0,.2);
+}
+
+.menu-bottom {
+  display: flex;
+  justify-content: flex-start;
+  padding-top: 10px;
+  border-top: 2px solid rgba(255,255,255,.15);
+  box-shadow: 0 -1px 3px rgba(0,0,0,.1);
+}
+
+.gear-btn {
+  width: 48px;
+  height: 48px;
+  border-radius: 13px;
+  border: 0;
+  background: rgba(0,0,0,.3);
+  box-shadow: 0 4px 12px rgba(0,0,0,.3), inset 0 2px 0 rgba(255,255,255,.15);
+  font-size: 20px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.gear-btn:hover {
+  background: rgba(0,0,0,.4);
+  transform: translateY(-2px) rotate(45deg);
+  box-shadow: 0 6px 16px rgba(0,0,0,.4);
+}
+
+.gear-btn:active {
+  transform: translateY(1px) rotate(90deg);
+  box-shadow: 0 2px 8px rgba(0,0,0,.3);
+}
+
+/* ===== ARENA AREA ===== */
+.arena-area {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 10px 0;
+  height: 100%;
+  overflow: hidden;
+}
+
+.arena-title {
+  font-size: 32px;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 4px;
+  color: #fff;
+  text-shadow: 
+    0 0 20px rgba(255, 215, 100, 0.8),
+    0 0 40px rgba(255, 215, 100, 0.5),
+    0 4px 15px rgba(0,0,0,1),
+    0 8px 25px rgba(0,0,0,0.8);
+  padding: 10px 32px;
+  background: 
+    linear-gradient(135deg, 
+      rgba(139, 69, 19, 0.95) 0%,
+      rgba(101, 67, 33, 0.98) 50%,
+      rgba(139, 69, 19, 0.95) 100%);
+  border: 4px solid;
+  border-image: linear-gradient(135deg, #f1d27a, #c9a44a, #f1d27a) 1;
+  border-radius: 16px;
+  box-shadow: 
+    0 12px 40px rgba(0,0,0,.8),
+    inset 0 -4px 20px rgba(0,0,0,0.5),
+    inset 0 4px 20px rgba(255,215,100,0.2);
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.arena-title::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 215, 100, 0.3),
+    transparent
+  );
+  animation: shine 3s infinite;
+}
+
+@keyframes shine {
+  0% { left: -100%; }
+  50%, 100% { left: 100%; }
+}
+
+.arena-container {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 30px;
+  flex: 1;
+  overflow: hidden;
+}
+
+/* ===== PLAYER SECTION ===== */
+.player-section {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  background: 
+    linear-gradient(135deg, rgba(30,36,42,0.97), rgba(18,22,26,0.99)),
+    url('pozadi_menu.jpg');
+  background-size: cover;
+  background-position: center;
+  background-blend-mode: overlay;
+  border: 4px solid;
+  border-image: linear-gradient(135deg, #7a5a23, #c9a44a, #7a5a23) 1;
+  border-radius: 14px;
+  padding: 18px;
+  box-shadow: 
+    0 15px 45px rgba(0,0,0,.8),
+    inset 0 2px 10px rgba(255,215,100,0.1);
+  overflow: hidden;
+}
+
+.character-name-arena {
+  font-size: 22px;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: #f1d27a;
+  text-shadow: 
+    0 0 10px rgba(241, 210, 122, 0.5),
+    0 0 20px rgba(241, 210, 122, 0.3),
+    0 4px 8px rgba(0,0,0,.8);
+  padding: 8px 16px;
+  background: linear-gradient(135deg, rgba(60,40,25,0.7), rgba(35,22,14,0.8));
+  border: 2px solid rgba(255, 215, 100, 0.4);
+  border-radius: 12px;
+  box-shadow: 0 8px 20px rgba(0,0,0,.5);
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.character-name-arena.enemy {
+  color: #ff6b6b;
+  text-shadow: 
+    0 0 10px rgba(255, 107, 107, 0.5),
+    0 0 20px rgba(255, 107, 107, 0.3),
+    0 4px 8px rgba(0,0,0,.8);
+  border-color: rgba(255, 107, 107, 0.4);
+}
+
+.character-frame-arena {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 16px;
+  background: linear-gradient(135deg, rgba(30,36,42,0.9), rgba(18,22,26,0.95));
+  border: 4px solid #7a5a23;
+  border-radius: 12px;
+  box-shadow: 0 12px 35px rgba(0,0,0,.6);
+  flex-shrink: 0;
+}
+
+.character-arena {
+  position: relative;
+  width: 220px;
+  height: 300px;
+  background: radial-gradient(circle at center, rgba(44,47,52,0.8), rgba(15,17,20,0.95));
+  border: 4px solid #c9a44a;
+  border-radius: 8px;
+  box-shadow: inset 0 0 30px rgba(0,0,0,.4);
+  display: flex;
+  flex-direction: column;
+}
+
+.character-arena img {
+  width: 100%;
+  flex: 1;
+  object-fit: contain;
+}
+
+/* HEALTH BAR */
+.health-bar {
+  position: relative;
+  width: calc(100% - 16px);
+  height: 28px;
+  margin: 8px 8px 0 8px;
+  background: linear-gradient(135deg, rgba(20,20,20,0.95), rgba(10,10,10,0.98));
+  border: 3px solid #c9a44a;
+  border-radius: 6px;
+  overflow: hidden;
+  box-shadow: 
+    inset 0 3px 8px rgba(0,0,0,0.6),
+    0 3px 8px rgba(0,0,0,0.4);
+}
+
+.health-fill {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  background: linear-gradient(135deg, #2ecc71, #27ae60);
+  transition: width 0.5s ease;
+  box-shadow: 
+    inset 0 2px 6px rgba(255,255,255,0.3),
+    0 0 15px rgba(46, 204, 113, 0.6);
+}
+
+.health-bar.enemy .health-fill {
+  background: linear-gradient(135deg, #e74c3c, #c0392b);
+  box-shadow: 
+    inset 0 2px 6px rgba(255,255,255,0.3),
+    0 0 15px rgba(231, 76, 60, 0.6);
+}
+
+.health-text {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: #fff;
+  font-weight: 900;
+  font-size: 13px;
+  text-shadow: 
+    0 2px 4px rgba(0,0,0,0.9),
+    0 0 8px rgba(0,0,0,0.8);
+  z-index: 1;
+  letter-spacing: 0.5px;
+}
+
+.level-arena {
+  position: absolute;
+  bottom: 6px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 4px 12px;
+  background: linear-gradient(135deg, #f1d27a, #b8862b);
+  color: #2b1a0f;
+  font-weight: 900;
+  font-size: 12px;
+  border-radius: 6px;
+  box-shadow: 0 4px 12px rgba(0,0,0,.4);
+  border: 2px solid #fff0b0;
+  text-align: center;
+  min-width: 80px;
+}
+
+.level-arena.enemy {
+  background: linear-gradient(135deg, #ff6b6b, #d63031);
+  color: #fff;
+  border-color: #ff8787;
+}
+
+.slots-arena {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  justify-content: center;
+}
+
+.slot-arena {
+  width: 50px;
+  height: 50px;
+  display: grid;
+  place-items: center;
+  font-size: 24px;
+  background: radial-gradient(circle at center, rgba(58,63,70,0.9), rgba(26,31,36,0.95));
+  border: 3px solid #c9a44a;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+  box-shadow: inset 0 0 15px rgba(0,0,0,.3), 0 4px 8px rgba(0,0,0,.3);
+}
+
+.slot-arena:hover {
+  transform: scale(1.08);
+  border-color: #f1d27a;
+  box-shadow: 0 0 20px rgba(241, 210, 122, 0.4);
+}
+
+/* ===== STATS SECTION ARENA ===== */
+.stats-section-arena {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.stat-arena {
+  display: grid;
+  grid-template-columns: 1fr 50px;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  background-image: url('tlacitko.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  border: 2px solid #c9a44a;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+  box-shadow:
+    0 3px 8px rgba(0,0,0,.3),
+    inset 0 2px 0 rgba(255,255,255,.15);
+  image-rendering: -webkit-optimize-contrast;
+  image-rendering: crisp-edges;
+}
+
+.stat-arena:hover {
+  transform: translateX(3px);
+  border-color: #f1d27a;
+  box-shadow: 0 4px 12px rgba(0,0,0,.4);
+}
+
+.stat-arena.enemy {
+  border-color: #ff6b6b;
+}
+
+.stat-arena.enemy:hover {
+  border-color: #ff8787;
+}
+
+.stat-arena b {
+  text-align: center;
+  font-size: 16px;
+  font-weight: 900;
+  color: #f1d27a;
+  text-shadow: 0 2px 4px rgba(0,0,0,.8);
+}
+
+.stat-arena span {
+  color: #ffffff;
+  font-weight: 900;
+  font-size: 13px;
+  text-shadow: 0 2px 4px rgba(0,0,0,.5);
+}
+
+@media (max-width: 1200px) {
+  .arena-container {
+    grid-template-columns: 1fr;
+  }
+}

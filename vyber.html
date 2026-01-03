@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Výběr postavy</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-image: url('pozadi2.jpg');
+            background-size: cover;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .container {
+            display: flex;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+            width: 1200px;
+        }
+
+        .left-panel {
+            background-image: url('menu_bg.jpg');
+            background-size: cover;
+            padding: 20px;
+            width: 300px;
+            border-top-left-radius: 8px;
+            border-bottom-left-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .left-panel img {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            margin-bottom: 20px;
+        }
+
+        .left-panel button {
+            margin: 10px 0;
+            padding: 10px;
+            width: 100%;
+            background-image: url('tlacitko.jpg');
+            background-size: cover;
+            border: none;
+            cursor: pointer;
+            height: 50px;
+            transition: transform 0.3s ease;
+        }
+
+        .left-panel button:hover {
+            transform: scale(1.1);
+        }
+
+        .right-panel {
+            padding: 20px;
+            flex-grow: 1;
+            background-color: #ecf0f1;
+            border-top-right-radius: 8px;
+            border-bottom-right-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .character-image {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .character-image img {
+            max-width: 300px;
+            border: 3px solid #34495e;
+            padding: 5px;
+            border-radius: 10px;
+        }
+
+        .character-info {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            margin-bottom: 20px;
+        }
+
+        .character-info input {
+            width: 250px;
+            margin: 5px 0;
+            padding: 10px;
+            font-size: 16px;
+            border: 2px solid #34495e;
+            border-radius: 5px;
+            background-color: #fff;
+        }
+
+        .character-info input:focus {
+            border-color: #2ecc71; /* Změna barvy rámečku při kliknutí */
+            box-shadow: 0 0 5px rgba(46, 204, 113, 0.5); /* Efekt při focusu */
+        }
+
+        .arrows {
+            display: flex;
+            justify-content: space-between;
+            width: 60px;
+        }
+
+        .arrows div {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            height: 100px;
+        }
+
+        .arrows div button {
+            background-color: transparent;
+            border: none;
+            cursor: pointer;
+            font-size: 20px;
+            color: #34495e;
+            transition: color 0.3s ease;
+        }
+
+        .arrows div button:hover {
+            color: #2c3e50;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <!-- Levý panel -->
+        <div class="left-panel">
+            <img id="avatar-img" src="avatar.jpg" alt="Postava" />
+            <button onclick="changeHair()">Změnit vlasy</button>
+            <button onclick="changeNose()">Změnit nos</button>
+            <button onclick="changeClothes()">Změnit oblečení</button>
+            <button onclick="changeEyeColor()">Změnit barvu očí</button>
+            <button onclick="changeFacialHair()">Změnit vousy</button>
+            <button onclick="changeSkinTone()">Změnit pleť</button>
+            <button onclick="changeAccessory()">Změnit doplněk</button>
+            <button onclick="confirmCharacter()">Potvrdit výběr</button>
+        </div>
+
+        <!-- Pravý panel -->
+        <div class="right-panel">
+            <div class="character-image">
+                <img id="character-avatar" src="avatar.jpg" alt="Obrázek postavy" />
+            </div>
+
+            <div class="character-info">
+                <input id="nickname" type="text" value="Boris Gopnikov" placeholder="Změnit přezdívku" />
+            </div>
+
+            <div class="arrows">
+                <div>
+                    <button onclick="rotateCharacter('left')">←</button>
+                    <button onclick="rotateCharacter('right')">→</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Funkce pro změnu vzhledu
+        let avatarIndex = 0;
+
+        function changeHair() {
+            // Změna obrázku vlasů
+            avatarIndex = (avatarIndex + 1) % 3; // Simulace tří možností pro vlasy
+            updateAvatar();
+        }
+
+        function changeNose() {
+            // Změna nosu
+            avatarIndex = (avatarIndex + 1) % 3; // Simulace tří možností pro nos
+            updateAvatar();
+        }
+
+        function changeClothes() {
+            // Změna oblečení
+            avatarIndex = (avatarIndex + 1) % 3; // Simulace tří možností pro oblečení
+            updateAvatar();
+        }
+
+        function changeEyeColor() {
+            // Změna barvy očí
+            avatarIndex = (avatarIndex + 1) % 3; // Simulace tří možností pro barvu očí
+            updateAvatar();
+        }
+
+        function changeFacialHair() {
+            // Změna vousů
+            avatarIndex = (avatarIndex + 1) % 3; // Simulace tří možností pro vousy
+            updateAvatar();
+        }
+
+        function changeSkinTone() {
+            // Změna pleti
+            avatarIndex = (avatarIndex + 1) % 3; // Simulace tří možností pro pleť
+            updateAvatar();
+        }
+
+        function changeAccessory() {
+            // Změna doplňků (brýle, klobouk, atd.)
+            avatarIndex = (avatarIndex + 1) % 3; // Simulace tří možností pro doplňky
+            updateAvatar();
+        }
+
+        function updateAvatar() {
+            const avatarImages = [
+                "avatar.jpg", // Originální obrázek
+                "avatar_hair2.jpg", // Příklad změny vlasů
+                "avatar_nose2.jpg", // Příklad změny nosu
+                "avatar_clothes2.jpg", // Příklad změny oblečení
+                "avatar_eye_color2.jpg", // Příklad změny barvy očí
+                "avatar_facial_hair2.jpg", // Příklad změny vousů
+                "avatar_skin2.jpg" // Příklad změny pleti
+            ];
+
+            // Nastavení obrázku podle indexu
+            document.getElementById("character-avatar").src = avatarImages[avatarIndex];
+        }
+
+        // Funkce pro otáčení postavy (např. pro ukázání různých pohledů)
+        function rotateCharacter(direction) {
+            if (direction === 'left') {
+                avatarIndex = (avatarIndex + 1) % 7; // Rotace postavy doleva
+            } else {
+                avatarIndex = (avatarIndex + 6) % 7; // Rotace postavy doprava
+            }
+            updateAvatar();
+        }
+
+        // Funkce pro potvrzení výběru
+        function confirmCharacter() {
+            alert("Výběr postavy potvrzen!");
+        }
+    </script>
+
+</body>
+</html>
