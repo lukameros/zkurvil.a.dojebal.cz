@@ -4,15 +4,19 @@
   <meta charset="utf-8">
   <title>Postava</title>
   <link rel="stylesheet" href="postava.css">
+
+<script>
+    // Anti-loop: pokud jsme sem přišli z loadingu, už nepřesměrovávej
+    if (sessionStorage.getItem("skipLoadingOnce") === "1") {
+      sessionStorage.removeItem("skipLoadingOnce");
+    } else {
+      window.location.replace("loading.html?next=postava.html");
+    }
+  </script>
+</head>
+  
 </head>
 <body>
-
- // Anti-loop: pokud jsme sem přišli z loadingu, už nepřesměrovávej
-  if (sessionStorage.getItem("skipLoadingOnce") === "1") {
-    sessionStorage.removeItem("skipLoadingOnce");
-  } else {
-    window.location.replace("loading.html?next=postava.html");
-  }
   
 <div class="layout">
 
@@ -145,3 +149,4 @@
 </body>
 
 </html>
+
