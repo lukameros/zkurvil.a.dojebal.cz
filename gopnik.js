@@ -10,12 +10,18 @@ document.addEventListener("DOMContentLoaded", () => {
   const musicToggle       = document.getElementById("musicToggle");
   const langSelect        = document.getElementById("langSelect");
 
+  // left panel
+  const coinsEl     = document.getElementById("coins");
+  const mushEl      = document.getElementById("mushrooms");
+  const levelEl     = document.getElementById("sfLevel");
   const navSettings = document.getElementById("navSettings");
 
+  // shop buttons
   const btnCursor = document.getElementById("buyCursor");
   const btnGranny = document.getElementById("buyGranny");
   const btnClick  = document.getElementById("buyClick");
 
+  // right stats
   const moneyEl   = document.getElementById("money");
   const cpcEl     = document.getElementById("cpc");
   const cpsEl     = document.getElementById("cps");
@@ -27,7 +33,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const gopnikImg = document.getElementById("gopnikImg");
   const gopnikBtn = document.getElementById("gopnik");
 
-  // prestige refs
+  // prestige
   const spEl        = document.getElementById("sp");
   const bonusEl     = document.getElementById("bonus");
   const spGainEl    = document.getElementById("spGain");
@@ -39,7 +45,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const CLICK_COST   = 50;
 
   const PRESTIGE_MIN = 100000;
-  const SP_BONUS_PER_POINT = 0.02; // +2% za point
+  const SP_BONUS_PER_POINT = 0.02;
 
   // Combo
   const COMBO_WINDOW_MS = 900;
@@ -111,14 +117,110 @@ document.addEventListener("DOMContentLoaded", () => {
   };
 
   const el = (id) => document.getElementById(id);
-
   let lang = localStorage.getItem("slavLang") || "cs";
   function t(){ return i18n[lang] || i18n.cs; }
 
+  // ===== modal =====
+  function applyMusicEnabled(enabled){
+    localStorage.setItem("musicEnabled", enabled ? "1" : "0");
+    if(!bgMusic) return;
+
+    if(enabled){
+      bgMusic.muted = false;
+      bgMusic.volume = 0.35;
+      bgMusic.play().catch(()=>{});
+    }else{
+      bgMusic.pause();
+      bgMusic.currentTime = 0;
+    }
+  }
+
+  function openSettings(){
+    if(!settingsModal) return;
+    settingsModal.classList.add("show");
+    settingsModal.setAttribute("aria-hidden","false");
+    if(musicToggle?.checked) applyMusicEnabled(true);
+  }
+  function closeSettings(){
+    if(!settingsModal) return;
+    settingsModal.classList.remove("show");
+    settingsModal.setAttribute("aria-hidden","true");
+  }
+
+  btnSettings?.addEventListener("click", openSettings);
+  navSettings?.addEventListener("click", openSettings);
+  btnCloseSettings?.addEventListener("click", closeSettings);
+  settingsModal?.addEventListener("click", (e) => {
+    if(e.target === settingsModal) closeSettings();
+  });
+
+  // ===== game state =====
+  let money = 0, cpc = 1, cps = 0; // money = coins
+  let mushrooms = 0;              // druhá měna (zatím 0)
+  let slavPoints = 0;
+
+  let combo = 1.0;
+  let lastClickAt = 0;
+
+  let activeEvent = null;
+  let eventEndsAt = 0;
+  let nextEventTimer = null;
+
+  function totalPrestigeMultiplier(){
+    return 1 + (slavPoints * SP_BONUS_PER_POINT);
+  }
+  function calcPrestigeGain(currentMoney){
+    if(currentMoney < PRESTIGE_MIN) return 0;
+    return Math.floor(Math.sqrt(currentMoney / PRESTIGE_MIN));
+  }
+
+  function isEventActive(name){
+    return activeEvent === name && Date.now() < eventEndsAt;
+  }
+  function clickEventMultiplier(){
+    if(isEventActive("vodka")) return 1.5;
+    if(isEventActive("raid")) return 2.0;
+    return 1.0;
+  }
+  function cpsEventMultiplier(){
+    if(isEventActive("raid")) return 0.5;
+    return 1.0;
+  }
+  function shopDiscountMultiplier(){
+    if(isEventActive("market")) return 0.70;
+    return 1.0;
+  }
   function effectiveCost(base){
     return Math.ceil(base * shopDiscountMultiplier());
   }
 
+  // save/load
+  function getSave(){
+    return {
+      version: 3,
+      money, cpc, cps,
+      mushrooms,
+      slavPoints,
+      updatedAt: Date.now()
+    };
+  }
+  function applySave(d){
+    money = d?.money ?? 0;
+    cpc   = d?.cpc ?? 1;
+    cps   = d?.cps ?? 0;
+    mushrooms = d?.mushrooms ?? 0;
+    slavPoints = d?.slavPoints ?? 0;
+  }
+  function saveGame(){
+    localStorage.setItem("slavClickerSave", JSON.stringify(getSave()));
+  }
+  function loadGame(){
+    const s = localStorage.getItem("slavClickerSave");
+    if(!s) return;
+    try { applySave(JSON.parse(s)); } catch {}
+  }
+
+  // i18n apply
   function applyLang(newLang){
     lang = newLang;
     localStorage.setItem("slavLang", lang);
@@ -154,95 +256,7 @@ document.addEventListener("DOMContentLoaded", () => {
     renderEventLine();
   }
 
-  function applyMusicEnabled(enabled){
-    localStorage.setItem("musicEnabled", enabled ? "1" : "0");
-    if(!bgMusic) return;
-
-    if(enabled){
-      bgMusic.muted = false;
-      bgMusic.volume = 0.35;
-      bgMusic.play().catch(()=>{});
-    }else{
-      bgMusic.pause();
-      bgMusic.currentTime = 0;
-    }
-  }
-
-  function openSettings(){
-    if(!settingsModal) return;
-    settingsModal.classList.add("show");
-    settingsModal.setAttribute("aria-hidden","false");
-    if(musicToggle?.checked) applyMusicEnabled(true);
-  }
-  function closeSettings(){
-    if(!settingsModal) return;
-    settingsModal.classList.remove("show");
-    settingsModal.setAttribute("aria-hidden","true");
-  }
-
-  btnSettings?.addEventListener("click", openSettings);
-  navSettings?.addEventListener("click", openSettings);
-  btnCloseSettings?.addEventListener("click", closeSettings);
-  settingsModal?.addEventListener("click", (e) => {
-    if(e.target === settingsModal) closeSettings();
-  });
-  musicToggle?.addEventListener("change", () => applyMusicEnabled(musicToggle.checked));
-  langSelect?.addEventListener("change", () => applyLang(langSelect.value));
-
-  // ===== GAME STATE =====
-  let money = 0, cpc = 1, cps = 0;
-  let slavPoints = 0;
-
-  let combo = 1.0;
-  let lastClickAt = 0;
-
-  let activeEvent = null;
-  let eventEndsAt = 0;
-  let nextEventTimer = null;
-
-  function totalPrestigeMultiplier(){
-    return 1 + (slavPoints * SP_BONUS_PER_POINT);
-  }
-  function calcPrestigeGain(currentMoney){
-    if(currentMoney < PRESTIGE_MIN) return 0;
-    return Math.floor(Math.sqrt(currentMoney / PRESTIGE_MIN));
-  }
-
-  function isEventActive(name){
-    return activeEvent === name && Date.now() < eventEndsAt;
-  }
-  function clickEventMultiplier(){
-    if(isEventActive("vodka")) return 1.5;
-    if(isEventActive("raid")) return 2.0;
-    return 1.0;
-  }
-  function cpsEventMultiplier(){
-    if(isEventActive("raid")) return 0.5;
-    return 1.0;
-  }
-  function shopDiscountMultiplier(){
-    if(isEventActive("market")) return 0.70;
-    return 1.0;
-  }
-
-  function getSave(){
-    return { version: 2, money, cpc, cps, slavPoints, updatedAt: Date.now() };
-  }
-  function applySave(d){
-    money = d?.money ?? 0;
-    cpc   = d?.cpc ?? 1;
-    cps   = d?.cps ?? 0;
-    slavPoints = d?.slavPoints ?? 0;
-  }
-  function saveGame(){
-    localStorage.setItem("slavClickerSave", JSON.stringify(getSave()));
-  }
-  function loadGame(){
-    const s = localStorage.getItem("slavClickerSave");
-    if(!s) return;
-    try { applySave(JSON.parse(s)); } catch {}
-  }
-
+  // UI
   function renderEventLine(){
     const tr = t();
     if(!eventLine) return;
@@ -270,6 +284,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const prestigeMult = totalPrestigeMultiplier();
     const cpsMult = prestigeMult * cpsEventMultiplier();
 
+    // right panel
     if(moneyEl) moneyEl.textContent = Math.floor(money);
 
     const effClick = cpc * prestigeMult * combo * clickEventMultiplier();
@@ -282,6 +297,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if(critEl) critEl.textContent = `${Math.round(CRIT_CHANCE * 100)}%`;
     renderEventLine();
 
+    // shop buttons
     const cCost = effectiveCost(CURSOR_COST);
     const gCost = effectiveCost(GRANNY_COST);
     const kCost = effectiveCost(CLICK_COST);
@@ -299,15 +315,22 @@ document.addEventListener("DOMContentLoaded", () => {
       btnClick.textContent = `${t().upgrade} (${kCost})`;
     }
 
+    // prestige
     const gain = calcPrestigeGain(money);
     if(spEl) spEl.textContent = String(slavPoints);
     if(bonusEl) bonusEl.textContent = `+${Math.round((prestigeMult - 1) * 100)}%`;
     if(spGainEl) spGainEl.textContent = String(gain);
     if(btnPrestige) btnPrestige.disabled = gain <= 0;
 
+    // left top display
+    if(coinsEl) coinsEl.textContent = Math.floor(money).toLocaleString("en-US");
+    if(mushEl) mushEl.textContent = Math.floor(mushrooms).toLocaleString("en-US");
+    if(levelEl) levelEl.textContent = String(Math.max(1, Math.floor(1 + Math.log10(1 + money))));
+
     saveGame();
   }
 
+  // prestige
   function doPrestige(){
     const gain = calcPrestigeGain(money);
     if(gain <= 0) return;
@@ -329,6 +352,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
   btnPrestige?.addEventListener("click", doPrestige);
 
+  // shop
   btnCursor?.addEventListener("click", () => {
     const cost = effectiveCost(CURSOR_COST);
     if(money < cost) return;
@@ -351,8 +375,8 @@ document.addEventListener("DOMContentLoaded", () => {
     render();
   });
 
-  // ✅ A → B → C → A
-  const imgs = ["gopnik_A.png", "gopnik_B.png", "gopnik_C.png"];
+  // click (✅ jen A ↔ B, žádný gopnik_C)
+  const imgs = ["gopnik_A.png", "gopnik_B.png"];
   let imgIndex = 0;
 
   function updateComboOnClick(){
@@ -364,9 +388,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
     lastClickAt = now;
   }
-  function rollCrit(){
-    return Math.random() < CRIT_CHANCE;
-  }
+  function rollCrit(){ return Math.random() < CRIT_CHANCE; }
 
   gopnikBtn?.addEventListener("click", () => {
     if(clickSnd){
@@ -400,6 +422,7 @@ document.addEventListener("DOMContentLoaded", () => {
     render();
   });
 
+  // combo decay
   setInterval(() => {
     if(!lastClickAt) return;
     const idle = Date.now() - lastClickAt;
@@ -409,6 +432,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }, 250);
 
+  // passive income
   setInterval(() => {
     const prestigeMult = totalPrestigeMultiplier();
     const gain = cps * prestigeMult * cpsEventMultiplier();
@@ -416,12 +440,12 @@ document.addEventListener("DOMContentLoaded", () => {
     render();
   }, 1000);
 
+  // events
   function scheduleNextEvent(){
     clearTimeout(nextEventTimer);
     const delay = EVENT_MIN_MS + Math.random() * (EVENT_MAX_MS - EVENT_MIN_MS);
     nextEventTimer = setTimeout(startRandomEvent, delay);
   }
-
   function startRandomEvent(){
     if(activeEvent && Date.now() < eventEndsAt){
       scheduleNextEvent();
@@ -457,6 +481,8 @@ document.addEventListener("DOMContentLoaded", () => {
       bgMusic.currentTime = 0;
     }
   }
+  musicToggle?.addEventListener("change", () => applyMusicEnabled(musicToggle.checked));
+  langSelect?.addEventListener("change", () => applyLang(langSelect.value));
 
   if(langSelect) langSelect.value = lang;
   applyLang(lang);
