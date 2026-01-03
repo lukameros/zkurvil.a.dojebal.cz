@@ -49,32 +49,57 @@
   <!-- GAME -->
   <div class="wrap">
 
-    <!-- LEFT SIDEBAR (S&F layout) -->
+    <!-- LEFT SIDEBAR (S&F style) -->
     <aside class="sfSide">
-      <div class="sfSideTop">
-        <div class="sfSideLogo">SLAV <span>CLICKER</span></div>
+
+      <!-- TOP: avatar + currencies -->
+      <div class="sfTop">
+        <div class="sfAvatarBox">
+          <img id="avatarImg" class="sfAvatar" src="avatar.jpg" alt="avatar"
+               onerror="this.style.display='none'; document.getElementById('avatarFallback').style.display='grid';">
+          <div id="avatarFallback" class="sfAvatarFallback" style="display:none;">🙂</div>
+          <div class="sfLevelPill" id="sfLevel">1</div>
+        </div>
+
+        <div class="sfCurrencyCol">
+          <div class="sfCurrencyLine">
+            <span class="sfCoinIcon" aria-hidden="true"></span>
+            <b id="coins">0</b>
+          </div>
+          <div class="sfCurrencyLine">
+            <span class="sfMushIcon" aria-hidden="true"></span>
+            <b id="mushrooms">0</b>
+          </div>
+          <button class="sfPlusBtn" id="btnPlus" title="Plus">+</button>
+        </div>
       </div>
 
-      <!-- ✅ přesně 13 tlačítek, všechny TEST -->
-      <div class="sfSideNav">
-        <button class="sfBtn sfBtn--nav" id="btnTest1">TEST</button>
-        <button class="sfBtn sfBtn--nav" id="btnTest2">TEST</button>
-        <button class="sfBtn sfBtn--nav" id="btnTest3">TEST</button>
-        <button class="sfBtn sfBtn--nav" id="btnTest4">TEST</button>
-        <button class="sfBtn sfBtn--nav" id="btnTest5">TEST</button>
-        <button class="sfBtn sfBtn--nav" id="btnTest6">TEST</button>
-        <button class="sfBtn sfBtn--nav" id="btnTest7">TEST</button>
-        <button class="sfBtn sfBtn--nav" id="btnTest8">TEST</button>
-        <button class="sfBtn sfBtn--nav" id="btnTest9">TEST</button>
-        <button class="sfBtn sfBtn--nav" id="btnTest10">TEST</button>
-        <button class="sfBtn sfBtn--nav" id="btnTest11">TEST</button>
-        <button class="sfBtn sfBtn--nav" id="btnTest12">TEST</button>
-        <button class="sfBtn sfBtn--nav" id="btnTest13">TEST</button>
+      <!-- NAV BUTTONS -->
+      <div class="sfNav">
+        <button class="sfNavBtn">TAVERN</button>
+        <button class="sfNavBtn">ARENA</button>
+        <button class="sfNavBtn">WEAPON SHOP</button>
+        <button class="sfNavBtn">MAGIC SHOP</button>
+        <button class="sfNavBtn">STABLE</button>
+        <button class="sfNavBtn">DUNGEONS</button>
+        <button class="sfNavBtn">FORTRESS</button>
+
+        <div class="sfDivider"></div>
+
+        <button class="sfNavBtn">GUILD</button>
+        <button class="sfNavBtn">MAIL</button>
+        <button class="sfNavBtn">HALL OF FAME</button>
+        <button class="sfNavBtn">DR. ABAWUWU</button>
+
+        <!-- poslední -->
+        <button class="sfNavBtn sfNavBtn--last">SLAV CLICKER</button>
       </div>
 
-      <div class="sfSideBottom">
-        <button class="sfIconBtn" id="navSettings" title="Nastavení">⚙️</button>
+      <!-- BOTTOM: settings like on screenshot -->
+      <div class="sfBottom">
+        <button class="sfGearBtn" id="navSettings" title="Nastavení">⚙️</button>
       </div>
+
     </aside>
 
     <!-- MAIN AREA -->
@@ -84,7 +109,7 @@
       </div>
     </div>
 
-    <!-- RIGHT PANEL -->
+    <!-- RIGHT PANEL (ponechávám jak máš) -->
     <div class="panel">
 
       <div class="panelTop">
@@ -96,7 +121,6 @@
       <div class="stat"><span id="t_cpcLabel">Za klik:</span><b id="cpc">1</b></div>
       <div class="stat"><span id="t_cpsLabel">Za sekundu:</span><b id="cps">0</b></div>
 
-      <!-- HUD + EVENTS -->
       <div class="hud">
         <div class="hudLine"><span id="t_comboLabel">Combo:</span> <b id="combo">x1.00</b></div>
         <div class="hudLine"><span id="t_critLabel">Krit:</span> <b id="crit">10%</b></div>
