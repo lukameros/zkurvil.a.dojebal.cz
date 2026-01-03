@@ -10,17 +10,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const musicToggle       = document.getElementById("musicToggle");
   const langSelect        = document.getElementById("langSelect");
 
-  // sidebar nav
-  const navPlay     = document.getElementById("navPlay");
-  const navShop     = document.getElementById("navShop");
-  const navUpgrades = document.getElementById("navUpgrades");
-  const navPrestige = document.getElementById("navPrestige");
   const navSettings = document.getElementById("navSettings");
-
-  // sidebar stats
-  const moneySideEl = document.getElementById("moneySide");
-  const cpcSideEl   = document.getElementById("cpcSide");
-  const cpsSideEl   = document.getElementById("cpsSide");
 
   const btnCursor = document.getElementById("buyCursor");
   const btnGranny = document.getElementById("buyGranny");
@@ -125,6 +115,10 @@ document.addEventListener("DOMContentLoaded", () => {
   let lang = localStorage.getItem("slavLang") || "cs";
   function t(){ return i18n[lang] || i18n.cs; }
 
+  function effectiveCost(base){
+    return Math.ceil(base * shopDiscountMultiplier());
+  }
+
   function applyLang(newLang){
     lang = newLang;
     localStorage.setItem("slavLang", lang);
@@ -186,47 +180,26 @@ document.addEventListener("DOMContentLoaded", () => {
     settingsModal.setAttribute("aria-hidden","true");
   }
 
-  // ===== modal =====
   btnSettings?.addEventListener("click", openSettings);
   navSettings?.addEventListener("click", openSettings);
-
   btnCloseSettings?.addEventListener("click", closeSettings);
   settingsModal?.addEventListener("click", (e) => {
     if(e.target === settingsModal) closeSettings();
   });
-
   musicToggle?.addEventListener("change", () => applyMusicEnabled(musicToggle.checked));
   langSelect?.addEventListener("change", () => applyLang(langSelect.value));
-
-  // ===== nav actions =====
-  navPlay?.addEventListener("click", () => {
-    // jen vizuálně – klidně později dáme highlight
-    gopnikBtn?.scrollIntoView?.({ behavior: "smooth", block: "center" });
-  });
-  navShop?.addEventListener("click", () => {
-    document.getElementById("t_shopTitle")?.scrollIntoView?.({ behavior: "smooth", block: "start" });
-  });
-  navUpgrades?.addEventListener("click", () => {
-    document.getElementById("t_shopTitle")?.scrollIntoView?.({ behavior: "smooth", block: "start" });
-  });
-  navPrestige?.addEventListener("click", () => {
-    document.getElementById("t_prestigeTitle")?.scrollIntoView?.({ behavior: "smooth", block: "start" });
-  });
 
   // ===== GAME STATE =====
   let money = 0, cpc = 1, cps = 0;
   let slavPoints = 0;
 
-  // combo state
   let combo = 1.0;
   let lastClickAt = 0;
 
-  // event state
-  let activeEvent = null; // "vodka" | "raid" | "market" | null
+  let activeEvent = null;
   let eventEndsAt = 0;
   let nextEventTimer = null;
 
-  // ===== prestige =====
   function totalPrestigeMultiplier(){
     return 1 + (slavPoints * SP_BONUS_PER_POINT);
   }
@@ -235,7 +208,6 @@ document.addEventListener("DOMContentLoaded", () => {
     return Math.floor(Math.sqrt(currentMoney / PRESTIGE_MIN));
   }
 
-  // ===== event effects =====
   function isEventActive(name){
     return activeEvent === name && Date.now() < eventEndsAt;
   }
@@ -252,18 +224,9 @@ document.addEventListener("DOMContentLoaded", () => {
     if(isEventActive("market")) return 0.70;
     return 1.0;
   }
-  function effectiveCost(base){
-    return Math.ceil(base * shopDiscountMultiplier());
-  }
 
-  // ===== save/load =====
   function getSave(){
-    return {
-      version: 2,
-      money, cpc, cps,
-      slavPoints,
-      updatedAt: Date.now()
-    };
+    return { version: 2, money, cpc, cps, slavPoints, updatedAt: Date.now() };
   }
   function applySave(d){
     money = d?.money ?? 0;
@@ -280,7 +243,6 @@ document.addEventListener("DOMContentLoaded", () => {
     try { applySave(JSON.parse(s)); } catch {}
   }
 
-  // ===== UI helpers =====
   function renderEventLine(){
     const tr = t();
     if(!eventLine) return;
@@ -309,15 +271,12 @@ document.addEventListener("DOMContentLoaded", () => {
     const cpsMult = prestigeMult * cpsEventMultiplier();
 
     if(moneyEl) moneyEl.textContent = Math.floor(money);
-    if(moneySideEl) moneySideEl.textContent = Math.floor(money);
 
     const effClick = cpc * prestigeMult * combo * clickEventMultiplier();
     if(cpcEl) cpcEl.textContent = `${cpc} (≈ ${Math.floor(effClick)})`;
-    if(cpcSideEl) cpcSideEl.textContent = `${cpc}`;
 
     const effCps = cps * cpsMult;
     if(cpsEl) cpsEl.textContent = effCps.toFixed(1);
-    if(cpsSideEl) cpsSideEl.textContent = effCps.toFixed(1);
 
     if(comboEl) comboEl.textContent = `x${combo.toFixed(2)}`;
     if(critEl) critEl.textContent = `${Math.round(CRIT_CHANCE * 100)}%`;
@@ -349,7 +308,6 @@ document.addEventListener("DOMContentLoaded", () => {
     saveGame();
   }
 
-  // ===== prestige action =====
   function doPrestige(){
     const gain = calcPrestigeGain(money);
     if(gain <= 0) return;
@@ -358,7 +316,6 @@ document.addEventListener("DOMContentLoaded", () => {
     if(!ok) return;
 
     slavPoints += gain;
-
     money = 0;
     cpc = 1;
     cps = 0;
@@ -372,7 +329,6 @@ document.addEventListener("DOMContentLoaded", () => {
   }
   btnPrestige?.addEventListener("click", doPrestige);
 
-  // ===== shop =====
   btnCursor?.addEventListener("click", () => {
     const cost = effectiveCost(CURSOR_COST);
     if(money < cost) return;
@@ -395,7 +351,7 @@ document.addEventListener("DOMContentLoaded", () => {
     render();
   });
 
-  // ===== combo + click gain =====
+  // ✅ A → B → C → A
   const imgs = ["gopnik_A.png", "gopnik_B.png", "gopnik_C.png"];
   let imgIndex = 0;
 
@@ -444,7 +400,6 @@ document.addEventListener("DOMContentLoaded", () => {
     render();
   });
 
-  // combo decay
   setInterval(() => {
     if(!lastClickAt) return;
     const idle = Date.now() - lastClickAt;
@@ -454,7 +409,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }, 250);
 
-  // passive income
   setInterval(() => {
     const prestigeMult = totalPrestigeMultiplier();
     const gain = cps * prestigeMult * cpsEventMultiplier();
@@ -462,7 +416,6 @@ document.addEventListener("DOMContentLoaded", () => {
     render();
   }, 1000);
 
-  // ===== events scheduler =====
   function scheduleNextEvent(){
     clearTimeout(nextEventTimer);
     const delay = EVENT_MIN_MS + Math.random() * (EVENT_MAX_MS - EVENT_MIN_MS);
@@ -495,7 +448,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }, (dur + 0.2) * 1000);
   }
 
-  // ===== init =====
+  // init
   const savedMusic = localStorage.getItem("musicEnabled");
   if(musicToggle){
     musicToggle.checked = (savedMusic !== "0");
@@ -511,12 +464,10 @@ document.addEventListener("DOMContentLoaded", () => {
   loadGame();
   render();
 
-  // loading click starts music (allowed user gesture)
   loading?.addEventListener("click", () => {
     if(musicToggle?.checked) applyMusicEnabled(true);
     loading.style.display = "none";
   }, { once:true });
 
-  // start event loop
   scheduleNextEvent();
 });
