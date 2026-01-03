@@ -6,7 +6,7 @@
   <link rel="stylesheet" href="arena.css">
 </head>
 <body>
-
+<audio id="bgMusic" src="go.mp3" loop preload="auto"></audio>
 <div class="layout">
 
   <!-- LEVÉ PANEL - GOPNIK STYL -->
@@ -185,6 +185,27 @@
 </div>
 
 <script src="arena.js"></script>
+<script>
+const music = document.getElementById("bgMusic");
 
+if (localStorage.getItem("musicPlaying") === "true") {
+  music.currentTime = parseFloat(localStorage.getItem("musicTime")) || 0;
+  music.volume = 0.4;
+  music.play();
+}
+
+document.addEventListener("click", () => {
+  if (music.paused) {
+    music.play();
+    localStorage.setItem("musicPlaying", "true");
+  }
+}, { once: true });
+
+setInterval(() => {
+  if (!music.paused) {
+    localStorage.setItem("musicTime", music.currentTime);
+  }
+}, 500);
+</script>
 </body>
 </html>
