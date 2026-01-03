@@ -233,7 +233,7 @@ body{
   <div class="ui">
     <div class="panel">
       <div class="title" id="loadingText">Načítání<span class="dots"></span></div>
-      <div class="sub">Připravuji gopnika</div>
+	<div class="sub"></div>
 
       <div class="bar" aria-label="Loading">
         <div class="fill" id="fill"></div>
@@ -244,16 +244,8 @@ body{
 </div>
 
 <script>
-const params = new URLSearchParams(window.location.search);
-const NEXT_PAGE = params.get("next") || "postava.html";
-const frames = [
-  "anim1.jpg",
-  "anim2.jpg",
-  "anim3.jpg",
-  "anim4.jpg",
-  "anim5.jpg"
-];
-
+const NEXT_PAGE = "gopnik.html";
+const frames = ["anim1.jpg","anim2.jpg","anim3.jpg","anim4.jpg","anim5.jpg"];
 
 // přesně 15 sekund celkem
 const TOTAL_TIME = 15000;
@@ -267,9 +259,12 @@ const img  = document.getElementById("bgImg");
 const fill = document.getElementById("fill");
 const pct  = document.getElementById("pct");
 const text = document.getElementById("loadingText");
+const sub  = document.querySelector(".sub");
+const panel = document.querySelector(".panel");
 
 let index = 0;
 let start = performance.now();
+let ready = false;
 
 function restartKenBurns(){
   img.classList.remove("kenburns");
@@ -288,6 +283,33 @@ setInterval(() => {
   }, 520);
 }, FRAME_TIME);
 
+// po 100% zobrazí "klikni pro spuštění"
+function showStart(){
+  if (ready) return;
+  ready = true;
+
+  // texty
+  text.innerHTML = 'Připraveno';
+  sub.textContent = 'Klikni pro spuštění hry';
+
+  // zastavíme animaci teček
+  text.classList.remove("dots");
+
+  // uděláme z panelu "tlačítko"
+  panel.style.cursor = "pointer";
+  panel.style.userSelect = "none";
+
+  // klik (stačí jednou)
+  panel.addEventListener("click", () => {
+    // řekneme hře, že se má hudba pustit
+    localStorage.setItem("musicPlaying", "true");
+    // vynuluj čas, nebo nech jak chceš:
+    localStorage.setItem("musicTime", "0");
+
+    location.href = NEXT_PAGE;
+  }, { once: true });
+}
+
 // progress
 function update(){
   const elapsed = performance.now() - start;
@@ -297,25 +319,21 @@ function update(){
   fill.style.width = percent + "%";
   pct.textContent = percent + "%";
 
-  if (percent < 33) text.innerHTML = 'Načítání<span class="dots"></span>';
-  else if (percent < 66) text.innerHTML = 'Připravuji obsah<span class="dots"></span>';
-  else text.innerHTML = 'Dokončuji přípravy<span class="dots"></span>';
+  if (!ready){
+    if (percent < 33) text.innerHTML = 'Načítání<span class="dots"></span>';
+    else if (percent < 66) text.innerHTML = 'Načítám soubory<span class="dots"></span>';
+    else text.innerHTML = 'Dokončuji přípravy<span class="dots"></span>';
+  }
 
- if (percent >= 100){
-  setTimeout(() => {
-    sessionStorage.setItem("skipLoadingOnce", "1");
-    window.location.replace(NEXT_PAGE);
-  }, 250);
-  return;
-}
-
+  if (percent >= 100){
+    showStart();
+    return; // už nepokračuj v RAF
+  }
   requestAnimationFrame(update);
 }
 requestAnimationFrame(update);
 </script>
 
+
 </body>
 </html>
-
-
-
