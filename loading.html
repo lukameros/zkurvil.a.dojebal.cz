@@ -244,7 +244,8 @@ body{
 </div>
 
 <script>
-const NEXT_PAGE = "gopnik.html";
+const params = new URLSearchParams(window.location.search);
+const NEXT_PAGE = params.get("next") || "postava.html";
 const frames = ["anim1.jpg","anim2.jpg","anim3.jpg"];
 
 // přesně 15 sekund celkem
@@ -304,3 +305,4 @@ requestAnimationFrame(update);
 
 </body>
 </html>
+
