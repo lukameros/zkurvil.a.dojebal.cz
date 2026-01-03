@@ -1,0 +1,197 @@
+<!doctype html>
+<html lang="cs">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Slav Clicker</title>
+  <link rel="stylesheet" href="gopnik.css">
+</head>
+
+<body>
+
+  <!-- LOADING -->
+  <div id="loading">
+    <div class="loader">
+      <div class="title">SLAV CLICKER</div>
+      <div class="hint" id="t_startHint">klikni pro start</div>
+    </div>
+  </div>
+
+  <!-- AUDIO -->
+  <audio id="clickSnd" src="click.mp3" preload="auto"></audio>
+  <audio id="bgMusic" src="go.mp3" preload="auto" loop></audio>
+
+  <!-- SETTINGS MODAL -->
+  <div id="settingsModal" class="modal" aria-hidden="true">
+    <div class="modalBox">
+      <div class="modalHeader">
+        <div id="t_settingsTitle" class="modalTitle">Nastavení</div>
+        <button id="btnCloseSettings" class="iconBtn" title="Zavřít" aria-label="Zavřít">✖</button>
+      </div>
+
+      <div class="modalRow">
+        <label class="switchRow">
+          <input type="checkbox" id="musicToggle" checked>
+          <span id="t_musicLabel">Hudba</span>
+        </label>
+      </div>
+
+      <div class="modalRow">
+        <label for="langSelect" id="t_langLabel">Jazyk</label>
+        <select id="langSelect" class="select">
+          <option value="cs">Čeština</option>
+          <option value="en">English</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <!-- GAME -->
+  <div class="wrap">
+
+    <!-- LEFT SIDEBAR -->
+    <aside class="sfSide">
+
+      <!-- TOP -->
+      <div class="sfTop">
+
+        <!-- PLUS VPRAVO NAHOŘE (JAK NA OBRÁZKU) -->
+        <button class="sfPlusBtn skinBtn" id="btnPlus" title="Plus" aria-label="Plus">+</button>
+
+        <div class="sfAvatarBox">
+          <img
+            id="avatarImg"
+            class="sfAvatar"
+            src="avatar.jpg"
+            alt="avatar"
+            onerror="this.style.display='none'; document.getElementById('avatarFallback').style.display='grid';"
+          >
+          <div id="avatarFallback" class="sfAvatarFallback" style="display:none;">🙂</div>
+          <div class="sfLevelPill" id="sfLevel">1</div>
+        </div>
+
+        <div class="sfCurrencyCol">
+          <div class="sfCurrencyLine">
+            <span class="sfCurIcon">₽</span>
+            <b id="coins">0</b>
+          </div>
+          <div class="sfCurrencyLine">
+            <span class="sfCurIcon">🚬</span>
+            <b id="mushrooms">0</b>
+          </div>
+        </div>
+      </div>
+
+      <!-- NAV -->
+      <div class="sfNav">
+
+        <button
+          class="sfNavBtn skinNav"
+          data-icon="🍺"
+          onclick="window.location.href='postava.html'">
+          POSTAVA
+        </button>
+
+        <button
+  class="sfNavBtn skinNav"
+  data-icon="⚔️"
+  onclick="window.location.href='arena.html'">
+  ARENA
+</button>
+
+<button
+  class="sfNavBtn skinNav"
+  data-icon="🗡️"
+  onclick="window.location.href='shop.html'">
+  SHOP
+</button>
+
+        <button class="sfNavBtn skinNav" data-icon="🔮">MAGIC SHOP</button>
+        <button class="sfNavBtn skinNav" data-icon="🐴">STABLE</button>
+
+        <div class="sfDivider"></div>
+
+        <button class="sfNavBtn skinNav" data-icon="👥">GUILD</button>
+        <button class="sfNavBtn skinNav" data-icon="✉️">MAIL</button>
+        <button class="sfNavBtn skinNav" data-icon="🏆">HALL OF FAME</button>
+        <button class="sfNavBtn skinNav" data-icon="🧙">DR. ABAWUWU</button>
+        <button class="sfNavBtn sfNavBtn--last skinNav" data-icon="🎮">SLAV CLICKER</button>
+
+      </div>
+
+      <!-- BOTTOM -->
+      <div class="sfBottom">
+        <button class="sfGearBtn skinBtn" id="navSettings" title="Nastavení" aria-label="Nastavení">⚙️</button>
+      </div>
+
+    </aside>
+
+    <!-- MAIN -->
+    <div class="leftcol">
+      <div class="ring" id="gopnik">
+        <img id="gopnikImg" src="gopnik_A.png" alt="gopnik">
+      </div>
+    </div>
+
+    <!-- RIGHT PANEL -->
+    <div class="panel">
+
+      <div class="panelTop">
+        <button id="btnSettings" class="iconBtn skinBtn" title="Nastavení" aria-label="Nastavení">⚙️</button>
+      </div>
+
+      <h2 id="t_moneyTitle">PENÍZE</h2>
+      <div class="stat"><span id="t_moneyLabel">Peníze:</span><b id="money">0</b></div>
+      <div class="stat"><span id="t_cpcLabel">Za klik:</span><b id="cpc">1</b></div>
+      <div class="stat"><span id="t_cpsLabel">Za sekundu:</span><b id="cps">0</b></div>
+
+      <div class="hud">
+        <div class="hudLine"><span id="t_comboLabel">Combo:</span> <b id="combo">x1.00</b></div>
+        <div class="hudLine"><span id="t_critLabel">Krit:</span> <b id="crit">10%</b></div>
+        <div class="hudLine hudEvent" id="eventLine">—</div>
+      </div>
+
+      <h2 id="t_shopTitle" style="margin-top:15px">OBCHOD</h2>
+
+      <div class="item">
+        <b id="t_itemCursor">Kurzor</b><br>
+        +0.2 / s<br>
+        <button id="buyCursor" class="skinBtn">Koupit (25)</button>
+      </div>
+
+      <div class="item">
+        <b id="t_itemGranny">Babička</b><br>
+        +2 / s<br>
+        <button id="buyGranny" class="skinBtn">Koupit (150)</button>
+      </div>
+
+      <div class="item">
+        <b id="t_itemClick">Síla kliku</b><br>
+        <button id="buyClick" class="skinBtn">Vylepšit (80)</button>
+      </div>
+
+      <h2 id="t_prestigeTitle" style="margin-top:15px">PRESTIGE</h2>
+
+      <div class="item prestigeBox">
+        <div class="prestigeStat"><span id="t_spLabel">Slav Points:</span><b id="sp">0</b></div>
+        <div class="prestigeStat"><span id="t_bonusLabel">Bonus celkem:</span><b id="bonus">+0%</b></div>
+
+        <div class="prestigeBonus">
+          <span id="t_gainLabel">Získáš při prestiži:</span> <b id="spGain">0</b>
+        </div>
+
+        <button id="btnPrestige" class="prestigeBtn skinBtn" disabled>
+          Prestige (reset)
+        </button>
+
+        <small id="t_prestigeHint" class="prestigeHint">
+          Resetuje peníze a upgradey, ale dá trvalý bonus.
+        </small>
+      </div>
+
+    </div>
+  </div>
+
+  <script src="gopnik.js"></script>
+</body>
+</html>
