@@ -294,10 +294,14 @@ function update(){
   else if (percent < 66) text.innerHTML = 'Připravuji obsah<span class="dots"></span>';
   else text.innerHTML = 'Dokončuji přípravy<span class="dots"></span>';
 
-  if (percent >= 100){
-    setTimeout(() => location.href = NEXT_PAGE, 250);
-    return;
-  }
+ if (percent >= 100){
+  setTimeout(() => {
+    sessionStorage.setItem("skipLoadingOnce", "1");
+    window.location.replace(NEXT_PAGE);
+  }, 250);
+  return;
+}
+
   requestAnimationFrame(update);
 }
 requestAnimationFrame(update);
@@ -305,4 +309,5 @@ requestAnimationFrame(update);
 
 </body>
 </html>
+
 
